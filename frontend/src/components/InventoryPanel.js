@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Plus, Edit, Trash2, CheckCircle, Home } from 'lucide-react';
 import { toast } from 'sonner';
 import { propertyAPI } from '../utils/api';
+import FileUploader from './FileUploader';
 
 const InventoryPanel = () => {
   const [properties] = useState([
@@ -201,23 +202,23 @@ const InventoryPanel = () => {
               />
             </div>
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-[#264653] mb-1">Image URLs (comma-separated)</label>
-              <input
-                type="text"
-                placeholder="https://example.com/image1.jpg, https://example.com/image2.jpg"
-                value={formData.images.join(', ')}
-                onChange={(e) => setFormData({ ...formData, images: e.target.value.split(',').map(url => url.trim()).filter(url => url) })}
-                className="input-field"
+              <FileUploader
+                type="image"
+                multiple={true}
+                label="Property Images"
+                onUploadComplete={(urls) => {
+                  setFormData({ ...formData, images: Array.isArray(urls) ? urls : [urls] });
+                }}
               />
             </div>
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-[#264653] mb-1">Video Tour URL (optional)</label>
-              <input
-                type="url"
-                placeholder="https://example.com/video.mp4"
-                value={formData.video_url}
-                onChange={(e) => setFormData({ ...formData, video_url: e.target.value })}
-                className="input-field"
+              <FileUploader
+                type="video"
+                multiple={false}
+                label="Property Video Tour (Optional)"
+                onUploadComplete={(url) => {
+                  setFormData({ ...formData, video_url: url });
+                }}
               />
             </div>
             <div className="md:col-span-2">

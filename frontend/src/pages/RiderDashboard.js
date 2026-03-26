@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { visitAPI } from '../utils/api';
 import { MapPin, Phone, Camera, CheckCircle, Clock, IndianRupee, LogOut } from 'lucide-react';
 import { toast } from 'sonner';
+import VisitProofUpload from '../components/VisitProofUpload';
 
 const RiderDashboard = () => {
   const { user, logout } = useAuth();
@@ -10,6 +11,7 @@ const RiderDashboard = () => {
   const [activeVisit, setActiveVisit] = useState(null);
   const [loading, setLoading] = useState(true);
   const [earnings, setEarnings] = useState({ today: 0, thisWeek: 0 });
+  const [showProofUpload, setShowProofUpload] = useState(false);
 
   useEffect(() => {
     loadAvailableVisits();
@@ -103,12 +105,31 @@ const RiderDashboard = () => {
                   <Phone className="w-4 h-4" />
                   Call Customer
                 </button>
-                <button className="btn-secondary bg-white text-[#2A9D8F] hover:bg-gray-50 flex items-center justify-center gap-2">
+                <button
+                  onClick={() => setShowProofUpload(!showProofUpload)}
+                  className="btn-secondary bg-white text-[#2A9D8F] hover:bg-gray-50 flex items-center justify-center gap-2"
+                  data-testid="upload-proof-toggle"
+                >
                   <Camera className="w-4 h-4" />
                   Upload Proof
                 </button>
               </div>
             </div>
+          </div>
+        )}
+
+        {/* Proof Upload Modal */}
+        {showProofUpload && activeVisit && (
+          <div className="bg-white rounded-xl border border-[#E5E3D8] p-6 mb-6">
+            <VisitProofUpload
+              visitId={activeVisit.visit?.id}
+              onComplete={() => {
+                toast.success('Visit completed successfully!');
+                setShowProofUpload(false);
+                setActiveVisit(null);
+                loadAvailableVisits();
+              }}
+            />
           </div>
         )}
 
