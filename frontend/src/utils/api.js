@@ -21,40 +21,23 @@ export const authAPI = {
   getMe: () => api.get('/auth/me'),
 };
 
-export const riderAPI = {
-  getRiders: (city) => api.get('/riders', { params: { city } }),
-  getRider: (riderId) => api.get(`/riders/${riderId}`),
-  createRider: (data) => api.post('/riders', data),
-  toggleDuty: (riderId, data) => api.post(`/riders/${riderId}/duty`, data),
-  updateLocation: (riderId, data) => api.post(`/riders/${riderId}/location`, data),
-  getStats: (riderId) => api.get(`/riders/${riderId}/stats`),
+export const propertyAPI = {
+  getProperties: (filters) => api.get('/properties', { params: filters }),
+  getProperty: (id) => api.get(`/properties/${id}`),
+  createProperty: (data) => api.post('/properties', data),
 };
 
-export const siteVisitAPI = {
-  getSiteVisits: (params) => api.get('/site-visits', { params }),
-  createSiteVisit: (data) => api.post('/site-visits', data),
-  updateSiteVisit: (visitId, data) => api.patch(`/site-visits/${visitId}`, data),
+export const paymentAPI = {
+  createCheckout: (packageId, originUrl, propertyId) => 
+    api.post('/payments/checkout', { package_id: packageId, origin_url: originUrl, property_id: propertyId }),
+  getPaymentStatus: (sessionId) => api.get(`/payments/status/${sessionId}`),
 };
 
-export const boardAPI = {
-  getBoards: (city) => api.get('/tolet-boards', { params: { city } }),
-  createBoard: (data) => api.post('/tolet-boards', data),
-};
-
-export const brokerAPI = {
-  getBrokerVisits: (city) => api.get('/broker-visits', { params: { city } }),
-  createBrokerVisit: (data) => api.post('/broker-visits', data),
-};
-
-export const dashboardAPI = {
-  getAdminDashboard: () => api.get('/dashboard/admin'),
-  getCityManagerDashboard: () => api.get('/dashboard/city-manager'),
-  getLeaderboard: () => api.get('/leaderboard'),
-};
-
-export const notificationAPI = {
-  getNotifications: () => api.get('/notifications'),
-  markRead: (notifId) => api.patch(`/notifications/${notifId}/read`),
+export const visitAPI = {
+  bookVisit: (data) => api.post('/visits/book', data),
+  getMyBookings: () => api.get('/visits/my-bookings'),
+  getAvailableVisits: () => api.get('/visits/available'),
+  acceptVisit: (visitId) => api.post(`/visits/${visitId}/accept`),
 };
 
 export default api;

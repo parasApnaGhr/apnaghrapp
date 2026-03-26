@@ -31,13 +31,18 @@ export const AuthProvider = ({ children }) => {
     return response.data.user;
   };
 
+  const register = async (data) => {
+    const response = await authAPI.register(data);
+    return response.data;
+  };
+
   const logout = () => {
     localStorage.removeItem('token');
     setUser(null);
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
       {children}
     </AuthContext.Provider>
   );

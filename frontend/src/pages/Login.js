@@ -2,125 +2,158 @@ import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { LogIn, Bike } from 'lucide-react';
+import { Home, LogIn } from 'lucide-react';
 
 const Login = () => {
-  const [phone, setPhone] = useState('');
-  const [password, setPassword] = useState('');
+  const [isRegister, setIsRegister] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    phone: '',
+    email: '',
+    password: '',
+    role: 'customer',
+  });
   const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
+  const { login, register } = useAuth();
   const navigate = useNavigate();
 
-  const handleLogin = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      const user = await login(phone, password);
-      toast.success('Login successful!');
+      if (isRegister) {
+        await register(formData);
+        toast.success('Registration successful! Please login.');
+        setIsRegister(false);
+      } else {
+        const user = await login(formData.phone, formData.password);
+        toast.success('Login successful!');
 
-      if (user.role === 'admin') {
-        navigate('/admin');
-      } else if (user.role === 'city_manager') {
-        navigate('/city-manager');
-      } else if (user.role === 'call_center') {
-        navigate('/call-center');
-      } else if (user.role === 'rider') {
-        navigate('/rider');
+        if (user.role === 'customer') {
+          navigate('/customer');
+        } else if (user.role === 'rider') {
+          navigate('/rider');
+        } else if (user.role === 'admin' || user.role === 'support_admin' || user.role === 'inventory_admin' || user.role === 'rider_admin') {
+          navigate('/admin');
+        }
       }
     } catch (error) {
-      toast.error(error.response?.data?.detail || 'Login failed');
+      toast.error(error.response?.data?.detail || 'Operation failed');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex">
-      <div
-        className="hidden lg:flex lg:w-1/2 relative bg-cover bg-center"
-        style={{
-          backgroundImage: 'url(https://images.unsplash.com/photo-1733565823567-ca12618dec46?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1NjZ8MHwxfHNlYXJjaHwxfHxpbmRpYW4lMjBkZWxpdmVyeSUyMHJpZGVyJTIwbW90b3JiaWtlJTIwaGFwcHl8ZW58MHx8fHwxNzczNjQ4OTY5fDA&ixlib=rb-4.1.0&q=85)',
-        }}
-      >
-        <div className="absolute inset-0 bg-indigo-900 bg-opacity-40"></div>
-        <div className="relative z-10 p-12 text-white flex flex-col justify-end">
-          <h1 className="text-6xl font-black mb-4" style={{ fontFamily: 'Barlow Condensed' }}>
-            ApnaGhr Field Ops
-          </h1>
-          <p className="text-xl font-medium">Operating System for Field Riders</p>
-        </div>
-      </div>
-
-      <div className="flex-1 flex items-center justify-center p-8 bg-slate-50">
-        <div className="w-full max-w-md">
-          <div className="bg-white rounded-2xl border border-slate-200 p-8 shadow-sm">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 bg-indigo-600 rounded-xl flex items-center justify-center">
-                <Bike className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <h2 className="text-2xl font-bold" style={{ fontFamily: 'Barlow Condensed' }}>
-                  Sign In
-                </h2>
-                <p className="text-sm text-slate-500">Access your dashboard</p>
-              </div>
-            </div>
-
-            <form onSubmit={handleLogin} className="space-y-6">
-              <div>
-                <label className="text-sm font-medium text-slate-700 mb-1.5 block">
-                  Phone Number
-                </label>
-                <input
-                  type="tel"
-                  data-testid="login-phone-input"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  placeholder="Enter phone number"
-                  className="input-field"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="text-sm font-medium text-slate-700 mb-1.5 block">
-                  Password
-                </label>
-                <input
-                  type="password"
-                  data-testid="login-password-input"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter password"
-                  className="input-field"
-                  required
-                />
-              </div>
-
-              <button
-                type="submit"
-                data-testid="login-submit-button"
-                disabled={loading}
-                className="btn-primary w-full flex items-center justify-center gap-2"
-              >
-                {loading ? (
-                  'Signing in...'
-                ) : (
-                  <>
-                    <LogIn className="w-4 h-4" />
-                    Sign In
-                  </>
-                )}
-              </button>
-            </form>
-
-            <div className="mt-6 pt-6 border-t border-slate-200">
-              <p className="text-sm text-slate-500 text-center">
-                Demo accounts available for testing
-              </p>
-            </div>
+    <div className="min-h-screen flex items-center justify-center p-4" style={{ background: 'linear-gradient(135deg, #FAF9F6 0%, #F3F2EB 100%)' }}>
+      <div className="w-full max-w-md">
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-[#E07A5F] rounded-2xl mb-4">
+            <Home className="w-8 h-8 text-white" />
           </div>
+          <h1 className="text-4xl font-bold mb-2" style={{ fontFamily: 'Outfit' }}>ApnaGhr</h1>
+          <p className="text-[#4A626C]">Book property visits, pay only ₹200</p>
+        </div>
+
+        <div className="bg-white rounded-2xl border border-[#E5E3D8] p-8 shadow-sm">
+          <h2 className="text-2xl font-bold mb-6" style={{ fontFamily: 'Outfit' }}>
+            {isRegister ? 'Create Account' : 'Sign In'}
+          </h2>
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {isRegister && (
+              <div>
+                <label className="block text-sm font-medium text-[#264653] mb-1.5">Full Name</label>
+                <input
+                  type="text"
+                  data-testid="register-name-input"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  className="input-field"
+                  required
+                />
+              </div>
+            )}
+
+            <div>
+              <label className="block text-sm font-medium text-[#264653] mb-1.5">Phone Number</label>
+              <input
+                type="tel"
+                data-testid="login-phone-input"
+                value={formData.phone}
+                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                placeholder="Enter your phone"
+                className="input-field"
+                required
+              />
+            </div>
+
+            {isRegister && (
+              <div>
+                <label className="block text-sm font-medium text-[#264653] mb-1.5">Email (optional)</label>
+                <input
+                  type="email"
+                  data-testid="register-email-input"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  className="input-field"
+                />
+              </div>
+            )}
+
+            <div>
+              <label className="block text-sm font-medium text-[#264653] mb-1.5">Password</label>
+              <input
+                type="password"
+                data-testid="login-password-input"
+                value={formData.password}
+                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                placeholder="Enter password"
+                className="input-field"
+                required
+              />
+            </div>
+
+            {isRegister && (
+              <div>
+                <label className="block text-sm font-medium text-[#264653] mb-1.5">Register as</label>
+                <select
+                  data-testid="role-select"
+                  value={formData.role}
+                  onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                  className="input-field"
+                >
+                  <option value="customer">Customer (Looking for property)</option>
+                  <option value="rider">Rider (Field Executive)</option>
+                </select>
+              </div>
+            )}
+
+            <button
+              type="submit"
+              data-testid="login-submit-button"
+              disabled={loading}
+              className="btn-primary w-full flex items-center justify-center gap-2"
+            >
+              {loading ? 'Please wait...' : isRegister ? 'Create Account' : 'Sign In'}
+              {!loading && <LogIn className="w-4 h-4" />}
+            </button>
+          </form>
+
+          <div className="mt-6 text-center">
+            <button
+              onClick={() => setIsRegister(!isRegister)}
+              className="text-[#E07A5F] font-medium hover:underline"
+            >
+              {isRegister ? 'Already have an account? Sign in' : "Don't have an account? Register"}
+            </button>
+          </div>
+        </div>
+
+        <div className="mt-6 text-center text-sm text-[#4A626C]">
+          <p>Demo: Customer - 9999999999 / test123</p>
+          <p>Rider - 8888888888 / test123</p>
         </div>
       </div>
     </div>
