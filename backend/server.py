@@ -414,54 +414,134 @@ async def city_manager_dashboard(current_user: dict = Depends(get_current_user))
     if not city:
         raise HTTPException(status_code=400, detail="City not assigned")
     
-    riders = await db.riders.find({"city": city}, {"_id": 0}).to_list(100)
-    rider_stats = []
+    pipeline = [
+        {"$match": {"city": city}},
+        {"$limit": 100},
+        {"$lookup": {
+            "from": "tolet_boards",
+            "localField": "id",
+            "foreignField": "rider_id",
+            "as": "boards"
+        }},
+        {"$lookup": {
+            "from": "broker_visits",
+            "localField": "id",
+            "foreignField": "rider_id",
+            "as": "brokers"
+        }},
+        {"$lookup": {
+            "from": "site_visits",
+            "localField": "id",
+            "foreignField": "assigned_rider_id",
+            "as": "visits"
+        }},
+        {"$lookup": {
+            "from": "users",
+            "localField": "user_id",
+            "foreignField": "id",
+            "as": "user_data"
+        }},
+        {"$addFields": {
+            "boards_count": {"$size": "$boards"},
+            "brokers_count": {"$size": "$brokers"},
+            "visits_count": {"$size": "$visits"},
+            "user_name": {"$arrayElemAt": ["$user_data.name", 0]}
+        }},
+        {"$project": {
+            "rider": "$user_name",
+            "rider_id": "$id",
+            "boards_found": "$boards_count",
+            "brokers_visited": "$brokers_count",
+            "visits": "$visits_count",
+            "on_duty": 1
+        }}
+    ]
     
-    for rider in riders:
-        boards_count = await db.tolet_boards.count_documents({"rider_id": rider['id']})
-        brokers_count = await db.broker_visits.count_documents({"rider_id": rider['id']})
-        visits_count = await db.site_visits.count_documents({"assigned_rider_id": rider['id']})
-        
-        user = await db.users.find_one({"id": rider['user_id']}, {"_id": 0, "password": 0})
-        
-        rider_stats.append({
-            "rider": user['name'] if user else "Unknown",
-            "rider_id": rider['id'],
-            "boards_found": boards_count,
-            "brokers_visited": brokers_count,
-            "visits": visits_count,
-            "on_duty": rider.get('on_duty', False)
-        })
+    rider_stats = await db.riders.aggregate(pipeline).to_list(None)
+    
+    for stat in rider_stats:
+        stat.pop('_id', None)
     
     return {"city": city, "riders": rider_stats}
 
 @api_router.get("/leaderboard")
 async def get_leaderboard(current_user: dict = Depends(get_current_user)):
-    riders = await db.riders.find({}, {"_id": 0}).to_list(1000)
-    leaderboard = []
+    pipeline = [
+        {"$limit": 100},
+        {"$lookup": {
+            "from": "tolet_boards",
+            "localField": "id",
+            "foreignField": "rider_id",
+            "as": "boards"
+        }},
+        {"$lookup": {
+            "from": "broker_visits",
+            "localField": "id",
+            "foreignField": "rider_id",
+            "as": "brokers"
+        }},
+        {"$lookup": {
+            "from": "broker_visits",
+            "let": {"rider_id": "$id"},
+            "pipeline": [
+                {"$match": {
+                    "$expr": {
+                        "$and": [
+                            {"$eq": ["$rider_id", "$$rider_id"]},
+                            {"$eq": ["$package_sold", True]}
+                        ]
+                    }
+                }}
+            ],
+            "as": "packages"
+        }},
+        {"$lookup": {
+            "from": "site_visits",
+            "localField": "id",
+            "foreignField": "assigned_rider_id",
+            "as": "visits"
+        }},
+        {"$lookup": {
+            "from": "users",
+            "localField": "user_id",
+            "foreignField": "id",
+            "as": "user_data"
+        }},
+        {"$addFields": {
+            "boards_count": {"$size": "$boards"},
+            "brokers_count": {"$size": "$brokers"},
+            "visits_count": {"$size": "$visits"},
+            "packages_count": {"$size": "$packages"},
+            "user_name": {"$arrayElemAt": ["$user_data.name", 0]}
+        }},
+        {"$addFields": {
+            "score": {
+                "$add": [
+                    {"$multiply": ["$boards_count", 1]},
+                    {"$multiply": ["$brokers_count", 2]},
+                    {"$multiply": ["$visits_count", 3]},
+                    {"$multiply": ["$packages_count", 10]}
+                ]
+            }
+        }},
+        {"$sort": {"score": -1}},
+        {"$project": {
+            "rider_id": "$id",
+            "name": "$user_name",
+            "city": 1,
+            "score": 1,
+            "boards": "$boards_count",
+            "brokers": "$brokers_count",
+            "visits": "$visits_count",
+            "packages_sold": "$packages_count"
+        }}
+    ]
     
-    for rider in riders:
-        boards_count = await db.tolet_boards.count_documents({"rider_id": rider['id']})
-        brokers_count = await db.broker_visits.count_documents({"rider_id": rider['id']})
-        visits_count = await db.site_visits.count_documents({"assigned_rider_id": rider['id']})
-        packages_sold = await db.broker_visits.count_documents({"rider_id": rider['id'], "package_sold": True})
-        
-        score = (boards_count * 1) + (brokers_count * 2) + (visits_count * 3) + (packages_sold * 10)
-        
-        user = await db.users.find_one({"id": rider['user_id']}, {"_id": 0, "password": 0})
-        
-        leaderboard.append({
-            "rider_id": rider['id'],
-            "name": user['name'] if user else "Unknown",
-            "city": rider['city'],
-            "score": score,
-            "boards": boards_count,
-            "brokers": brokers_count,
-            "visits": visits_count,
-            "packages_sold": packages_sold
-        })
+    leaderboard = await db.riders.aggregate(pipeline).to_list(None)
     
-    leaderboard.sort(key=lambda x: x['score'], reverse=True)
+    for entry in leaderboard:
+        entry.pop('_id', None)
+    
     return leaderboard
 
 app.include_router(api_router)
