@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
 import { Phone, MessageCircle, CheckCircle, Clock } from 'lucide-react';
+import ChatWindow from './ChatWindow';
+import { toast } from 'sonner';
 
 const CustomerSupportPanel = () => {
   const [bookings] = useState([
     {
       id: '1',
       customer: 'Rahul Kumar',
+      customerId: 'customer-001',
+      customerPhone: '9999999999',
       property: '2BHK Sector 70',
       status: 'in_progress',
       scheduled: '2:00 PM',
@@ -13,11 +17,26 @@ const CustomerSupportPanel = () => {
     {
       id: '2',
       customer: 'Priya Sharma',
+      customerId: 'customer-002',
+      customerPhone: '9999999998',
       property: '3BHK Zirakpur',
       status: 'pending',
       scheduled: '4:30 PM',
     },
   ]);
+
+  const [activeChatUser, setActiveChatUser] = useState(null);
+
+  const handleCall = (phone, name) => {
+    // Show masked number calling instructions
+    toast.info(`Calling ${name} at ${phone}...`, { duration: 3000 });
+    // In production, this would use Twilio masked calling
+    window.location.href = `tel:${phone}`;
+  };
+
+  const handleChat = (customerId, customerName) => {
+    setActiveChatUser({ id: customerId, name: customerName });
+  };
 
   return (
     <div>
@@ -66,11 +85,19 @@ const CustomerSupportPanel = () => {
                 </span>
               </div>
               <div className="flex gap-2">
-                <button className="btn-primary flex-1 flex items-center justify-center gap-2">
+                <button 
+                  onClick={() => handleCall(booking.customerPhone, booking.customer)}
+                  className="btn-primary flex-1 flex items-center justify-center gap-2"
+                  data-testid={`call-customer-${booking.id}`}
+                >
                   <Phone className="w-4 h-4" />
                   Call Customer
                 </button>
-                <button className="btn-secondary flex-1 flex items-center justify-center gap-2">
+                <button 
+                  onClick={() => handleChat(booking.customerId, booking.customer)}
+                  className="btn-secondary flex-1 flex items-center justify-center gap-2"
+                  data-testid={`chat-customer-${booking.id}`}
+                >
                   <MessageCircle className="w-4 h-4" />
                   Chat
                 </button>
@@ -93,6 +120,14 @@ const CustomerSupportPanel = () => {
           <li>• Update deal status immediately after closing</li>
         </ul>
       </div>
+
+      {activeChatUser && (
+        <ChatWindow
+          otherUserId={activeChatUser.id}
+          otherUserName={activeChatUser.name}
+          onClose={() => setActiveChatUser(null)}
+        />
+      )}
     </div>
   );
 };

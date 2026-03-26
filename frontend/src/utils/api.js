@@ -25,6 +25,8 @@ export const propertyAPI = {
   getProperties: (filters) => api.get('/properties', { params: filters }),
   getProperty: (id) => api.get(`/properties/${id}`),
   createProperty: (data) => api.post('/properties', data),
+  updateProperty: (id, available) => api.patch(`/properties/${id}`, null, { params: { available } }),
+  deleteProperty: (id) => api.delete(`/properties/${id}`),
 };
 
 export const paymentAPI = {
@@ -39,5 +41,12 @@ export const visitAPI = {
   getAvailableVisits: () => api.get('/visits/available'),
   acceptVisit: (visitId) => api.post(`/visits/${visitId}/accept`),
 };
+
+export const chatAPI = {
+  sendMessage: (data) => api.post('/chat/send', data),
+  getMessages: (otherUserId) => api.get(`/chat/messages/${otherUserId}`),
+  getConversations: () => api.get('/chat/conversations'),
+};
+
 
 export default api;

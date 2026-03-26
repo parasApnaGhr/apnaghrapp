@@ -159,6 +159,21 @@ class PaymentTransaction(BaseModel):
     metadata: Dict = {}
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
+class ChatMessage(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    sender_id: str
+    receiver_id: str
+    message: str
+    visit_id: Optional[str] = None
+    read: bool = False
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class ChatMessageCreate(BaseModel):
+    receiver_id: str
+    message: str
+    visit_id: Optional[str] = None
+
 def hash_password(password: str) -> str:
     return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
 
@@ -234,6 +249,25 @@ async def create_property(property_data: PropertyCreate, current_user: dict = De
     
     doc.pop('_id', None)
     return doc
+
+@api_router.patch("/properties/{property_id}")
+async def update_property(property_id: str, available: bool, current_user: dict = Depends(get_current_user)):
+    if current_user['role'] not in ['admin', 'inventory_admin']:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    await db.properties.update_one({"id": property_id}, {"$set": {"available": available}})
+    return {"success": True, "available": available}
+
+@api_router.delete("/properties/{property_id}")
+async def delete_property(property_id: str, current_user: dict = Depends(get_current_user)):
+    if current_user['role'] not in ['admin', 'inventory_admin']:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    result = await db.properties.delete_one({"id": property_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Property not found")
+    
+    return {"success": True, "message": "Property deleted"}
 
 @api_router.get("/properties")
 async def get_properties(
@@ -467,6 +501,92 @@ async def accept_visit(visit_id: str, current_user: dict = Depends(get_current_u
     property_data = await db.properties.find_one({"id": visit['property_id']}, {"_id": 0})
     
     return {"visit": visit, "property": property_data}
+
+
+# Chat endpoints
+@api_router.post("/chat/send")
+async def send_message(message_data: ChatMessageCreate, current_user: dict = Depends(get_current_user)):
+    chat_msg = ChatMessage(
+        sender_id=current_user['id'],
+        receiver_id=message_data.receiver_id,
+        message=message_data.message,
+        visit_id=message_data.visit_id
+    )
+    
+    doc = chat_msg.model_dump()
+    doc['created_at'] = doc['created_at'].isoformat()
+    await db.chat_messages.insert_one(doc)
+    
+    doc.pop('_id', None)
+    return doc
+
+@api_router.get("/chat/messages/{other_user_id}")
+async def get_messages(other_user_id: str, current_user: dict = Depends(get_current_user)):
+    messages = await db.chat_messages.find({
+        "$or": [
+            {"sender_id": current_user['id'], "receiver_id": other_user_id},
+            {"sender_id": other_user_id, "receiver_id": current_user['id']}
+        ]
+    }, {"_id": 0}).sort("created_at", 1).limit(100).to_list(None)
+    
+    # Mark messages as read
+    await db.chat_messages.update_many(
+        {"sender_id": other_user_id, "receiver_id": current_user['id'], "read": False},
+        {"$set": {"read": True}}
+    )
+    
+    return messages
+
+@api_router.get("/chat/conversations")
+async def get_conversations(current_user: dict = Depends(get_current_user)):
+    pipeline = [
+        {
+            "$match": {
+                "$or": [
+                    {"sender_id": current_user['id']},
+                    {"receiver_id": current_user['id']}
+                ]
+            }
+        },
+        {"$sort": {"created_at": -1}},
+        {
+            "$group": {
+                "_id": {
+                    "$cond": [
+                        {"$eq": ["$sender_id", current_user['id']]},
+                        "$receiver_id",
+                        "$sender_id"
+                    ]
+                },
+                "last_message": {"$first": "$message"},
+                "last_time": {"$first": "$created_at"},
+                "unread_count": {
+                    "$sum": {
+                        "$cond": [
+                            {"$and": [
+                                {"$eq": ["$receiver_id", current_user['id']]},
+                                {"$eq": ["$read", False]}
+                            ]},
+                            1,
+                            0
+                        ]
+                    }
+                }
+            }
+        },
+        {"$limit": 50}
+    ]
+    
+    conversations = await db.chat_messages.aggregate(pipeline).to_list(None)
+    
+    # Get user details for each conversation
+    for conv in conversations:
+        user = await db.users.find_one({"id": conv['_id']}, {"_id": 0, "password": 0})
+        conv['user'] = user
+        conv['other_user_id'] = conv.pop('_id')
+    
+    return conversations
+
 
 # File upload endpoints
 UPLOAD_DIR = Path("/app/uploads")

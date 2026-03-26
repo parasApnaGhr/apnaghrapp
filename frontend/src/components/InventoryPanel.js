@@ -24,6 +24,28 @@ const InventoryPanel = () => {
     },
   ]);
 
+  const handleDelete = async (propertyId) => {
+    if (!window.confirm('Are you sure you want to delete this property?')) return;
+    
+    try {
+      await propertyAPI.deleteProperty(propertyId);
+      toast.success('Property deleted successfully!');
+      window.location.reload();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Failed to delete property');
+    }
+  };
+
+  const handleToggleAvailability = async (propertyId, currentStatus) => {
+    try {
+      await propertyAPI.updateProperty(propertyId, !currentStatus);
+      toast.success(`Property marked as ${!currentStatus ? 'available' : 'rented out'}`);
+      window.location.reload();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Failed to update property');
+    }
+  };
+
   const [showAddForm, setShowAddForm] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
@@ -274,13 +296,25 @@ const InventoryPanel = () => {
                     Verified
                   </span>
                 )}
-                <span className={`badge ${property.available ? 'badge-success' : 'badge-warning'}`}>
-                  {property.available ? 'Available' : 'Occupied'}
-                </span>
-                <button className="p-2 hover:bg-[#F3F2EB] rounded-lg">
+                <button
+                  onClick={() => handleToggleAvailability(property.id, property.available)}
+                  className={`badge ${property.available ? 'badge-success' : 'badge-warning'} cursor-pointer hover:opacity-80`}
+                  data-testid={`toggle-availability-${property.id}`}
+                >
+                  {property.available ? 'Available' : 'Rented Out'}
+                </button>
+                <button 
+                  className="p-2 hover:bg-[#F3F2EB] rounded-lg"
+                  title="Edit property"
+                >
                   <Edit className="w-4 h-4 text-[#4A626C]" />
                 </button>
-                <button className="p-2 hover:bg-red-50 rounded-lg">
+                <button 
+                  onClick={() => handleDelete(property.id)}
+                  className="p-2 hover:bg-red-50 rounded-lg"
+                  title="Delete property"
+                  data-testid={`delete-property-${property.id}`}
+                >
                   <Trash2 className="w-4 h-4 text-red-500" />
                 </button>
               </div>
