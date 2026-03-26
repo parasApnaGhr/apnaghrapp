@@ -3,11 +3,12 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Login from './pages/Login';
-import AdminDashboard from './pages/AdminDashboard';
-import CityManagerDashboard from './pages/CityManagerDashboard';
-import CallCenterDashboard from './pages/CallCenterDashboard';
+import CustomerHome from './pages/CustomerHome';
+import PropertyDetail from './pages/PropertyDetail';
+import CustomerBookings from './pages/CustomerBookings';
+import PaymentSuccess from './pages/PaymentSuccess';
 import RiderDashboard from './pages/RiderDashboard';
-import Leaderboard from './pages/Leaderboard';
+import AdminDashboard from './pages/AdminDashboard';
 import '@/App.css';
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
@@ -16,13 +17,13 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="w-16 h-16 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+        <div className="w-16 h-16 border-4 border-[#E07A5F] border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
   }
 
   if (!user) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/" replace />;
   }
 
   if (allowedRoles && !allowedRoles.includes(user.role)) {
@@ -37,45 +38,47 @@ const AppRoutes = () => {
 
   return (
     <Routes>
-      <Route path="/login" element={user ? <Navigate to="/" replace /> : <Login />} />
+      <Route path="/" element={user ? <Navigate to={`/${user.role === 'customer' ? 'customer' : user.role === 'rider' ? 'rider' : 'admin'}`} replace /> : <Login />} />
 
       <Route
-        path="/"
+        path="/customer"
         element={
-          <ProtectedRoute>
-            {user?.role === 'admin' && <Navigate to="/admin" replace />}
-            {user?.role === 'city_manager' && <Navigate to="/city-manager" replace />}
-            {user?.role === 'call_center' && <Navigate to="/call-center" replace />}
-            {user?.role === 'rider' && <Navigate to="/rider" replace />}
+          <ProtectedRoute allowedRoles={['customer']}>
+            <CustomerHome />
           </ProtectedRoute>
         }
       />
 
       <Route
-        path="/admin"
+        path="/customer/property/:id"
         element={
-          <ProtectedRoute allowedRoles={['admin']}>
-            <AdminDashboard />
+          <ProtectedRoute allowedRoles={['customer']}>
+            <PropertyDetail />
           </ProtectedRoute>
         }
       />
 
       <Route
-        path="/city-manager"
+        path="/customer/bookings"
         element={
-          <ProtectedRoute allowedRoles={['city_manager']}>
-            <CityManagerDashboard />
+          <ProtectedRoute allowedRoles={['customer']}>
+            <CustomerBookings />
           </ProtectedRoute>
         }
       />
 
       <Route
-        path="/call-center"
+        path="/payment-success"
         element={
-          <ProtectedRoute allowedRoles={['call_center']}>
-            <CallCenterDashboard />
+          <ProtectedRoute allowedRoles={['customer']}>
+            <PaymentSuccess />
           </ProtectedRoute>
         }
+      />
+
+      <Route
+        path="/payment-cancelled"
+        element={<div className="min-h-screen flex items-center justify-center"><p>Payment cancelled</p></div>}
       />
 
       <Route
@@ -88,10 +91,10 @@ const AppRoutes = () => {
       />
 
       <Route
-        path="/leaderboard"
+        path="/admin"
         element={
-          <ProtectedRoute>
-            <Leaderboard />
+          <ProtectedRoute allowedRoles={['admin', 'support_admin', 'inventory_admin', 'rider_admin']}>
+            <AdminDashboard />
           </ProtectedRoute>
         }
       />
@@ -105,7 +108,7 @@ function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
-        <Toaster position="top-right" richColors />
+        <Toaster position="top-right" richColors expand={true} />
         <AppRoutes />
       </BrowserRouter>
     </AuthProvider>
