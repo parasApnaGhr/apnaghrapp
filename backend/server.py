@@ -276,7 +276,8 @@ async def create_checkout(
     package = PAYMENT_PACKAGES[package_id]
     amount = package["amount"]
     
-    webhook_url = f"{origin_url}/api/webhook/stripe"
+    backend_url = os.environ.get('BACKEND_URL', origin_url)
+    webhook_url = f"{backend_url}/api/webhook/stripe"
     stripe_checkout = StripeCheckout(api_key=STRIPE_API_KEY, webhook_url=webhook_url)
     
     success_url = f"{origin_url}/payment-success?session_id={{CHECKOUT_SESSION_ID}}"
@@ -324,7 +325,8 @@ async def get_payment_status(session_id: str, current_user: dict = Depends(get_c
     if transaction['payment_status'] == "paid":
         return transaction
     
-    webhook_url = f"{os.environ.get('REACT_APP_BACKEND_URL', 'http://localhost:8001')}/api/webhook/stripe"
+    backend_url = os.environ.get('BACKEND_URL', os.environ.get('REACT_APP_BACKEND_URL', 'http://localhost:8001'))
+    webhook_url = f"{backend_url}/api/webhook/stripe"
     stripe_checkout = StripeCheckout(api_key=STRIPE_API_KEY, webhook_url=webhook_url)
     
     status = await stripe_checkout.get_checkout_status(session_id)
@@ -370,7 +372,8 @@ async def stripe_webhook(request: Request):
     body = await request.body()
     signature = request.headers.get("Stripe-Signature")
     
-    webhook_url = f"{os.environ.get('REACT_APP_BACKEND_URL', 'http://localhost:8001')}/api/webhook/stripe"
+    backend_url = os.environ.get('BACKEND_URL', str(request.base_url).rstrip('/'))
+    webhook_url = f"{backend_url}/api/webhook/stripe"
     stripe_checkout = StripeCheckout(api_key=STRIPE_API_KEY, webhook_url=webhook_url)
     
     try:
@@ -382,12 +385,22 @@ async def stripe_webhook(request: Request):
 # Visit booking endpoints
 @api_router.post("/visits/book")
 async def book_visit(booking_data: VisitBookingCreate, current_user: dict = Depends(get_current_user)):
-    # Check if user has available visits
-    packages = await db.visit_packages.find({
-        "customer_id": current_user['id'],
-        "visits_used": {"$lt": "$total_visits"},
-        "valid_until": {"$gt": datetime.now(timezone.utc).isoformat()}
-    }, {"_id": 0}).to_list(10)
+    # Check if user has available visits using aggregation
+    pipeline = [
+        {
+            "$match": {
+                "customer_id": current_user['id'],
+                "valid_until": {"$gt": datetime.now(timezone.utc).isoformat()}
+            }
+        },
+        {
+            "$match": {
+                "$expr": {"$lt": ["$visits_used", "$total_visits"]}
+            }
+        },
+        {"$limit": 10}
+    ]
+    packages = await db.visit_packages.aggregate(pipeline).to_list(None)
     
     if not packages:
         raise HTTPException(status_code=400, detail="No available visit credits")
