@@ -1,183 +1,105 @@
 {
-  "project_identity": {
-    "name": "ApnaGhr Field Rider System",
-    "mission": "Operating System for Field Operations - Tactical, High-Performance, Vibrant.",
-    "persona": "E1: The Performance Pro",
-    "tone": "Energetic, Clear, Athletic, Direct.",
-    "aesthetics": "Tactical Minimalism. High Contrast. Kinetic."
-  },
-  "design_tokens": {
-    "colors": {
-      "palette_strategy": "Archetype 2: The Performance Pro (Tactical Athleticism)",
-      "primary": {
-        "name": "Electric Indigo",
-        "hex": "#4F46E5",
-        "tailwind": "bg-indigo-600",
-        "usage": "Primary Actions, Active States, Key Brand Elements"
-      },
-      "secondary": {
-        "name": "Slate Gunmetal",
-        "hex": "#1E293B",
-        "tailwind": "bg-slate-800",
-        "usage": "Headings, Navigation Backgrounds, Strong Borders"
-      },
-      "background": {
-        "light": "#F8FAFC",
-        "dark": "#0F172A",
-        "surface_light": "#FFFFFF",
-        "surface_dark": "#1E293B"
-      },
-      "accents": {
-        "safety_orange": {
-          "hex": "#F97316",
-          "tailwind": "text-orange-500",
-          "usage": "Alerts, Pending Actions, 'Stop' signals"
-        },
-        "signal_green": {
-          "hex": "#10B981",
-          "tailwind": "text-emerald-500",
-          "usage": "Success, Completed Tasks, Growth Metrics"
-        },
-        "volt_blue": {
-          "hex": "#0EA5E9",
-          "tailwind": "text-sky-500",
-          "usage": "Info, Navigation, Links"
-        }
-      },
-      "gradients": {
-        "allowed": false,
-        "rule": "Do not use gradients for backgrounds. Use flat, high-contrast colors. Gradients only allowed for subtle 'glow' effects on active states."
-      }
+  "theme": "light",
+  "archetype": "1 (Organic & Earthy)",
+  "typography": {
+    "headings": {
+      "font_family": "Outfit",
+      "weights": ["400", "600", "800"],
+      "usage": "Use for all H1-H6. Ensure tight letter spacing (tracking-tight) for large sizes."
     },
-    "typography": {
-      "headings": {
-        "font_family": "Barlow Condensed, sans-serif",
-        "weight": "Bold (700) or Black (900)",
-        "tracking": "tracking-tight",
-        "usage": "All Page Titles, Section Headers, KPI Numbers"
-      },
-      "body": {
-        "font_family": "Inter, sans-serif",
-        "weight": "Regular (400) or Medium (500)",
-        "usage": "Paragraphs, Labels, Input text"
-      },
-      "mono": {
-        "font_family": "JetBrains Mono, monospace",
-        "usage": "IDs, Codes, Technical Data"
-      }
+    "body": {
+      "font_family": "Manrope",
+      "weights": ["400", "500"],
+      "usage": "Use for all body copy, forms, and small UI elements."
     },
-    "spacing": {
-      "base_unit": "4px",
-      "container_padding": "p-4 md:p-8 lg:p-12",
-      "card_padding": "p-6",
-      "section_gap": "gap-8"
-    },
-    "radius": {
-      "default": "rounded-lg",
-      "buttons": "rounded-md",
-      "cards": "rounded-xl",
-      "inputs": "rounded-md"
-    },
-    "shadows": {
-      "card": "shadow-sm hover:shadow-md transition-shadow duration-200",
-      "floating": "shadow-lg shadow-indigo-500/20",
-      "dropdown": "shadow-xl border border-slate-100 dark:border-slate-800"
+    "hierarchy": {
+      "h1": "text-4xl sm:text-5xl lg:text-6xl tracking-tighter",
+      "h2": "text-2xl sm:text-3xl lg:text-4xl tracking-tight",
+      "h3": "text-xl sm:text-2xl tracking-tight",
+      "body": "text-base leading-relaxed text-gray-800",
+      "small": "text-sm tracking-wide uppercase font-semibold"
     }
   },
-  "layout_strategies": {
-    "dashboard_web": {
-      "structure": "Sidebar Layout",
-      "sidebar": "Fixed width (64px collapsed / 240px expanded), Dark Slate bg.",
-      "header": "Sticky top, Glassmorphism (White/80% opacity), Breadcrumbs.",
-      "content_area": "Max-width 1600px, Centered, Grid-based (12 col).",
-      "grid_pattern": "Bento Grid: KPI Cards (Col-span-3), Main Chart (Col-span-8), Recent Activity (Col-span-4)."
+  "colors": {
+    "background": {
+      "primary": "#FAF9F6",
+      "secondary": "#F3F2EB",
+      "surface": "#FFFFFF"
     },
-    "mobile_app": {
-      "structure": "Stack Navigation",
-      "header": "Minimal. Page Title Left. Action Right.",
-      "navigation": "Floating Bottom Bar (Island style) with 4-5 icons.",
-      "content_area": "Single Column, Vertical Scroll.",
-      "cards": "Full width cards with 'Clip-board' style left border for status indication."
+    "brand": {
+      "primary": "#E07A5F",
+      "primary_hover": "#D0674C",
+      "secondary": "#2A9D8F",
+      "accent": "#F4A261"
+    },
+    "text": {
+      "primary": "#264653",
+      "secondary": "#4A626C",
+      "inverse": "#FFFFFF"
+    },
+    "ui": {
+      "border": "#E5E3D8",
+      "divider": "#E5E3D8",
+      "success": "#2A9D8F",
+      "error": "#E63946",
+      "warning": "#E9C46A"
     }
   },
-  "component_rules": {
-    "buttons": {
-      "primary": "bg-indigo-600 hover:bg-indigo-700 text-white font-medium shadow-sm hover:translate-y-[-1px] transition-all",
-      "secondary": "bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 hover:text-slate-900",
-      "destructive": "bg-red-50 text-red-600 hover:bg-red-100 border border-red-200",
-      "ghost": "hover:bg-slate-100 text-slate-600"
-    },
-    "cards": {
-      "default": "bg-white border border-slate-200 rounded-xl p-6",
-      "interactive": "cursor-pointer hover:border-indigo-300 transition-colors group",
-      "metric": "Flex-col, Label (text-sm text-muted-foreground), Value (text-3xl font-bold tracking-tight)"
-    },
-    "inputs": {
-      "default": "bg-slate-50 border-slate-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 h-10 px-3",
-      "label": "text-sm font-medium mb-1.5 block text-slate-700"
-    },
-    "badges": {
-      "success": "bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded-full text-xs font-medium",
-      "warning": "bg-orange-50 text-orange-700 border border-orange-200 px-2 py-0.5 rounded-full text-xs font-medium",
-      "neutral": "bg-slate-100 text-slate-600 border border-slate-200 px-2 py-0.5 rounded-full text-xs font-medium"
-    },
-    "maps": {
-      "provider": "OpenStreetMap (Leaflet/React-Leaflet)",
-      "styling": "Custom tile layer if possible, or standard OSM. Markers must be custom SVG icons (Rider Bike, House, Office).",
-      "controls": "Floating action buttons (Zoom, Recenter) in bottom-right."
-    }
+  "spacing_and_layout": {
+    "general": "Use generous padding (p-6, p-8) to let content breathe. Avoid cramped containers.",
+    "customer_app": "Mobile-first approach. Use sticky bottom navigation, thumb-friendly CTAs, and simplified card stacks for properties. Hide exact address visually with a blurred map overlay until unlocked.",
+    "rider_app": "High-contrast utility mode. Large tap targets, swipe-to-accept gestures, and prominent live-map integration.",
+    "admin_dashboard": "The 'Control Room' Bento Grid (grid-cols-1 md:grid-cols-3 lg:grid-cols-4) with tight gaps (gap-4). Every pixel utilized, no jagged bottoms. Keep metrics top-left.",
+    "cards": "Solid background, 1px subtle border (border-border), no default shadow. Hover adds slight lift (-translate-y-1) and shadow-lg."
   },
-  "assets": {
+  "components": {
+    "strategy": "Hybrid. Use pure HTML/Tailwind for marketing/hero sections. Use highly customized Shadcn UI components for app functionality (forms, dialogs, cards, sheets).",
+    "buttons": "rounded-md, solid colors for primary. Use Terracotta (#E07A5F) for main actions (Book Visit, Lock Property). Use Forest Green for success actions (Start Visit, Verify OTP).",
+    "inputs": "Shadcn input/select. Customize to have slightly warmer background (bg-white) and distinct focus ring (focus:ring-brand-primary).",
+    "maps": "OpenStreetMap with custom minimalist tiles if possible, or grayscale overlay via CSS filter. Use brand colors for map pins.",
+    "modals": "Use Shadcn Dialog/Sheet. Must have a backdrop-blur-sm on the overlay."
+  },
+  "motion": {
+    "hover": "Subtle transform (-translate-y-1) and shadow increase on cards.",
+    "transitions": "transition-all duration-200 ease-in-out",
+    "page_load": "Staggered fade-up for property lists."
+  },
+  "icons": {
+    "library": "lucide-react",
+    "style": "Clean, line-based, consistent stroke width (1.5px to 2px)."
+  },
+  "media": {
     "images": {
-      "rider_hero": {
-        "url": "https://images.unsplash.com/photo-1733565823567-ca12618dec46?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1NjZ8MHwxfHNlYXJjaHwxfHxpbmRpYW4lMjBkZWxpdmVyeSUyMHJpZGVyJTIwbW90b3JiaWtlJTIwaGFwcHl8ZW58MHx8fHwxNzczNjQ4OTY5fDA&ixlib=rb-4.1.0&q=85",
-        "alt": "Field Rider on Motorbike",
-        "context": "Login Screen, Hero Section, Rider Profile"
-      },
-      "office_meeting": {
-        "url": "https://images.unsplash.com/photo-1758518727707-b023e285b709?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NzF8MHwxfHNlYXJjaHwzfHxtb2Rlcm4lMjBjb3Jwb3JhdGUlMjB0ZWFtJTIwbWVldGluZyUyMG9mZmljZXxlbnwwfHx8fDE3NzM2NDg5Njl8MA&ixlib=rb-4.1.0&q=85",
-        "alt": "Corporate Team Meeting",
-        "context": "Admin Dashboard About, Login Page Background (blurred)"
-      },
-      "placeholder_map": {
-        "url": "https://images.unsplash.com/photo-1524661135-423995f22d0b?auto=format&fit=crop&q=80&w=2074&ixlib=rb-4.0.3",
-        "alt": "Abstract Map View",
-        "context": "Empty State for Map, Dashboard Widget Background"
-      }
-    },
-    "icons": {
-      "library": "lucide-react",
-      "preferred_set": [
-        "MapPin",
-        "Navigation",
-        "Users",
-        "ClipboardList",
-        "TrendingUp",
-        "Bike",
-        "Building2",
-        "Phone",
-        "Camera"
+      "property_exterior": [
+        "https://images.unsplash.com/photo-1772103628874-1b084bdae27b?crop=entropy&cs=srgb&fm=jpg&q=85",
+        "https://images.pexels.com/photos/2462015/pexels-photo-2462015.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+        "https://images.unsplash.com/photo-1759148955043-2e6cc5b97b81?crop=entropy&cs=srgb&fm=jpg&q=85",
+        "https://images.pexels.com/photos/36294220/pexels-photo-36294220.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940"
+      ],
+      "property_interior": [
+        "https://images.unsplash.com/photo-1639059851892-95c80412298c?crop=entropy&cs=srgb&fm=jpg&q=85",
+        "https://images.pexels.com/photos/6970070/pexels-photo-6970070.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+        "https://images.unsplash.com/photo-1674230227190-05b589f2f730?crop=entropy&cs=srgb&fm=jpg&q=85"
+      ],
+      "rider_context": [
+        "https://images.unsplash.com/photo-1770927423939-bae721171237?crop=entropy&cs=srgb&fm=jpg&q=85",
+        "https://images.unsplash.com/photo-1764745223157-64f76610cb3c?crop=entropy&cs=srgb&fm=jpg&q=85"
       ]
-    }
+    },
+    "usage_rules": "Property photos MUST use a max-height limit on mobile (max-h-[60vh] to max-h-[80vh]). Overlays on hero images must not exceed bg-black/40. Map elements should use a blur filter until unlocked by payment."
   },
-  "universal_guidelines": [
-    "Do NOT use gradients for main backgrounds. Use solid colors or subtle patterns.",
-    "Do NOT center-align long text. Use left-align for readability.",
-    "Do NOT use 'Inter' for Headings. Use 'Barlow Condensed' or a strong Sans-Serif.",
-    "Use 2x more padding than you think is necessary.",
-    "All interactive elements must have a :hover and :active state.",
-    "Rider app inputs must be 'Thumb-Friendly' (min-height 44px).",
-    "Use 'Sonner' for all toast notifications.",
-    "Ensure high contrast (WCAG AA) for outdoor visibility on the Rider App."
-  ],
+  "accessibility": {
+    "contrast": "Ensure all text on brand colors meets 4.5:1 ratio. Terracotta button with White text is required.",
+    "testing": "All interactive elements must have data-testid attributes (e.g., data-testid='book-visit-button').",
+    "focus": "Visible focus states required on all form inputs and links."
+  },
   "instructions_to_main_agent": [
-    "1. Setup 'Barlow Condensed' font from Google Fonts.",
-    "2. Configure Tailwind colors to match the 'Performance Pro' palette.",
-    "3. Create a 'Layout' component for the Rider App that handles the bottom floating nav.",
-    "4. Use the provided image URLs for the Login and Dashboard mockups.",
-    "5. Implement 'OpenStreetMap' using 'react-leaflet' for the Map View.",
-    "6. Build the 'Rider Dashboard' using the 'Bento Grid' strategy (KPIs top, List bottom).",
-    "7. Ensure all buttons have 'data-testid' attributes.",
-    "8. For the Leaderboard, use a 'Gamified' list design with badges and rank numbers."
+    "Implement navigation bars for Customer, Rider, and Admin views separately. Customer app uses mobile-first bottom/sticky tabs.",
+    "For the Customer property view, blur the map/location area using Tailwind 'blur-md' and overlay a locked icon/CTA to 'Pay ₹200 to Unlock Visit'.",
+    "Admin dashboards MUST use the Bento Grid strategy for analytics, utilizing a high-density, sharp layout.",
+    "Use standard OpenStreetMap iframe/integration but apply 'filter: grayscale(80%) sepia(20%)' to fit the earthy theme.",
+    "Ensure Shadcn components are fully configured in the project, particularly Dialog, Sheet, Button, Input, and Cards.",
+    "Do NOT use raw <input> or <select> tags. ALWAYS use Shadcn.",
+    "Rider 'Accept Visit' screens should feature high-visibility Terracotta/Green buttons and large legible text for field conditions."
   ]
 }
