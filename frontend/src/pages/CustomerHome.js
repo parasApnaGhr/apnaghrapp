@@ -26,10 +26,19 @@ const CustomerHome = () => {
 
   const loadProperties = async () => {
     try {
-      const response = await propertyAPI.getProperties(filters);
+      const cleanFilters = {};
+      if (filters.city) cleanFilters.city = filters.city;
+      if (filters.min_rent) cleanFilters.min_rent = parseFloat(filters.min_rent);
+      if (filters.max_rent) cleanFilters.max_rent = parseFloat(filters.max_rent);
+      if (filters.bhk) cleanFilters.bhk = parseInt(filters.bhk);
+      if (filters.furnishing) cleanFilters.furnishing = filters.furnishing;
+      
+      const response = await propertyAPI.getProperties(cleanFilters);
       setProperties(response.data);
+      console.log('Loaded properties:', response.data);
     } catch (error) {
-      toast.error('Failed to load properties');
+      console.error('Property load error:', error);
+      toast.error(error.response?.data?.detail || 'Failed to load properties');
     } finally {
       setLoading(false);
     }

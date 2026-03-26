@@ -1,5 +1,6 @@
-from fastapi import FastAPI, APIRouter, HTTPException, Depends, status, Request
+from fastapi import FastAPI, APIRouter, HTTPException, Depends, status, Request, UploadFile, File
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi.staticfiles import StaticFiles
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -12,6 +13,7 @@ import uuid
 from datetime import datetime, timezone, timedelta
 import bcrypt
 import jwt
+import aiofiles
 from emergentintegrations.payments.stripe.checkout import StripeCheckout, CheckoutSessionResponse, CheckoutStatusResponse, CheckoutSessionRequest
 
 ROOT_DIR = Path(__file__).parent
@@ -229,7 +231,9 @@ async def create_property(property_data: PropertyCreate, current_user: dict = De
     doc = property_obj.model_dump()
     doc['created_at'] = doc['created_at'].isoformat()
     await db.properties.insert_one(doc)
-    return property_obj
+    
+    doc.pop('_id', None)
+    return doc
 
 @api_router.get("/properties")
 async def get_properties(
@@ -464,7 +468,68 @@ async def accept_visit(visit_id: str, current_user: dict = Depends(get_current_u
     
     return {"visit": visit, "property": property_data}
 
+# File upload endpoints
+UPLOAD_DIR = Path("/app/uploads")
+UPLOAD_DIR.mkdir(exist_ok=True)
+
+@api_router.post("/upload/image")
+async def upload_image(file: UploadFile = File(...), current_user: dict = Depends(get_current_user)):
+    if not file.content_type.startswith('image/'):
+        raise HTTPException(status_code=400, detail="File must be an image")
+    
+    file_ext = file.filename.split('.')[-1]
+    file_name = f"{uuid.uuid4()}.{file_ext}"
+    file_path = UPLOAD_DIR / file_name
+    
+    async with aiofiles.open(file_path, 'wb') as f:
+        content = await file.read()
+        await f.write(content)
+    
+    file_url = f"/uploads/{file_name}"
+    return {"url": file_url, "filename": file_name}
+
+@api_router.post("/upload/video")
+async def upload_video(file: UploadFile = File(...), current_user: dict = Depends(get_current_user)):
+    if not file.content_type.startswith('video/'):
+        raise HTTPException(status_code=400, detail="File must be a video")
+    
+    file_ext = file.filename.split('.')[-1]
+    file_name = f"{uuid.uuid4()}.{file_ext}"
+    file_path = UPLOAD_DIR / file_name
+    
+    async with aiofiles.open(file_path, 'wb') as f:
+        content = await file.read()
+        await f.write(content)
+    
+    file_url = f"/uploads/{file_name}"
+    return {"url": file_url, "filename": file_name}
+
+@api_router.post("/visits/{visit_id}/upload-proof")
+async def upload_visit_proof(
+    visit_id: str,
+    selfie: Optional[UploadFile] = File(None),
+    video: Optional[UploadFile] = File(None),
+    current_user: dict = Depends(get_current_user)
+):
+    update_data = {}
+    
+    if selfie:
+        selfie_response = await upload_image(selfie, current_user)
+        update_data["visit_proof_selfie"] = selfie_response["url"]
+    
+    if video:
+        video_response = await upload_video(video, current_user)
+        update_data["visit_proof_video"] = video_response["url"]
+    
+    if update_data:
+        await db.visit_bookings.update_one({"id": visit_id}, {"$set": update_data})
+    
+    return {"success": True, "uploaded": update_data}
+
 app.include_router(api_router)
+
+# Mount uploads directory for serving files
+app.mount("/uploads", StaticFiles(directory="/app/uploads"), name="uploads")
 
 app.add_middleware(
     CORSMiddleware,

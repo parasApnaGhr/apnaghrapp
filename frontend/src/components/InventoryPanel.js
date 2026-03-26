@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Plus, Edit, Trash2, CheckCircle, Home } from 'lucide-react';
 import { toast } from 'sonner';
+import { propertyAPI } from '../utils/api';
 
 const InventoryPanel = () => {
   const [properties] = useState([
@@ -34,12 +35,40 @@ const InventoryPanel = () => {
     city: '',
     exact_address: '',
     images: [],
+    video_url: '',
+    amenities: [],
   });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    toast.success('Property added successfully!');
-    setShowAddForm(false);
+    try {
+      const propertyData = {
+        ...formData,
+        rent: parseFloat(formData.rent),
+        bhk: parseInt(formData.bhk),
+        amenities: formData.amenities.filter(a => a.trim()),
+      };
+      
+      await propertyAPI.createProperty(propertyData);
+      toast.success('Property added successfully!');
+      setShowAddForm(false);
+      setFormData({
+        title: '',
+        description: '',
+        property_type: 'Apartment',
+        bhk: 2,
+        rent: '',
+        furnishing: 'Semi-Furnished',
+        area_name: '',
+        city: '',
+        exact_address: '',
+        images: [],
+        video_url: '',
+        amenities: [],
+      });
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Failed to add property');
+    }
   };
 
   return (
@@ -171,6 +200,37 @@ const InventoryPanel = () => {
                 required
               />
             </div>
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-[#264653] mb-1">Image URLs (comma-separated)</label>
+              <input
+                type="text"
+                placeholder="https://example.com/image1.jpg, https://example.com/image2.jpg"
+                value={formData.images.join(', ')}
+                onChange={(e) => setFormData({ ...formData, images: e.target.value.split(',').map(url => url.trim()).filter(url => url) })}
+                className="input-field"
+              />
+            </div>
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-[#264653] mb-1">Video Tour URL (optional)</label>
+              <input
+                type="url"
+                placeholder="https://example.com/video.mp4"
+                value={formData.video_url}
+                onChange={(e) => setFormData({ ...formData, video_url: e.target.value })}
+                className="input-field"
+              />
+            </div>
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-[#264653] mb-1">Amenities (comma-separated)</label>
+              <input
+                type="text"
+                placeholder="Parking, Gym, Swimming Pool"
+                value={formData.amenities.join(', ')}
+                onChange={(e) => setFormData({ ...formData, amenities: e.target.value.split(',').map(a => a.trim()).filter(a => a) })}
+                className="input-field"
+              />
+            </div>
+
             <div className="md:col-span-2 flex gap-3">
               <button type="submit" className="btn-primary">
                 Add Property
