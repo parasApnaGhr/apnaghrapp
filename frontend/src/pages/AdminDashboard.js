@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { Users, Package, Bike, LogOut, Home, DollarSign, TrendingUp } from 'lucide-react';
+import { Users, Package, Bike, LogOut, Home, DollarSign, TrendingUp, Settings, Video } from 'lucide-react';
 import CustomerSupportPanel from '../components/CustomerSupportPanel';
 import InventoryPanel from '../components/InventoryPanel';
 import RiderManagementPanel from '../components/RiderManagementPanel';
+import AppSettingsPanel from '../components/AppSettingsPanel';
 
 const AdminDashboard = () => {
   const { user, logout } = useAuth();
@@ -81,6 +82,18 @@ const AdminDashboard = () => {
             >
               <Bike className="w-4 h-4" />
               Rider Management
+            </button>
+            <button
+              onClick={() => setActivePanel('settings')}
+              className={`px-6 py-3 font-medium text-sm transition flex items-center gap-2 ${
+                activePanel === 'settings'
+                  ? 'text-[#E07A5F] border-b-2 border-[#E07A5F]'
+                  : 'text-[#4A626C] hover:text-[#264653]'
+              }`}
+              data-testid="tab-settings"
+            >
+              <Settings className="w-4 h-4" />
+              Settings
             </button>
           </div>
         </div>
@@ -188,6 +201,7 @@ const AdminDashboard = () => {
         {activePanel === 'support' && <CustomerSupportPanel />}
         {activePanel === 'inventory' && <InventoryPanel />}
         {activePanel === 'riders' && <RiderManagementPanel />}
+        {activePanel === 'settings' && <AppSettingsPanel />}
       </main>
     </div>
   );

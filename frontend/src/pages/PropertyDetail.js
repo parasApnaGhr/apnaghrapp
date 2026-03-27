@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { propertyAPI, paymentAPI } from '../utils/api';
-import { ArrowLeft, MapPin, Bed, Sofa, Home, Lock, Video, IndianRupee, ShoppingCart, Plus, Check } from 'lucide-react';
+import api from '../utils/api';
+import { ArrowLeft, MapPin, Bed, Sofa, Home, Lock, Video, IndianRupee, ShoppingCart, Plus, Check, Play, Upload } from 'lucide-react';
 import { toast } from 'sonner';
 
 const PropertyDetail = () => {
@@ -13,6 +14,7 @@ const PropertyDetail = () => {
   const [loading, setLoading] = useState(true);
   const [processingPayment, setProcessingPayment] = useState(false);
   const [selectedImage, setSelectedImage] = useState(0);
+  const [explainerVideo, setExplainerVideo] = useState(null);
   
   // Get cart from localStorage
   const [cart, setCart] = useState(() => {
@@ -24,6 +26,7 @@ const PropertyDetail = () => {
 
   useEffect(() => {
     loadProperty();
+    loadExplainerVideo();
   }, [id]);
 
   // Save cart to localStorage
@@ -39,6 +42,17 @@ const PropertyDetail = () => {
       toast.error('Failed to load property');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadExplainerVideo = async () => {
+    try {
+      const response = await api.get('/settings/explainer-video');
+      if (response.data.video_url) {
+        setExplainerVideo(response.data.video_url);
+      }
+    } catch (error) {
+      console.log('No explainer video set');
     }
   };
 
@@ -390,15 +404,29 @@ const PropertyDetail = () => {
             How ApnaGhr Works
           </h3>
           
-          {/* Video Placeholder */}
-          <div className="bg-black/20 rounded-xl aspect-video mb-6 flex items-center justify-center relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
-            <div className="relative z-10 text-center">
-              <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-3 backdrop-blur-sm">
-                <Video className="w-8 h-8" />
+          {/* Video Section */}
+          <div className="bg-black/20 rounded-xl aspect-video mb-6 overflow-hidden relative">
+            {explainerVideo ? (
+              <video 
+                controls 
+                className="w-full h-full object-cover"
+                poster=""
+              >
+                <source src={explainerVideo} type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
+            ) : (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+                <div className="relative z-10 text-center">
+                  <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-3 backdrop-blur-sm">
+                    <Play className="w-8 h-8 ml-1" />
+                  </div>
+                  <p className="text-sm opacity-90">Video coming soon</p>
+                  <p className="text-xs opacity-70 mt-1">Our team is preparing an explainer video</p>
+                </div>
               </div>
-              <p className="text-sm opacity-90">Watch how our visit system works</p>
-            </div>
+            )}
           </div>
 
           {/* Steps */}

@@ -919,6 +919,50 @@ async def upload_video(file: UploadFile = File(...), current_user: dict = Depend
     file_url = f"/uploads/{file_name}"
     return {"url": file_url, "filename": file_name}
 
+# App Settings (for explainer video, etc.)
+@api_router.get("/settings/explainer-video")
+async def get_explainer_video():
+    """Get the explainer video URL"""
+    setting = await db.app_settings.find_one({"key": "explainer_video"}, {"_id": 0})
+    if setting:
+        return {"video_url": setting.get("value")}
+    return {"video_url": None}
+
+@api_router.post("/settings/explainer-video")
+async def set_explainer_video(current_user: dict = Depends(get_current_user)):
+    """Upload explainer video (admin only)"""
+    if current_user['role'] not in ['admin', 'inventory_admin']:
+        raise HTTPException(status_code=403, detail="Admin access required")
+    return {"message": "Use /api/upload/explainer-video to upload the video"}
+
+@api_router.post("/upload/explainer-video")
+async def upload_explainer_video(file: UploadFile = File(...), current_user: dict = Depends(get_current_user)):
+    """Upload the 'How It Works' explainer video (admin only)"""
+    if current_user['role'] not in ['admin', 'inventory_admin']:
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    if not file.content_type.startswith('video/'):
+        raise HTTPException(status_code=400, detail="File must be a video")
+    
+    file_ext = file.filename.split('.')[-1]
+    file_name = f"explainer_video.{file_ext}"
+    file_path = UPLOAD_DIR / file_name
+    
+    async with aiofiles.open(file_path, 'wb') as f:
+        content = await file.read()
+        await f.write(content)
+    
+    video_url = f"/uploads/{file_name}"
+    
+    # Save to settings
+    await db.app_settings.update_one(
+        {"key": "explainer_video"},
+        {"$set": {"key": "explainer_video", "value": video_url}},
+        upsert=True
+    )
+    
+    return {"url": video_url, "message": "Explainer video uploaded successfully"}
+
 @api_router.post("/visits/{visit_id}/upload-proof")
 async def upload_visit_proof(
     visit_id: str,
