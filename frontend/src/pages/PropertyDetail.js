@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { propertyAPI, paymentAPI } from '../utils/api';
-import { ArrowLeft, MapPin, Bed, Sofa, Home, Lock, Video, IndianRupee } from 'lucide-react';
+import { ArrowLeft, MapPin, Bed, Sofa, Home, Lock, Video, IndianRupee, ShoppingCart, Plus, Check } from 'lucide-react';
 import { toast } from 'sonner';
 
 const PropertyDetail = () => {
@@ -13,10 +13,23 @@ const PropertyDetail = () => {
   const [loading, setLoading] = useState(true);
   const [processingPayment, setProcessingPayment] = useState(false);
   const [selectedImage, setSelectedImage] = useState(0);
+  
+  // Get cart from localStorage
+  const [cart, setCart] = useState(() => {
+    const saved = localStorage.getItem('visitCart');
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  const isInCart = cart.some(item => item.id === id);
 
   useEffect(() => {
     loadProperty();
   }, [id]);
+
+  // Save cart to localStorage
+  useEffect(() => {
+    localStorage.setItem('visitCart', JSON.stringify(cart));
+  }, [cart]);
 
   const loadProperty = async () => {
     try {
@@ -27,6 +40,28 @@ const PropertyDetail = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const addToCart = () => {
+    if (!isInCart && property) {
+      const newCart = [...cart, {
+        id: property.id,
+        title: property.title,
+        rent: property.rent,
+        area_name: property.area_name,
+        bhk: property.bhk,
+        furnishing: property.furnishing,
+        images: property.images
+      }];
+      setCart(newCart);
+      toast.success('Property added to visit cart!');
+    }
+  };
+
+  const removeFromCart = () => {
+    const newCart = cart.filter(item => item.id !== id);
+    setCart(newCart);
+    toast.success('Property removed from cart');
   };
 
   const handleBookVisit = async (packageId) => {
@@ -76,18 +111,34 @@ const PropertyDetail = () => {
     <div className="min-h-screen bg-[#FAF9F6] pb-32">
       {/* Header */}
       <header className="bg-white border-b border-[#E5E3D8] sticky top-0 z-50">
-        <div className="max-w-4xl mx-auto px-4 py-4 flex items-center gap-3">
-          <button
-            onClick={() => navigate('/customer')}
-            className="p-2 hover:bg-[#F3F2EB] rounded-lg"
-            data-testid="back-button"
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </button>
-          <div>
-            <h1 className="font-bold text-lg">{property.title}</h1>
-            <p className="text-sm text-[#4A626C]">{property.area_name}</p>
+        <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => navigate('/customer')}
+              className="p-2 hover:bg-[#F3F2EB] rounded-lg"
+              data-testid="back-button"
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </button>
+            <div>
+              <h1 className="font-bold text-lg">{property.title}</h1>
+              <p className="text-sm text-[#4A626C]">{property.area_name}</p>
+            </div>
           </div>
+          
+          {/* Cart Button */}
+          <button
+            onClick={() => navigate('/customer/cart')}
+            className="relative p-2 hover:bg-[#F3F2EB] rounded-lg"
+            data-testid="cart-button"
+          >
+            <ShoppingCart className="w-6 h-6 text-[#E07A5F]" />
+            {cart.length > 0 && (
+              <span className="absolute -top-1 -right-1 w-5 h-5 bg-[#E07A5F] text-white text-xs rounded-full flex items-center justify-center">
+                {cart.length}
+              </span>
+            )}
+          </button>
         </div>
       </header>
 
@@ -208,66 +259,106 @@ const PropertyDetail = () => {
           </div>
         )}
 
-        {/* Booking Options */}
+        {/* Add to Cart / Booking Options */}
         <div className="bg-white rounded-xl border border-[#E5E3D8] p-6">
           <h3 className="font-bold text-xl mb-4" style={{ fontFamily: 'Outfit' }}>
             Book Your Visit
           </h3>
 
-          <div className="space-y-3 mb-6">
-            <div
-              className="border-2 border-[#E07A5F] rounded-xl p-4 cursor-pointer hover:bg-[#FFF5F2] transition"
-              onClick={() => !processingPayment && handleBookVisit('single_visit')}
-              data-testid="single-visit-button"
-            >
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="font-bold text-lg">Single Visit</p>
-                  <p className="text-sm text-[#4A626C]">Book one property visit</p>
-                </div>
-                <div className="text-right">
-                  <p className="text-2xl font-bold text-[#E07A5F]" style={{ fontFamily: 'Outfit' }}>
-                    ₹200
-                  </p>
-                  <p className="text-xs text-[#4A626C]">Adjusted in brokerage</p>
-                </div>
+          {/* Add to Cart Button */}
+          <div className="mb-6">
+            {isInCart ? (
+              <div className="flex gap-3">
+                <button
+                  onClick={removeFromCart}
+                  className="flex-1 bg-gray-100 text-gray-700 px-4 py-3 rounded-xl flex items-center justify-center gap-2 hover:bg-gray-200"
+                  data-testid="remove-from-cart-button"
+                >
+                  <Check className="w-5 h-5" />
+                  In Cart
+                </button>
+                <button
+                  onClick={() => navigate('/customer/cart')}
+                  className="flex-1 bg-[#E07A5F] text-white px-4 py-3 rounded-xl flex items-center justify-center gap-2 hover:bg-[#d06a4f] font-bold"
+                  data-testid="view-cart-button"
+                >
+                  <ShoppingCart className="w-5 h-5" />
+                  View Cart ({cart.length})
+                </button>
               </div>
-            </div>
-
-            <div
-              className="border-2 border-[#2A9D8F] rounded-xl p-4 cursor-pointer hover:bg-[#F0FDF9] transition relative overflow-hidden"
-              onClick={() => !processingPayment && handleBookVisit('five_visits')}
-              data-testid="five-visits-button"
-            >
-              <span className="absolute top-2 right-2 badge badge-success text-xs">Best Value</span>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="font-bold text-lg">5 Visit Package</p>
-                  <p className="text-sm text-[#4A626C]">Valid for 10 days</p>
-                </div>
-                <div className="text-right">
-                  <p className="text-2xl font-bold text-[#2A9D8F]" style={{ fontFamily: 'Outfit' }}>
-                    ₹500
-                  </p>
-                  <p className="text-xs text-[#4A626C]">₹100 per visit</p>
-                </div>
-              </div>
-            </div>
+            ) : (
+              <button
+                onClick={addToCart}
+                className="w-full bg-[#2A9D8F] text-white px-4 py-4 rounded-xl flex items-center justify-center gap-2 hover:bg-[#238b7e] font-bold text-lg"
+                data-testid="add-to-cart-button"
+              >
+                <Plus className="w-5 h-5" />
+                Add to Visit Cart
+              </button>
+            )}
+            <p className="text-xs text-center text-[#4A626C] mt-2">
+              Add multiple properties and book one visit for all!
+            </p>
           </div>
 
           <div className="border-t border-[#E5E3D8] pt-4">
-            <button
-              onClick={() => !processingPayment && handleLockProperty()}
-              disabled={processingPayment}
-              data-testid="lock-property-button"
-              className="btn-secondary w-full flex items-center justify-center gap-2"
-            >
-              <Lock className="w-5 h-5" />
-              Lock Property - ₹999
-            </button>
-            <p className="text-xs text-center text-[#4A626C] mt-2">
-              Lock this property exclusively. Amount adjusted in final brokerage.
-            </p>
+            <p className="text-sm text-[#4A626C] mb-4 text-center">Or book just this property:</p>
+            
+            <div className="space-y-3 mb-6">
+              <div
+                className="border-2 border-[#E07A5F] rounded-xl p-4 cursor-pointer hover:bg-[#FFF5F2] transition"
+                onClick={() => !processingPayment && handleBookVisit('single_visit')}
+                data-testid="single-visit-button"
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-bold text-lg">Single Visit</p>
+                    <p className="text-sm text-[#4A626C]">Book one property visit</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-2xl font-bold text-[#E07A5F]" style={{ fontFamily: 'Outfit' }}>
+                      ₹200
+                    </p>
+                    <p className="text-xs text-[#4A626C]">Adjusted in brokerage</p>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                className="border-2 border-[#2A9D8F] rounded-xl p-4 cursor-pointer hover:bg-[#F0FDF9] transition relative overflow-hidden"
+                onClick={() => !processingPayment && handleBookVisit('five_visits')}
+                data-testid="five-visits-button"
+              >
+                <span className="absolute top-2 right-2 badge badge-success text-xs">Best Value</span>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-bold text-lg">5 Visit Package</p>
+                    <p className="text-sm text-[#4A626C]">Valid for 10 days</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-2xl font-bold text-[#2A9D8F]" style={{ fontFamily: 'Outfit' }}>
+                      ₹500
+                    </p>
+                    <p className="text-xs text-[#4A626C]">₹100 per visit</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="border-t border-[#E5E3D8] pt-4">
+              <button
+                onClick={() => !processingPayment && handleLockProperty()}
+                disabled={processingPayment}
+                data-testid="lock-property-button"
+                className="btn-secondary w-full flex items-center justify-center gap-2"
+              >
+                <Lock className="w-5 h-5" />
+                Lock Property - ₹999
+              </button>
+              <p className="text-xs text-center text-[#4A626C] mt-2">
+                Lock this property exclusively. Amount adjusted in final brokerage.
+              </p>
+            </div>
           </div>
         </div>
       </main>

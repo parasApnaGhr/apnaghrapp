@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { visitAPI } from '../utils/api';
-import { ArrowLeft, Calendar, MapPin, User, Clock } from 'lucide-react';
+import { ArrowLeft, Calendar, MapPin, User, Clock, Home, Phone, Navigation } from 'lucide-react';
 import { toast } from 'sonner';
 
 const CustomerBookings = () => {
@@ -10,9 +10,12 @@ const CustomerBookings = () => {
   const { user } = useAuth();
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedBooking, setSelectedBooking] = useState(null);
 
   useEffect(() => {
     loadBookings();
+    const interval = setInterval(loadBookings, 15000); // Refresh every 15 seconds
+    return () => clearInterval(interval);
   }, []);
 
   const loadBookings = async () => {
@@ -26,14 +29,41 @@ const CustomerBookings = () => {
     }
   };
 
+  const loadBookingDetails = async (bookingId) => {
+    try {
+      const response = await visitAPI.getVisitDetails(bookingId);
+      setSelectedBooking(response.data);
+    } catch (error) {
+      toast.error('Failed to load booking details');
+    }
+  };
+
   const getStatusBadge = (status) => {
     const badges = {
-      pending: 'badge badge-warning',
-      rider_assigned: 'badge badge-info',
-      in_progress: 'badge badge-info',
-      completed: 'badge badge-success',
+      pending: { class: 'bg-amber-100 text-amber-800', text: 'Waiting for Rider' },
+      rider_assigned: { class: 'bg-blue-100 text-blue-800', text: 'Rider Assigned' },
+      pickup_started: { class: 'bg-purple-100 text-purple-800', text: 'Rider on the Way' },
+      at_customer: { class: 'bg-indigo-100 text-indigo-800', text: 'Rider Arrived' },
+      navigating: { class: 'bg-cyan-100 text-cyan-800', text: 'En Route to Property' },
+      at_property: { class: 'bg-teal-100 text-teal-800', text: 'At Property' },
+      completed: { class: 'bg-green-100 text-green-800', text: 'Completed' },
+      cancelled: { class: 'bg-red-100 text-red-800', text: 'Cancelled' },
     };
-    return badges[status] || 'badge';
+    return badges[status] || { class: 'bg-gray-100 text-gray-800', text: status };
+  };
+
+  const getStepProgress = (booking) => {
+    const steps = [
+      'pending',
+      'rider_assigned',
+      'pickup_started',
+      'at_customer',
+      'navigating',
+      'at_property',
+      'completed'
+    ];
+    const currentIndex = steps.indexOf(booking.status);
+    return Math.max(0, currentIndex);
   };
 
   return (
@@ -72,60 +102,204 @@ const CustomerBookings = () => {
           </div>
         ) : (
           <div className="space-y-4">
-            {bookings.map((booking) => (
-              <div
-                key={booking.id}
-                className="bg-white rounded-xl border border-[#E5E3D8] p-6"
-                data-testid={`booking-${booking.id}`}
-              >
-                <div className="flex items-start justify-between mb-4">
-                  <div>
-                    <h3 className="font-bold text-lg mb-1">Property Visit</h3>
-                    <p className="text-sm text-[#4A626C]">Property ID: {booking.property_id.substring(0, 8)}...</p>
-                  </div>
-                  <span className={getStatusBadge(booking.status)}>
-                    {booking.status.replace('_', ' ')}
-                  </span>
-                </div>
-
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2 text-sm">
-                    <Calendar className="w-4 h-4 text-[#4A626C]" />
-                    <span>{booking.scheduled_date}</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm">
-                    <Clock className="w-4 h-4 text-[#4A626C]" />
-                    <span>{booking.scheduled_time}</span>
-                  </div>
-                  {booking.rider_id && (
-                    <div className="flex items-center gap-2 text-sm">
-                      <User className="w-4 h-4 text-[#4A626C]" />
-                      <span>Rider assigned</span>
+            {bookings.map((booking) => {
+              const statusInfo = getStatusBadge(booking.status);
+              const numProperties = booking.property_ids?.length || 1;
+              const numCompleted = booking.properties_completed?.length || 0;
+              
+              return (
+                <div
+                  key={booking.id}
+                  className="bg-white rounded-xl border border-[#E5E3D8] overflow-hidden"
+                  data-testid={`booking-${booking.id}`}
+                >
+                  {/* Header */}
+                  <div className="p-4 border-b border-[#E5E3D8]">
+                    <div className="flex items-start justify-between mb-2">
+                      <div>
+                        <h3 className="font-bold text-lg">
+                          {numProperties > 1 ? `Multi-Property Visit (${numProperties})` : 'Property Visit'}
+                        </h3>
+                        <p className="text-sm text-[#4A626C]">
+                          {booking.scheduled_date} at {booking.scheduled_time}
+                        </p>
+                      </div>
+                      <span className={`px-3 py-1 rounded-full text-sm font-medium ${statusInfo.class}`}>
+                        {statusInfo.text}
+                      </span>
                     </div>
-                  )}
+                    
+                    {/* Progress Bar */}
+                    {booking.status !== 'completed' && booking.status !== 'cancelled' && numProperties > 1 && (
+                      <div className="mt-3">
+                        <div className="flex justify-between text-xs text-[#4A626C] mb-1">
+                          <span>Properties Visited</span>
+                          <span>{numCompleted} / {numProperties}</span>
+                        </div>
+                        <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+                          <div 
+                            className="h-full bg-[#2A9D8F] transition-all"
+                            style={{ width: `${(numCompleted / numProperties) * 100}%` }}
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Content */}
+                  <div className="p-4">
+                    {/* Pickup Location */}
+                    {booking.pickup_location && (
+                      <div className="flex items-start gap-3 mb-4 pb-4 border-b border-[#E5E3D8]">
+                        <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                          <MapPin className="w-4 h-4 text-blue-600" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium">Pickup Location</p>
+                          <p className="text-sm text-[#4A626C]">{booking.pickup_location}</p>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Property IDs Preview */}
+                    <div className="space-y-2 mb-4">
+                      {booking.property_ids?.slice(0, 3).map((propId, idx) => (
+                        <div 
+                          key={propId} 
+                          className={`flex items-center gap-3 p-2 rounded-lg ${
+                            booking.properties_completed?.includes(propId)
+                              ? 'bg-green-50'
+                              : 'bg-[#F3F2EB]'
+                          }`}
+                        >
+                          <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
+                            booking.properties_completed?.includes(propId)
+                              ? 'bg-green-500 text-white'
+                              : 'bg-[#E07A5F] text-white'
+                          }`}>
+                            {booking.properties_completed?.includes(propId) ? '✓' : idx + 1}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium truncate">Property {idx + 1}</p>
+                            <p className="text-xs text-[#4A626C]">ID: {propId.substring(0, 8)}...</p>
+                          </div>
+                        </div>
+                      ))}
+                      {booking.property_ids?.length > 3 && (
+                        <p className="text-sm text-[#4A626C] text-center">
+                          +{booking.property_ids.length - 3} more properties
+                        </p>
+                      )}
+                    </div>
+
+                    {/* OTP Section */}
+                    {['rider_assigned', 'pickup_started', 'at_customer'].includes(booking.status) && booking.otp && (
+                      <div className="bg-[#F0FDF9] rounded-xl p-4 mb-4">
+                        <p className="text-sm font-medium mb-1">Your Visit OTP:</p>
+                        <p className="text-3xl font-bold text-[#2A9D8F] tracking-widest" style={{ fontFamily: 'Outfit' }}>
+                          {booking.otp}
+                        </p>
+                        <p className="text-xs text-[#4A626C] mt-2">
+                          Share this OTP with the rider to start your visit
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Estimated Duration */}
+                    {booking.estimated_duration && (
+                      <div className="flex items-center gap-2 text-sm text-[#4A626C] mb-4">
+                        <Clock className="w-4 h-4" />
+                        <span>Estimated Duration: {booking.estimated_duration}</span>
+                      </div>
+                    )}
+
+                    {/* View Details Button */}
+                    <button
+                      onClick={() => loadBookingDetails(booking.id)}
+                      className="w-full bg-[#F3F2EB] text-[#264653] px-4 py-3 rounded-lg hover:bg-[#E5E3D8] font-medium"
+                      data-testid={`view-details-${booking.id}`}
+                    >
+                      View Full Details
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Details Modal */}
+        {selectedBooking && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
+              <div className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-xl font-bold">Visit Details</h3>
+                  <button
+                    onClick={() => setSelectedBooking(null)}
+                    className="text-gray-500 hover:text-gray-700"
+                  >
+                    ✕
+                  </button>
                 </div>
 
-                {booking.status === 'pending' && (
-                  <div className="mt-4 p-3 bg-[#FFF5F2] rounded-lg">
-                    <p className="text-sm text-[#E07A5F] font-medium">
-                      Waiting for rider assignment...
-                    </p>
+                {/* Rider Info */}
+                {selectedBooking.rider && (
+                  <div className="bg-[#F3F2EB] rounded-xl p-4 mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 bg-[#E07A5F] rounded-full flex items-center justify-center">
+                        <User className="w-6 h-6 text-white" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="font-bold">{selectedBooking.rider.name}</p>
+                        <p className="text-sm text-[#4A626C]">Your Rider</p>
+                      </div>
+                      <a
+                        href={`tel:${selectedBooking.rider.phone}`}
+                        className="bg-[#2A9D8F] text-white p-3 rounded-full"
+                      >
+                        <Phone className="w-5 h-5" />
+                      </a>
+                    </div>
                   </div>
                 )}
 
-                {booking.status === 'rider_assigned' && booking.otp && (
-                  <div className="mt-4 p-3 bg-[#F0FDF9] rounded-lg">
-                    <p className="text-sm font-medium mb-1">Visit OTP:</p>
-                    <p className="text-2xl font-bold text-[#2A9D8F]" style={{ fontFamily: 'Outfit' }}>
-                      {booking.otp}
-                    </p>
-                    <p className="text-xs text-[#4A626C] mt-1">
-                      Share this OTP with the rider to start visit
-                    </p>
-                  </div>
-                )}
+                {/* Properties */}
+                <div className="space-y-3">
+                  <h4 className="font-bold">Properties to Visit</h4>
+                  {selectedBooking.properties?.map((prop, idx) => (
+                    <div key={prop.id} className="bg-[#FFF5F2] rounded-xl p-4">
+                      <div className="flex gap-3">
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-white ${
+                          selectedBooking.visit.properties_completed?.includes(prop.id)
+                            ? 'bg-green-500'
+                            : 'bg-[#E07A5F]'
+                        }`}>
+                          {selectedBooking.visit.properties_completed?.includes(prop.id) ? '✓' : idx + 1}
+                        </div>
+                        <div className="flex-1">
+                          <h5 className="font-bold">{prop.title}</h5>
+                          <p className="text-sm text-[#4A626C]">
+                            {prop.bhk} BHK • {prop.furnishing}
+                          </p>
+                          <p className="text-sm text-[#4A626C]">{prop.area_name}</p>
+                          <p className="text-[#E07A5F] font-bold mt-1">
+                            ₹{prop.rent?.toLocaleString()}/mo
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <button
+                  onClick={() => setSelectedBooking(null)}
+                  className="w-full mt-6 bg-[#264653] text-white px-4 py-3 rounded-xl font-medium"
+                >
+                  Close
+                </button>
               </div>
-            ))}
+            </div>
           </div>
         )}
       </main>

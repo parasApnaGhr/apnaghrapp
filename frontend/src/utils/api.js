@@ -40,6 +40,22 @@ export const visitAPI = {
   getMyBookings: () => api.get('/visits/my-bookings'),
   getAvailableVisits: () => api.get('/visits/available'),
   acceptVisit: (visitId) => api.post(`/visits/${visitId}/accept`),
+  updateVisitStep: (visitId, action) => api.post(`/visits/${visitId}/update-step`, { action }),
+  getVisitDetails: (visitId) => api.get(`/visits/${visitId}/details`),
+  uploadProof: (visitId, formData) => api.post(`/visits/${visitId}/upload-proof`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  }),
+};
+
+export const riderAPI = {
+  updateShift: (isOnline, lat, lng) => api.post('/rider/shift', { 
+    is_online: isOnline, 
+    current_lat: lat, 
+    current_lng: lng 
+  }),
+  getShift: () => api.get('/rider/shift'),
+  updateLocation: (lat, lng) => api.post('/rider/location', null, { params: { lat, lng } }),
+  getActiveVisit: () => api.get('/rider/active-visit'),
 };
 
 export const chatAPI = {

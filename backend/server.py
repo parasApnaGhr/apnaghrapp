@@ -46,6 +46,10 @@ class User(BaseModel):
     email: Optional[str] = None
     password: str
     role: str
+    is_online: bool = False  # For rider shift system
+    current_lat: Optional[float] = None
+    current_lng: Optional[float] = None
+    last_location_update: Optional[datetime] = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class UserCreate(BaseModel):
@@ -120,14 +124,19 @@ class VisitBooking(BaseModel):
     package_id: Optional[str] = None
     scheduled_date: str
     scheduled_time: str
-    status: str = "pending"  # pending, assigned, in_progress, completed, cancelled
+    status: str = "pending"  # pending, rider_assigned, pickup_started, at_customer, navigating, at_property, completed, cancelled
+    current_step: str = "waiting"  # waiting, go_to_customer, at_customer, go_to_property_X, at_property_X, completed
+    current_property_index: int = 0  # Which property in the list we're at
     rider_id: Optional[str] = None
     otp: Optional[str] = None
     total_properties: int = 1
     total_earnings: float = 0.0
     estimated_duration: str = ""
-    pickup_location: Optional[str] = None
+    pickup_location: str = ""  # Customer pickup location
+    pickup_lat: Optional[float] = None
+    pickup_lng: Optional[float] = None
     properties_completed: List[str] = []  # Track which properties are done
+    property_proofs: Dict = {}  # {property_id: {selfie: url, video: url}}
     visit_start_time: Optional[datetime] = None
     visit_end_time: Optional[datetime] = None
     customer_feedback: Optional[str] = None
@@ -140,6 +149,16 @@ class VisitBookingCreate(BaseModel):
     scheduled_date: str
     scheduled_time: str
     pickup_location: str
+    pickup_lat: Optional[float] = None
+    pickup_lng: Optional[float] = None
+
+class RiderShiftUpdate(BaseModel):
+    is_online: bool
+    current_lat: Optional[float] = None
+    current_lng: Optional[float] = None
+
+class VisitStepUpdate(BaseModel):
+    action: str  # start_pickup, arrived_customer, start_property, arrived_property, complete_property, complete_visit
 
 class PropertyLock(BaseModel):
     model_config = ConfigDict(extra="ignore")
@@ -202,7 +221,7 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
         return user
     except jwt.ExpiredSignatureError:
         raise HTTPException(status_code=401, detail="Token expired")
-    except Exception as e:
+    except Exception:
         raise HTTPException(status_code=401, detail="Invalid token")
 
 # Auth endpoints
@@ -436,6 +455,8 @@ async def stripe_webhook(request: Request):
 @api_router.post("/visits/book")
 async def book_visit(booking_data: VisitBookingCreate, current_user: dict = Depends(get_current_user)):
     # Check if user has available visits using aggregation
+    num_properties = len(booking_data.property_ids)
+    
     pipeline = [
         {
             "$match": {
@@ -453,34 +474,60 @@ async def book_visit(booking_data: VisitBookingCreate, current_user: dict = Depe
     packages = await db.visit_packages.aggregate(pipeline).to_list(None)
     
     if not packages:
-        raise HTTPException(status_code=400, detail="No available visit credits")
+        raise HTTPException(status_code=400, detail="No available visit credits. Please purchase a visit package first.")
     
-    package = packages[0]
+    # Calculate total available visits
+    total_available = sum(p['total_visits'] - p['visits_used'] for p in packages)
+    
+    if total_available < num_properties:
+        raise HTTPException(status_code=400, detail=f"Not enough visit credits. You have {total_available} visits but need {num_properties}.")
     
     # Generate OTP
     otp = str(uuid.uuid4().int)[:6]
     
+    # Calculate estimated duration (15 min per property + 20 min travel between)
+    estimated_minutes = num_properties * 15 + (num_properties - 1) * 20 + 30  # +30 for pickup
+    hours = estimated_minutes // 60
+    mins = estimated_minutes % 60
+    estimated_duration = f"{hours}h {mins}m" if hours > 0 else f"{mins}m"
+    
     booking = VisitBooking(
         customer_id=current_user['id'],
-        property_id=booking_data.property_id,
-        package_id=package['id'],
+        property_ids=booking_data.property_ids,
+        package_id=packages[0]['id'],
         scheduled_date=booking_data.scheduled_date,
         scheduled_time=booking_data.scheduled_time,
         status="pending",
-        otp=otp
+        current_step="waiting",
+        current_property_index=0,
+        otp=otp,
+        total_properties=num_properties,
+        estimated_duration=estimated_duration,
+        pickup_location=booking_data.pickup_location,
+        pickup_lat=booking_data.pickup_lat,
+        pickup_lng=booking_data.pickup_lng,
+        total_earnings=num_properties * 100  # ₹100 per property for rider
     )
     
     doc = booking.model_dump()
     doc['created_at'] = doc['created_at'].isoformat()
     await db.visit_bookings.insert_one(doc)
     
-    # Increment package usage
-    await db.visit_packages.update_one(
-        {"id": package['id']},
-        {"$inc": {"visits_used": 1}}
-    )
+    # Increment package usage for each property
+    visits_to_deduct = num_properties
+    for package in packages:
+        available_in_package = package['total_visits'] - package['visits_used']
+        deduct_from_this = min(visits_to_deduct, available_in_package)
+        await db.visit_packages.update_one(
+            {"id": package['id']},
+            {"$inc": {"visits_used": deduct_from_this}}
+        )
+        visits_to_deduct -= deduct_from_this
+        if visits_to_deduct <= 0:
+            break
     
-    return booking
+    doc.pop('_id', None)
+    return doc
 
 @api_router.get("/visits/my-bookings")
 async def get_my_bookings(current_user: dict = Depends(get_current_user)):
@@ -492,7 +539,22 @@ async def get_available_visits(current_user: dict = Depends(get_current_user)):
     if current_user['role'] != 'rider':
         raise HTTPException(status_code=403, detail="Riders only")
     
+    # Only show pending visits to online riders
+    rider = await db.users.find_one({"id": current_user['id']}, {"_id": 0})
+    if not rider.get('is_online', False):
+        return []  # Offline riders don't see visits
+    
     visits = await db.visit_bookings.find({"status": "pending", "rider_id": None}, {"_id": 0}).limit(20).to_list(None)
+    
+    # Enrich with property details
+    for visit in visits:
+        properties = []
+        for prop_id in visit.get('property_ids', []):
+            prop = await db.properties.find_one({"id": prop_id}, {"_id": 0, "exact_address": 0})
+            if prop:
+                properties.append(prop)
+        visit['properties'] = properties
+    
     return visits
 
 @api_router.post("/visits/{visit_id}/accept")
@@ -500,19 +562,239 @@ async def accept_visit(visit_id: str, current_user: dict = Depends(get_current_u
     if current_user['role'] != 'rider':
         raise HTTPException(status_code=403, detail="Riders only")
     
+    # Check if rider is online
+    rider = await db.users.find_one({"id": current_user['id']}, {"_id": 0})
+    if not rider.get('is_online', False):
+        raise HTTPException(status_code=400, detail="You must be online to accept visits")
+    
     result = await db.visit_bookings.update_one(
         {"id": visit_id, "status": "pending"},
-        {"$set": {"rider_id": current_user['id'], "status": "rider_assigned"}}
+        {"$set": {
+            "rider_id": current_user['id'], 
+            "status": "rider_assigned",
+            "current_step": "go_to_customer"
+        }}
     )
     
     if result.modified_count == 0:
         raise HTTPException(status_code=400, detail="Visit not available")
     
-    # Return property details with exact location
+    # Return visit with ALL property details including exact location
     visit = await db.visit_bookings.find_one({"id": visit_id}, {"_id": 0})
-    property_data = await db.properties.find_one({"id": visit['property_id']}, {"_id": 0})
     
-    return {"visit": visit, "property": property_data}
+    # Get customer details
+    customer = await db.users.find_one({"id": visit['customer_id']}, {"_id": 0, "password": 0})
+    
+    # Get all properties with FULL details including exact address
+    properties = []
+    for prop_id in visit.get('property_ids', []):
+        prop = await db.properties.find_one({"id": prop_id}, {"_id": 0})
+        if prop:
+            properties.append(prop)
+    
+    return {
+        "visit": visit, 
+        "properties": properties,
+        "customer": customer
+    }
+
+@api_router.post("/visits/{visit_id}/update-step")
+async def update_visit_step(visit_id: str, step_data: VisitStepUpdate, current_user: dict = Depends(get_current_user)):
+    """Update visit progress step by step (Uber Eats style navigation)"""
+    if current_user['role'] != 'rider':
+        raise HTTPException(status_code=403, detail="Riders only")
+    
+    visit = await db.visit_bookings.find_one({"id": visit_id, "rider_id": current_user['id']}, {"_id": 0})
+    if not visit:
+        raise HTTPException(status_code=404, detail="Visit not found or not assigned to you")
+    
+    update_data = {}
+    action = step_data.action
+    
+    if action == "start_pickup":
+        update_data["current_step"] = "go_to_customer"
+        update_data["status"] = "pickup_started"
+        update_data["visit_start_time"] = datetime.now(timezone.utc).isoformat()
+    
+    elif action == "arrived_customer":
+        update_data["current_step"] = "at_customer"
+        update_data["status"] = "at_customer"
+    
+    elif action == "start_property":
+        # Move to first/next property
+        idx = visit.get('current_property_index', 0)
+        update_data["current_step"] = f"go_to_property_{idx}"
+        update_data["status"] = "navigating"
+    
+    elif action == "arrived_property":
+        idx = visit.get('current_property_index', 0)
+        update_data["current_step"] = f"at_property_{idx}"
+        update_data["status"] = "at_property"
+    
+    elif action == "complete_property":
+        # Mark current property as completed and move to next
+        idx = visit.get('current_property_index', 0)
+        property_ids = visit.get('property_ids', [])
+        completed = visit.get('properties_completed', [])
+        
+        if idx < len(property_ids):
+            completed.append(property_ids[idx])
+        
+        update_data["properties_completed"] = completed
+        
+        # Check if there are more properties
+        if idx + 1 < len(property_ids):
+            update_data["current_property_index"] = idx + 1
+            update_data["current_step"] = f"go_to_property_{idx + 1}"
+            update_data["status"] = "navigating"
+        else:
+            # All properties done
+            update_data["current_step"] = "completed"
+            update_data["status"] = "completed"
+            update_data["visit_end_time"] = datetime.now(timezone.utc).isoformat()
+    
+    elif action == "complete_visit":
+        update_data["current_step"] = "completed"
+        update_data["status"] = "completed"
+        update_data["visit_end_time"] = datetime.now(timezone.utc).isoformat()
+    
+    await db.visit_bookings.update_one({"id": visit_id}, {"$set": update_data})
+    
+    updated_visit = await db.visit_bookings.find_one({"id": visit_id}, {"_id": 0})
+    return updated_visit
+
+@api_router.get("/visits/{visit_id}/details")
+async def get_visit_details(visit_id: str, current_user: dict = Depends(get_current_user)):
+    """Get full visit details including all properties for rider navigation"""
+    visit = await db.visit_bookings.find_one({"id": visit_id}, {"_id": 0})
+    if not visit:
+        raise HTTPException(status_code=404, detail="Visit not found")
+    
+    # Check authorization
+    if current_user['role'] == 'rider' and visit.get('rider_id') != current_user['id']:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    if current_user['role'] == 'customer' and visit.get('customer_id') != current_user['id']:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    # Get customer details
+    customer = await db.users.find_one({"id": visit['customer_id']}, {"_id": 0, "password": 0})
+    
+    # Get rider details if assigned
+    rider = None
+    if visit.get('rider_id'):
+        rider = await db.users.find_one({"id": visit['rider_id']}, {"_id": 0, "password": 0})
+    
+    # Get all properties with FULL details (for rider)
+    properties = []
+    for prop_id in visit.get('property_ids', []):
+        if current_user['role'] == 'rider' or current_user['role'] in ['admin', 'support_admin']:
+            prop = await db.properties.find_one({"id": prop_id}, {"_id": 0})
+        else:
+            # Customer doesn't see exact address until visit
+            prop = await db.properties.find_one({"id": prop_id}, {"_id": 0, "exact_address": 0, "latitude": 0, "longitude": 0})
+        if prop:
+            properties.append(prop)
+    
+    return {
+        "visit": visit,
+        "properties": properties,
+        "customer": customer,
+        "rider": rider
+    }
+
+# Rider shift endpoints
+@api_router.post("/rider/shift")
+async def update_rider_shift(shift_data: RiderShiftUpdate, current_user: dict = Depends(get_current_user)):
+    """Toggle rider online/offline status"""
+    if current_user['role'] != 'rider':
+        raise HTTPException(status_code=403, detail="Riders only")
+    
+    update_data = {
+        "is_online": shift_data.is_online,
+        "last_location_update": datetime.now(timezone.utc).isoformat()
+    }
+    
+    if shift_data.current_lat is not None:
+        update_data["current_lat"] = shift_data.current_lat
+    if shift_data.current_lng is not None:
+        update_data["current_lng"] = shift_data.current_lng
+    
+    await db.users.update_one({"id": current_user['id']}, {"$set": update_data})
+    
+    return {"success": True, "is_online": shift_data.is_online}
+
+@api_router.get("/rider/shift")
+async def get_rider_shift(current_user: dict = Depends(get_current_user)):
+    """Get rider's current shift status"""
+    if current_user['role'] != 'rider':
+        raise HTTPException(status_code=403, detail="Riders only")
+    
+    rider = await db.users.find_one({"id": current_user['id']}, {"_id": 0, "password": 0})
+    return {
+        "is_online": rider.get('is_online', False),
+        "current_lat": rider.get('current_lat'),
+        "current_lng": rider.get('current_lng')
+    }
+
+@api_router.post("/rider/location")
+async def update_rider_location(lat: float, lng: float, current_user: dict = Depends(get_current_user)):
+    """Update rider's current location"""
+    if current_user['role'] != 'rider':
+        raise HTTPException(status_code=403, detail="Riders only")
+    
+    await db.users.update_one(
+        {"id": current_user['id']},
+        {"$set": {
+            "current_lat": lat,
+            "current_lng": lng,
+            "last_location_update": datetime.now(timezone.utc).isoformat()
+        }}
+    )
+    
+    return {"success": True}
+
+@api_router.get("/rider/active-visit")
+async def get_active_visit(current_user: dict = Depends(get_current_user)):
+    """Get rider's currently active visit"""
+    if current_user['role'] != 'rider':
+        raise HTTPException(status_code=403, detail="Riders only")
+    
+    # Find any non-completed visit assigned to this rider
+    visit = await db.visit_bookings.find_one({
+        "rider_id": current_user['id'],
+        "status": {"$nin": ["completed", "cancelled", "pending"]}
+    }, {"_id": 0})
+    
+    if not visit:
+        return None
+    
+    # Get full details
+    customer = await db.users.find_one({"id": visit['customer_id']}, {"_id": 0, "password": 0})
+    
+    properties = []
+    for prop_id in visit.get('property_ids', []):
+        prop = await db.properties.find_one({"id": prop_id}, {"_id": 0})
+        if prop:
+            properties.append(prop)
+    
+    return {
+        "visit": visit,
+        "properties": properties,
+        "customer": customer
+    }
+
+# Admin: Get online riders
+@api_router.get("/admin/riders/online")
+async def get_online_riders(current_user: dict = Depends(get_current_user)):
+    if current_user['role'] not in ['admin', 'rider_admin']:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    riders = await db.users.find(
+        {"role": "rider", "is_online": True}, 
+        {"_id": 0, "password": 0}
+    ).to_list(100)
+    
+    return riders
 
 
 # Chat endpoints

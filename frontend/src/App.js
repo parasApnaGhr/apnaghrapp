@@ -6,6 +6,7 @@ import Login from './pages/Login';
 import CustomerHome from './pages/CustomerHome';
 import PropertyDetail from './pages/PropertyDetail';
 import CustomerBookings from './pages/CustomerBookings';
+import VisitCart from './pages/VisitCart';
 import PaymentSuccess from './pages/PaymentSuccess';
 import RiderDashboard from './pages/RiderDashboard';
 import AdminDashboard from './pages/AdminDashboard';
@@ -63,6 +64,15 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={['customer']}>
             <CustomerBookings />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/customer/cart"
+        element={
+          <ProtectedRoute allowedRoles={['customer']}>
+            <VisitCart />
           </ProtectedRoute>
         }
       />
