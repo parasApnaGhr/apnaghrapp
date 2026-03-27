@@ -116,15 +116,18 @@ class VisitBooking(BaseModel):
     model_config = ConfigDict(extra="ignore")
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     customer_id: str
-    property_id: str
+    property_ids: List[str] = []  # Multiple properties support
     package_id: Optional[str] = None
     scheduled_date: str
     scheduled_time: str
-    status: str = "pending"
+    status: str = "pending"  # pending, assigned, in_progress, completed, cancelled
     rider_id: Optional[str] = None
     otp: Optional[str] = None
-    visit_proof_selfie: Optional[str] = None
-    visit_proof_video: Optional[str] = None
+    total_properties: int = 1
+    total_earnings: float = 0.0
+    estimated_duration: str = ""
+    pickup_location: Optional[str] = None
+    properties_completed: List[str] = []  # Track which properties are done
     visit_start_time: Optional[datetime] = None
     visit_end_time: Optional[datetime] = None
     customer_feedback: Optional[str] = None
@@ -132,10 +135,11 @@ class VisitBooking(BaseModel):
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class VisitBookingCreate(BaseModel):
-    property_id: str
+    property_ids: List[str]  # Can book multiple properties
     package_id: Optional[str] = None
     scheduled_date: str
     scheduled_time: str
+    pickup_location: str
 
 class PropertyLock(BaseModel):
     model_config = ConfigDict(extra="ignore")
@@ -235,6 +239,14 @@ async def login(login_data: LoginRequest):
 async def get_me(current_user: dict = Depends(get_current_user)):
     current_user.pop('password', None)
     return current_user
+
+@api_router.get("/users")
+async def get_all_users(current_user: dict = Depends(get_current_user)):
+    if current_user['role'] not in ['admin', 'support_admin', 'rider_admin']:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    users = await db.users.find({}, {"_id": 0, "password": 0}).limit(100).to_list(None)
+    return users
 
 # Property endpoints
 @api_router.post("/properties")
