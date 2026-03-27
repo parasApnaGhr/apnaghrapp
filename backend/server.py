@@ -33,7 +33,8 @@ STRIPE_API_KEY = os.environ.get('STRIPE_API_KEY', 'sk_test_emergent')
 
 # Payment packages
 PAYMENT_PACKAGES = {
-    "single_visit": {"amount": 200.0, "visits": 1, "validity_days": 1},
+    "single_visit": {"amount": 200.0, "visits": 1, "validity_days": 3},
+    "three_visits": {"amount": 350.0, "visits": 3, "validity_days": 7},
     "five_visits": {"amount": 500.0, "visits": 5, "validity_days": 10},
     "property_lock": {"amount": 999.0, "type": "lock"}
 }
