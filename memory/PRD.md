@@ -1,210 +1,153 @@
 # ApnaGhr Visit Platform - Product Requirements Document
 
 ## Overview
-ApnaGhr Visit Platform is a multi-role mobile and web platform for rental property discovery, paid visits, and centralized deal closing. It functions as a combination of a property listing app, a ride-hailing system (like Uber Eats), and a centralized call center.
+ApnaGhr Visit Platform is a multi-role mobile and web platform for rental property discovery, paid visits, and centralized deal closing.
 
 ## User Roles
 
 ### 1. Customer
 - Browse properties (exact location hidden until visit)
-- Book paid visits (₹200 single, ₹500 for 5 visits)
-- **Select multiple properties for single visit (Uber Eats style)**
+- Select multiple properties for visit cart
+- Book paid visits using credit packages
 - Track rider in real-time
-- Connect to support for deal negotiation
-- Lock property for exclusive access
+- Contact support for deal negotiations
 
 ### 2. Rider (Field Executive)
-- **Online/Offline Shift System** - Toggle to receive visit requests
-- Accept nearby visit requests (batched multi-property)
-- **Uber Eats Style Navigation Flow**:
-  1. Accept visit → Get customer pickup location
-  2. Navigate to customer → Verify OTP
-  3. Navigate to Property 1 → Complete visit proof
-  4. Navigate to Property 2 → Complete visit proof
-  5. ... repeat for all properties
-  6. Complete entire visit
-- Upload selfie/video proof at each property
-- Earn ₹100 per property visited
+- Online/Offline shift toggle
+- Accept property visits (Uber Eats style multi-property routing)
+- Accept ToLet board collection tasks
+- Upload proof (selfie/video) at each location
+- View wallet with pending/approved/paid earnings
+- Bi-weekly payouts
 
 ### 3. Admin Panel
-- **Customer Support**: Chat/call with customers, close deals
-- **Inventory Management**: Add/delete properties, hide address, upload photos/videos
-- **Rider Management**: Track online riders, approve applications, manage bonuses
+- **Live Tracking**: Real-time rider locations, active visits
+- **Visit Approvals**: Review completed visits, verify proofs, approve/reject
+- **ToLet Tasks**: Create board collection tasks, set rates, assign to riders
+- **Payouts**: View rider wallets, process bi-weekly payouts
+- **Notifications**: Real-time alerts for ride start/end, task completion
+- **Customer Support**: Chat/call with customers
+- **Inventory**: Manage properties
+- **Settings**: Upload explainer video
 
-## Core Features (Implemented)
+## Pricing Packages
+- 1 Visit: ₹200 (3 days validity)
+- 3 Visits: ₹350 (7 days validity) - Popular
+- 5 Visits: ₹500 (10 days validity) - Best Value
+- Property Lock: ₹999
 
-### ✅ Authentication System
-- Phone + password login
-- JWT token-based authentication
-- Role-based access control (customer/rider/admin)
+---
 
-### ✅ Property Management
-- Property listing with images, videos, amenities
-- Filters: city, rent range, BHK, furnishing
-- Exact address hidden until paid visit
-- Premium/Verified badges
+## Features Implemented
 
-### ✅ Payment Integration (Stripe)
-- Single visit: ₹200
-- 5-visit package: ₹500
-- Property lock: ₹999
-- Test mode enabled
+### ✅ Customer Flow
+- Property browsing with filters
+- Multi-property cart selection
+- Visit booking with pickup location
+- Visit tracking with OTP
+- "How It Works" explainer section
 
-### ✅ Multi-Property Visit Booking (NEW - Uber Eats Style)
-- Customers add multiple properties to visit cart
-- Set pickup location, date, and time
-- Single booking for all selected properties
-- Visit credits deducted from package
+### ✅ Rider Flow (Uber Eats Style)
+- Shift toggle (Online/Offline)
+- Accept batched visits
+- Step-by-step navigation:
+  1. Go to Customer → Verify OTP
+  2. Navigate to Property 1 → Upload Proof → Complete
+  3. Navigate to Property 2 → Upload Proof → Complete
+  4. Finish Visit
+- ToLet board task acceptance
+- Wallet with earnings breakdown
 
-### ✅ Rider Shift System (NEW)
-- Online/Offline toggle in Rider Dashboard
-- Only online riders see and can accept visits
-- Location tracking (GPS) when online
+### ✅ Admin Panel (NEW)
+- **Live Tracking**: Online riders with GPS, active visits, call rider
+- **Visit Approvals**: Review proofs, approve/reject, credit earnings
+- **ToLet Tasks**: Create tasks with editable rates, assign riders
+- **Payouts**: Summary cards, bi-weekly payout processing
+- **Notifications**: Real-time alerts in header dropdown
+- Settings with video upload
 
-### ✅ Step-by-Step Visit Navigation (NEW)
-Visit flow states:
-1. `pending` - Waiting for rider
-2. `rider_assigned` - Rider accepted, customer notified
-3. `pickup_started` - Rider navigating to customer
-4. `at_customer` - Rider arrived, verify OTP
-5. `navigating` - En route to property
-6. `at_property` - At property, show/upload proof
-7. `completed` - All properties visited
+### ✅ Payment & Wallet System
+- Stripe integration (test mode)
+- Rider wallet with transaction history
+- Pending → Approved → Paid earnings flow
+- Bi-weekly payout dates (1st & 15th)
 
-### ✅ Visit Progress Tracking
-- Customer sees real-time status updates
-- Progress bar showing X/Y properties completed
-- Property checkmarks for completed visits
-- Estimated duration calculation
+### ✅ Notifications
+- Admin notified on: ride start, ride end, task completion
+- Rider notified on: task assigned, visit approved, payout processed
 
-### ✅ Direct File Upload
-- Property images and videos
-- Visit proof (selfie + video) at each property
-- Stored in /app/uploads directory
-
-### ✅ Chat System
-- Customer-Support messaging
-- Message history and read receipts
-
-## Technical Stack
-- **Frontend**: React 19, TailwindCSS, Shadcn/UI
-- **Backend**: FastAPI (Python)
-- **Database**: MongoDB
-- **Payments**: Stripe (test mode)
-- **Authentication**: JWT
+---
 
 ## API Endpoints
 
-### Auth
-- POST `/api/auth/register`
-- POST `/api/auth/login`
-- GET `/api/auth/me`
+### ToLet Tasks
+- POST `/api/admin/tolet-tasks` - Create task
+- GET `/api/admin/tolet-tasks` - List all
+- PATCH `/api/admin/tolet-tasks/{id}` - Update rate
+- POST `/api/admin/tolet-tasks/{id}/assign` - Assign to rider
+- GET `/api/tolet-tasks/available` - Rider gets available
+- POST `/api/tolet-tasks/{id}/accept` - Accept
+- POST `/api/tolet-tasks/{id}/start` - Start
+- POST `/api/tolet-tasks/{id}/complete` - Complete
 
-### Properties
-- GET `/api/properties`
-- GET `/api/properties/{id}`
-- POST `/api/properties`
-- PATCH `/api/properties/{id}`
-- DELETE `/api/properties/{id}`
+### Visit Management
+- GET `/api/admin/visits/all` - All visits
+- GET `/api/admin/visits/pending-approval` - Needs review
+- POST `/api/admin/visits/{id}/assign` - Assign rider
+- POST `/api/admin/visits/{id}/approve` - Approve/Reject
 
-### Visits
-- POST `/api/visits/book` - Book multi-property visit
-- GET `/api/visits/available` - Get pending visits (riders only)
-- POST `/api/visits/{id}/accept` - Accept visit
-- POST `/api/visits/{id}/update-step` - Update visit progress
-- GET `/api/visits/{id}/details` - Get full visit details
-- GET `/api/visits/my-bookings` - Customer's bookings
+### Rider Wallet
+- GET `/api/rider/wallet` - Balance
+- GET `/api/rider/wallet/transactions` - History
+- GET `/api/admin/riders/wallets` - All wallets
+- POST `/api/admin/payouts/process` - Bi-weekly payout
 
-### Rider
-- POST `/api/rider/shift` - Toggle online/offline
-- GET `/api/rider/shift` - Get current shift status
-- POST `/api/rider/location` - Update GPS location
-- GET `/api/rider/active-visit` - Get current active visit
+### Live Tracking
+- GET `/api/admin/visits/{id}/tracking` - Visit tracking
+- GET `/api/admin/riders/live-locations` - All online riders
 
-### Payments
-- POST `/api/payments/checkout`
-- GET `/api/payments/status/{session_id}`
-
-### Chat
-- POST `/api/chat/send`
-- GET `/api/chat/messages/{user_id}`
-- GET `/api/chat/conversations`
-
-## Data Models
-
-### VisitBooking (Updated for Multi-Property)
-```json
-{
-  "id": "string",
-  "customer_id": "string",
-  "property_ids": ["string"],  // Array of properties
-  "scheduled_date": "string",
-  "scheduled_time": "string",
-  "status": "pending|rider_assigned|pickup_started|at_customer|navigating|at_property|completed",
-  "current_step": "waiting|go_to_customer|at_customer|go_to_property_X|at_property_X|completed",
-  "current_property_index": 0,  // Which property we're at
-  "rider_id": "string",
-  "otp": "string",
-  "pickup_location": "string",
-  "pickup_lat": "float",
-  "pickup_lng": "float",
-  "properties_completed": ["string"],  // Completed property IDs
-  "total_earnings": "float",  // Rider earnings
-  "estimated_duration": "string"
-}
-```
+### Notifications
+- GET `/api/notifications` - User notifications
+- POST `/api/notifications/mark-read` - Mark read
 
 ---
 
-## Completed Work (March 27, 2025)
-
-### Session 1: Initial MVP
-- Basic auth, property listing, single visit booking
-- Stripe payment integration
-- Direct file upload
-
-### Session 2: Multi-Property Visit Flow (Uber Eats Style)
-- ✅ Updated VisitBooking model for multiple properties
-- ✅ Created visit cart (VisitCart.js)
-- ✅ Added "Add to Cart" button on PropertyDetail
-- ✅ Implemented step-by-step navigation API
-- ✅ Created Uber Eats style RiderDashboard
-- ✅ Added rider shift toggle (Online/Offline)
-- ✅ Updated CustomerBookings for multi-property tracking
-- ✅ All tests passing (20/20 backend, all frontend flows)
+## Test Credentials
+- Customer: 9999999999 / test123
+- Rider: 8888888888 / test123
+- Admin: 7777777777 / admin123
 
 ---
 
-## Upcoming Tasks (P1)
+## Completed (March 27, 2025)
 
-1. **Real-time WebSocket Tracking**
-   - Live rider location updates
-   - Push notifications for status changes
+### Session 1: MVP
+- Basic auth, property listing, Stripe payments
 
-2. **SMS Notifications (Twilio)**
-   - OTP delivery via SMS
-   - Visit status updates
+### Session 2: Multi-Property Visit Flow
+- Uber Eats style routing
+- Rider shift system
+- Visit cart for customers
 
-3. **Rider Management Panel Fixes**
-   - Live tracking on admin map
-   - Bonus system implementation
+### Session 3: Admin Panel Overhaul (Current)
+- ✅ Live Tracking panel with online riders
+- ✅ Visit Approvals panel with proof review
+- ✅ ToLet Board Tasks (create, assign, editable rates)
+- ✅ Payouts panel with bi-weekly processing
+- ✅ Notifications system with real-time alerts
+- ✅ Rider wallet with transaction history
+- ✅ Pricing updated (1/3/5 visits)
+- ✅ "How It Works" video section
 
 ---
+
+## Next Tasks (P1)
+- [ ] Add wallet section to Rider Dashboard
+- [ ] ToLet tasks section in Rider Dashboard
+- [ ] Real-time WebSocket for tracking (currently polling)
 
 ## Future/Backlog (P2)
-
-1. Anti-Cheat & Fraud Detection
-   - Flag short visits (<5 min)
-   - Detect repeated patterns
-   - Photo/video verification
-
-2. Advanced Filters
-   - Map-based property search
-   - Distance-based sorting
-
-3. In-App Voice/Video Call
-   - Direct customer-rider communication
-
-4. Rating & Review System
-   - Rate properties after visit
-   - Rate riders
+- SMS notifications (Twilio)
+- Anti-fraud detection
+- In-app calling
+- Rating system

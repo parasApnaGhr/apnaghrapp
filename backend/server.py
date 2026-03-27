@@ -198,6 +198,100 @@ class ChatMessageCreate(BaseModel):
     message: str
     visit_id: Optional[str] = None
 
+# ============ NEW MODELS FOR ADMIN FEATURES ============
+
+class ToLetTask(BaseModel):
+    """Task for collecting ToLet boards from properties"""
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    title: str
+    description: str
+    location: str
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
+    rate_per_board: float = 10.0  # Editable rate
+    estimated_boards: int = 1
+    actual_boards_collected: int = 0
+    status: str = "open"  # open, assigned, in_progress, completed, verified, rejected
+    rider_id: Optional[str] = None
+    assigned_by: Optional[str] = None
+    proof_images: List[str] = []
+    proof_video: Optional[str] = None
+    started_at: Optional[str] = None
+    completed_at: Optional[str] = None
+    verified_at: Optional[str] = None
+    verified_by: Optional[str] = None
+    earnings: float = 0.0
+    notes: Optional[str] = None
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class ToLetTaskCreate(BaseModel):
+    title: str
+    description: str
+    location: str
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
+    rate_per_board: float = 10.0
+    estimated_boards: int = 1
+
+class ToLetTaskUpdate(BaseModel):
+    rate_per_board: Optional[float] = None
+    estimated_boards: Optional[int] = None
+    title: Optional[str] = None
+    description: Optional[str] = None
+    location: Optional[str] = None
+
+class RiderWallet(BaseModel):
+    """Rider's earnings wallet"""
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    rider_id: str
+    total_earnings: float = 0.0
+    pending_earnings: float = 0.0  # Awaiting admin approval
+    approved_earnings: float = 0.0  # Approved but not paid
+    paid_earnings: float = 0.0  # Already paid out
+    last_payout_date: Optional[str] = None
+    next_payout_date: Optional[str] = None
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class RiderTransaction(BaseModel):
+    """Individual transaction record"""
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    rider_id: str
+    type: str  # visit_earning, tolet_earning, bonus, deduction, payout
+    amount: float
+    status: str = "pending"  # pending, approved, rejected, paid
+    reference_id: Optional[str] = None  # visit_id or tolet_task_id
+    reference_type: Optional[str] = None  # visit, tolet_task, bonus
+    description: str
+    approved_by: Optional[str] = None
+    approved_at: Optional[str] = None
+    paid_at: Optional[str] = None
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class Notification(BaseModel):
+    """Notification for admin/rider"""
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str  # who receives
+    type: str  # ride_started, ride_ended, visit_completed, tolet_completed, payment_approved
+    title: str
+    message: str
+    reference_id: Optional[str] = None
+    reference_type: Optional[str] = None
+    read: bool = False
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class VisitApproval(BaseModel):
+    """For admin to approve/reject visits"""
+    approved: bool
+    rejection_reason: Optional[str] = None
+
+class AssignRider(BaseModel):
+    """Assign a visit/task to specific rider"""
+    rider_id: str
+
 def hash_password(password: str) -> str:
     return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
 
@@ -611,11 +705,17 @@ async def update_visit_step(visit_id: str, step_data: VisitStepUpdate, current_u
     
     update_data = {}
     action = step_data.action
+    notify_admins = False
+    notification_title = ""
+    notification_message = ""
     
     if action == "start_pickup":
         update_data["current_step"] = "go_to_customer"
         update_data["status"] = "pickup_started"
         update_data["visit_start_time"] = datetime.now(timezone.utc).isoformat()
+        notify_admins = True
+        notification_title = "Ride Started"
+        notification_message = f"Rider {current_user['name']} started visit - heading to customer"
     
     elif action == "arrived_customer":
         update_data["current_step"] = "at_customer"
@@ -653,13 +753,60 @@ async def update_visit_step(visit_id: str, step_data: VisitStepUpdate, current_u
             update_data["current_step"] = "completed"
             update_data["status"] = "completed"
             update_data["visit_end_time"] = datetime.now(timezone.utc).isoformat()
+            notify_admins = True
+            notification_title = "Ride Completed"
+            notification_message = f"Rider {current_user['name']} completed visit - {len(property_ids)} properties"
+            
+            # Create pending transaction for rider earnings
+            earnings = visit.get('total_earnings', 0)
+            transaction = RiderTransaction(
+                rider_id=current_user['id'],
+                type="visit_earning",
+                amount=earnings,
+                status="pending",
+                reference_id=visit_id,
+                reference_type="visit",
+                description=f"Visit completed: {len(property_ids)} properties"
+            )
+            trans_doc = transaction.model_dump()
+            trans_doc['created_at'] = trans_doc['created_at'].isoformat()
+            await db.rider_transactions.insert_one(trans_doc)
+            
+            # Update wallet
+            await db.rider_wallets.update_one(
+                {"rider_id": current_user['id']},
+                {
+                    "$inc": {"pending_earnings": earnings, "total_earnings": earnings},
+                    "$setOnInsert": {"approved_earnings": 0, "paid_earnings": 0}
+                },
+                upsert=True
+            )
     
     elif action == "complete_visit":
         update_data["current_step"] = "completed"
         update_data["status"] = "completed"
         update_data["visit_end_time"] = datetime.now(timezone.utc).isoformat()
+        notify_admins = True
+        notification_title = "Ride Completed"
+        notification_message = f"Rider {current_user['name']} completed visit"
     
     await db.visit_bookings.update_one({"id": visit_id}, {"$set": update_data})
+    
+    # Send notifications to admins
+    if notify_admins:
+        admins = await db.users.find({"role": {"$in": ["admin", "rider_admin", "support_admin"]}}, {"_id": 0}).to_list(50)
+        for admin in admins:
+            notification = Notification(
+                user_id=admin['id'],
+                type="ride_update",
+                title=notification_title,
+                message=notification_message,
+                reference_id=visit_id,
+                reference_type="visit"
+            )
+            notif_doc = notification.model_dump()
+            notif_doc['created_at'] = notif_doc['created_at'].isoformat()
+            await db.notifications.insert_one(notif_doc)
     
     updated_visit = await db.visit_bookings.find_one({"id": visit_id}, {"_id": 0})
     return updated_visit
@@ -984,6 +1131,731 @@ async def upload_visit_proof(
         await db.visit_bookings.update_one({"id": visit_id}, {"$set": update_data})
     
     return {"success": True, "uploaded": update_data}
+
+
+# ============ ADMIN: TOLET BOARD TASKS ============
+
+@api_router.post("/admin/tolet-tasks")
+async def create_tolet_task(task_data: ToLetTaskCreate, current_user: dict = Depends(get_current_user)):
+    """Admin creates a new ToLet board collection task"""
+    if current_user['role'] not in ['admin', 'inventory_admin']:
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    task = ToLetTask(
+        title=task_data.title,
+        description=task_data.description,
+        location=task_data.location,
+        latitude=task_data.latitude,
+        longitude=task_data.longitude,
+        rate_per_board=task_data.rate_per_board,
+        estimated_boards=task_data.estimated_boards
+    )
+    
+    doc = task.model_dump()
+    doc['created_at'] = doc['created_at'].isoformat()
+    await db.tolet_tasks.insert_one(doc)
+    
+    # Notify all online riders
+    online_riders = await db.users.find({"role": "rider", "is_online": True}, {"_id": 0}).to_list(100)
+    for rider in online_riders:
+        notification = Notification(
+            user_id=rider['id'],
+            type="new_tolet_task",
+            title="New ToLet Board Task",
+            message=f"New task: {task_data.title} - ₹{task_data.rate_per_board}/board",
+            reference_id=task.id,
+            reference_type="tolet_task"
+        )
+        notif_doc = notification.model_dump()
+        notif_doc['created_at'] = notif_doc['created_at'].isoformat()
+        await db.notifications.insert_one(notif_doc)
+    
+    doc.pop('_id', None)
+    return doc
+
+@api_router.get("/admin/tolet-tasks")
+async def get_all_tolet_tasks(current_user: dict = Depends(get_current_user)):
+    """Admin gets all ToLet tasks"""
+    if current_user['role'] not in ['admin', 'inventory_admin', 'rider_admin']:
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    tasks = await db.tolet_tasks.find({}, {"_id": 0}).sort("created_at", -1).to_list(100)
+    
+    # Enrich with rider info
+    for task in tasks:
+        if task.get('rider_id'):
+            rider = await db.users.find_one({"id": task['rider_id']}, {"_id": 0, "password": 0})
+            task['rider'] = rider
+    
+    return tasks
+
+@api_router.patch("/admin/tolet-tasks/{task_id}")
+async def update_tolet_task(task_id: str, update_data: ToLetTaskUpdate, current_user: dict = Depends(get_current_user)):
+    """Admin updates ToLet task (rate, etc.)"""
+    if current_user['role'] not in ['admin', 'inventory_admin']:
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    update_dict = {k: v for k, v in update_data.model_dump().items() if v is not None}
+    
+    if update_dict:
+        await db.tolet_tasks.update_one({"id": task_id}, {"$set": update_dict})
+    
+    task = await db.tolet_tasks.find_one({"id": task_id}, {"_id": 0})
+    return task
+
+@api_router.post("/admin/tolet-tasks/{task_id}/assign")
+async def assign_tolet_task(task_id: str, assignment: AssignRider, current_user: dict = Depends(get_current_user)):
+    """Admin assigns ToLet task to specific rider"""
+    if current_user['role'] not in ['admin', 'rider_admin']:
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    result = await db.tolet_tasks.update_one(
+        {"id": task_id, "status": "open"},
+        {"$set": {
+            "rider_id": assignment.rider_id,
+            "assigned_by": current_user['id'],
+            "status": "assigned"
+        }}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=400, detail="Task not available for assignment")
+    
+    # Notify rider
+    task = await db.tolet_tasks.find_one({"id": task_id}, {"_id": 0})
+    notification = Notification(
+        user_id=assignment.rider_id,
+        type="task_assigned",
+        title="Task Assigned to You",
+        message=f"You've been assigned: {task['title']}",
+        reference_id=task_id,
+        reference_type="tolet_task"
+    )
+    notif_doc = notification.model_dump()
+    notif_doc['created_at'] = notif_doc['created_at'].isoformat()
+    await db.notifications.insert_one(notif_doc)
+    
+    return task
+
+@api_router.get("/tolet-tasks/available")
+async def get_available_tolet_tasks(current_user: dict = Depends(get_current_user)):
+    """Rider gets available ToLet tasks"""
+    if current_user['role'] != 'rider':
+        raise HTTPException(status_code=403, detail="Riders only")
+    
+    # Get open tasks or tasks assigned to this rider
+    tasks = await db.tolet_tasks.find({
+        "$or": [
+            {"status": "open"},
+            {"rider_id": current_user['id'], "status": {"$in": ["assigned", "in_progress"]}}
+        ]
+    }, {"_id": 0}).to_list(50)
+    
+    return tasks
+
+@api_router.post("/tolet-tasks/{task_id}/accept")
+async def accept_tolet_task(task_id: str, current_user: dict = Depends(get_current_user)):
+    """Rider accepts an open ToLet task"""
+    if current_user['role'] != 'rider':
+        raise HTTPException(status_code=403, detail="Riders only")
+    
+    result = await db.tolet_tasks.update_one(
+        {"id": task_id, "status": "open"},
+        {"$set": {
+            "rider_id": current_user['id'],
+            "status": "assigned"
+        }}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=400, detail="Task not available")
+    
+    task = await db.tolet_tasks.find_one({"id": task_id}, {"_id": 0})
+    return task
+
+@api_router.post("/tolet-tasks/{task_id}/start")
+async def start_tolet_task(task_id: str, current_user: dict = Depends(get_current_user)):
+    """Rider starts ToLet task"""
+    if current_user['role'] != 'rider':
+        raise HTTPException(status_code=403, detail="Riders only")
+    
+    result = await db.tolet_tasks.update_one(
+        {"id": task_id, "rider_id": current_user['id'], "status": "assigned"},
+        {"$set": {
+            "status": "in_progress",
+            "started_at": datetime.now(timezone.utc).isoformat()
+        }}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=400, detail="Cannot start task")
+    
+    # Notify admins
+    admins = await db.users.find({"role": {"$in": ["admin", "rider_admin"]}}, {"_id": 0}).to_list(50)
+    for admin in admins:
+        notification = Notification(
+            user_id=admin['id'],
+            type="task_started",
+            title="ToLet Task Started",
+            message=f"Rider {current_user['name']} started task",
+            reference_id=task_id,
+            reference_type="tolet_task"
+        )
+        notif_doc = notification.model_dump()
+        notif_doc['created_at'] = notif_doc['created_at'].isoformat()
+        await db.notifications.insert_one(notif_doc)
+    
+    task = await db.tolet_tasks.find_one({"id": task_id}, {"_id": 0})
+    return task
+
+@api_router.post("/tolet-tasks/{task_id}/complete")
+async def complete_tolet_task(
+    task_id: str, 
+    boards_collected: int,
+    current_user: dict = Depends(get_current_user)
+):
+    """Rider completes ToLet task"""
+    if current_user['role'] != 'rider':
+        raise HTTPException(status_code=403, detail="Riders only")
+    
+    task = await db.tolet_tasks.find_one({"id": task_id, "rider_id": current_user['id']}, {"_id": 0})
+    if not task:
+        raise HTTPException(status_code=404, detail="Task not found")
+    
+    earnings = boards_collected * task['rate_per_board']
+    
+    await db.tolet_tasks.update_one(
+        {"id": task_id},
+        {"$set": {
+            "status": "completed",
+            "actual_boards_collected": boards_collected,
+            "earnings": earnings,
+            "completed_at": datetime.now(timezone.utc).isoformat()
+        }}
+    )
+    
+    # Create pending transaction
+    transaction = RiderTransaction(
+        rider_id=current_user['id'],
+        type="tolet_earning",
+        amount=earnings,
+        status="pending",
+        reference_id=task_id,
+        reference_type="tolet_task",
+        description=f"ToLet boards collected: {boards_collected} x ₹{task['rate_per_board']}"
+    )
+    trans_doc = transaction.model_dump()
+    trans_doc['created_at'] = trans_doc['created_at'].isoformat()
+    await db.rider_transactions.insert_one(trans_doc)
+    
+    # Update wallet pending earnings
+    await db.rider_wallets.update_one(
+        {"rider_id": current_user['id']},
+        {
+            "$inc": {"pending_earnings": earnings, "total_earnings": earnings},
+            "$setOnInsert": {"rider_id": current_user['id'], "approved_earnings": 0, "paid_earnings": 0}
+        },
+        upsert=True
+    )
+    
+    # Notify admins
+    admins = await db.users.find({"role": {"$in": ["admin", "rider_admin"]}}, {"_id": 0}).to_list(50)
+    for admin in admins:
+        notification = Notification(
+            user_id=admin['id'],
+            type="task_completed",
+            title="ToLet Task Completed",
+            message=f"Rider {current_user['name']} completed task - ₹{earnings} pending approval",
+            reference_id=task_id,
+            reference_type="tolet_task"
+        )
+        notif_doc = notification.model_dump()
+        notif_doc['created_at'] = notif_doc['created_at'].isoformat()
+        await db.notifications.insert_one(notif_doc)
+    
+    return {"success": True, "earnings": earnings, "status": "pending_approval"}
+
+
+# ============ ADMIN: VISIT MANAGEMENT & ASSIGNMENT ============
+
+@api_router.get("/admin/visits/all")
+async def get_all_visits(current_user: dict = Depends(get_current_user)):
+    """Admin gets all visits"""
+    if current_user['role'] not in ['admin', 'support_admin', 'rider_admin']:
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    visits = await db.visit_bookings.find({}, {"_id": 0}).sort("created_at", -1).to_list(100)
+    
+    # Enrich with customer and rider info
+    for visit in visits:
+        customer = await db.users.find_one({"id": visit['customer_id']}, {"_id": 0, "password": 0})
+        visit['customer'] = customer
+        if visit.get('rider_id'):
+            rider = await db.users.find_one({"id": visit['rider_id']}, {"_id": 0, "password": 0})
+            visit['rider'] = rider
+    
+    return visits
+
+@api_router.get("/admin/visits/pending-approval")
+async def get_visits_pending_approval(current_user: dict = Depends(get_current_user)):
+    """Admin gets visits that need approval (completed but not verified)"""
+    if current_user['role'] not in ['admin', 'support_admin', 'rider_admin']:
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    visits = await db.visit_bookings.find(
+        {"status": "completed", "admin_verified": {"$ne": True}},
+        {"_id": 0}
+    ).sort("visit_end_time", -1).to_list(50)
+    
+    # Enrich with details
+    for visit in visits:
+        customer = await db.users.find_one({"id": visit['customer_id']}, {"_id": 0, "password": 0})
+        visit['customer'] = customer
+        if visit.get('rider_id'):
+            rider = await db.users.find_one({"id": visit['rider_id']}, {"_id": 0, "password": 0})
+            visit['rider'] = rider
+        # Get properties
+        properties = []
+        for prop_id in visit.get('property_ids', []):
+            prop = await db.properties.find_one({"id": prop_id}, {"_id": 0})
+            if prop:
+                properties.append(prop)
+        visit['properties'] = properties
+    
+    return visits
+
+@api_router.post("/admin/visits/{visit_id}/assign")
+async def admin_assign_visit(visit_id: str, assignment: AssignRider, current_user: dict = Depends(get_current_user)):
+    """Admin assigns visit to specific rider"""
+    if current_user['role'] not in ['admin', 'rider_admin']:
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    result = await db.visit_bookings.update_one(
+        {"id": visit_id, "status": "pending"},
+        {"$set": {
+            "rider_id": assignment.rider_id,
+            "status": "rider_assigned",
+            "current_step": "go_to_customer",
+            "assigned_by_admin": current_user['id']
+        }}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=400, detail="Visit not available for assignment")
+    
+    visit = await db.visit_bookings.find_one({"id": visit_id}, {"_id": 0})
+    
+    # Notify rider
+    notification = Notification(
+        user_id=assignment.rider_id,
+        type="visit_assigned",
+        title="Visit Assigned to You",
+        message=f"Admin assigned you a visit with {len(visit.get('property_ids', []))} properties",
+        reference_id=visit_id,
+        reference_type="visit"
+    )
+    notif_doc = notification.model_dump()
+    notif_doc['created_at'] = notif_doc['created_at'].isoformat()
+    await db.notifications.insert_one(notif_doc)
+    
+    return visit
+
+@api_router.post("/admin/visits/{visit_id}/approve")
+async def approve_visit(visit_id: str, approval: VisitApproval, current_user: dict = Depends(get_current_user)):
+    """Admin approves a completed visit and credits rider wallet"""
+    if current_user['role'] not in ['admin', 'support_admin', 'rider_admin']:
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    visit = await db.visit_bookings.find_one({"id": visit_id}, {"_id": 0})
+    if not visit:
+        raise HTTPException(status_code=404, detail="Visit not found")
+    
+    if not approval.approved:
+        # Reject the visit
+        await db.visit_bookings.update_one(
+            {"id": visit_id},
+            {"$set": {
+                "admin_verified": True,
+                "admin_approved": False,
+                "rejection_reason": approval.rejection_reason,
+                "verified_by": current_user['id'],
+                "verified_at": datetime.now(timezone.utc).isoformat()
+            }}
+        )
+        
+        # Update transaction to rejected
+        await db.rider_transactions.update_one(
+            {"reference_id": visit_id, "reference_type": "visit", "status": "pending"},
+            {"$set": {"status": "rejected"}}
+        )
+        
+        # Notify rider
+        notification = Notification(
+            user_id=visit['rider_id'],
+            type="visit_rejected",
+            title="Visit Rejected",
+            message=f"Your visit was rejected: {approval.rejection_reason}",
+            reference_id=visit_id,
+            reference_type="visit"
+        )
+        notif_doc = notification.model_dump()
+        notif_doc['created_at'] = notif_doc['created_at'].isoformat()
+        await db.notifications.insert_one(notif_doc)
+        
+        return {"success": True, "status": "rejected"}
+    
+    # Approve the visit
+    earnings = visit.get('total_earnings', 0)
+    
+    await db.visit_bookings.update_one(
+        {"id": visit_id},
+        {"$set": {
+            "admin_verified": True,
+            "admin_approved": True,
+            "verified_by": current_user['id'],
+            "verified_at": datetime.now(timezone.utc).isoformat()
+        }}
+    )
+    
+    # Update transaction to approved
+    await db.rider_transactions.update_one(
+        {"reference_id": visit_id, "reference_type": "visit", "status": "pending"},
+        {"$set": {
+            "status": "approved",
+            "approved_by": current_user['id'],
+            "approved_at": datetime.now(timezone.utc).isoformat()
+        }}
+    )
+    
+    # Move earnings from pending to approved in wallet
+    await db.rider_wallets.update_one(
+        {"rider_id": visit['rider_id']},
+        {"$inc": {"pending_earnings": -earnings, "approved_earnings": earnings}}
+    )
+    
+    # Notify rider
+    notification = Notification(
+        user_id=visit['rider_id'],
+        type="visit_approved",
+        title="Visit Approved!",
+        message=f"Your visit was approved! ₹{earnings} added to your wallet",
+        reference_id=visit_id,
+        reference_type="visit"
+    )
+    notif_doc = notification.model_dump()
+    notif_doc['created_at'] = notif_doc['created_at'].isoformat()
+    await db.notifications.insert_one(notif_doc)
+    
+    return {"success": True, "status": "approved", "earnings_credited": earnings}
+
+
+# ============ ADMIN: TOLET TASK APPROVAL ============
+
+@api_router.get("/admin/tolet-tasks/pending-approval")
+async def get_tolet_tasks_pending_approval(current_user: dict = Depends(get_current_user)):
+    """Admin gets ToLet tasks that need approval"""
+    if current_user['role'] not in ['admin', 'rider_admin']:
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    tasks = await db.tolet_tasks.find({"status": "completed"}, {"_id": 0}).to_list(50)
+    
+    for task in tasks:
+        if task.get('rider_id'):
+            rider = await db.users.find_one({"id": task['rider_id']}, {"_id": 0, "password": 0})
+            task['rider'] = rider
+    
+    return tasks
+
+@api_router.post("/admin/tolet-tasks/{task_id}/approve")
+async def approve_tolet_task(task_id: str, approval: VisitApproval, current_user: dict = Depends(get_current_user)):
+    """Admin approves ToLet task"""
+    if current_user['role'] not in ['admin', 'rider_admin']:
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    task = await db.tolet_tasks.find_one({"id": task_id}, {"_id": 0})
+    if not task:
+        raise HTTPException(status_code=404, detail="Task not found")
+    
+    earnings = task.get('earnings', 0)
+    rider_id = task.get('rider_id')
+    
+    if not approval.approved:
+        await db.tolet_tasks.update_one(
+            {"id": task_id},
+            {"$set": {
+                "status": "rejected",
+                "rejection_reason": approval.rejection_reason,
+                "verified_by": current_user['id'],
+                "verified_at": datetime.now(timezone.utc).isoformat()
+            }}
+        )
+        
+        await db.rider_transactions.update_one(
+            {"reference_id": task_id, "status": "pending"},
+            {"$set": {"status": "rejected"}}
+        )
+        
+        # Remove from pending earnings
+        await db.rider_wallets.update_one(
+            {"rider_id": rider_id},
+            {"$inc": {"pending_earnings": -earnings, "total_earnings": -earnings}}
+        )
+        
+        return {"success": True, "status": "rejected"}
+    
+    # Approve
+    await db.tolet_tasks.update_one(
+        {"id": task_id},
+        {"$set": {
+            "status": "verified",
+            "verified_by": current_user['id'],
+            "verified_at": datetime.now(timezone.utc).isoformat()
+        }}
+    )
+    
+    await db.rider_transactions.update_one(
+        {"reference_id": task_id, "status": "pending"},
+        {"$set": {
+            "status": "approved",
+            "approved_by": current_user['id'],
+            "approved_at": datetime.now(timezone.utc).isoformat()
+        }}
+    )
+    
+    # Move to approved earnings
+    await db.rider_wallets.update_one(
+        {"rider_id": rider_id},
+        {"$inc": {"pending_earnings": -earnings, "approved_earnings": earnings}}
+    )
+    
+    # Notify rider
+    notification = Notification(
+        user_id=rider_id,
+        type="task_approved",
+        title="Task Approved!",
+        message=f"ToLet task approved! ₹{earnings} added to wallet",
+        reference_id=task_id,
+        reference_type="tolet_task"
+    )
+    notif_doc = notification.model_dump()
+    notif_doc['created_at'] = notif_doc['created_at'].isoformat()
+    await db.notifications.insert_one(notif_doc)
+    
+    return {"success": True, "status": "approved", "earnings": earnings}
+
+
+# ============ RIDER WALLET ============
+
+@api_router.get("/rider/wallet")
+async def get_rider_wallet(current_user: dict = Depends(get_current_user)):
+    """Get rider's wallet balance"""
+    if current_user['role'] != 'rider':
+        raise HTTPException(status_code=403, detail="Riders only")
+    
+    wallet = await db.rider_wallets.find_one({"rider_id": current_user['id']}, {"_id": 0})
+    
+    if not wallet:
+        # Create empty wallet
+        wallet = {
+            "rider_id": current_user['id'],
+            "total_earnings": 0,
+            "pending_earnings": 0,
+            "approved_earnings": 0,
+            "paid_earnings": 0,
+            "next_payout_date": get_next_biweekly_date()
+        }
+        await db.rider_wallets.insert_one(wallet)
+    
+    wallet['next_payout_date'] = get_next_biweekly_date()
+    return wallet
+
+def get_next_biweekly_date():
+    """Calculate next bi-weekly payout date (1st and 15th of month)"""
+    today = datetime.now(timezone.utc)
+    if today.day < 15:
+        next_date = today.replace(day=15)
+    else:
+        # Next month 1st
+        if today.month == 12:
+            next_date = today.replace(year=today.year + 1, month=1, day=1)
+        else:
+            next_date = today.replace(month=today.month + 1, day=1)
+    return next_date.strftime("%Y-%m-%d")
+
+@api_router.get("/rider/wallet/transactions")
+async def get_rider_transactions(current_user: dict = Depends(get_current_user)):
+    """Get rider's transaction history"""
+    if current_user['role'] != 'rider':
+        raise HTTPException(status_code=403, detail="Riders only")
+    
+    transactions = await db.rider_transactions.find(
+        {"rider_id": current_user['id']},
+        {"_id": 0}
+    ).sort("created_at", -1).limit(100).to_list(None)
+    
+    return transactions
+
+@api_router.get("/admin/riders/wallets")
+async def get_all_rider_wallets(current_user: dict = Depends(get_current_user)):
+    """Admin gets all rider wallets"""
+    if current_user['role'] not in ['admin', 'rider_admin']:
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    wallets = await db.rider_wallets.find({}, {"_id": 0}).to_list(100)
+    
+    for wallet in wallets:
+        rider = await db.users.find_one({"id": wallet['rider_id']}, {"_id": 0, "password": 0})
+        wallet['rider'] = rider
+    
+    return wallets
+
+@api_router.post("/admin/payouts/process")
+async def process_payouts(current_user: dict = Depends(get_current_user)):
+    """Admin processes bi-weekly payouts"""
+    if current_user['role'] != 'admin':
+        raise HTTPException(status_code=403, detail="Admin only")
+    
+    # Get all wallets with approved earnings
+    wallets = await db.rider_wallets.find({"approved_earnings": {"$gt": 0}}, {"_id": 0}).to_list(100)
+    
+    payouts = []
+    for wallet in wallets:
+        amount = wallet['approved_earnings']
+        
+        # Create payout transaction
+        transaction = RiderTransaction(
+            rider_id=wallet['rider_id'],
+            type="payout",
+            amount=-amount,
+            status="paid",
+            description=f"Bi-weekly payout",
+            paid_at=datetime.now(timezone.utc).isoformat()
+        )
+        trans_doc = transaction.model_dump()
+        trans_doc['created_at'] = trans_doc['created_at'].isoformat()
+        await db.rider_transactions.insert_one(trans_doc)
+        
+        # Update wallet
+        await db.rider_wallets.update_one(
+            {"rider_id": wallet['rider_id']},
+            {
+                "$set": {"approved_earnings": 0, "last_payout_date": datetime.now(timezone.utc).isoformat()},
+                "$inc": {"paid_earnings": amount}
+            }
+        )
+        
+        # Notify rider
+        notification = Notification(
+            user_id=wallet['rider_id'],
+            type="payout_processed",
+            title="Payout Processed!",
+            message=f"₹{amount} has been transferred to your account",
+            reference_type="payout"
+        )
+        notif_doc = notification.model_dump()
+        notif_doc['created_at'] = notif_doc['created_at'].isoformat()
+        await db.notifications.insert_one(notif_doc)
+        
+        payouts.append({"rider_id": wallet['rider_id'], "amount": amount})
+    
+    return {"success": True, "payouts_processed": len(payouts), "payouts": payouts}
+
+
+# ============ NOTIFICATIONS ============
+
+@api_router.get("/notifications")
+async def get_notifications(current_user: dict = Depends(get_current_user)):
+    """Get user's notifications"""
+    notifications = await db.notifications.find(
+        {"user_id": current_user['id']},
+        {"_id": 0}
+    ).sort("created_at", -1).limit(50).to_list(None)
+    
+    unread_count = await db.notifications.count_documents({"user_id": current_user['id'], "read": False})
+    
+    return {"notifications": notifications, "unread_count": unread_count}
+
+@api_router.post("/notifications/mark-read")
+async def mark_notifications_read(notification_ids: List[str] = None, current_user: dict = Depends(get_current_user)):
+    """Mark notifications as read"""
+    if notification_ids:
+        await db.notifications.update_many(
+            {"id": {"$in": notification_ids}, "user_id": current_user['id']},
+            {"$set": {"read": True}}
+        )
+    else:
+        # Mark all as read
+        await db.notifications.update_many(
+            {"user_id": current_user['id']},
+            {"$set": {"read": True}}
+        )
+    
+    return {"success": True}
+
+
+# ============ LIVE TRACKING ============
+
+@api_router.get("/admin/visits/{visit_id}/tracking")
+async def get_visit_tracking(visit_id: str, current_user: dict = Depends(get_current_user)):
+    """Admin gets live tracking for a visit"""
+    if current_user['role'] not in ['admin', 'rider_admin', 'support_admin']:
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    visit = await db.visit_bookings.find_one({"id": visit_id}, {"_id": 0})
+    if not visit:
+        raise HTTPException(status_code=404, detail="Visit not found")
+    
+    rider = None
+    if visit.get('rider_id'):
+        rider = await db.users.find_one({"id": visit['rider_id']}, {"_id": 0, "password": 0})
+    
+    customer = await db.users.find_one({"id": visit['customer_id']}, {"_id": 0, "password": 0})
+    
+    properties = []
+    for prop_id in visit.get('property_ids', []):
+        prop = await db.properties.find_one({"id": prop_id}, {"_id": 0})
+        if prop:
+            properties.append(prop)
+    
+    return {
+        "visit": visit,
+        "rider": rider,
+        "customer": customer,
+        "properties": properties,
+        "rider_location": {
+            "lat": rider.get('current_lat') if rider else None,
+            "lng": rider.get('current_lng') if rider else None,
+            "last_update": rider.get('last_location_update') if rider else None
+        }
+    }
+
+@api_router.get("/admin/riders/live-locations")
+async def get_live_rider_locations(current_user: dict = Depends(get_current_user)):
+    """Admin gets all online riders' locations"""
+    if current_user['role'] not in ['admin', 'rider_admin']:
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    riders = await db.users.find(
+        {"role": "rider", "is_online": True},
+        {"_id": 0, "password": 0}
+    ).to_list(100)
+    
+    # Get active visits for each rider
+    for rider in riders:
+        active_visit = await db.visit_bookings.find_one(
+            {"rider_id": rider['id'], "status": {"$nin": ["completed", "cancelled", "pending"]}},
+            {"_id": 0}
+        )
+        rider['active_visit'] = active_visit
+        
+        active_task = await db.tolet_tasks.find_one(
+            {"rider_id": rider['id'], "status": "in_progress"},
+            {"_id": 0}
+        )
+        rider['active_task'] = active_task
+    
+    return riders
+
 
 app.include_router(api_router)
 

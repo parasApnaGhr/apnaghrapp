@@ -56,6 +56,20 @@ export const riderAPI = {
   getShift: () => api.get('/rider/shift'),
   updateLocation: (lat, lng) => api.post('/rider/location', null, { params: { lat, lng } }),
   getActiveVisit: () => api.get('/rider/active-visit'),
+  getWallet: () => api.get('/rider/wallet'),
+  getTransactions: () => api.get('/rider/wallet/transactions'),
+};
+
+export const toletAPI = {
+  getAvailable: () => api.get('/tolet-tasks/available'),
+  accept: (taskId) => api.post(`/tolet-tasks/${taskId}/accept`),
+  start: (taskId) => api.post(`/tolet-tasks/${taskId}/start`),
+  complete: (taskId, boardsCollected) => api.post(`/tolet-tasks/${taskId}/complete`, null, { params: { boards_collected: boardsCollected } }),
+};
+
+export const notificationAPI = {
+  getNotifications: () => api.get('/notifications'),
+  markRead: (ids) => api.post('/notifications/mark-read', { notification_ids: ids }),
 };
 
 export const chatAPI = {
