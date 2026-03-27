@@ -37,15 +37,44 @@ ApnaGhr Visit Platform is a production-ready multi-role rental property platform
 - **Notifications**: Real-time alerts
 - **Inventory**: Property management
 - **Settings**: Explainer video upload
-- **NEW: Manage shifting bookings**
-- **NEW: Approve/reject advertisements**
+- **Manage shifting bookings**
+- **Approve/reject advertisements**
+
+## Payment Gateway: Cashfree ✅
+
+### Integration Details
+- **Environment**: PRODUCTION
+- **App ID**: 924724a3da0d70cab4e9eddd52427429
+- **Checkout URL**: https://payments.cashfree.com/order/#/{payment_session_id}
+- **Webhook**: /api/webhook/cashfree
+- **API Version**: 2023-08-01
+
+### Supported Transactions
+1. **Visit Packages**
+   - Single Visit: ₹200
+   - 3 Visits: ₹350
+   - 5 Visits: ₹500
+   - Property Lock: ₹999
+
+2. **Packers & Movers** (Deposit payment)
+   - Basic Shift: ₹2,999
+   - Standard Shift: ₹5,999
+   - Premium Shift: ₹10,999
+   - Elite Shift: ₹18,999
+   - Intercity Shift: ₹15,000
+
+3. **Advertising** (Monthly subscription)
+   - Starter Boost: ₹2,999/month
+   - Growth Package: ₹7,999/month
+   - Premium Visibility: ₹14,999/month
+   - Elite Brand Partner: ₹29,999/month
 
 ## Pricing
 
 ### Visit Packages
-- 1 Visit: ₹200 (3 days)
-- 3 Visits: ₹350 (7 days) - Popular
-- 5 Visits: ₹500 (10 days) - Best Value
+- 1 Visit: ₹200 (3 days validity)
+- 3 Visits: ₹350 (7 days validity) - Popular
+- 5 Visits: ₹500 (10 days validity) - Best Value
 - Property Lock: ₹999
 
 ### Packers & Movers Packages
@@ -68,22 +97,6 @@ ApnaGhr Visit Platform is a production-ready multi-role rental property platform
 - **Animations**: framer-motion for page transitions and interactions
 - **Components**: Solid 2px black borders, 4px offset shadows, pill buttons
 
-## Property Analytics Features
-- **Visit Tracking**: Weekly and total visits per property
-- **Hot Properties**: Auto-mark top visited properties
-- **Daily Verification**: Check if properties are still available
-- **Status Management**: Available | Rented | Under Verification
-- **Customer FOMO**: Show "High Demand" and "X viewed this week" badges
-
-## Production Features
-- Stripe payment integration
-- MongoDB database
-- JWT authentication
-- Direct file uploads (images/videos)
-- Real-time notifications
-- Bi-weekly payout system
-- GPS tracking for riders
-
 ## Test Credentials
 - Customer: 9999999999 / test123
 - Rider: 8888888888 / test123
@@ -96,69 +109,59 @@ ApnaGhr Visit Platform is a production-ready multi-role rental property platform
 - POST /api/auth/register
 - GET /api/auth/me
 
+### Payments (Cashfree)
+- POST /api/payments/checkout - Create checkout session
+- GET /api/payments/status/{order_id} - Check payment status
+- POST /api/webhook/cashfree - Handle webhooks
+
 ### Properties
 - GET /api/properties
 - GET /api/properties/{id}
 - POST /api/properties
 - PATCH /api/properties/{id}
-- GET /api/admin/properties/analytics
 
 ### Visits
 - POST /api/visits/book
 - GET /api/visits/my-bookings
 - POST /api/visits/{id}/accept
-- POST /api/admin/visits/approve
-
-### ToLet Tasks
-- GET /api/admin/tolet-tasks
-- POST /api/admin/tolet-tasks
-- POST /api/tolet-tasks/{id}/accept
-
-### Wallet & Payouts
-- GET /api/rider/wallet
-- GET /api/rider/wallet/transactions
-- POST /api/admin/payouts/process
-
-### Tracking
-- GET /api/admin/riders/live-locations
-- GET /api/admin/visits/{id}/tracking
 
 ### Packers & Movers
 - GET /api/packers/packages
 - POST /api/packers/book
+- POST /api/packers/pay
 - GET /api/packers/my-bookings
-- GET /api/packers/admin/bookings
 
 ### Advertising
 - GET /api/advertising/packages
 - POST /api/advertising/profile
 - POST /api/advertising/ads
-- GET /api/advertising/ads
-- POST /api/admin/ads/{id}/approve
+- POST /api/advertising/pay
 - GET /api/advertising/active
 
 ## Test Results
-- Backend: 100% tests passed
-- Frontend: All features verified
-- Production Ready: YES
+- Backend: 100% tests passed (18/18)
+- Cashfree Integration: ✅ PRODUCTION
+- Payment Flows: All verified
 
 ## Architecture
 ```
 /app/
 ├── backend/
-│   ├── server.py (Main server with all routes)
+│   ├── server.py (Main server)
+│   ├── services/
+│   │   └── cashfree_service.py (Payment gateway)
 │   ├── routes/
-│   │   ├── packers.py (Packers & Movers API)
-│   │   └── advertising.py (Advertising API)
-│   └── requirements.txt
+│   │   ├── packers.py
+│   │   └── advertising.py
+│   └── .env (Cashfree credentials)
 ├── frontend/
 │   ├── src/
 │   │   ├── pages/
-│   │   │   ├── CustomerHome.js (With services & animations)
-│   │   │   ├── PackersMovers.js (NEW)
-│   │   │   └── AdvertiseWithUs.js (NEW)
-│   │   ├── components/
-│   │   └── index.css (Neo-Brutalist styling)
+│   │   │   ├── CustomerHome.js
+│   │   │   ├── PackersMovers.js
+│   │   │   ├── AdvertiseWithUs.js
+│   │   │   └── PaymentSuccess.js
+│   │   └── utils/api.js
 │   └── package.json
 └── memory/
     └── PRD.md
@@ -173,14 +176,13 @@ ApnaGhr Visit Platform is a production-ready multi-role rental property platform
 6. ✅ Rider wallet and bi-weekly payouts
 7. ✅ Live tracking UI (polling-based)
 8. ✅ Property analytics with hot badges
-9. ✅ **Neo-Brutalist UI redesign with animations**
-10. ✅ **Packers & Movers module (5 packages)**
-11. ✅ **Advertising platform (4 packages)**
+9. ✅ Neo-Brutalist UI redesign with animations
+10. ✅ Packers & Movers module (5 packages)
+11. ✅ Advertising platform (4 packages)
+12. ✅ **Cashfree Payment Gateway Integration**
 
 ## Backlog / Future Tasks
-- P1: Real WebSockets for live rider tracking (currently polling)
+- P1: Real WebSockets for live rider tracking
 - P2: SMS notifications via Twilio
-- P2: Anti-fraud system (flagging short visits)
-- P2: In-app VoIP calling
+- P2: Anti-fraud system
 - P3: Builders/Developers user roles
-- P3: Payment integration for Packers & Advertising
