@@ -3,10 +3,11 @@ import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { Home, LogIn, User, Phone, Mail, Lock, ChevronRight } from 'lucide-react';
+import { Home, User, Phone, Mail, Lock, ChevronRight, Eye, EyeOff } from 'lucide-react';
 
 const Login = () => {
   const [isRegister, setIsRegister] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -18,18 +19,45 @@ const Login = () => {
   const { login, register } = useAuth();
   const navigate = useNavigate();
 
+  const validatePhone = (phone) => {
+    const phoneRegex = /^[6-9]\d{9}$/;
+    return phoneRegex.test(phone);
+  };
+
+  const validatePassword = (password) => {
+    return password.length >= 6;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Validation
+    if (!validatePhone(formData.phone)) {
+      toast.error('Please enter a valid 10-digit Indian mobile number');
+      return;
+    }
+    
+    if (!validatePassword(formData.password)) {
+      toast.error('Password must be at least 6 characters');
+      return;
+    }
+    
+    if (isRegister && !formData.name.trim()) {
+      toast.error('Please enter your full name');
+      return;
+    }
+
     setLoading(true);
 
     try {
       if (isRegister) {
         await register(formData);
-        toast.success('Registration successful! Please login.');
+        toast.success('Account created successfully! Please login.');
         setIsRegister(false);
+        setFormData({ ...formData, name: '', password: '' });
       } else {
         const user = await login(formData.phone, formData.password);
-        toast.success('Login successful!');
+        toast.success(`Welcome back, ${user.name || 'User'}!`);
 
         if (user.role === 'customer' || user.role === 'advertiser') {
           navigate('/customer');
@@ -40,7 +68,8 @@ const Login = () => {
         }
       }
     } catch (error) {
-      toast.error(error.response?.data?.detail || 'Operation failed');
+      const errorMsg = error.response?.data?.detail || 'Something went wrong. Please try again.';
+      toast.error(errorMsg);
     } finally {
       setLoading(false);
     }
@@ -79,7 +108,9 @@ const Login = () => {
           <h1 className="text-5xl font-black tracking-tighter mb-2" style={{ fontFamily: 'Outfit' }}>
             Apna<span className="text-[#FF5A5F]">Ghr</span>
           </h1>
-          <p className="text-[#52525B] font-medium">Book property visits, pay only ₹200</p>
+          <p className="text-[#52525B] font-medium">
+            {isRegister ? 'Create your account to get started' : 'Book property visits, pay only ₹200'}
+          </p>
         </motion.div>
 
         {/* Form Card */}
@@ -101,7 +132,7 @@ const Login = () => {
               >
                 <label className="block text-sm font-bold text-[#111111] mb-2">
                   <User className="w-4 h-4 inline mr-1" />
-                  Full Name
+                  Full Name *
                 </label>
                 <input
                   type="text"
@@ -109,7 +140,7 @@ const Login = () => {
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   className="input-field"
-                  placeholder="Your full name"
+                  placeholder="Enter your full name"
                   required
                 />
               </motion.div>
@@ -118,17 +149,24 @@ const Login = () => {
             <div>
               <label className="block text-sm font-bold text-[#111111] mb-2">
                 <Phone className="w-4 h-4 inline mr-1" />
-                Phone Number
+                Phone Number *
               </label>
               <input
                 type="tel"
                 data-testid="login-phone-input"
                 value={formData.phone}
-                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                onChange={(e) => {
+                  const value = e.target.value.replace(/\D/g, '').slice(0, 10);
+                  setFormData({ ...formData, phone: value });
+                }}
                 placeholder="10-digit mobile number"
                 className="input-field"
+                maxLength={10}
                 required
               />
+              {formData.phone && !validatePhone(formData.phone) && (
+                <p className="text-xs text-[#FF5A5F] mt-1">Enter valid 10-digit number starting with 6-9</p>
+              )}
             </div>
 
             {isRegister && (
@@ -154,17 +192,29 @@ const Login = () => {
             <div>
               <label className="block text-sm font-bold text-[#111111] mb-2">
                 <Lock className="w-4 h-4 inline mr-1" />
-                Password
+                Password *
               </label>
-              <input
-                type="password"
-                data-testid="login-password-input"
-                value={formData.password}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                placeholder="Your password"
-                className="input-field"
-                required
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  data-testid="login-password-input"
+                  value={formData.password}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  placeholder={isRegister ? "Create a password (min 6 characters)" : "Enter your password"}
+                  className="input-field pr-12"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-[#52525B] hover:text-[#111111]"
+                >
+                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
+              {isRegister && formData.password && !validatePassword(formData.password) && (
+                <p className="text-xs text-[#FF5A5F] mt-1">Password must be at least 6 characters</p>
+              )}
             </div>
 
             {isRegister && (
@@ -172,11 +222,11 @@ const Login = () => {
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: 'auto' }}
               >
-                <label className="block text-sm font-bold text-[#111111] mb-2">Register as</label>
+                <label className="block text-sm font-bold text-[#111111] mb-2">I want to</label>
                 <div className="grid grid-cols-2 gap-3">
                   {[
-                    { value: 'customer', label: 'Customer', desc: 'Find homes' },
-                    { value: 'rider', label: 'Rider', desc: 'Field work' }
+                    { value: 'customer', label: 'Find a Home', desc: 'Browse & book visits', icon: '🏠' },
+                    { value: 'rider', label: 'Join as Rider', desc: 'Earn with visits', icon: '🚴' }
                   ].map((option) => (
                     <button
                       key={option.value}
@@ -189,6 +239,7 @@ const Login = () => {
                       }`}
                       data-testid={`role-${option.value}`}
                     >
+                      <div className="text-2xl mb-1">{option.icon}</div>
                       <div className="font-bold">{option.label}</div>
                       <div className="text-xs text-[#52525B]">{option.desc}</div>
                     </button>
@@ -222,7 +273,10 @@ const Login = () => {
 
           <div className="mt-6 text-center">
             <button
-              onClick={() => setIsRegister(!isRegister)}
+              onClick={() => {
+                setIsRegister(!isRegister);
+                setFormData({ name: '', phone: '', email: '', password: '', role: 'customer' });
+              }}
               className="text-[#FF5A5F] font-bold hover:underline"
             >
               {isRegister ? 'Already have an account? Sign in' : "Don't have an account? Register"}
@@ -230,30 +284,13 @@ const Login = () => {
           </div>
         </motion.div>
 
-        {/* Demo Credentials */}
-        <motion.div 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.3 }}
-          className="mt-6 p-4 bg-[#111111] text-white rounded-xl border-2 border-[#111111]"
-        >
-          <p className="text-sm font-bold mb-2 text-[#FFD166]">Demo Accounts:</p>
-          <div className="grid grid-cols-3 gap-2 text-xs">
-            <div>
-              <span className="text-[#4ECDC4]">Customer</span>
-              <br />9999999999
-            </div>
-            <div>
-              <span className="text-[#4ECDC4]">Rider</span>
-              <br />8888888888
-            </div>
-            <div>
-              <span className="text-[#4ECDC4]">Admin</span>
-              <br />7777777777
-            </div>
-          </div>
-          <p className="text-xs mt-2 text-gray-400">Password: test123 / admin123</p>
-        </motion.div>
+        {/* Terms & Privacy */}
+        <p className="text-center text-xs text-[#52525B] mt-6">
+          By continuing, you agree to our{' '}
+          <span className="text-[#FF5A5F] cursor-pointer hover:underline">Terms of Service</span>
+          {' '}and{' '}
+          <span className="text-[#FF5A5F] cursor-pointer hover:underline">Privacy Policy</span>
+        </p>
       </motion.div>
     </div>
   );
