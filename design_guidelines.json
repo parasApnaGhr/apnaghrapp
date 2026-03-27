@@ -1,105 +1,73 @@
 {
-  "theme": "light",
-  "archetype": "1 (Organic & Earthy)",
-  "typography": {
-    "headings": {
-      "font_family": "Outfit",
-      "weights": ["400", "600", "800"],
-      "usage": "Use for all H1-H6. Ensure tight letter spacing (tracking-tight) for large sizes."
-    },
-    "body": {
-      "font_family": "Manrope",
-      "weights": ["400", "500"],
-      "usage": "Use for all body copy, forms, and small UI elements."
-    },
-    "hierarchy": {
-      "h1": "text-4xl sm:text-5xl lg:text-6xl tracking-tighter",
-      "h2": "text-2xl sm:text-3xl lg:text-4xl tracking-tight",
-      "h3": "text-xl sm:text-2xl tracking-tight",
-      "body": "text-base leading-relaxed text-gray-800",
-      "small": "text-sm tracking-wide uppercase font-semibold"
-    }
-  },
+  "theme": "Light",
+  "archetype": "Archetype 3 (Pastel & Soft) mixed with Neo-Brutalist Kinetic Energy",
+  "reasoning": "The user explicitly requested a MORE LIVELY AND ANIMATED UI for the ApnaGhr app. Moving away from standard, boring corporate real estate apps to a tactile, kinetic 'Neo-Brutalist' pastel approach. This makes the platform feel like a fun, premium consumer product with high engagement, perfect for property hunting, booking movers, and buying ads.",
   "colors": {
-    "background": {
-      "primary": "#FAF9F6",
-      "secondary": "#F3F2EB",
-      "surface": "#FFFFFF"
-    },
-    "brand": {
-      "primary": "#E07A5F",
-      "primary_hover": "#D0674C",
-      "secondary": "#2A9D8F",
-      "accent": "#F4A261"
-    },
-    "text": {
-      "primary": "#264653",
-      "secondary": "#4A626C",
-      "inverse": "#FFFFFF"
-    },
-    "ui": {
-      "border": "#E5E3D8",
-      "divider": "#E5E3D8",
-      "success": "#2A9D8F",
-      "error": "#E63946",
-      "warning": "#E9C46A"
+    "background": "#FAF9F6",
+    "primary": "#FF5A5F",
+    "secondary": "#4ECDC4",
+    "accent": "#FFD166",
+    "surface": "#FFFFFF",
+    "text_main": "#111111",
+    "text_muted": "#52525B",
+    "border": "#111111"
+  },
+  "typography": {
+    "heading_font": "Outfit",
+    "body_font": "DM Sans",
+    "scales": {
+      "h1": "text-4xl sm:text-5xl lg:text-6xl tracking-tighter font-black",
+      "h2": "text-2xl sm:text-3xl lg:text-4xl tracking-tight font-bold",
+      "h3": "text-xl sm:text-2xl font-bold",
+      "body": "text-base leading-relaxed",
+      "small": "text-sm font-medium tracking-wide"
     }
   },
   "spacing_and_layout": {
-    "general": "Use generous padding (p-6, p-8) to let content breathe. Avoid cramped containers.",
-    "customer_app": "Mobile-first approach. Use sticky bottom navigation, thumb-friendly CTAs, and simplified card stacks for properties. Hide exact address visually with a blurred map overlay until unlocked.",
-    "rider_app": "High-contrast utility mode. Large tap targets, swipe-to-accept gestures, and prominent live-map integration.",
-    "admin_dashboard": "The 'Control Room' Bento Grid (grid-cols-1 md:grid-cols-3 lg:grid-cols-4) with tight gaps (gap-4). Every pixel utilized, no jagged bottoms. Keep metrics top-left.",
-    "cards": "Solid background, 1px subtle border (border-border), no default shadow. Hover adds slight lift (-translate-y-1) and shadow-lg."
+    "philosophy": "Generous spacing. Overlapping elements for kinetic feel.",
+    "container_padding": "p-6 md:p-8 lg:p-12",
+    "card_padding": "p-6",
+    "grid_system": "Bento Grid (Mode A for Marketing, Mode B for Dashboards) with tight gaps (gap-4 or gap-6) but bold borders."
+  },
+  "surfaces_and_borders": {
+    "cards": "bg-white border-2 border-[#111111] shadow-[4px_4px_0px_#111111] rounded-xl transition-all duration-200 hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_#111111]",
+    "glass": "backdrop-blur-xl bg-white/80 border-b-2 border-[#111111]",
+    "buttons_primary": "bg-[#FF5A5F] text-white border-2 border-[#111111] shadow-[4px_4px_0px_#111111] rounded-full font-bold uppercase tracking-wide hover:bg-[#ff4449] active:translate-y-[2px] active:translate-x-[2px] active:shadow-[0px_0px_0px_#111111] transition-all"
   },
   "components": {
-    "strategy": "Hybrid. Use pure HTML/Tailwind for marketing/hero sections. Use highly customized Shadcn UI components for app functionality (forms, dialogs, cards, sheets).",
-    "buttons": "rounded-md, solid colors for primary. Use Terracotta (#E07A5F) for main actions (Book Visit, Lock Property). Use Forest Green for success actions (Start Visit, Verify OTP).",
-    "inputs": "Shadcn input/select. Customize to have slightly warmer background (bg-white) and distinct focus ring (focus:ring-brand-primary).",
-    "maps": "OpenStreetMap with custom minimalist tiles if possible, or grayscale overlay via CSS filter. Use brand colors for map pins.",
-    "modals": "Use Shadcn Dialog/Sheet. Must have a backdrop-blur-sm on the overlay."
+    "navigation": "Floating bottom nav for mobile (Crystal Glass style). Desktop gets a sticky header.",
+    "property_card": "Image takes top 60%, bottom 40% has bold title, price, and a vibrant 'Hot' badge (#FFD166) overlapping the image border. Card must use the solid shadow hover effect.",
+    "packages_list": "Horizontal scroll with 'snap-x' or CSS Grid. Movers packages (Basic, Standard, Premium, Elite, Intercity) use distinct pastel background colors (Mint, Peach, Lavender, Lemon, Sky Blue) with solid black borders.",
+    "marquee": "Use a marquee for the 'Advertise With Us' brands/partners or animated text like 'GROW YOUR BUSINESS • PREMIUM ADS • REACH RENTERS' using react-fast-marquee."
   },
-  "motion": {
-    "hover": "Subtle transform (-translate-y-1) and shadow increase on cards.",
-    "transitions": "transition-all duration-200 ease-in-out",
-    "page_load": "Staggered fade-up for property lists."
+  "motion_and_interactions": {
+    "library": "framer-motion",
+    "page_transitions": "Slide up and fade in (y: 20, opacity: 0 -> y: 0, opacity: 1).",
+    "hover_states": "Tactile 'push down' effect for buttons. Cards lift up and cast a larger solid shadow.",
+    "loading": "Kinetic spinning geometric shapes, avoiding standard spinners."
   },
-  "icons": {
-    "library": "lucide-react",
-    "style": "Clean, line-based, consistent stroke width (1.5px to 2px)."
-  },
-  "media": {
+  "assets": {
+    "icons": "lucide-react with 2px stroke width to match the neo-brutalist border style.",
     "images": {
-      "property_exterior": [
-        "https://images.unsplash.com/photo-1772103628874-1b084bdae27b?crop=entropy&cs=srgb&fm=jpg&q=85",
-        "https://images.pexels.com/photos/2462015/pexels-photo-2462015.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
-        "https://images.unsplash.com/photo-1759148955043-2e6cc5b97b81?crop=entropy&cs=srgb&fm=jpg&q=85",
-        "https://images.pexels.com/photos/36294220/pexels-photo-36294220.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940"
-      ],
-      "property_interior": [
-        "https://images.unsplash.com/photo-1639059851892-95c80412298c?crop=entropy&cs=srgb&fm=jpg&q=85",
-        "https://images.pexels.com/photos/6970070/pexels-photo-6970070.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
-        "https://images.unsplash.com/photo-1674230227190-05b589f2f730?crop=entropy&cs=srgb&fm=jpg&q=85"
-      ],
-      "rider_context": [
-        "https://images.unsplash.com/photo-1770927423939-bae721171237?crop=entropy&cs=srgb&fm=jpg&q=85",
-        "https://images.unsplash.com/photo-1764745223157-64f76610cb3c?crop=entropy&cs=srgb&fm=jpg&q=85"
-      ]
-    },
-    "usage_rules": "Property photos MUST use a max-height limit on mobile (max-h-[60vh] to max-h-[80vh]). Overlays on hero images must not exceed bg-black/40. Map elements should use a blur filter until unlocked by payment."
+      "property_placeholder_1": "https://images.unsplash.com/photo-1666282167632-c613fbeb163c?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjY2NzF8MHwxfHNlYXJjaHwyfHxtb2Rlcm4lMjBhcGFydG1lbnQlMjBpbnRlcmlvcnxlbnwwfHx8fDE3NzQ2MTcxODN8MA&ixlib=rb-4.1.0&q=85",
+      "property_placeholder_2": "https://images.pexels.com/photos/279719/pexels-photo-279719.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+      "movers_hero": "https://images.pexels.com/photos/7464510/pexels-photo-7464510.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+      "ads_hero": "https://images.pexels.com/photos/1486222/pexels-photo-1486222.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940"
+    }
   },
   "accessibility": {
-    "contrast": "Ensure all text on brand colors meets 4.5:1 ratio. Terracotta button with White text is required.",
-    "testing": "All interactive elements must have data-testid attributes (e.g., data-testid='book-visit-button').",
-    "focus": "Visible focus states required on all form inputs and links."
+    "contrast": "Extremely high due to 2px black borders and solid shadows.",
+    "focus": "focus:outline-none focus:ring-4 focus:ring-[#4ECDC4] focus:ring-offset-2",
+    "testing": "All interactive elements MUST have data-testid attributes (e.g., data-testid='book-movers-btn')."
   },
   "instructions_to_main_agent": [
-    "Implement navigation bars for Customer, Rider, and Admin views separately. Customer app uses mobile-first bottom/sticky tabs.",
-    "For the Customer property view, blur the map/location area using Tailwind 'blur-md' and overlay a locked icon/CTA to 'Pay ₹200 to Unlock Visit'.",
-    "Admin dashboards MUST use the Bento Grid strategy for analytics, utilizing a high-density, sharp layout.",
-    "Use standard OpenStreetMap iframe/integration but apply 'filter: grayscale(80%) sepia(20%)' to fit the earthy theme.",
-    "Ensure Shadcn components are fully configured in the project, particularly Dialog, Sheet, Button, Input, and Cards.",
-    "Do NOT use raw <input> or <select> tags. ALWAYS use Shadcn.",
-    "Rider 'Accept Visit' screens should feature high-visibility Terracotta/Green buttons and large legible text for field conditions."
+    "Run: yarn add framer-motion react-fast-marquee",
+    "Update tailwind.config.js with the custom colors (primary: #FF5A5F, secondary: #4ECDC4, accent: #FFD166, surface: #FFFFFF, border: #111111).",
+    "Import Outfit and DM Sans fonts via Google Fonts in index.html or index.css. Do NOT use Inter.",
+    "Apply the Neo-Brutalist card styles globally for Shadcn cards (border-2 border-[#111111] shadow-[4px_4px_0px_#111111] rounded-xl).",
+    "For 'Packers & Movers' and 'Advertise With Us', create dedicated animated sections. Use framer-motion for staggering the appearance of the 5 moving packages and 4 ad packages.",
+    "Ensure the mobile bottom nav floats with backdrop-blur-xl and a solid top border.",
+    "Use the provided image URLs for the respective sections. NEVER use placeholder text or dummy image URLs.",
+    "Replace the existing muted colors with this vibrant, highly animated kinetic theme to perfectly hit the user's request for a lively app."
   ]
 }

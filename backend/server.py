@@ -16,6 +16,10 @@ import jwt
 import aiofiles
 from emergentintegrations.payments.stripe.checkout import StripeCheckout, CheckoutSessionResponse, CheckoutStatusResponse, CheckoutSessionRequest
 
+# Import new modular routes
+from routes.packers import router as packers_router
+from routes.advertising import router as advertising_router
+
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
@@ -23,7 +27,7 @@ mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
 
-app = FastAPI()
+app = FastAPI(title="ApnaGhr Visit Platform", version="2.0")
 api_router = APIRouter(prefix="/api")
 security = HTTPBearer()
 
@@ -2048,6 +2052,10 @@ async def get_property_popularity(property_id: str):
 
 
 app.include_router(api_router)
+
+# Include new modular routes
+app.include_router(packers_router, prefix="/api")
+app.include_router(advertising_router, prefix="/api")
 
 # Mount uploads directory for serving files
 app.mount("/uploads", StaticFiles(directory="/app/uploads"), name="uploads")
