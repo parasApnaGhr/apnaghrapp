@@ -76,16 +76,21 @@ export const visitAPI = {
 };
 
 export const riderAPI = {
-  updateShift: (isOnline, lat, lng) => api.post('/rider/shift', { 
-    is_online: isOnline, 
-    current_lat: lat, 
-    current_lng: lng 
-  }),
+  // Shift management
+  updateShift: (data) => api.post('/rider/shift', data),
   getShift: () => api.get('/rider/shift'),
   updateLocation: (lat, lng) => api.post('/rider/location', null, { params: { lat, lng } }),
   getActiveVisit: () => api.get('/rider/active-visit'),
+  
+  // Wallet
   getWallet: () => api.get('/rider/wallet'),
   getTransactions: () => api.get('/rider/wallet/transactions'),
+  
+  // ToLet Tasks
+  getAvailableTasks: () => api.get('/tolet-tasks/available'),
+  acceptTask: (taskId) => api.post(`/tolet-tasks/${taskId}/accept`),
+  startTask: (taskId) => api.post(`/tolet-tasks/${taskId}/start`),
+  completeTask: (taskId, data) => api.post(`/tolet-tasks/${taskId}/complete`, data),
 };
 
 export const toletAPI = {

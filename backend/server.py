@@ -433,12 +433,22 @@ async def get_properties(
     current_user: dict = Depends(get_current_user)
 ):
     query = {"available": True}
+    
+    # Case-insensitive partial match for city/area_name
     if city:
-        query["city"] = city
-    if min_rent:
-        query.setdefault("rent", {})["$gte"] = min_rent
-    if max_rent:
-        query.setdefault("rent", {})["$lte"] = max_rent
+        query["$or"] = [
+            {"city": {"$regex": city, "$options": "i"}},
+            {"area_name": {"$regex": city, "$options": "i"}}
+        ]
+    
+    # Rent range filter
+    if min_rent or max_rent:
+        query["rent"] = {}
+        if min_rent:
+            query["rent"]["$gte"] = min_rent
+        if max_rent:
+            query["rent"]["$lte"] = max_rent
+    
     if bhk:
         query["bhk"] = bhk
     if furnishing:
@@ -2051,6 +2061,35 @@ async def get_live_rider_locations(current_user: dict = Depends(get_current_user
 
 
 # ============ PROPERTY ANALYTICS & STATUS ============
+
+@api_router.get("/admin/properties")
+async def get_all_admin_properties(current_user: dict = Depends(get_current_user)):
+    """Get all properties for admin inventory"""
+    if current_user['role'] not in ['admin', 'inventory_admin', 'support_admin']:
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    properties = await db.properties.find({}, {"_id": 0}).sort("created_at", -1).to_list(500)
+    return properties
+
+
+@api_router.put("/admin/properties/{property_id}")
+async def update_admin_property(property_id: str, property_data: PropertyCreate, current_user: dict = Depends(get_current_user)):
+    """Update a property"""
+    if current_user['role'] not in ['admin', 'inventory_admin', 'support_admin']:
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    update_data = property_data.model_dump()
+    result = await db.properties.update_one(
+        {"id": property_id},
+        {"$set": update_data}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Property not found")
+    
+    updated = await db.properties.find_one({"id": property_id}, {"_id": 0})
+    return updated
+
 
 @api_router.get("/admin/properties/analytics")
 async def get_property_analytics(current_user: dict = Depends(get_current_user)):
