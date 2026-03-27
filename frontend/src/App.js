@@ -10,6 +10,8 @@ import VisitCart from './pages/VisitCart';
 import PaymentSuccess from './pages/PaymentSuccess';
 import RiderDashboard from './pages/RiderDashboard';
 import AdminDashboard from './pages/AdminDashboard';
+import PackersMovers from './pages/PackersMovers';
+import AdvertiseWithUs from './pages/AdvertiseWithUs';
 import '@/App.css';
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
@@ -39,12 +41,12 @@ const AppRoutes = () => {
 
   return (
     <Routes>
-      <Route path="/" element={user ? <Navigate to={`/${user.role === 'customer' ? 'customer' : user.role === 'rider' ? 'rider' : 'admin'}`} replace /> : <Login />} />
+      <Route path="/" element={user ? <Navigate to={`/${user.role === 'customer' || user.role === 'advertiser' ? 'customer' : user.role === 'rider' ? 'rider' : 'admin'}`} replace /> : <Login />} />
 
       <Route
         path="/customer"
         element={
-          <ProtectedRoute allowedRoles={['customer']}>
+          <ProtectedRoute allowedRoles={['customer', 'advertiser']}>
             <CustomerHome />
           </ProtectedRoute>
         }
@@ -53,7 +55,7 @@ const AppRoutes = () => {
       <Route
         path="/customer/property/:id"
         element={
-          <ProtectedRoute allowedRoles={['customer']}>
+          <ProtectedRoute allowedRoles={['customer', 'advertiser']}>
             <PropertyDetail />
           </ProtectedRoute>
         }
@@ -62,7 +64,7 @@ const AppRoutes = () => {
       <Route
         path="/customer/bookings"
         element={
-          <ProtectedRoute allowedRoles={['customer']}>
+          <ProtectedRoute allowedRoles={['customer', 'advertiser']}>
             <CustomerBookings />
           </ProtectedRoute>
         }
@@ -71,7 +73,7 @@ const AppRoutes = () => {
       <Route
         path="/customer/cart"
         element={
-          <ProtectedRoute allowedRoles={['customer']}>
+          <ProtectedRoute allowedRoles={['customer', 'advertiser']}>
             <VisitCart />
           </ProtectedRoute>
         }
@@ -80,7 +82,7 @@ const AppRoutes = () => {
       <Route
         path="/payment-success"
         element={
-          <ProtectedRoute allowedRoles={['customer']}>
+          <ProtectedRoute allowedRoles={['customer', 'advertiser']}>
             <PaymentSuccess />
           </ProtectedRoute>
         }
@@ -89,6 +91,24 @@ const AppRoutes = () => {
       <Route
         path="/payment-cancelled"
         element={<div className="min-h-screen flex items-center justify-center"><p>Payment cancelled</p></div>}
+      />
+
+      <Route
+        path="/customer/packers"
+        element={
+          <ProtectedRoute allowedRoles={['customer', 'advertiser']}>
+            <PackersMovers />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/customer/advertise"
+        element={
+          <ProtectedRoute allowedRoles={['customer', 'advertiser']}>
+            <AdvertiseWithUs />
+          </ProtectedRoute>
+        }
       />
 
       <Route

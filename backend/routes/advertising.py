@@ -30,8 +30,8 @@ class Advertisement(BaseModel):
     company_name: str
     package_tier: str
     poster_images: List[str] = []
-    video_url: str = None
-    target_url: str = None
+    video_url: Optional[str] = None
+    target_url: Optional[str] = None
     description: str
     placement: List[str] = []
     status: str = "pending"
@@ -40,7 +40,7 @@ class Advertisement(BaseModel):
     start_date: str
     end_date: str
     amount_paid: float = 0.0
-    rejection_reason: str = None
+    rejection_reason: Optional[str] = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 
@@ -48,8 +48,8 @@ class AdvertisementCreate(BaseModel):
     company_name: str
     package_tier: str
     poster_images: List[str] = []
-    video_url: str = None
-    target_url: str = None
+    video_url: Optional[str] = None
+    target_url: Optional[str] = None
     description: str
     placement: List[str] = []
     start_date: str

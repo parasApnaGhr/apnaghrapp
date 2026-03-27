@@ -1,42 +1,54 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&family=Manrope:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=DM+Sans:wght@400;500;600;700&display=swap');
 @import url('https://unpkg.com/leaflet@1.9.4/dist/leaflet.css');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+:root {
+    --color-primary: #FF5A5F;
+    --color-secondary: #4ECDC4;
+    --color-accent: #FFD166;
+    --color-background: #FAF9F6;
+    --color-surface: #FFFFFF;
+    --color-text: #111111;
+    --color-text-muted: #52525B;
+    --color-border: #111111;
+}
+
 body {
     margin: 0;
-    font-family: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    background: #FAF9F6;
+    background: var(--color-background);
+    color: var(--color-text);
 }
 
 h1, h2, h3, h4, h5, h6 {
     font-family: 'Outfit', sans-serif;
-    font-weight: 600;
-    letter-spacing: -0.02em;
+    font-weight: 700;
+    letter-spacing: -0.03em;
 }
 
 @layer base {
     :root {
         --background: 250 249 246;
-        --foreground: 38 70 83;
+        --foreground: 17 17 17;
         --card: 255 255 255;
-        --card-foreground: 38 70 83;
-        --primary: 224 122 95;
+        --card-foreground: 17 17 17;
+        --primary: 255 90 95;
         --primary-foreground: 255 255 255;
-        --secondary: 42 157 143;
-        --secondary-foreground: 255 255 255;
-        --muted: 243 242 235;
-        --muted-foreground: 74 98 108;
-        --accent: 244 162 97;
-        --accent-foreground: 38 70 83;
-        --border: 229 227 216;
-        --input: 229 227 216;
-        --ring: 224 122 95;
-        --radius: 0.5rem;
+        --secondary: 78 205 196;
+        --secondary-foreground: 17 17 17;
+        --muted: 243 244 246;
+        --muted-foreground: 82 82 91;
+        --accent: 255 209 102;
+        --accent-foreground: 17 17 17;
+        --border: 17 17 17;
+        --input: 229 231 235;
+        --ring: 255 90 95;
+        --radius: 0.75rem;
     }
 }
 
@@ -45,69 +57,189 @@ h1, h2, h3, h4, h5, h6 {
         @apply border-border;
     }
     body {
-        @apply bg-[#FAF9F6] text-[#264653];
+        @apply bg-[#FAF9F6] text-[#111111];
     }
 }
 
+/* Neo-Brutalist Button Styles */
 .btn-primary {
-    background: #E07A5F;
+    background: #FF5A5F;
     color: white;
-    font-weight: 500;
-    padding: 12px 24px;
-    border-radius: 8px;
-    border: none;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 14px 28px;
+    border-radius: 9999px;
+    border: 2px solid #111111;
+    box-shadow: 4px 4px 0px #111111;
     cursor: pointer;
-    transition: all 0.2s ease;
-    min-height: 44px;
+    transition: all 0.15s ease;
+    min-height: 48px;
 }
 
 .btn-primary:hover {
-    background: #D0674C;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(224, 122, 95, 0.2);
+    background: #ff4449;
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0px #111111;
+}
+
+.btn-primary:active {
+    transform: translate(2px, 2px);
+    box-shadow: 0px 0px 0px #111111;
 }
 
 .btn-secondary {
-    background: #2A9D8F;
-    color: white;
-    font-weight: 500;
-    padding: 12px 24px;
-    border-radius: 8px;
-    border: none;
+    background: #4ECDC4;
+    color: #111111;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 14px 28px;
+    border-radius: 9999px;
+    border: 2px solid #111111;
+    box-shadow: 4px 4px 0px #111111;
     cursor: pointer;
-    transition: all 0.2s ease;
-    min-height: 44px;
+    transition: all 0.15s ease;
+    min-height: 48px;
 }
 
 .btn-secondary:hover {
-    background: #238276;
-    transform: translateY(-1px);
+    background: #3dbdb4;
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0px #111111;
+}
+
+.btn-secondary:active {
+    transform: translate(2px, 2px);
+    box-shadow: 0px 0px 0px #111111;
+}
+
+.btn-accent {
+    background: #FFD166;
+    color: #111111;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 14px 28px;
+    border-radius: 9999px;
+    border: 2px solid #111111;
+    box-shadow: 4px 4px 0px #111111;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    min-height: 48px;
+}
+
+.btn-accent:hover {
+    background: #ffc94d;
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0px #111111;
+}
+
+/* Neo-Brutalist Card Styles */
+.neo-card {
+    background: white;
+    border: 2px solid #111111;
+    border-radius: 16px;
+    box-shadow: 4px 4px 0px #111111;
+    transition: all 0.2s ease;
+    overflow: hidden;
+}
+
+.neo-card:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0px #111111;
+}
+
+.property-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 24px;
 }
 
 .property-card {
     background: white;
-    border: 1px solid #E5E3D8;
-    border-radius: 12px;
+    border: 2px solid #111111;
+    border-radius: 16px;
+    box-shadow: 4px 4px 0px #111111;
     overflow: hidden;
     transition: all 0.2s ease;
     cursor: pointer;
 }
 
 .property-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0px #111111;
 }
 
+.admin-bento {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: 16px;
+}
+
+@media (min-width: 768px) {
+    .admin-bento {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (min-width: 1024px) {
+    .admin-bento {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+.stat-card {
+    background: white;
+    border: 2px solid #111111;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 4px 4px 0px #111111;
+    transition: all 0.2s ease;
+}
+
+.stat-card:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0px #111111;
+}
+
+.visit-request-card {
+    background: white;
+    border: 3px solid #FF5A5F;
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 16px;
+    box-shadow: 4px 4px 0px #FF5A5F;
+    animation: pulse-border 2s ease-in-out infinite;
+}
+
+@keyframes pulse-border {
+    0%, 100% {
+        border-color: #FF5A5F;
+        box-shadow: 4px 4px 0px #FF5A5F;
+    }
+    50% {
+        border-color: #FFD166;
+        box-shadow: 4px 4px 0px #FFD166;
+    }
+}
+
+/* Floating Bottom Nav - Crystal Glass Style */
 .bottom-nav {
     position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: rgba(255, 255, 255, 0.98);
-    backdrop-filter: blur(12px);
-    border-top: 1px solid #E5E3D8;
-    padding: 12px 0;
+    bottom: 16px;
+    left: 16px;
+    right: 16px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border: 2px solid #111111;
+    border-radius: 24px;
+    padding: 8px;
     z-index: 1000;
+    box-shadow: 4px 4px 0px #111111;
 }
 
 .bottom-nav button {
@@ -115,77 +247,212 @@ h1, h2, h3, h4, h5, h6 {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 4px;
-    padding: 8px;
+    gap: 2px;
+    padding: 10px 8px;
     background: transparent;
     border: none;
-    color: #4A626C;
+    color: #52525B;
     font-size: 11px;
+    font-weight: 600;
     cursor: pointer;
+    border-radius: 16px;
     transition: all 0.2s ease;
 }
 
 .bottom-nav button.active {
-    color: #E07A5F;
+    color: #111111;
+    background: #FFD166;
 }
 
-.bottom-nav button:hover {
-    color: #E07A5F;
+.bottom-nav button:hover:not(.active) {
+    background: #F3F4F6;
+    color: #111111;
 }
 
+/* Badge Styles */
 .badge {
-    display: inline-block;
-    padding: 4px 12px;
-    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 14px;
+    border-radius: 9999px;
     font-size: 12px;
-    font-weight: 500;
+    font-weight: 700;
+    font-family: 'Outfit', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border: 2px solid #111111;
+}
+
+.badge-hot {
+    background: #FF5A5F;
+    color: white;
+    animation: badge-bounce 1s ease infinite;
+}
+
+@keyframes badge-bounce {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
 }
 
 .badge-success {
-    background: #D1FAE5;
-    color: #065F46;
-    border: 1px solid #A7F3D0;
+    background: #4ECDC4;
+    color: #111111;
 }
 
 .badge-warning {
-    background: #FED7AA;
-    color: #9A3412;
-    border: 1px solid #FDBA74;
+    background: #FFD166;
+    color: #111111;
 }
 
 .badge-info {
-    background: #DBEAFE;
-    color: #1E40AF;
-    border: 1px solid #BFDBFE;
+    background: #E5E7EB;
+    color: #111111;
 }
 
+/* Input Styles */
 .input-field {
     background: white;
-    border: 1px solid #E5E3D8;
-    padding: 12px 16px;
-    border-radius: 8px;
+    border: 2px solid #111111;
+    padding: 14px 18px;
+    border-radius: 12px;
     width: 100%;
     font-size: 1rem;
+    font-family: 'DM Sans', sans-serif;
     transition: all 0.2s ease;
-    min-height: 44px;
+    min-height: 48px;
 }
 
 .input-field:focus {
     outline: none;
-    border-color: #E07A5F;
-    box-shadow: 0 0 0 3px rgba(224, 122, 95, 0.1);
+    box-shadow: 4px 4px 0px #4ECDC4;
+    transform: translate(-2px, -2px);
 }
 
+.input-field::placeholder {
+    color: #9CA3AF;
+}
+
+/* Package Cards - Pastel Colors */
+.package-card {
+    border: 2px solid #111111;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 4px 4px 0px #111111;
+    transition: all 0.2s ease;
+}
+
+.package-card:hover {
+    transform: translate(-4px, -4px);
+    box-shadow: 8px 8px 0px #111111;
+}
+
+.package-basic { background: #C1F5C3; }
+.package-standard { background: #FFE4C9; }
+.package-premium { background: #E5D4ED; }
+.package-elite { background: #FFF3C7; }
+.package-intercity { background: #C9E4FF; }
+
+/* Ad Package Cards */
+.ad-starter { background: #C1F5C3; }
+.ad-growth { background: #C9E4FF; }
+.ad-premium { background: #FFF3C7; }
+.ad-elite { background: #FFE4C9; }
+
+/* Proof Upload */
+.proof-upload {
+    border: 3px dashed #111111;
+    border-radius: 16px;
+    padding: 32px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: #F9FAFB;
+}
+
+.proof-upload:hover {
+    border-color: #FF5A5F;
+    background: #FFF5F5;
+}
+
+/* Location Blur */
 .location-blur {
     filter: blur(8px);
     pointer-events: none;
     user-select: none;
 }
 
+/* Map Styles */
 .leaflet-container {
     width: 100%;
     height: 100%;
-    filter: grayscale(80%) sepia(20%);
+    filter: grayscale(50%) contrast(1.1);
+    border-radius: 12px;
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #F3F4F6;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #111111;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #333333;
+}
+
+/* Kinetic Loading Animation */
+.kinetic-loader {
+    display: flex;
+    gap: 8px;
+}
+
+.kinetic-loader span {
+    width: 16px;
+    height: 16px;
+    background: #FF5A5F;
+    border: 2px solid #111111;
+    animation: kinetic-bounce 0.6s ease-in-out infinite;
+}
+
+.kinetic-loader span:nth-child(2) {
+    animation-delay: 0.1s;
+    background: #4ECDC4;
+}
+
+.kinetic-loader span:nth-child(3) {
+    animation-delay: 0.2s;
+    background: #FFD166;
+}
+
+@keyframes kinetic-bounce {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-16px) rotate(180deg); }
+}
+
+/* Marquee styling */
+.marquee-text {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 800;
+    font-size: 1.25rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 0 24px;
+}
+
+/* Selection */
+::selection {
+    background: #FFD166;
+    color: #111111;
 }
 
 @layer base {
