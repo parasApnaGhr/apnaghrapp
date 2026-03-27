@@ -1,7 +1,7 @@
 # Packers & Movers Routes
 from fastapi import APIRouter, HTTPException, Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from typing import List
+from typing import List, Optional
 from datetime import datetime, timezone
 from pydantic import BaseModel, Field, ConfigDict
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -34,13 +34,15 @@ class ShiftingBooking(BaseModel):
     to_city: str
     scheduled_date: str
     contact_phone: str
-    items_description: str = None
+    items_description: Optional[str] = None
     add_ons: List[str] = []
     estimated_price: float = 0.0
-    final_price: float = None
-    status: str = "pending"
-    assigned_vendor: str = None
-    notes: str = None
+    final_price: Optional[float] = None
+    status: str = "pending"  # pending, payment_pending, confirmed, in_progress, completed, cancelled
+    payment_status: Optional[str] = None
+    payment_session_id: Optional[str] = None
+    assigned_vendor: Optional[str] = None
+    notes: Optional[str] = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 
@@ -52,8 +54,13 @@ class ShiftingBookingCreate(BaseModel):
     to_city: str
     scheduled_date: str
     contact_phone: str
-    items_description: str = None
+    items_description: Optional[str] = None
     add_ons: List[str] = []
+
+
+class PaymentRequest(BaseModel):
+    booking_id: str
+    origin_url: str
 
 
 async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
@@ -278,3 +285,87 @@ async def complete_shifting_booking(booking_id: str, current_user: dict = Depend
     if result.modified_count == 0:
         raise HTTPException(status_code=400, detail="Cannot complete this booking")
     return {"message": "Booking completed"}
+
+
+@router.post("/pay")
+async def initiate_packers_payment(payment_req: PaymentRequest, current_user: dict = Depends(get_current_user)):
+    """Initiate Cashfree payment for packers booking"""
+    from services.cashfree_service import get_cashfree_service
+    
+    booking = await db.shifting_bookings.find_one(
+        {"id": payment_req.booking_id, "customer_id": current_user['id']},
+        {"_id": 0}
+    )
+    if not booking:
+        raise HTTPException(status_code=404, detail="Booking not found")
+    
+    if booking.get('payment_status') == 'paid':
+        raise HTTPException(status_code=400, detail="Already paid")
+    
+    # Get package info
+    package = next((p for p in SHIFTING_PACKAGES if p["tier"] == booking['package_tier']), None)
+    if not package:
+        raise HTTPException(status_code=400, detail="Invalid package")
+    
+    # Use minimum price for initial payment (deposit)
+    amount = package['price_min']
+    backend_url = os.environ.get('BACKEND_URL', payment_req.origin_url)
+    
+    metadata = {
+        "user_id": current_user['id'],
+        "package_id": f"packers_{booking['package_tier']}",
+        "booking_id": booking['id'],
+        "type": "packers"
+    }
+    
+    try:
+        cashfree_service = get_cashfree_service()
+        
+        order_response = await cashfree_service.create_order(
+            order_amount=amount,
+            customer_id=current_user['id'],
+            customer_phone=current_user.get('phone', booking['contact_phone']),
+            customer_name=current_user.get('name'),
+            return_url=f"{payment_req.origin_url}/payment-success?order_id={{order_id}}&type=packers",
+            notify_url=f"{backend_url}/api/webhook/cashfree",
+            order_note=f"ApnaGhr Packers - {package['name']}",
+            order_tags=metadata
+        )
+        
+        # Update booking status
+        await db.shifting_bookings.update_one(
+            {"id": booking['id']},
+            {"$set": {"status": "payment_pending", "payment_session_id": order_response['order_id']}}
+        )
+        
+        # Create payment transaction record
+        trans_doc = {
+            "id": str(uuid.uuid4()),
+            "user_id": current_user['id'],
+            "session_id": order_response['order_id'],
+            "payment_id": order_response.get('cf_order_id'),
+            "amount": amount,
+            "currency": "inr",
+            "package_type": f"packers_{booking['package_tier']}",
+            "payment_status": "pending",
+            "payment_session_id": order_response['payment_session_id'],
+            "metadata": metadata,
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+        await db.payment_transactions.insert_one(trans_doc)
+        
+        # Return Cashfree checkout URL
+        cashfree_env = os.environ.get('CASHFREE_ENVIRONMENT', 'SANDBOX')
+        checkout_base = "https://payments.cashfree.com/order" if cashfree_env == "PRODUCTION" else "https://payments-test.cashfree.com/order"
+        checkout_url = f"{checkout_base}/#/{order_response['payment_session_id']}"
+        
+        return {
+            "checkout_url": checkout_url,
+            "session_id": order_response['order_id'],
+            "payment_session_id": order_response['payment_session_id'],
+            "order_id": order_response['order_id']
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Payment initialization failed: {str(e)}")
+

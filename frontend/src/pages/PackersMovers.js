@@ -79,26 +79,28 @@ const PackersMovers = () => {
 
     setSubmitting(true);
     try {
-      await api.post('/packers/book', {
+      // First create the booking
+      const bookingResponse = await api.post('/packers/book', {
         ...formData,
         package_tier: selectedPackage.tier
       });
-      toast.success('Booking request submitted! We will contact you soon.');
-      setShowBookingForm(false);
-      setSelectedPackage(null);
-      setFormData({
-        from_address: '',
-        to_address: '',
-        from_city: '',
-        to_city: '',
-        scheduled_date: '',
-        contact_phone: user?.phone || '',
-        items_description: '',
-        add_ons: []
+      
+      const booking = bookingResponse.data.booking;
+      
+      // Then initiate payment
+      const paymentResponse = await api.post('/packers/pay', {
+        booking_id: booking.id,
+        origin_url: window.location.origin
       });
+      
+      // Redirect to Cashfree checkout
+      if (paymentResponse.data.checkout_url) {
+        window.location.href = paymentResponse.data.checkout_url;
+      } else {
+        toast.success('Booking created! Redirecting to payment...');
+      }
     } catch (error) {
       toast.error(error.response?.data?.detail || 'Failed to submit booking');
-    } finally {
       setSubmitting(false);
     }
   };

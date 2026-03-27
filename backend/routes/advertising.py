@@ -34,7 +34,9 @@ class Advertisement(BaseModel):
     target_url: Optional[str] = None
     description: str
     placement: List[str] = []
-    status: str = "pending"
+    status: str = "pending"  # pending, payment_pending, active, paused, expired, rejected
+    payment_status: Optional[str] = None
+    payment_session_id: Optional[str] = None
     impressions: int = 0
     clicks: int = 0
     start_date: str
@@ -76,8 +78,13 @@ class AdvertiserProfileCreate(BaseModel):
     business_type: str
     contact_email: str
     contact_phone: str
-    gst_number: str = None
-    address: str = None
+    gst_number: Optional[str] = None
+    address: Optional[str] = None
+
+
+class AdPaymentRequest(BaseModel):
+    ad_id: str
+    origin_url: str
 
 
 async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
@@ -385,3 +392,94 @@ async def admin_verify_profile(profile_id: str, current_user: dict = Depends(get
     if result.modified_count == 0:
         raise HTTPException(status_code=400, detail="Profile not found")
     return {"message": "Profile verified"}
+
+
+class AdPaymentRequest(BaseModel):
+    ad_id: str
+    origin_url: str
+
+
+@router.post("/pay")
+async def initiate_advertising_payment(payment_req: AdPaymentRequest, current_user: dict = Depends(get_current_user)):
+    """Initiate Cashfree payment for advertising"""
+    from services.cashfree_service import get_cashfree_service
+    
+    ad = await db.advertisements.find_one(
+        {"id": payment_req.ad_id, "advertiser_id": current_user['id']},
+        {"_id": 0}
+    )
+    if not ad:
+        raise HTTPException(status_code=404, detail="Advertisement not found")
+    
+    if ad.get('payment_status') == 'paid':
+        raise HTTPException(status_code=400, detail="Already paid")
+    
+    # Get package info
+    package = next((p for p in ADVERTISING_PACKAGES if p["tier"] == ad['package_tier']), None)
+    if not package:
+        raise HTTPException(status_code=400, detail="Invalid package")
+    
+    amount = package['price_monthly']
+    backend_url = os.environ.get('BACKEND_URL', payment_req.origin_url)
+    
+    metadata = {
+        "user_id": current_user['id'],
+        "package_id": f"ads_{ad['package_tier']}",
+        "ad_id": ad['id'],
+        "type": "advertising"
+    }
+    
+    try:
+        cashfree_service = get_cashfree_service()
+        
+        # Get profile for contact details
+        profile = await db.advertiser_profiles.find_one({"user_id": current_user['id']}, {"_id": 0})
+        
+        order_response = await cashfree_service.create_order(
+            order_amount=amount,
+            customer_id=current_user['id'],
+            customer_phone=profile.get('contact_phone') if profile else current_user.get('phone', '9999999999'),
+            customer_email=profile.get('contact_email') if profile else None,
+            customer_name=profile.get('company_name') if profile else current_user.get('name'),
+            return_url=f"{payment_req.origin_url}/payment-success?order_id={{order_id}}&type=advertising",
+            notify_url=f"{backend_url}/api/webhook/cashfree",
+            order_note=f"ApnaGhr Advertising - {package['name']}",
+            order_tags=metadata
+        )
+        
+        # Update ad status
+        await db.advertisements.update_one(
+            {"id": ad['id']},
+            {"$set": {"status": "payment_pending", "payment_session_id": order_response['order_id']}}
+        )
+        
+        # Create payment transaction record
+        trans_doc = {
+            "id": str(uuid.uuid4()),
+            "user_id": current_user['id'],
+            "session_id": order_response['order_id'],
+            "payment_id": order_response.get('cf_order_id'),
+            "amount": amount,
+            "currency": "inr",
+            "package_type": f"ads_{ad['package_tier']}",
+            "payment_status": "pending",
+            "payment_session_id": order_response['payment_session_id'],
+            "metadata": metadata,
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+        await db.payment_transactions.insert_one(trans_doc)
+        
+        # Return Cashfree checkout URL
+        cashfree_env = os.environ.get('CASHFREE_ENVIRONMENT', 'SANDBOX')
+        checkout_base = "https://payments.cashfree.com/order" if cashfree_env == "PRODUCTION" else "https://payments-test.cashfree.com/order"
+        checkout_url = f"{checkout_base}/#/{order_response['payment_session_id']}"
+        
+        return {
+            "checkout_url": checkout_url,
+            "session_id": order_response['order_id'],
+            "payment_session_id": order_response['payment_session_id'],
+            "order_id": order_response['order_id']
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Payment initialization failed: {str(e)}")

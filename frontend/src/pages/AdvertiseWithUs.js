@@ -86,17 +86,30 @@ const AdvertiseWithUs = () => {
     e.preventDefault();
     setSubmitting(true);
     try {
-      await api.post('/advertising/ads', {
+      // First create the ad
+      const adResponse = await api.post('/advertising/ads', {
         company_name: profileData.company_name,
         package_tier: selectedPackage.tier,
         poster_images: [],
         ...adData
       });
-      toast.success('Ad campaign submitted for review!');
-      navigate('/customer');
+      
+      const ad = adResponse.data.ad;
+      
+      // Then initiate payment
+      const paymentResponse = await api.post('/advertising/pay', {
+        ad_id: ad.id,
+        origin_url: window.location.origin
+      });
+      
+      // Redirect to Cashfree checkout
+      if (paymentResponse.data.checkout_url) {
+        window.location.href = paymentResponse.data.checkout_url;
+      } else {
+        toast.success('Ad created! Redirecting to payment...');
+      }
     } catch (error) {
       toast.error(error.response?.data?.detail || 'Failed to submit ad');
-    } finally {
       setSubmitting(false);
     }
   };

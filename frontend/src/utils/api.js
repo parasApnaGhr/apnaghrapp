@@ -30,9 +30,37 @@ export const propertyAPI = {
 };
 
 export const paymentAPI = {
-  createCheckout: (packageId, originUrl, propertyId) => 
-    api.post('/payments/checkout', { package_id: packageId, origin_url: originUrl, property_id: propertyId }),
-  getPaymentStatus: (sessionId) => api.get(`/payments/status/${sessionId}`),
+  // Cashfree checkout - supports visits, packers, and ads
+  createCheckout: (packageId, originUrl, propertyId = null, bookingId = null, adId = null) => 
+    api.post('/payments/checkout', { 
+      package_id: packageId, 
+      origin_url: originUrl, 
+      property_id: propertyId,
+      booking_id: bookingId,
+      ad_id: adId
+    }),
+  getPaymentStatus: (orderId) => api.get(`/payments/status/${orderId}`),
+};
+
+export const packersAPI = {
+  getPackages: () => api.get('/packers/packages'),
+  book: (data) => api.post('/packers/book', data),
+  getMyBookings: () => api.get('/packers/my-bookings'),
+  getBooking: (id) => api.get(`/packers/booking/${id}`),
+  cancelBooking: (id) => api.post(`/packers/booking/${id}/cancel`),
+  pay: (bookingId, originUrl) => api.post('/packers/pay', { booking_id: bookingId, origin_url: originUrl }),
+};
+
+export const advertisingAPI = {
+  getPackages: () => api.get('/advertising/packages'),
+  createProfile: (data) => api.post('/advertising/profile', data),
+  getProfile: () => api.get('/advertising/profile'),
+  createAd: (data) => api.post('/advertising/ads', data),
+  getMyAds: () => api.get('/advertising/ads'),
+  getAd: (id) => api.get(`/advertising/ads/${id}`),
+  pauseAd: (id) => api.post(`/advertising/ads/${id}/pause`),
+  pay: (adId, originUrl) => api.post('/advertising/pay', { ad_id: adId, origin_url: originUrl }),
+  getActiveAds: (placement) => api.get('/advertising/active', { params: { placement } }),
 };
 
 export const visitAPI = {

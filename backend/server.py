@@ -14,11 +14,12 @@ from datetime import datetime, timezone, timedelta
 import bcrypt
 import jwt
 import aiofiles
-from emergentintegrations.payments.stripe.checkout import StripeCheckout, CheckoutSessionResponse, CheckoutStatusResponse, CheckoutSessionRequest
+import json
 
 # Import new modular routes
 from routes.packers import router as packers_router
 from routes.advertising import router as advertising_router
+from services.cashfree_service import get_cashfree_service, CashfreePaymentService
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -33,14 +34,24 @@ security = HTTPBearer()
 
 JWT_SECRET = os.environ.get('JWT_SECRET', 'apnaghr-visit-platform-2024')
 JWT_ALGORITHM = 'HS256'
-STRIPE_API_KEY = os.environ.get('STRIPE_API_KEY', 'sk_test_emergent')
 
 # Payment packages
 PAYMENT_PACKAGES = {
-    "single_visit": {"amount": 200.0, "visits": 1, "validity_days": 3},
-    "three_visits": {"amount": 350.0, "visits": 3, "validity_days": 7},
-    "five_visits": {"amount": 500.0, "visits": 5, "validity_days": 10},
-    "property_lock": {"amount": 999.0, "type": "lock"}
+    "single_visit": {"amount": 200.0, "visits": 1, "validity_days": 3, "type": "visit"},
+    "three_visits": {"amount": 350.0, "visits": 3, "validity_days": 7, "type": "visit"},
+    "five_visits": {"amount": 500.0, "visits": 5, "validity_days": 10, "type": "visit"},
+    "property_lock": {"amount": 999.0, "type": "lock"},
+    # Packers packages - using minimum price for checkout
+    "packers_basic": {"amount": 2999.0, "type": "packers", "tier": "basic"},
+    "packers_standard": {"amount": 5999.0, "type": "packers", "tier": "standard"},
+    "packers_premium": {"amount": 10999.0, "type": "packers", "tier": "premium"},
+    "packers_elite": {"amount": 18999.0, "type": "packers", "tier": "elite"},
+    "packers_intercity": {"amount": 15000.0, "type": "packers", "tier": "intercity"},
+    # Advertising packages - monthly subscription
+    "ads_starter": {"amount": 2999.0, "type": "advertising", "tier": "starter"},
+    "ads_growth": {"amount": 7999.0, "type": "advertising", "tier": "growth"},
+    "ads_premium": {"amount": 14999.0, "type": "advertising", "tier": "premium"},
+    "ads_elite": {"amount": 29999.0, "type": "advertising", "tier": "elite"},
 }
 
 class User(BaseModel):
@@ -443,125 +454,267 @@ async def get_property(property_id: str, current_user: dict = Depends(get_curren
         raise HTTPException(status_code=404, detail="Property not found")
     return property_data
 
-# Payment endpoints
+# Payment endpoints - Using Cashfree
+class CashfreeCheckoutRequest(BaseModel):
+    package_id: str
+    origin_url: str
+    property_id: Optional[str] = None
+    booking_id: Optional[str] = None
+    ad_id: Optional[str] = None
+
 @api_router.post("/payments/checkout")
 async def create_checkout(
-    package_id: str,
-    origin_url: str,
-    property_id: Optional[str] = None,
+    request: CashfreeCheckoutRequest,
     current_user: dict = Depends(get_current_user)
 ):
-    if package_id not in PAYMENT_PACKAGES:
+    """Create a Cashfree payment checkout session."""
+    if request.package_id not in PAYMENT_PACKAGES:
         raise HTTPException(status_code=400, detail="Invalid package")
     
-    package = PAYMENT_PACKAGES[package_id]
+    package = PAYMENT_PACKAGES[request.package_id]
     amount = package["amount"]
     
-    backend_url = os.environ.get('BACKEND_URL', origin_url)
-    webhook_url = f"{backend_url}/api/webhook/stripe"
-    stripe_checkout = StripeCheckout(api_key=STRIPE_API_KEY, webhook_url=webhook_url)
+    backend_url = os.environ.get('BACKEND_URL', request.origin_url)
     
-    success_url = f"{origin_url}/payment-success?session_id={{CHECKOUT_SESSION_ID}}"
-    cancel_url = f"{origin_url}/payment-cancelled"
-    
+    # Build metadata - only include non-empty values
     metadata = {
         "user_id": current_user['id'],
-        "package_id": package_id,
-        "property_id": property_id or ""
+        "package_id": request.package_id,
+        "type": package.get("type", "visit")
     }
+    if request.property_id:
+        metadata["property_id"] = request.property_id
+    if request.booking_id:
+        metadata["booking_id"] = request.booking_id
+    if request.ad_id:
+        metadata["ad_id"] = request.ad_id
     
-    checkout_request = CheckoutSessionRequest(
-        amount=amount,
-        currency="inr",
-        success_url=success_url,
-        cancel_url=cancel_url,
-        metadata=metadata
-    )
-    
-    session = await stripe_checkout.create_checkout_session(checkout_request)
-    
-    # Create payment transaction record
-    transaction = PaymentTransaction(
-        user_id=current_user['id'],
-        session_id=session.session_id,
-        amount=amount,
-        currency="inr",
-        package_type=package_id,
-        payment_status="pending",
-        metadata=metadata
-    )
-    
-    trans_doc = transaction.model_dump()
-    trans_doc['created_at'] = trans_doc['created_at'].isoformat()
-    await db.payment_transactions.insert_one(trans_doc)
-    
-    return {"checkout_url": session.url, "session_id": session.session_id}
+    try:
+        cashfree_service = get_cashfree_service()
+        
+        order_response = await cashfree_service.create_order(
+            order_amount=amount,
+            customer_id=current_user['id'],
+            customer_phone=current_user.get('phone', '9999999999'),
+            customer_email=current_user.get('email'),
+            customer_name=current_user.get('name'),
+            return_url=f"{request.origin_url}/payment-success?order_id={{order_id}}",
+            notify_url=f"{backend_url}/api/webhook/cashfree",
+            order_note=f"ApnaGhr {request.package_id} payment",
+            order_tags=metadata
+        )
+        
+        # Create payment transaction record
+        transaction = PaymentTransaction(
+            user_id=current_user['id'],
+            session_id=order_response['order_id'],
+            payment_id=order_response.get('cf_order_id'),
+            amount=amount,
+            currency="inr",
+            package_type=request.package_id,
+            payment_status="pending",
+            metadata=metadata
+        )
+        
+        trans_doc = transaction.model_dump()
+        trans_doc['created_at'] = trans_doc['created_at'].isoformat()
+        trans_doc['payment_session_id'] = order_response['payment_session_id']
+        await db.payment_transactions.insert_one(trans_doc)
+        
+        # Return Cashfree checkout URL (using payment_session_id for JS SDK or redirect)
+        cashfree_env = os.environ.get('CASHFREE_ENVIRONMENT', 'SANDBOX')
+        checkout_base = "https://payments.cashfree.com/order" if cashfree_env == "PRODUCTION" else "https://payments-test.cashfree.com/order"
+        checkout_url = f"{checkout_base}/#/{order_response['payment_session_id']}"
+        
+        return {
+            "checkout_url": checkout_url,
+            "session_id": order_response['order_id'],
+            "payment_session_id": order_response['payment_session_id'],
+            "order_id": order_response['order_id'],
+            "cf_order_id": order_response.get('cf_order_id')
+        }
+        
+    except Exception as e:
+        logging.error(f"Cashfree checkout error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Payment initialization failed: {str(e)}")
 
-@api_router.get("/payments/status/{session_id}")
-async def get_payment_status(session_id: str, current_user: dict = Depends(get_current_user)):
-    transaction = await db.payment_transactions.find_one({"session_id": session_id}, {"_id": 0})
+@api_router.get("/payments/status/{order_id}")
+async def get_payment_status(order_id: str, current_user: dict = Depends(get_current_user)):
+    """Check payment status and process successful payments."""
+    transaction = await db.payment_transactions.find_one({"session_id": order_id}, {"_id": 0})
     if not transaction:
         raise HTTPException(status_code=404, detail="Transaction not found")
     
     if transaction['payment_status'] == "paid":
         return transaction
     
-    backend_url = os.environ.get('BACKEND_URL', os.environ.get('REACT_APP_BACKEND_URL', 'http://localhost:8001'))
-    webhook_url = f"{backend_url}/api/webhook/stripe"
-    stripe_checkout = StripeCheckout(api_key=STRIPE_API_KEY, webhook_url=webhook_url)
-    
-    status = await stripe_checkout.get_checkout_status(session_id)
-    
-    if status.payment_status == "paid" and transaction['payment_status'] != "paid":
-        await db.payment_transactions.update_one(
-            {"session_id": session_id},
-            {"$set": {"payment_status": "paid", "payment_id": session_id}}
-        )
-        
-        # Create visit package
-        package = PAYMENT_PACKAGES[transaction['package_type']]
-        if 'visits' in package:
-            visit_package = VisitPackage(
-                customer_id=transaction['user_id'],
-                package_type=transaction['package_type'],
-                total_visits=package['visits'],
-                visits_used=0,
-                amount_paid=transaction['amount'],
-                valid_until=datetime.now(timezone.utc) + timedelta(days=package['validity_days'])
-            )
-            pkg_doc = visit_package.model_dump()
-            pkg_doc['created_at'] = pkg_doc['created_at'].isoformat()
-            pkg_doc['valid_until'] = pkg_doc['valid_until'].isoformat()
-            await db.visit_packages.insert_one(pkg_doc)
-        
-        # Handle property lock
-        if transaction['package_type'] == "property_lock" and transaction['metadata'].get('property_id'):
-            lock = PropertyLock(
-                customer_id=transaction['user_id'],
-                property_id=transaction['metadata']['property_id']
-            )
-            lock_doc = lock.model_dump()
-            lock_doc['created_at'] = lock_doc['created_at'].isoformat()
-            await db.property_locks.insert_one(lock_doc)
-        
-        transaction['payment_status'] = "paid"
-    
-    return transaction
-
-@api_router.post("/webhook/stripe")
-async def stripe_webhook(request: Request):
-    body = await request.body()
-    signature = request.headers.get("Stripe-Signature")
-    
-    backend_url = os.environ.get('BACKEND_URL', str(request.base_url).rstrip('/'))
-    webhook_url = f"{backend_url}/api/webhook/stripe"
-    stripe_checkout = StripeCheckout(api_key=STRIPE_API_KEY, webhook_url=webhook_url)
-    
     try:
-        webhook_response = await stripe_checkout.handle_webhook(body, signature)
-        return {"status": "success", "event_type": webhook_response.event_type}
+        cashfree_service = get_cashfree_service()
+        order_status = await cashfree_service.get_order_status(order_id)
+        
+        # Check if payment is successful
+        if order_status.get('order_status') == "PAID" and transaction['payment_status'] != "paid":
+            await db.payment_transactions.update_one(
+                {"session_id": order_id},
+                {"$set": {"payment_status": "paid", "payment_id": order_status.get('cf_order_id')}}
+            )
+            
+            package = PAYMENT_PACKAGES.get(transaction['package_type'], {})
+            package_type = package.get('type', 'visit')
+            
+            # Handle visit packages
+            if 'visits' in package:
+                visit_package = VisitPackage(
+                    customer_id=transaction['user_id'],
+                    package_type=transaction['package_type'],
+                    total_visits=package['visits'],
+                    visits_used=0,
+                    amount_paid=transaction['amount'],
+                    valid_until=datetime.now(timezone.utc) + timedelta(days=package['validity_days'])
+                )
+                pkg_doc = visit_package.model_dump()
+                pkg_doc['created_at'] = pkg_doc['created_at'].isoformat()
+                pkg_doc['valid_until'] = pkg_doc['valid_until'].isoformat()
+                await db.visit_packages.insert_one(pkg_doc)
+            
+            # Handle property lock
+            if transaction['package_type'] == "property_lock" and transaction['metadata'].get('property_id'):
+                lock = PropertyLock(
+                    customer_id=transaction['user_id'],
+                    property_id=transaction['metadata']['property_id']
+                )
+                lock_doc = lock.model_dump()
+                lock_doc['created_at'] = lock_doc['created_at'].isoformat()
+                await db.property_locks.insert_one(lock_doc)
+            
+            # Handle packers booking confirmation
+            if package_type == "packers" and transaction['metadata'].get('booking_id'):
+                booking_id = transaction['metadata']['booking_id']
+                await db.shifting_bookings.update_one(
+                    {"id": booking_id},
+                    {"$set": {
+                        "status": "confirmed",
+                        "payment_status": "paid",
+                        "payment_session_id": order_id,
+                        "final_price": transaction['amount']
+                    }}
+                )
+            
+            # Handle advertising payment
+            if package_type == "advertising" and transaction['metadata'].get('ad_id'):
+                ad_id = transaction['metadata']['ad_id']
+                await db.advertisements.update_one(
+                    {"id": ad_id},
+                    {"$set": {
+                        "status": "active",
+                        "payment_status": "paid",
+                        "payment_session_id": order_id,
+                        "amount_paid": transaction['amount']
+                    }}
+                )
+            
+            transaction['payment_status'] = "paid"
+        
+        return transaction
+        
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        logging.error(f"Payment status check error: {str(e)}")
+        return transaction
+
+@api_router.post("/webhook/cashfree")
+async def cashfree_webhook(request: Request):
+    """Handle Cashfree payment webhooks."""
+    try:
+        raw_body = await request.body()
+        signature = request.headers.get('x-webhook-signature', '')
+        timestamp = request.headers.get('x-webhook-timestamp', '')
+        
+        # Parse webhook data
+        webhook_data = json.loads(raw_body.decode('utf-8'))
+        
+        # Extract payment data
+        data = webhook_data.get('data', {})
+        order_data = data.get('order', {})
+        payment_data = data.get('payment', {})
+        
+        order_id = order_data.get('order_id')
+        payment_status = payment_data.get('payment_status')
+        event_type = webhook_data.get('type')
+        
+        logging.info(f"Cashfree webhook: order={order_id}, status={payment_status}, type={event_type}")
+        
+        if event_type == 'PAYMENT_SUCCESS_WEBHOOK' and payment_status == 'SUCCESS':
+            # Find transaction
+            transaction = await db.payment_transactions.find_one({"session_id": order_id})
+            
+            if transaction and transaction.get('payment_status') != 'paid':
+                # Update transaction status
+                await db.payment_transactions.update_one(
+                    {"session_id": order_id},
+                    {"$set": {"payment_status": "paid", "payment_id": payment_data.get('cf_payment_id')}}
+                )
+                
+                package = PAYMENT_PACKAGES.get(transaction['package_type'], {})
+                package_type = package.get('type', 'visit')
+                
+                # Handle visit packages
+                if 'visits' in package:
+                    visit_package = VisitPackage(
+                        customer_id=transaction['user_id'],
+                        package_type=transaction['package_type'],
+                        total_visits=package['visits'],
+                        visits_used=0,
+                        amount_paid=transaction['amount'],
+                        valid_until=datetime.now(timezone.utc) + timedelta(days=package['validity_days'])
+                    )
+                    pkg_doc = visit_package.model_dump()
+                    pkg_doc['created_at'] = pkg_doc['created_at'].isoformat()
+                    pkg_doc['valid_until'] = pkg_doc['valid_until'].isoformat()
+                    await db.visit_packages.insert_one(pkg_doc)
+                
+                # Handle property lock
+                if transaction['package_type'] == "property_lock" and transaction.get('metadata', {}).get('property_id'):
+                    lock = PropertyLock(
+                        customer_id=transaction['user_id'],
+                        property_id=transaction['metadata']['property_id']
+                    )
+                    lock_doc = lock.model_dump()
+                    lock_doc['created_at'] = lock_doc['created_at'].isoformat()
+                    await db.property_locks.insert_one(lock_doc)
+                
+                # Handle packers booking confirmation
+                if package_type == "packers" and transaction.get('metadata', {}).get('booking_id'):
+                    booking_id = transaction['metadata']['booking_id']
+                    await db.shifting_bookings.update_one(
+                        {"id": booking_id},
+                        {"$set": {
+                            "status": "confirmed",
+                            "payment_status": "paid",
+                            "payment_session_id": order_id,
+                            "final_price": transaction['amount']
+                        }}
+                    )
+                
+                # Handle advertising payment
+                if package_type == "advertising" and transaction.get('metadata', {}).get('ad_id'):
+                    ad_id = transaction['metadata']['ad_id']
+                    await db.advertisements.update_one(
+                        {"id": ad_id},
+                        {"$set": {
+                            "status": "active",
+                            "payment_status": "paid",
+                            "payment_session_id": order_id,
+                            "amount_paid": transaction['amount']
+                        }}
+                    )
+                
+                logging.info(f"Payment processed successfully for order: {order_id}")
+        
+        return {"status": "success"}
+        
+    except Exception as e:
+        logging.error(f"Cashfree webhook error: {str(e)}")
+        return {"status": "error", "message": str(e)}
 
 # Visit booking endpoints
 @api_router.post("/visits/book")
