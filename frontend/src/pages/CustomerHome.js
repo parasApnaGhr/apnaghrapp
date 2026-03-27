@@ -193,11 +193,23 @@ const CustomerHome = () => {
                       <Home className="w-12 h-12 text-[#4A626C]" />
                     </div>
                   )}
-                  {property.premium_listing && (
+                  {/* Hot Property Badge */}
+                  {property.is_hot && (
+                    <span className="absolute top-2 left-2 bg-orange-500 text-white px-2 py-1 rounded-full text-xs font-bold flex items-center gap-1 animate-pulse">
+                      🔥 High Demand
+                    </span>
+                  )}
+                  {property.premium_listing && !property.is_hot && (
                     <span className="absolute top-2 left-2 badge badge-warning">Premium</span>
                   )}
                   {property.verified_owner && (
                     <span className="absolute top-2 right-2 badge badge-success">Verified</span>
+                  )}
+                  {/* Weekly Visits Badge */}
+                  {property.weekly_visits > 0 && (
+                    <span className="absolute bottom-2 left-2 bg-black/70 text-white px-2 py-1 rounded text-xs">
+                      👀 {property.weekly_visits} viewed this week
+                    </span>
                   )}
                 </div>
                 <div className="p-4">

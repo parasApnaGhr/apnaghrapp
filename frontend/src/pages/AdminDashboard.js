@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { 
   Users, Package, Bike, LogOut, Home, DollarSign, TrendingUp, 
-  Settings, MapPin, CheckSquare, CreditCard, Bell
+  Settings, MapPin, CheckSquare, CreditCard, Bell, BarChart3
 } from 'lucide-react';
 import CustomerSupportPanel from '../components/CustomerSupportPanel';
 import InventoryPanel from '../components/InventoryPanel';
@@ -12,6 +12,7 @@ import ToLetTasksPanel from '../components/ToLetTasksPanel';
 import VisitApprovalPanel from '../components/VisitApprovalPanel';
 import PayoutsPanel from '../components/PayoutsPanel';
 import LiveTrackingPanel from '../components/LiveTrackingPanel';
+import PropertyAnalyticsPanel from '../components/PropertyAnalyticsPanel';
 import NotificationsDropdown from '../components/NotificationsDropdown';
 
 const AdminDashboard = () => {
@@ -105,6 +106,18 @@ const AdminDashboard = () => {
             >
               <CreditCard className="w-4 h-4" />
               Payouts
+            </button>
+            <button
+              onClick={() => setActivePanel('analytics')}
+              className={`px-4 py-3 font-medium text-sm transition flex items-center gap-2 ${
+                activePanel === 'analytics'
+                  ? 'text-[#E07A5F] border-b-2 border-[#E07A5F]'
+                  : 'text-[#4A626C] hover:text-[#264653]'
+              }`}
+              data-testid="tab-analytics"
+            >
+              <BarChart3 className="w-4 h-4" />
+              Property Analytics
             </button>
             <button
               onClick={() => setActivePanel('riders')}
@@ -271,6 +284,7 @@ const AdminDashboard = () => {
         {activePanel === 'approvals' && <VisitApprovalPanel />}
         {activePanel === 'tolet' && <ToLetTasksPanel />}
         {activePanel === 'payouts' && <PayoutsPanel />}
+        {activePanel === 'analytics' && <PropertyAnalyticsPanel />}
         {activePanel === 'riders' && <RiderManagementPanel />}
         {activePanel === 'support' && <CustomerSupportPanel />}
         {activePanel === 'inventory' && <InventoryPanel />}

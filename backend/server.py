@@ -88,7 +88,20 @@ class Property(BaseModel):
     available: bool = True
     verified_owner: bool = False
     premium_listing: bool = False
+    # Analytics & Status Tracking
+    visit_count: int = 0
+    weekly_visits: int = 0
+    last_visited: Optional[str] = None
+    status: str = "available"  # available, rented, under_verification, inactive
+    last_status_check: Optional[str] = None
+    status_verified_by: Optional[str] = None
+    status_notes: Optional[str] = None
+    is_hot: bool = False  # High demand property
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class PropertyStatusUpdate(BaseModel):
+    status: str  # available, rented, under_verification, inactive
+    notes: Optional[str] = None
 
 class PropertyCreate(BaseModel):
     title: str
@@ -748,6 +761,16 @@ async def update_visit_step(visit_id: str, step_data: VisitStepUpdate, current_u
             update_data["current_property_index"] = idx + 1
             update_data["current_step"] = f"go_to_property_{idx + 1}"
             update_data["status"] = "navigating"
+            
+            # Increment visit count for completed property
+            completed_prop_id = property_ids[idx]
+            await db.properties.update_one(
+                {"id": completed_prop_id},
+                {
+                    "$inc": {"visit_count": 1, "weekly_visits": 1},
+                    "$set": {"last_visited": datetime.now(timezone.utc).isoformat()}
+                }
+            )
         else:
             # All properties done
             update_data["current_step"] = "completed"
@@ -756,6 +779,17 @@ async def update_visit_step(visit_id: str, step_data: VisitStepUpdate, current_u
             notify_admins = True
             notification_title = "Ride Completed"
             notification_message = f"Rider {current_user['name']} completed visit - {len(property_ids)} properties"
+            
+            # Increment visit count for last property
+            if property_ids:
+                last_prop_id = property_ids[-1]
+                await db.properties.update_one(
+                    {"id": last_prop_id},
+                    {
+                        "$inc": {"visit_count": 1, "weekly_visits": 1},
+                        "$set": {"last_visited": datetime.now(timezone.utc).isoformat()}
+                    }
+                )
             
             # Create pending transaction for rider earnings
             earnings = visit.get('total_earnings', 0)
@@ -1665,6 +1699,8 @@ async def get_rider_wallet(current_user: dict = Depends(get_current_user)):
             "next_payout_date": get_next_biweekly_date()
         }
         await db.rider_wallets.insert_one(wallet)
+        # Remove _id that MongoDB adds after insert
+        wallet.pop('_id', None)
     
     wallet['next_payout_date'] = get_next_biweekly_date()
     return wallet
@@ -1855,6 +1891,160 @@ async def get_live_rider_locations(current_user: dict = Depends(get_current_user
         rider['active_task'] = active_task
     
     return riders
+
+
+# ============ PROPERTY ANALYTICS & STATUS ============
+
+@api_router.get("/admin/properties/analytics")
+async def get_property_analytics(current_user: dict = Depends(get_current_user)):
+    """Get property analytics with visit counts and status"""
+    if current_user['role'] not in ['admin', 'inventory_admin', 'support_admin']:
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    # Get all properties with analytics
+    properties = await db.properties.find({}, {"_id": 0}).sort("visit_count", -1).to_list(200)
+    
+    # Calculate properties needing status check (not checked in 24 hours)
+    cutoff = (datetime.now(timezone.utc) - timedelta(days=1)).isoformat()
+    needs_verification = [p for p in properties if not p.get('last_status_check') or p.get('last_status_check', '') < cutoff]
+    
+    # Get visit bookings to calculate recent visits per property
+    recent_visits = await db.visit_bookings.find(
+        {"created_at": {"$gte": (datetime.now(timezone.utc) - timedelta(days=7)).isoformat()}},
+        {"_id": 0, "property_ids": 1}
+    ).to_list(500)
+    
+    # Count visits per property
+    visit_counts = {}
+    for visit in recent_visits:
+        for prop_id in visit.get('property_ids', []):
+            visit_counts[prop_id] = visit_counts.get(prop_id, 0) + 1
+    
+    # Update weekly visits in response
+    for prop in properties:
+        prop['weekly_visits'] = visit_counts.get(prop['id'], 0)
+        prop['needs_verification'] = prop['id'] in [p['id'] for p in needs_verification]
+    
+    # Summary stats
+    summary = {
+        "total_properties": len(properties),
+        "available": len([p for p in properties if p.get('status') == 'available']),
+        "rented": len([p for p in properties if p.get('status') == 'rented']),
+        "under_verification": len([p for p in properties if p.get('status') == 'under_verification']),
+        "needs_daily_check": len(needs_verification),
+        "hot_properties": len([p for p in properties if p.get('is_hot')]),
+        "total_weekly_visits": sum(visit_counts.values())
+    }
+    
+    return {"properties": properties, "summary": summary}
+
+@api_router.get("/admin/properties/needs-verification")
+async def get_properties_needing_verification(current_user: dict = Depends(get_current_user)):
+    """Get properties that need daily status verification"""
+    if current_user['role'] not in ['admin', 'inventory_admin']:
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    cutoff = (datetime.now(timezone.utc) - timedelta(days=1)).isoformat()
+    
+    properties = await db.properties.find({
+        "status": {"$in": ["available", "under_verification"]},
+        "$or": [
+            {"last_status_check": None},
+            {"last_status_check": {"$lt": cutoff}}
+        ]
+    }, {"_id": 0}).to_list(100)
+    
+    return properties
+
+@api_router.post("/admin/properties/{property_id}/verify-status")
+async def verify_property_status(property_id: str, status_update: PropertyStatusUpdate, current_user: dict = Depends(get_current_user)):
+    """Admin verifies/updates property status"""
+    if current_user['role'] not in ['admin', 'inventory_admin']:
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    update_data = {
+        "status": status_update.status,
+        "last_status_check": datetime.now(timezone.utc).isoformat(),
+        "status_verified_by": current_user['id'],
+        "available": status_update.status == "available"
+    }
+    
+    if status_update.notes:
+        update_data["status_notes"] = status_update.notes
+    
+    # If rented, mark as not available
+    if status_update.status == "rented":
+        update_data["available"] = False
+        update_data["is_hot"] = False
+    
+    await db.properties.update_one({"id": property_id}, {"$set": update_data})
+    
+    prop = await db.properties.find_one({"id": property_id}, {"_id": 0})
+    return prop
+
+@api_router.post("/admin/properties/{property_id}/mark-hot")
+async def mark_property_hot(property_id: str, is_hot: bool = True, current_user: dict = Depends(get_current_user)):
+    """Mark property as hot/high-demand"""
+    if current_user['role'] not in ['admin', 'inventory_admin']:
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    await db.properties.update_one({"id": property_id}, {"$set": {"is_hot": is_hot}})
+    return {"success": True, "is_hot": is_hot}
+
+@api_router.post("/admin/properties/auto-mark-hot")
+async def auto_mark_hot_properties(current_user: dict = Depends(get_current_user)):
+    """Automatically mark top visited properties as hot"""
+    if current_user['role'] != 'admin':
+        raise HTTPException(status_code=403, detail="Admin only")
+    
+    # Get visit counts from last 7 days
+    recent_visits = await db.visit_bookings.find(
+        {"created_at": {"$gte": (datetime.now(timezone.utc) - timedelta(days=7)).isoformat()}},
+        {"_id": 0, "property_ids": 1}
+    ).to_list(500)
+    
+    visit_counts = {}
+    for visit in recent_visits:
+        for prop_id in visit.get('property_ids', []):
+            visit_counts[prop_id] = visit_counts.get(prop_id, 0) + 1
+    
+    # Mark top 10% as hot
+    if visit_counts:
+        sorted_props = sorted(visit_counts.items(), key=lambda x: x[1], reverse=True)
+        hot_threshold = max(1, len(sorted_props) // 10)
+        hot_ids = [p[0] for p in sorted_props[:hot_threshold]]
+        
+        # Reset all hot status
+        await db.properties.update_many({}, {"$set": {"is_hot": False}})
+        
+        # Mark new hot properties
+        await db.properties.update_many(
+            {"id": {"$in": hot_ids}, "status": "available"},
+            {"$set": {"is_hot": True}}
+        )
+        
+        return {"success": True, "hot_properties_count": len(hot_ids)}
+    
+    return {"success": True, "hot_properties_count": 0}
+
+@api_router.get("/properties/{property_id}/popularity")
+async def get_property_popularity(property_id: str):
+    """Get property popularity info (public - for customers)"""
+    prop = await db.properties.find_one({"id": property_id}, {"_id": 0})
+    if not prop:
+        raise HTTPException(status_code=404, detail="Property not found")
+    
+    # Count visits in last 7 days
+    recent_visits = await db.visit_bookings.count_documents({
+        "property_ids": property_id,
+        "created_at": {"$gte": (datetime.now(timezone.utc) - timedelta(days=7)).isoformat()}
+    })
+    
+    return {
+        "weekly_visits": recent_visits,
+        "is_hot": prop.get('is_hot', False),
+        "total_visits": prop.get('visit_count', 0)
+    }
 
 
 app.include_router(api_router)
