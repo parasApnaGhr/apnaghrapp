@@ -15,6 +15,26 @@ logger = logging.getLogger(__name__)
 SCRIPT_DIR = Path(__file__).parent
 SEED_DATA_FILE = SCRIPT_DIR / "seed_data.json"
 
+# All collections to seed
+COLLECTIONS_TO_SEED = [
+    'users',
+    'properties', 
+    'advertisements',
+    'advertiser_profiles',
+    'app_settings',
+    'visit_bookings',
+    'visit_packages',
+    'payment_transactions',
+    'rider_wallets',
+    'rider_transactions',
+    'tolet_tasks',
+    'shifting_bookings',
+    'property_locks',
+    'notifications',
+    'chat_sessions',
+    'chat_messages',
+]
+
 
 async def seed_production_data(db):
     """
@@ -30,53 +50,30 @@ async def seed_production_data(db):
         with open(SEED_DATA_FILE, 'r') as f:
             data = json.load(f)
         
-        # Seed Users (if empty)
-        user_count = await db.users.count_documents({})
-        if user_count == 0 and data.get('users'):
-            users = data['users']
-            if users:
-                await db.users.insert_many(users)
-                logger.info(f"Seeded {len(users)} users to production")
-        else:
-            logger.info(f"Users collection has {user_count} documents, skipping user seeding")
+        total_seeded = 0
         
-        # Seed Properties (if empty)
-        prop_count = await db.properties.count_documents({})
-        if prop_count == 0 and data.get('properties'):
-            properties = data['properties']
-            if properties:
-                await db.properties.insert_many(properties)
-                logger.info(f"Seeded {len(properties)} properties to production")
-        else:
-            logger.info(f"Properties collection has {prop_count} documents, skipping property seeding")
+        for collection_name in COLLECTIONS_TO_SEED:
+            try:
+                collection = db[collection_name]
+                count = await collection.count_documents({})
+                
+                if count == 0 and data.get(collection_name):
+                    items = data[collection_name]
+                    if items and len(items) > 0:
+                        await collection.insert_many(items)
+                        logger.info(f"Seeded {len(items)} documents to {collection_name}")
+                        total_seeded += len(items)
+                    else:
+                        logger.info(f"No data for {collection_name}, skipping")
+                else:
+                    if count > 0:
+                        logger.info(f"{collection_name} has {count} documents, skipping")
+                    else:
+                        logger.info(f"No data for {collection_name} in seed file")
+            except Exception as e:
+                logger.warning(f"Error seeding {collection_name}: {str(e)}")
         
-        # Seed Advertisements (if empty)
-        ad_count = await db.advertisements.count_documents({})
-        if ad_count == 0 and data.get('advertisements'):
-            ads = data['advertisements']
-            if ads:
-                await db.advertisements.insert_many(ads)
-                logger.info(f"Seeded {len(ads)} advertisements to production")
-        else:
-            logger.info(f"Advertisements collection has {ad_count} documents, skipping ad seeding")
-        
-        # Seed Advertiser Profiles (if empty)
-        profile_count = await db.advertiser_profiles.count_documents({})
-        if profile_count == 0 and data.get('advertiser_profiles'):
-            profiles = data['advertiser_profiles']
-            if profiles:
-                await db.advertiser_profiles.insert_many(profiles)
-                logger.info(f"Seeded {len(profiles)} advertiser profiles to production")
-        
-        # Seed App Settings (if empty)
-        settings_count = await db.app_settings.count_documents({})
-        if settings_count == 0 and data.get('app_settings'):
-            settings = data['app_settings']
-            if settings:
-                await db.app_settings.insert_many(settings)
-                logger.info(f"Seeded {len(settings)} app settings to production")
-        
-        logger.info("Production data seeding completed")
+        logger.info(f"Production data seeding completed. Total documents seeded: {total_seeded}")
         
     except Exception as e:
         logger.error(f"Error seeding production data: {str(e)}")
