@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import api from '../utils/api';
+import api, { getMediaUrl } from '../utils/api';
 import { 
   Home, TrendingUp, Eye, CheckCircle, AlertCircle, Clock,
   Flame, MapPin, IndianRupee, RefreshCw, XCircle, Search
@@ -202,7 +202,7 @@ const PropertyAnalyticsPanel = () => {
                   {/* Image */}
                   <div className="w-24 h-24 bg-[#F3F2EB] rounded-lg overflow-hidden flex-shrink-0">
                     {property.images?.[0] ? (
-                      <img src={property.images[0]} alt="" className="w-full h-full object-cover" />
+                      <img src={getMediaUrl(property.images[0])} alt="" className="w-full h-full object-cover" />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
                         <Home className="w-8 h-8 text-[#4A626C]" />

@@ -10,18 +10,31 @@ if (process.env.NODE_ENV === 'development' && !BACKEND_URL) {
 }
 
 // Helper to fix image/video URLs - ensures full URL for uploaded files
+// This handles all cases: external URLs, uploaded files, and relative paths
 export const getMediaUrl = (url) => {
   if (!url) return null;
-  // If already a full URL, return as-is
+  
+  // If it's a data URL (base64), return as-is
+  if (url.startsWith('data:')) {
+    return url;
+  }
+  
+  // If already a full URL (http/https), return as-is
   if (url.startsWith('http://') || url.startsWith('https://')) {
     return url;
   }
-  // If it's a relative path and we have BACKEND_URL, prefix it
-  if (BACKEND_URL && url.startsWith('/uploads/')) {
-    return `${BACKEND_URL}${url}`;
+  
+  // If it's an upload path
+  if (url.startsWith('/uploads/') || url.startsWith('uploads/')) {
+    const cleanPath = url.startsWith('/') ? url : `/${url}`;
+    // In production (no BACKEND_URL), use same domain
+    // In development, prefix with BACKEND_URL
+    return BACKEND_URL ? `${BACKEND_URL}${cleanPath}` : cleanPath;
   }
-  // For relative paths without BACKEND_URL, return as-is (will use same domain)
-  return url;
+  
+  // For any other path, prefix with BACKEND_URL if available
+  const cleanPath = url.startsWith('/') ? url : `/${url}`;
+  return BACKEND_URL ? `${BACKEND_URL}${cleanPath}` : cleanPath;
 };
 
 const api = axios.create({

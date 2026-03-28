@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { paymentAPI } from '../utils/api';
+import { paymentAPI, getMediaUrl } from '../utils/api';
 import { 
   ArrowLeft, Trash2, MapPin, Home, Calendar, Clock, 
   IndianRupee, ShoppingCart, CreditCard, Check, ChevronRight
@@ -184,7 +184,7 @@ const VisitCart = () => {
                     <div className="flex gap-4">
                       {property.images?.[0] ? (
                         <img 
-                          src={property.images[0]} 
+                          src={getMediaUrl(property.images[0])} 
                           alt="" 
                           className="w-20 h-20 rounded-xl object-cover flex-shrink-0 border-2 border-[#111111]"
                         />

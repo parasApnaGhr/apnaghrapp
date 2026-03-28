@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
-import { visitAPI, riderAPI } from '../utils/api';
+import { visitAPI, riderAPI, getMediaUrl } from '../utils/api';
 import api from '../utils/api';
 import VisitProofUpload from '../components/VisitProofUpload';
 import { 

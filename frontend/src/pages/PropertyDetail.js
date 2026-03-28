@@ -267,7 +267,7 @@ const PropertyDetail = () => {
             </h3>
             <div className="aspect-video bg-[#F3F2EB] rounded-lg">
               <video controls className="w-full h-full rounded-lg">
-                <source src={property.video_url} type="video/mp4" />
+                <source src={getMediaUrl(property.video_url)} type="video/mp4" />
               </video>
             </div>
           </div>

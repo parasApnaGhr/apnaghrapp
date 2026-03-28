@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import api from '../utils/api';
+import api, { getMediaUrl } from '../utils/api';
 import { 
   MapPin, Plus, Edit2, Trash2, User, Clock, IndianRupee, 
   CheckCircle, XCircle, AlertCircle, Send, Eye, Camera, Image, X

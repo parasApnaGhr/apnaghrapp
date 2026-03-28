@@ -340,9 +340,13 @@ const InventoryPanel = () => {
                   {formData.images.map((img, idx) => (
                     <div key={idx} className="relative group">
                       <img 
-                        src={img} 
+                        src={getMediaUrl(img)} 
                         alt={`Property ${idx + 1}`} 
                         className="w-24 h-24 object-cover rounded-lg border-2 border-[#111111]"
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 24 24" fill="none" stroke="%239CA3AF" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>';
+                        }}
                       />
                       <button
                         type="button"
@@ -378,7 +382,7 @@ const InventoryPanel = () => {
               {formData.video_url && (
                 <div className="mb-3 relative inline-block">
                   <video 
-                    src={formData.video_url} 
+                    src={getMediaUrl(formData.video_url)} 
                     className="w-48 h-32 object-cover rounded-lg border-2 border-[#111111]"
                     controls
                   />
