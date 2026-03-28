@@ -1,7 +1,13 @@
 import axios from 'axios';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
+// In production, use relative URLs (same domain), in development use env variable
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || '';
+const API = BACKEND_URL ? `${BACKEND_URL}/api` : '/api';
+
+// Debug log for troubleshooting (only in development)
+if (process.env.NODE_ENV === 'development' && !BACKEND_URL) {
+  console.warn('REACT_APP_BACKEND_URL is not set, using relative URLs');
+}
 
 // Helper to fix image/video URLs - ensures full URL for uploaded files
 export const getMediaUrl = (url) => {
@@ -10,16 +16,17 @@ export const getMediaUrl = (url) => {
   if (url.startsWith('http://') || url.startsWith('https://')) {
     return url;
   }
-  // If it's a relative path, prefix with backend URL
-  if (url.startsWith('/uploads/')) {
+  // If it's a relative path and we have BACKEND_URL, prefix it
+  if (BACKEND_URL && url.startsWith('/uploads/')) {
     return `${BACKEND_URL}${url}`;
   }
-  // For any other path, prefix with backend URL
-  return `${BACKEND_URL}${url}`;
+  // For relative paths without BACKEND_URL, return as-is (will use same domain)
+  return url;
 };
 
 const api = axios.create({
   baseURL: API,
+  timeout: 30000, // 30 second timeout
 });
 
 api.interceptors.request.use((config) => {
@@ -29,6 +36,22 @@ api.interceptors.request.use((config) => {
   }
   return config;
 });
+
+// Handle response errors globally
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    // Handle 401 unauthorized - clear token and redirect to login
+    if (error.response?.status === 401) {
+      localStorage.removeItem('token');
+      // Only redirect if not already on login page
+      if (window.location.pathname !== '/') {
+        window.location.href = '/';
+      }
+    }
+    return Promise.reject(error);
+  }
+);
 
 export const authAPI = {
   login: (phone, password) => api.post('/auth/login', { phone, password }),

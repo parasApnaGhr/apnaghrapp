@@ -69,12 +69,14 @@ const Login = () => {
         const user = await login(formData.phone, formData.password);
         toast.success(`Welcome back, ${user.name || 'User'}!`);
 
-        if (user.role === 'customer' || user.role === 'advertiser') {
+        if (user.role === 'customer' || user.role === 'advertiser' || user.role === 'builder') {
           navigate('/customer');
         } else if (user.role === 'rider') {
           navigate('/rider');
         } else if (['admin', 'support_admin', 'inventory_admin', 'rider_admin'].includes(user.role)) {
           navigate('/admin');
+        } else {
+          navigate('/customer'); // Default fallback
         }
       }
     } catch (error) {

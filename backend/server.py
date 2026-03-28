@@ -569,6 +569,16 @@ async def get_me(current_user: dict = Depends(get_current_user)):
     current_user.pop('password', None)
     return current_user
 
+# Health check endpoint (under /api)
+@api_router.get("/health")
+async def api_health_check():
+    """Health check endpoint accessible via /api/health"""
+    try:
+        await client.admin.command('ping')
+        return {"status": "healthy", "database": "connected", "version": "2.0"}
+    except Exception as e:
+        return {"status": "unhealthy", "error": str(e)}
+
 @api_router.get("/users")
 async def get_all_users(current_user: dict = Depends(get_current_user)):
     if current_user['role'] not in ['admin', 'support_admin', 'rider_admin']:
@@ -2668,6 +2678,53 @@ logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
+
+# Startup event - seed default accounts if not exist
+@app.on_event("startup")
+async def seed_default_accounts():
+    """Create default admin and test accounts on first run"""
+    default_accounts = [
+        {"name": "Admin User", "phone": "7777777777", "password": "admin123", "role": "admin"},
+        {"name": "Test Customer", "phone": "6987654321", "password": "test123", "role": "customer"},
+        {"name": "Test Rider", "phone": "6111222333", "password": "rider123", "role": "rider"},
+        {"name": "Test Advertiser", "phone": "6222333444", "password": "adv123", "role": "advertiser"},
+        {"name": "Test Builder", "phone": "6333444555", "password": "build123", "role": "builder"},
+    ]
+    
+    for account in default_accounts:
+        existing = await db.users.find_one({"phone": account["phone"]})
+        if not existing:
+            user = User(
+                name=account["name"],
+                phone=account["phone"],
+                password=hash_password(account["password"]),
+                role=account["role"]
+            )
+            doc = user.model_dump()
+            doc['created_at'] = doc['created_at'].isoformat()
+            await db.users.insert_one(doc)
+            logger.info(f"Created default {account['role']} account: {account['phone']}")
+        else:
+            logger.info(f"Account already exists: {account['phone']}")
+
+# Health check endpoint for production keep-alive (outside /api prefix)
+@app.get("/health")
+async def health_check():
+    """Health check endpoint for Kubernetes/load balancer"""
+    try:
+        # Check MongoDB connection
+        await client.admin.command('ping')
+        return {
+            "status": "healthy",
+            "database": "connected",
+            "version": "2.0"
+        }
+    except Exception as e:
+        return {
+            "status": "unhealthy",
+            "database": "disconnected",
+            "error": str(e)
+        }
 
 @app.on_event("shutdown")
 async def shutdown_db_client():

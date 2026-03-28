@@ -39,14 +39,25 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
 const AppRoutes = () => {
   const { user } = useAuth();
 
+  const getRedirectPath = (role) => {
+    if (role === 'customer' || role === 'advertiser' || role === 'builder') {
+      return '/customer';
+    } else if (role === 'rider') {
+      return '/rider';
+    } else if (['admin', 'support_admin', 'inventory_admin', 'rider_admin'].includes(role)) {
+      return '/admin';
+    }
+    return '/customer'; // Default fallback
+  };
+
   return (
     <Routes>
-      <Route path="/" element={user ? <Navigate to={`/${user.role === 'customer' || user.role === 'advertiser' ? 'customer' : user.role === 'rider' ? 'rider' : 'admin'}`} replace /> : <Login />} />
+      <Route path="/" element={user ? <Navigate to={getRedirectPath(user.role)} replace /> : <Login />} />
 
       <Route
         path="/customer"
         element={
-          <ProtectedRoute allowedRoles={['customer', 'advertiser']}>
+          <ProtectedRoute allowedRoles={['customer', 'advertiser', 'builder']}>
             <CustomerHome />
           </ProtectedRoute>
         }
@@ -55,7 +66,7 @@ const AppRoutes = () => {
       <Route
         path="/customer/property/:id"
         element={
-          <ProtectedRoute allowedRoles={['customer', 'advertiser']}>
+          <ProtectedRoute allowedRoles={['customer', 'advertiser', 'builder']}>
             <PropertyDetail />
           </ProtectedRoute>
         }
@@ -64,7 +75,7 @@ const AppRoutes = () => {
       <Route
         path="/customer/bookings"
         element={
-          <ProtectedRoute allowedRoles={['customer', 'advertiser']}>
+          <ProtectedRoute allowedRoles={['customer', 'advertiser', 'builder']}>
             <CustomerBookings />
           </ProtectedRoute>
         }
@@ -73,7 +84,7 @@ const AppRoutes = () => {
       <Route
         path="/customer/cart"
         element={
-          <ProtectedRoute allowedRoles={['customer', 'advertiser']}>
+          <ProtectedRoute allowedRoles={['customer', 'advertiser', 'builder']}>
             <VisitCart />
           </ProtectedRoute>
         }
@@ -82,7 +93,7 @@ const AppRoutes = () => {
       <Route
         path="/payment-success"
         element={
-          <ProtectedRoute allowedRoles={['customer', 'advertiser']}>
+          <ProtectedRoute allowedRoles={['customer', 'advertiser', 'builder']}>
             <PaymentSuccess />
           </ProtectedRoute>
         }
@@ -96,7 +107,7 @@ const AppRoutes = () => {
       <Route
         path="/customer/packers"
         element={
-          <ProtectedRoute allowedRoles={['customer', 'advertiser']}>
+          <ProtectedRoute allowedRoles={['customer', 'advertiser', 'builder']}>
             <PackersMovers />
           </ProtectedRoute>
         }
@@ -105,7 +116,7 @@ const AppRoutes = () => {
       <Route
         path="/customer/advertise"
         element={
-          <ProtectedRoute allowedRoles={['customer', 'advertiser']}>
+          <ProtectedRoute allowedRoles={['customer', 'advertiser', 'builder']}>
             <AdvertiseWithUs />
           </ProtectedRoute>
         }
