@@ -1475,7 +1475,7 @@ async def upload_file(file: UploadFile = File(...), current_user: dict = Depends
         await f.write(content)
     
     # Return full URL that works in frontend
-    file_url = f"/uploads/{file_name}"
+    file_url = f"/api/uploads/{file_name}"
     return {"url": file_url, "filename": file_name, "size": len(content), "type": content_type}
 
 @api_router.post("/upload/image")
@@ -1491,7 +1491,7 @@ async def upload_image(file: UploadFile = File(...), current_user: dict = Depend
     async with aiofiles.open(file_path, 'wb') as f:
         await f.write(content)
     
-    file_url = f"/uploads/{file_name}"
+    file_url = f"/api/uploads/{file_name}"
     return {"url": file_url, "filename": file_name}
 
 @api_router.post("/upload/video")
@@ -1507,7 +1507,7 @@ async def upload_video(file: UploadFile = File(...), current_user: dict = Depend
     async with aiofiles.open(file_path, 'wb') as f:
         await f.write(content)
     
-    file_url = f"/uploads/{file_name}"
+    file_url = f"/api/uploads/{file_name}"
     return {"url": file_url, "filename": file_name}
 
 # App Settings (for explainer video, etc.)
@@ -2667,7 +2667,8 @@ app.include_router(packers_router, prefix="/api")
 app.include_router(advertising_router, prefix="/api")
 
 # Mount uploads directory for serving files
-app.mount("/uploads", StaticFiles(directory="/app/uploads"), name="uploads")
+# Using /api/uploads to ensure proper routing through Kubernetes ingress
+app.mount("/api/uploads", StaticFiles(directory="/app/uploads"), name="uploads")
 
 app.add_middleware(
     CORSMiddleware,

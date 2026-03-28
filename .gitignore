@@ -94,3 +94,4 @@ memory/test_credentials.md
 /uploads/*.mp4
 /uploads/*.mov
 /uploads/*.avi
+frontend/node_modules/.cache/default-development/5.pack

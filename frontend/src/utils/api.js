@@ -19,16 +19,27 @@ export const getMediaUrl = (url) => {
     return url;
   }
   
-  // If already a full URL (http/https), return as-is
+  // If already a full URL (http/https)
   if (url.startsWith('http://') || url.startsWith('https://')) {
+    // Check if it's an upload URL that needs to be converted to /api/uploads/
+    // This handles legacy URLs stored in database with /uploads/ path
+    if (url.includes('/uploads/') && !url.includes('/api/uploads/')) {
+      return url.replace('/uploads/', '/api/uploads/');
+    }
     return url;
   }
   
-  // If it's an upload path
+  // If it's an upload path (handle both old /uploads/ and new /api/uploads/)
   if (url.startsWith('/uploads/') || url.startsWith('uploads/')) {
+    // Convert old /uploads/ path to /api/uploads/ for proper routing
     const cleanPath = url.startsWith('/') ? url : `/${url}`;
-    // In production (no BACKEND_URL), use same domain
-    // In development, prefix with BACKEND_URL
+    const apiPath = cleanPath.replace('/uploads/', '/api/uploads/');
+    return BACKEND_URL ? `${BACKEND_URL}${apiPath}` : apiPath;
+  }
+  
+  // If it's already /api/uploads/ path
+  if (url.startsWith('/api/uploads/') || url.startsWith('api/uploads/')) {
+    const cleanPath = url.startsWith('/') ? url : `/${url}`;
     return BACKEND_URL ? `${BACKEND_URL}${cleanPath}` : cleanPath;
   }
   
