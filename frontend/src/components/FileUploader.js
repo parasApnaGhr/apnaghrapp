@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Upload, X, Camera, Video } from 'lucide-react';
+import { Upload, X, Image as ImageIcon, Video } from 'lucide-react';
 import axios from 'axios';
 import { toast } from 'sonner';
 
@@ -84,7 +84,6 @@ const FileUploader = ({ type = 'image', multiple = false, onUploadComplete, labe
           multiple={multiple}
           onChange={handleFileSelect}
           className="hidden"
-          capture={type === 'image' ? 'environment' : undefined}
         />
 
         {uploading ? (
@@ -95,15 +94,15 @@ const FileUploader = ({ type = 'image', multiple = false, onUploadComplete, labe
         ) : (
           <div className="flex flex-col items-center">
             {type === 'image' ? (
-              <Camera className="w-12 h-12 text-[#E07A5F] mb-3" />
+              <ImageIcon className="w-12 h-12 text-[#E07A5F] mb-3" />
             ) : (
               <Video className="w-12 h-12 text-[#E07A5F] mb-3" />
             )}
             <p className="text-sm font-medium text-[#264653] mb-1">
-              {type === 'image' ? 'Upload Photos' : 'Upload Video'}
+              {type === 'image' ? 'Add Photos' : 'Add Video'}
             </p>
             <p className="text-xs text-[#4A626C]">
-              Click to select or take {type === 'image' ? 'photo' : 'video'}
+              Choose from gallery or camera
             </p>
           </div>
         )}
