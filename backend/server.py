@@ -681,7 +681,11 @@ async def create_checkout(
     package = PAYMENT_PACKAGES[request.package_id]
     amount = package["amount"]
     
-    backend_url = os.environ.get('BACKEND_URL', request.origin_url)
+    # Use origin_url for callbacks - this should be the production domain
+    # For webhook, we need to construct the backend URL from the origin
+    origin_url = request.origin_url.rstrip('/')
+    # The backend API is on the same domain with /api prefix
+    webhook_url = f"{origin_url}/api/webhook/cashfree"
     
     # Build metadata - only include non-empty values
     metadata = {
@@ -705,8 +709,8 @@ async def create_checkout(
             customer_phone=current_user.get('phone', '9999999999'),
             customer_email=current_user.get('email'),
             customer_name=current_user.get('name'),
-            return_url=f"{request.origin_url}/payment-success?order_id={{order_id}}",
-            notify_url=f"{backend_url}/api/webhook/cashfree",
+            return_url=f"{origin_url}/payment-success?order_id={{order_id}}",
+            notify_url=webhook_url,
             order_note=f"ApnaGhr {request.package_id} payment",
             order_tags=metadata
         )
