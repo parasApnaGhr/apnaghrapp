@@ -177,5 +177,14 @@ export const chatAPI = {
   getConversations: () => api.get('/chat/conversations'),
 };
 
+// AI Chatbot API
+export const chatbotAPI = {
+  sendMessage: (sessionId, message) => api.post('/chatbot/send', { session_id: sessionId, message }),
+  getHistory: (sessionId) => api.get(`/chatbot/history/${sessionId}`),
+  getSessions: () => api.get('/chatbot/sessions'),
+  newSession: () => api.post('/chatbot/new-session'),
+  deleteSession: (sessionId) => api.delete(`/chatbot/session/${sessionId}`),
+};
+
 
 export default api;

@@ -7,6 +7,7 @@ import { Search, SlidersHorizontal, Home, User, Heart, Calendar, LogOut, Truck, 
 import { toast } from 'sonner';
 import Marquee from 'react-fast-marquee';
 import api from '../utils/api';
+import AIChatbot from '../components/AIChatbot';
 
 const CustomerHome = () => {
   const { user, logout } = useAuth();
@@ -537,6 +538,9 @@ const CustomerHome = () => {
           </button>
         </div>
       </div>
+      
+      {/* AI Chatbot */}
+      <AIChatbot />
     </div>
   );
 };

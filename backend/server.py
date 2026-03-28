@@ -19,6 +19,7 @@ import json
 # Import new modular routes
 from routes.packers import router as packers_router
 from routes.advertising import router as advertising_router
+from routes.chatbot import setup_chatbot_routes
 from services.cashfree_service import get_cashfree_service, CashfreePaymentService
 
 ROOT_DIR = Path(__file__).parent
@@ -2659,6 +2660,9 @@ async def get_property_popularity(property_id: str):
         "total_visits": prop.get('visit_count', 0)
     }
 
+
+# Setup AI Chatbot routes (must be before including router)
+setup_chatbot_routes(api_router, db, get_current_user)
 
 app.include_router(api_router)
 
