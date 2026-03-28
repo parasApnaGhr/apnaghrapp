@@ -844,18 +844,42 @@ async def cashfree_webhook(request: Request):
         # Parse webhook data
         webhook_data = json.loads(raw_body.decode('utf-8'))
         
-        # Extract payment data
+        # Log raw webhook for debugging
+        logging.info(f"Cashfree webhook raw: {webhook_data}")
+        
+        # Extract payment data - handle multiple payload formats
         data = webhook_data.get('data', {})
         order_data = data.get('order', {})
         payment_data = data.get('payment', {})
         
-        order_id = order_data.get('order_id')
-        payment_status = payment_data.get('payment_status')
-        event_type = webhook_data.get('type')
+        # Try different payload structures for order_id
+        order_id = (
+            order_data.get('order_id') or 
+            data.get('order_id') or 
+            webhook_data.get('order_id') or
+            payment_data.get('order_id')
+        )
         
-        logging.info(f"Cashfree webhook: order={order_id}, status={payment_status}, type={event_type}")
+        # Try different payload structures for payment_status
+        payment_status = (
+            payment_data.get('payment_status') or 
+            data.get('payment_status') or 
+            webhook_data.get('payment_status') or
+            data.get('txStatus')
+        )
         
-        if event_type == 'PAYMENT_SUCCESS_WEBHOOK' and payment_status == 'SUCCESS':
+        event_type = webhook_data.get('type', '')
+        
+        logging.info(f"Cashfree webhook parsed: order={order_id}, status={payment_status}, type={event_type}")
+        
+        # Handle both old and new webhook formats
+        is_success = (
+            (event_type == 'PAYMENT_SUCCESS_WEBHOOK' and payment_status == 'SUCCESS') or
+            (payment_status in ['SUCCESS', 'PAID']) or
+            (event_type in ['PAYMENT_SUCCESS', 'PAYMENT_CAPTURED'])
+        )
+        
+        if is_success and order_id:
             # Find transaction
             transaction = await db.payment_transactions.find_one({"session_id": order_id})
             
@@ -2005,13 +2029,21 @@ async def get_all_visits(current_user: dict = Depends(get_current_user)):
     
     visits = await db.visit_bookings.find({}, {"_id": 0}).sort("created_at", -1).to_list(100)
     
-    # Enrich with customer and rider info
+    # Batch fetch all users to avoid N+1 queries
+    user_ids = set()
     for visit in visits:
-        customer = await db.users.find_one({"id": visit['customer_id']}, {"_id": 0, "password": 0})
-        visit['customer'] = customer
+        user_ids.add(visit.get('customer_id'))
         if visit.get('rider_id'):
-            rider = await db.users.find_one({"id": visit['rider_id']}, {"_id": 0, "password": 0})
-            visit['rider'] = rider
+            user_ids.add(visit['rider_id'])
+    
+    users = await db.users.find({"id": {"$in": list(user_ids)}}, {"_id": 0, "password": 0}).to_list(None)
+    user_map = {u['id']: u for u in users}
+    
+    # Enrich with customer and rider info using batch data
+    for visit in visits:
+        visit['customer'] = user_map.get(visit.get('customer_id'))
+        if visit.get('rider_id'):
+            visit['rider'] = user_map.get(visit['rider_id'])
     
     return visits
 
@@ -2026,20 +2058,28 @@ async def get_visits_pending_approval(current_user: dict = Depends(get_current_u
         {"_id": 0}
     ).sort("visit_end_time", -1).to_list(50)
     
-    # Enrich with details
+    # Batch fetch all users and properties to avoid N+1 queries
+    user_ids = set()
+    property_ids = set()
     for visit in visits:
-        customer = await db.users.find_one({"id": visit['customer_id']}, {"_id": 0, "password": 0})
-        visit['customer'] = customer
+        user_ids.add(visit.get('customer_id'))
         if visit.get('rider_id'):
-            rider = await db.users.find_one({"id": visit['rider_id']}, {"_id": 0, "password": 0})
-            visit['rider'] = rider
-        # Get properties
-        properties = []
+            user_ids.add(visit['rider_id'])
         for prop_id in visit.get('property_ids', []):
-            prop = await db.properties.find_one({"id": prop_id}, {"_id": 0})
-            if prop:
-                properties.append(prop)
-        visit['properties'] = properties
+            property_ids.add(prop_id)
+    
+    users = await db.users.find({"id": {"$in": list(user_ids)}}, {"_id": 0, "password": 0}).to_list(None)
+    user_map = {u['id']: u for u in users}
+    
+    properties = await db.properties.find({"id": {"$in": list(property_ids)}}, {"_id": 0}).to_list(None)
+    prop_map = {p['id']: p for p in properties}
+    
+    # Enrich with details using batch data
+    for visit in visits:
+        visit['customer'] = user_map.get(visit.get('customer_id'))
+        if visit.get('rider_id'):
+            visit['rider'] = user_map.get(visit['rider_id'])
+        visit['properties'] = [prop_map[pid] for pid in visit.get('property_ids', []) if pid in prop_map]
     
     return visits
 
@@ -2178,10 +2218,14 @@ async def get_tolet_tasks_pending_approval(current_user: dict = Depends(get_curr
     
     tasks = await db.tolet_tasks.find({"status": "completed"}, {"_id": 0}).to_list(50)
     
+    # Batch fetch all riders to avoid N+1 queries
+    rider_ids = [t.get('rider_id') for t in tasks if t.get('rider_id')]
+    riders = await db.users.find({"id": {"$in": rider_ids}}, {"_id": 0, "password": 0}).to_list(None)
+    rider_map = {r['id']: r for r in riders}
+    
     for task in tasks:
         if task.get('rider_id'):
-            rider = await db.users.find_one({"id": task['rider_id']}, {"_id": 0, "password": 0})
-            task['rider'] = rider
+            task['rider'] = rider_map.get(task['rider_id'])
     
     return tasks
 
@@ -2324,9 +2368,13 @@ async def get_all_rider_wallets(current_user: dict = Depends(get_current_user)):
     
     wallets = await db.rider_wallets.find({}, {"_id": 0}).to_list(100)
     
+    # Batch fetch all riders to avoid N+1 queries
+    rider_ids = [w.get('rider_id') for w in wallets if w.get('rider_id')]
+    riders = await db.users.find({"id": {"$in": rider_ids}}, {"_id": 0, "password": 0}).to_list(None)
+    rider_map = {r['id']: r for r in riders}
+    
     for wallet in wallets:
-        rider = await db.users.find_one({"id": wallet['rider_id']}, {"_id": 0, "password": 0})
-        wallet['rider'] = rider
+        wallet['rider'] = rider_map.get(wallet.get('rider_id'))
     
     return wallets
 
@@ -2694,7 +2742,7 @@ async def seed_default_accounts():
     """Create default admin and test accounts on first run"""
     default_accounts = [
         {"name": "Admin User", "phone": "7777777777", "password": "admin123", "role": "admin"},
-        {"name": "Test Customer", "phone": "6987654321", "password": "test123", "role": "customer"},
+        {"name": "Test Customer", "phone": "6987654321", "password": "newpass123", "role": "customer"},
         {"name": "Test Rider", "phone": "6111222333", "password": "rider123", "role": "rider"},
         {"name": "Test Advertiser", "phone": "6222333444", "password": "adv123", "role": "advertiser"},
         {"name": "Test Builder", "phone": "6333444555", "password": "build123", "role": "builder"},
