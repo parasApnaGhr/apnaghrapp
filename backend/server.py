@@ -1422,17 +1422,40 @@ async def get_conversations(current_user: dict = Depends(get_current_user)):
 UPLOAD_DIR = Path("/app/uploads")
 UPLOAD_DIR.mkdir(exist_ok=True)
 
+# General file upload - supports any image or video
+@api_router.post("/upload")
+async def upload_file(file: UploadFile = File(...), current_user: dict = Depends(get_current_user)):
+    """Upload any image or video file - supports high quality files"""
+    content_type = file.content_type or ""
+    
+    if not (content_type.startswith('image/') or content_type.startswith('video/')):
+        raise HTTPException(status_code=400, detail="File must be an image or video")
+    
+    # Get file extension
+    file_ext = file.filename.split('.')[-1].lower() if '.' in file.filename else 'jpg'
+    file_name = f"{uuid.uuid4()}.{file_ext}"
+    file_path = UPLOAD_DIR / file_name
+    
+    # Read and save file (no size limit - handles high quality)
+    content = await file.read()
+    async with aiofiles.open(file_path, 'wb') as f:
+        await f.write(content)
+    
+    # Return full URL that works in frontend
+    file_url = f"/uploads/{file_name}"
+    return {"url": file_url, "filename": file_name, "size": len(content), "type": content_type}
+
 @api_router.post("/upload/image")
 async def upload_image(file: UploadFile = File(...), current_user: dict = Depends(get_current_user)):
     if not file.content_type.startswith('image/'):
         raise HTTPException(status_code=400, detail="File must be an image")
     
-    file_ext = file.filename.split('.')[-1]
+    file_ext = file.filename.split('.')[-1] if '.' in file.filename else 'jpg'
     file_name = f"{uuid.uuid4()}.{file_ext}"
     file_path = UPLOAD_DIR / file_name
     
+    content = await file.read()
     async with aiofiles.open(file_path, 'wb') as f:
-        content = await file.read()
         await f.write(content)
     
     file_url = f"/uploads/{file_name}"
@@ -1443,12 +1466,12 @@ async def upload_video(file: UploadFile = File(...), current_user: dict = Depend
     if not file.content_type.startswith('video/'):
         raise HTTPException(status_code=400, detail="File must be a video")
     
-    file_ext = file.filename.split('.')[-1]
+    file_ext = file.filename.split('.')[-1] if '.' in file.filename else 'mp4'
     file_name = f"{uuid.uuid4()}.{file_ext}"
     file_path = UPLOAD_DIR / file_name
     
+    content = await file.read()
     async with aiofiles.open(file_path, 'wb') as f:
-        content = await file.read()
         await f.write(content)
     
     file_url = f"/uploads/{file_name}"

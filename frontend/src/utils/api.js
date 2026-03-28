@@ -3,6 +3,21 @@ import axios from 'axios';
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
+// Helper to fix image/video URLs - ensures full URL for uploaded files
+export const getMediaUrl = (url) => {
+  if (!url) return null;
+  // If already a full URL, return as-is
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    return url;
+  }
+  // If it's a relative path, prefix with backend URL
+  if (url.startsWith('/uploads/')) {
+    return `${BACKEND_URL}${url}`;
+  }
+  // For any other path, prefix with backend URL
+  return `${BACKEND_URL}${url}`;
+};
+
 const api = axios.create({
   baseURL: API,
 });

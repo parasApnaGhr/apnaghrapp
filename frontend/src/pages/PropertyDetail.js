@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { propertyAPI, paymentAPI } from '../utils/api';
+import { propertyAPI, paymentAPI, getMediaUrl } from '../utils/api';
 import api from '../utils/api';
 import { ArrowLeft, MapPin, Bed, Sofa, Home, Lock, Video, IndianRupee, ShoppingCart, Plus, Check, Play, Upload } from 'lucide-react';
 import { toast } from 'sonner';
@@ -162,7 +162,7 @@ const PropertyDetail = () => {
           <div className="relative h-64 md:h-96 bg-[#F3F2EB] rounded-xl overflow-hidden mb-3">
             {property.images && property.images[selectedImage] ? (
               <img
-                src={property.images[selectedImage]}
+                src={getMediaUrl(property.images[selectedImage])}
                 alt={property.title}
                 className="w-full h-full object-cover"
               />
@@ -189,7 +189,7 @@ const PropertyDetail = () => {
                     selectedImage === idx ? 'border-[#E07A5F]' : 'border-transparent'
                   }`}
                 >
-                  <img src={img} alt="" className="w-full h-full object-cover" />
+                  <img src={getMediaUrl(img)} alt="" className="w-full h-full object-cover" />
                 </button>
               ))}
             </div>

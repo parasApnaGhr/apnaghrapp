@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Plus, Edit, Trash2, CheckCircle, Home, X, Video, Image as ImageIcon, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
-import { propertyAPI } from '../utils/api';
+import { propertyAPI, getMediaUrl } from '../utils/api';
 import api from '../utils/api';
 import FileUploader from './FileUploader';
 
@@ -465,7 +465,7 @@ const InventoryPanel = () => {
                 <div className="flex items-center gap-4">
                   <div className="w-20 h-20 bg-[#F3F4F6] rounded-lg border-2 border-[#111111] overflow-hidden flex-shrink-0">
                     {property.images?.[0] ? (
-                      <img src={property.images[0]} alt="" className="w-full h-full object-cover" />
+                      <img src={getMediaUrl(property.images[0])} alt="" className="w-full h-full object-cover" />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
                         <Home className="w-8 h-8 text-[#9CA3AF]" />

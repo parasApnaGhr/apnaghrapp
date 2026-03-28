@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
-import { propertyAPI } from '../utils/api';
+import { propertyAPI, getMediaUrl } from '../utils/api';
 import { useNavigate } from 'react-router-dom';
 import { Search, SlidersHorizontal, Home, User, Heart, Calendar, LogOut, Truck, Megaphone, ShoppingCart, X, Flame, Eye, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
@@ -24,10 +24,12 @@ const CustomerHome = () => {
   const [activeTab, setActiveTab] = useState('home');
   const [cartCount, setCartCount] = useState(0);
   const [appSettings, setAppSettings] = useState(null);
+  const [activeAds, setActiveAds] = useState([]);
 
   useEffect(() => {
     loadProperties();
     loadAppSettings();
+    loadActiveAds();
     // Load cart count from localStorage
     const cart = JSON.parse(localStorage.getItem('visitCart') || '[]');
     setCartCount(cart.length);
@@ -41,6 +43,26 @@ const CustomerHome = () => {
       }
     } catch (error) {
       console.log('No seasonal settings');
+    }
+  };
+
+  const loadActiveAds = async () => {
+    try {
+      const response = await api.get('/advertising/active?placement=home');
+      setActiveAds(response.data || []);
+    } catch (error) {
+      console.log('No active ads');
+    }
+  };
+
+  const handleAdClick = async (ad) => {
+    try {
+      await api.post(`/advertising/ads/${ad.id}/click`);
+      if (ad.target_url) {
+        window.open(ad.target_url, '_blank');
+      }
+    } catch (error) {
+      console.log('Ad click tracked');
     }
   };
 
@@ -290,6 +312,50 @@ const CustomerHome = () => {
         </motion.div>
       )}
 
+      {/* Sponsored Ads Banner */}
+      {activeAds.length > 0 && (
+        <div className="bg-[#FAF9F6] border-b-2 border-[#E5E3D8]">
+          <div className="max-w-7xl mx-auto px-4 py-4">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-xs font-bold text-[#52525B] uppercase tracking-wider">Sponsored Partners</span>
+              <span className="text-xs text-[#9CA3AF]">AD</span>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              {activeAds.slice(0, 4).map((ad, index) => (
+                <motion.div
+                  key={ad.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  onClick={() => handleAdClick(ad)}
+                  className="group cursor-pointer bg-white rounded-xl border-2 border-[#E5E3D8] hover:border-[#111111] overflow-hidden transition-all hover:shadow-[3px_3px_0px_#111111]"
+                  data-testid={`sponsored-ad-${ad.id}`}
+                >
+                  <div className="aspect-[4/5] relative overflow-hidden">
+                    <img 
+                      src={ad.image_url} 
+                      alt={ad.company_name}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      onError={(e) => e.target.style.display = 'none'}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                    <div className="absolute bottom-0 left-0 right-0 p-3">
+                      <h4 className="font-bold text-white text-sm truncate">{ad.company_name}</h4>
+                      <p className="text-white/80 text-xs truncate">{ad.tagline}</p>
+                    </div>
+                    {ad.package_type === 'elite' && (
+                      <span className="absolute top-2 right-2 bg-[#FFD166] text-[#111111] text-xs font-bold px-2 py-0.5 rounded-full">
+                        PREMIUM
+                      </span>
+                    )}
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Quick Services */}
       <div className="max-w-7xl mx-auto px-4 py-6">
         <div className="grid grid-cols-2 gap-4 mb-8">
@@ -354,7 +420,7 @@ const CustomerHome = () => {
                 <div className="relative h-48 bg-[#F3F4F6]">
                   {property.images && property.images[0] ? (
                     <img
-                      src={property.images[0]}
+                      src={getMediaUrl(property.images[0])}
                       alt={property.title}
                       className="w-full h-full object-cover"
                     />
