@@ -2740,6 +2740,15 @@ logger = logging.getLogger(__name__)
 @app.on_event("startup")
 async def seed_default_accounts():
     """Create default admin and test accounts on first run"""
+    
+    # First, seed production data from preview export (if available)
+    try:
+        from seed_production import seed_production_data
+        await seed_production_data(db)
+    except Exception as e:
+        logger.warning(f"Production seeding skipped: {str(e)}")
+    
+    # Then create default accounts if they don't exist
     default_accounts = [
         {"name": "Admin User", "phone": "7777777777", "password": "admin123", "role": "admin"},
         {"name": "Test Customer", "phone": "6987654321", "password": "newpass123", "role": "customer"},
