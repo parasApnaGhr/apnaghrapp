@@ -1008,14 +1008,24 @@ async def get_available_visits(current_user: dict = Depends(get_current_user)):
     
     visits = await db.visit_bookings.find({"status": "pending", "rider_id": None}, {"_id": 0}).limit(20).to_list(None)
     
-    # Enrich with property details
+    # Batch fetch all property IDs to avoid N+1 queries
+    all_prop_ids = []
     for visit in visits:
-        properties = []
-        for prop_id in visit.get('property_ids', []):
-            prop = await db.properties.find_one({"id": prop_id}, {"_id": 0, "exact_address": 0})
-            if prop:
-                properties.append(prop)
-        visit['properties'] = properties
+        all_prop_ids.extend(visit.get('property_ids', []))
+    
+    # Single query to get all properties
+    if all_prop_ids:
+        properties_list = await db.properties.find(
+            {"id": {"$in": all_prop_ids}}, 
+            {"_id": 0, "exact_address": 0}
+        ).to_list(None)
+        prop_map = {p['id']: p for p in properties_list}
+    else:
+        prop_map = {}
+    
+    # Enrich visits with properties from cache
+    for visit in visits:
+        visit['properties'] = [prop_map.get(pid) for pid in visit.get('property_ids', []) if prop_map.get(pid)]
     
     return visits
 
@@ -1409,10 +1419,19 @@ async def get_conversations(current_user: dict = Depends(get_current_user)):
     
     conversations = await db.chat_messages.aggregate(pipeline).to_list(None)
     
-    # Get user details for each conversation
+    # Batch fetch all user details to avoid N+1 queries
+    user_ids = [conv['_id'] for conv in conversations]
+    if user_ids:
+        users_list = await db.users.find(
+            {"id": {"$in": user_ids}}, 
+            {"_id": 0, "password": 0}
+        ).to_list(None)
+        user_map = {u['id']: u for u in users_list}
+    else:
+        user_map = {}
+    
     for conv in conversations:
-        user = await db.users.find_one({"id": conv['_id']}, {"_id": 0, "password": 0})
-        conv['user'] = user
+        conv['user'] = user_map.get(conv['_id'])
         conv['other_user_id'] = conv.pop('_id')
     
     return conversations
@@ -1625,11 +1644,20 @@ async def get_all_tolet_tasks(current_user: dict = Depends(get_current_user)):
     
     tasks = await db.tolet_tasks.find({}, {"_id": 0}).sort("created_at", -1).to_list(100)
     
-    # Enrich with rider info
+    # Batch fetch all rider info to avoid N+1 queries
+    rider_ids = [t['rider_id'] for t in tasks if t.get('rider_id')]
+    if rider_ids:
+        riders_list = await db.users.find(
+            {"id": {"$in": rider_ids}}, 
+            {"_id": 0, "password": 0}
+        ).to_list(None)
+        rider_map = {r['id']: r for r in riders_list}
+    else:
+        rider_map = {}
+    
     for task in tasks:
         if task.get('rider_id'):
-            rider = await db.users.find_one({"id": task['rider_id']}, {"_id": 0, "password": 0})
-            task['rider'] = rider
+            task['rider'] = rider_map.get(task['rider_id'])
     
     return tasks
 

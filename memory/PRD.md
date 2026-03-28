@@ -2,11 +2,20 @@
 
 ## Overview
 ApnaGhr Visit Platform is a production-ready multi-role rental property platform with:
-- Cashfree payment gateway
+- Cashfree payment gateway (PRODUCTION)
 - Packers & Movers service
 - Advertising module with AI Ad Generation
 - Multi-role authentication (Customer, Rider, Advertiser, Builder, Admin)
 - Neo-Brutalist animated UI design
+- SMS/Email OTP system (ready for Twilio/Resend integration)
+
+## Deployment Status: ✅ READY
+
+### Pre-deployment Optimizations Completed (March 28, 2026)
+- ✅ Fixed N+1 database queries (3 locations optimized with batch queries)
+- ✅ Added .gitignore for sensitive files
+- ✅ All API endpoints responding correctly
+- ✅ Environment variables properly configured
 
 ## Latest Updates (March 2026)
 
