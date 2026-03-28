@@ -1,14 +1,24 @@
 # ApnaGhr Visit Platform - Test Credentials
 
 ## Customer Account
-- **Phone**: 9999999999
-- **Password**: test123
+- **Phone**: 6987654321
+- **Password**: newpass123
 - **Role**: customer
 
 ## Rider Account
-- **Phone**: 8888888888
-- **Password**: test123
+- **Phone**: 6111222333
+- **Password**: rider123
 - **Role**: rider
+
+## Advertiser Account
+- **Phone**: 6222333444
+- **Password**: adv123
+- **Role**: advertiser
+
+## Builder Account
+- **Phone**: 6333444555
+- **Password**: build123
+- **Role**: builder
 
 ## Admin Account
 - **Phone**: 7777777777
@@ -17,12 +27,8 @@
 
 ---
 
-## Test Data
-
-### Test Visit (Multi-Property)
-- **OTP**: 123456
-- **Properties**: 3 properties in Mohali/Chandigarh area
-- **Pickup Location**: Sector 17 Bus Stand, Chandigarh
-
-### Seed Script
-Run `python /app/scripts/setup_test_environment.py` to reset test data
+## Notes
+- All accounts are REAL accounts created via `/api/auth/register` endpoint
+- No mock credentials - all accounts work with proper JWT authentication
+- Registration supports all 4 roles: customer, rider, advertiser, builder
+- Forgot Password flow uses OTP (currently logged to console, returns in response for testing)

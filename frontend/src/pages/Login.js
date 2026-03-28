@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { Home, User, Phone, Mail, Lock, ChevronRight, Eye, EyeOff } from 'lucide-react';
+import { Home, User, Phone, Mail, Lock, ChevronRight, Eye, EyeOff, KeyRound, ArrowLeft } from 'lucide-react';
+import api from '../utils/api';
 
 const Login = () => {
   const [isRegister, setIsRegister] = useState(false);
+  const [isForgotPassword, setIsForgotPassword] = useState(false);
+  const [forgotStep, setForgotStep] = useState(1); // 1: enter phone, 2: enter OTP, 3: new password
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
@@ -14,6 +17,13 @@ const Login = () => {
     email: '',
     password: '',
     role: 'customer',
+  });
+  const [forgotData, setForgotData] = useState({
+    phone: '',
+    otp: '',
+    newPassword: '',
+    confirmPassword: '',
+    method: 'sms'
   });
   const [loading, setLoading] = useState(false);
   const { login, register } = useAuth();
@@ -75,6 +85,77 @@ const Login = () => {
     }
   };
 
+  const handleForgotPassword = async () => {
+    if (!validatePhone(forgotData.phone)) {
+      toast.error('Please enter a valid 10-digit phone number');
+      return;
+    }
+    
+    setLoading(true);
+    try {
+      const response = await api.post('/auth/forgot-password', {
+        phone: forgotData.phone,
+        method: forgotData.method
+      });
+      toast.success('OTP sent to your phone!');
+      setForgotStep(2);
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Failed to send OTP');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleVerifyOTP = async () => {
+    if (forgotData.otp.length !== 6) {
+      toast.error('Please enter a valid 6-digit OTP');
+      return;
+    }
+    
+    setLoading(true);
+    try {
+      await api.post('/auth/verify-otp', {
+        phone: forgotData.phone,
+        otp: forgotData.otp
+      });
+      toast.success('OTP verified!');
+      setForgotStep(3);
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Invalid OTP');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResetPassword = async () => {
+    if (forgotData.newPassword.length < 6) {
+      toast.error('Password must be at least 6 characters');
+      return;
+    }
+    if (forgotData.newPassword !== forgotData.confirmPassword) {
+      toast.error('Passwords do not match');
+      return;
+    }
+    
+    setLoading(true);
+    try {
+      await api.post('/auth/reset-password', {
+        phone: forgotData.phone,
+        otp: forgotData.otp,
+        new_password: forgotData.newPassword
+      });
+      toast.success('Password reset successfully! Please login.');
+      setIsForgotPassword(false);
+      setForgotStep(1);
+      setForgotData({ phone: '', otp: '', newPassword: '', confirmPassword: '', method: 'sms' });
+      setFormData({ ...formData, phone: forgotData.phone, password: '' });
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Failed to reset password');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-[#FAF9F6]">
       {/* Background Decorations */}
@@ -109,11 +190,184 @@ const Login = () => {
             Apna<span className="text-[#FF5A5F]">Ghr</span>
           </h1>
           <p className="text-[#52525B] font-medium">
-            {isRegister ? 'Create your account to get started' : 'Book property visits, pay only ₹200'}
+            {isForgotPassword 
+              ? 'Reset your password' 
+              : isRegister 
+                ? 'Create your account to get started' 
+                : 'Book property visits, pay only ₹200'}
           </p>
         </motion.div>
 
-        {/* Form Card */}
+        {/* Forgot Password Flow */}
+        <AnimatePresence mode="wait">
+          {isForgotPassword ? (
+            <motion.div
+              key="forgot-password"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              className="neo-card p-8"
+            >
+              <button
+                onClick={() => {
+                  setIsForgotPassword(false);
+                  setForgotStep(1);
+                }}
+                className="flex items-center gap-2 text-[#52525B] hover:text-[#111111] mb-4"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                Back to Login
+              </button>
+
+              <h2 className="text-2xl font-black mb-6 tracking-tight flex items-center gap-2" style={{ fontFamily: 'Outfit' }}>
+                <KeyRound className="w-6 h-6 text-[#FF5A5F]" />
+                {forgotStep === 1 && 'Forgot Password'}
+                {forgotStep === 2 && 'Enter OTP'}
+                {forgotStep === 3 && 'New Password'}
+              </h2>
+
+              {forgotStep === 1 && (
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-bold text-[#111111] mb-2">
+                      <Phone className="w-4 h-4 inline mr-1" />
+                      Phone Number
+                    </label>
+                    <input
+                      type="tel"
+                      value={forgotData.phone}
+                      onChange={(e) => setForgotData({ ...forgotData, phone: e.target.value.replace(/\D/g, '').slice(0, 10) })}
+                      placeholder="Enter your registered phone"
+                      className="input-field"
+                      data-testid="forgot-phone-input"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-bold text-[#111111] mb-2">Send OTP via</label>
+                    <div className="flex gap-3">
+                      <button
+                        type="button"
+                        onClick={() => setForgotData({ ...forgotData, method: 'sms' })}
+                        className={`flex-1 p-3 rounded-xl border-2 font-bold transition-all ${
+                          forgotData.method === 'sms'
+                            ? 'border-[#111111] bg-[#4ECDC4] text-white shadow-[2px_2px_0px_#111111]'
+                            : 'border-[#E5E3D8] hover:border-[#111111]'
+                        }`}
+                      >
+                        SMS
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setForgotData({ ...forgotData, method: 'email' })}
+                        className={`flex-1 p-3 rounded-xl border-2 font-bold transition-all ${
+                          forgotData.method === 'email'
+                            ? 'border-[#111111] bg-[#4ECDC4] text-white shadow-[2px_2px_0px_#111111]'
+                            : 'border-[#E5E3D8] hover:border-[#111111]'
+                        }`}
+                      >
+                        Email
+                      </button>
+                    </div>
+                  </div>
+
+                  <motion.button
+                    onClick={handleForgotPassword}
+                    disabled={loading}
+                    whileHover={{ scale: loading ? 1 : 1.02 }}
+                    whileTap={{ scale: loading ? 1 : 0.98 }}
+                    className="btn-primary w-full mt-4"
+                    data-testid="send-otp-button"
+                  >
+                    {loading ? 'Sending...' : 'Send OTP'}
+                  </motion.button>
+                </div>
+              )}
+
+              {forgotStep === 2 && (
+                <div className="space-y-4">
+                  <p className="text-[#52525B] text-sm mb-4">
+                    Enter the 6-digit OTP sent to your {forgotData.method === 'sms' ? 'phone' : 'email'}
+                  </p>
+                  <div>
+                    <label className="block text-sm font-bold text-[#111111] mb-2">OTP Code</label>
+                    <input
+                      type="text"
+                      value={forgotData.otp}
+                      onChange={(e) => setForgotData({ ...forgotData, otp: e.target.value.replace(/\D/g, '').slice(0, 6) })}
+                      placeholder="Enter 6-digit OTP"
+                      className="input-field text-center text-2xl tracking-widest"
+                      maxLength={6}
+                      data-testid="otp-input"
+                    />
+                  </div>
+
+                  <motion.button
+                    onClick={handleVerifyOTP}
+                    disabled={loading}
+                    whileHover={{ scale: loading ? 1 : 1.02 }}
+                    whileTap={{ scale: loading ? 1 : 0.98 }}
+                    className="btn-primary w-full"
+                    data-testid="verify-otp-button"
+                  >
+                    {loading ? 'Verifying...' : 'Verify OTP'}
+                  </motion.button>
+
+                  <button
+                    onClick={() => setForgotStep(1)}
+                    className="w-full text-center text-[#FF5A5F] font-bold mt-2"
+                  >
+                    Didn't receive OTP? Try again
+                  </button>
+                </div>
+              )}
+
+              {forgotStep === 3 && (
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-bold text-[#111111] mb-2">
+                      <Lock className="w-4 h-4 inline mr-1" />
+                      New Password
+                    </label>
+                    <input
+                      type="password"
+                      value={forgotData.newPassword}
+                      onChange={(e) => setForgotData({ ...forgotData, newPassword: e.target.value })}
+                      placeholder="Enter new password (min 6 characters)"
+                      className="input-field"
+                      data-testid="new-password-input"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-bold text-[#111111] mb-2">
+                      <Lock className="w-4 h-4 inline mr-1" />
+                      Confirm Password
+                    </label>
+                    <input
+                      type="password"
+                      value={forgotData.confirmPassword}
+                      onChange={(e) => setForgotData({ ...forgotData, confirmPassword: e.target.value })}
+                      placeholder="Confirm new password"
+                      className="input-field"
+                      data-testid="confirm-password-input"
+                    />
+                  </div>
+
+                  <motion.button
+                    onClick={handleResetPassword}
+                    disabled={loading}
+                    whileHover={{ scale: loading ? 1 : 1.02 }}
+                    whileTap={{ scale: loading ? 1 : 0.98 }}
+                    className="btn-primary w-full"
+                    data-testid="reset-password-button"
+                  >
+                    {loading ? 'Resetting...' : 'Reset Password'}
+                  </motion.button>
+                </div>
+              )}
+            </motion.div>
+          ) : (
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -226,7 +480,9 @@ const Login = () => {
                 <div className="grid grid-cols-2 gap-3">
                   {[
                     { value: 'customer', label: 'Find a Home', desc: 'Browse & book visits', icon: '🏠' },
-                    { value: 'rider', label: 'Join as Rider', desc: 'Earn with visits', icon: '🚴' }
+                    { value: 'rider', label: 'Join as Rider', desc: 'Earn with visits', icon: '🚴' },
+                    { value: 'advertiser', label: 'Advertise', desc: 'Promote your business', icon: '📢' },
+                    { value: 'builder', label: 'List Properties', desc: 'Builder/Owner account', icon: '🏗️' }
                   ].map((option) => (
                     <button
                       key={option.value}
@@ -271,18 +527,31 @@ const Login = () => {
             </motion.button>
           </form>
 
-          <div className="mt-6 text-center">
-            <button
-              onClick={() => {
-                setIsRegister(!isRegister);
-                setFormData({ name: '', phone: '', email: '', password: '', role: 'customer' });
-              }}
-              className="text-[#FF5A5F] font-bold hover:underline"
-            >
-              {isRegister ? 'Already have an account? Sign in' : "Don't have an account? Register"}
-            </button>
+          <div className="mt-6 text-center space-y-2">
+            {!isRegister && (
+              <button
+                onClick={() => setIsForgotPassword(true)}
+                className="text-[#52525B] hover:text-[#FF5A5F] text-sm font-medium"
+                data-testid="forgot-password-link"
+              >
+                Forgot Password?
+              </button>
+            )}
+            <div>
+              <button
+                onClick={() => {
+                  setIsRegister(!isRegister);
+                  setFormData({ name: '', phone: '', email: '', password: '', role: 'customer' });
+                }}
+                className="text-[#FF5A5F] font-bold hover:underline"
+              >
+                {isRegister ? 'Already have an account? Sign in' : "Don't have an account? Register"}
+              </button>
+            </div>
           </div>
         </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Terms & Privacy */}
         <p className="text-center text-xs text-[#52525B] mt-6">

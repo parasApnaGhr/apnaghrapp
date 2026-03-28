@@ -483,3 +483,123 @@ async def initiate_advertising_payment(payment_req: AdPaymentRequest, current_us
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Payment initialization failed: {str(e)}")
+
+
+# ============ AI AD GENERATION ============
+import base64
+import asyncio
+from emergentintegrations.llm.openai.image_generation import OpenAIImageGeneration
+
+EMERGENT_LLM_KEY = os.environ.get('EMERGENT_LLM_KEY')
+
+class AIAdGenerationRequest(BaseModel):
+    company_name: str
+    business_type: str
+    tagline: Optional[str] = None
+    color_scheme: Optional[str] = None
+    style: str = "modern"  # modern, traditional, playful, professional
+    ad_type: str = "poster"  # poster, banner, social
+    include_contact: bool = True
+    contact_info: Optional[str] = None
+
+
+@router.post("/generate-ad")
+async def generate_ai_ad(request: AIAdGenerationRequest, current_user: dict = Depends(get_current_user)):
+    """Generate AI-powered advertisement poster/image using OpenAI Image Generation"""
+    
+    if not EMERGENT_LLM_KEY:
+        raise HTTPException(status_code=500, detail="AI generation not configured")
+    
+    # Build the prompt based on business type and style
+    style_descriptions = {
+        "modern": "clean, minimalist, modern design with bold typography",
+        "traditional": "classic, elegant design with traditional Indian motifs",
+        "playful": "colorful, fun, engaging design with dynamic elements",
+        "professional": "corporate, trustworthy, professional design"
+    }
+    
+    ad_type_descriptions = {
+        "poster": "promotional poster suitable for in-app display, vertical orientation",
+        "banner": "wide banner advertisement suitable for website header",
+        "social": "square social media post format"
+    }
+    
+    color_hint = f"using {request.color_scheme} color scheme" if request.color_scheme else "with vibrant, eye-catching colors"
+    tagline_hint = f'with tagline: "{request.tagline}"' if request.tagline else ""
+    contact_hint = f'Include contact: {request.contact_info}' if request.include_contact and request.contact_info else ""
+    
+    prompt = f"""Create a {ad_type_descriptions.get(request.ad_type, 'promotional poster')} for a {request.business_type} company called "{request.company_name}". 
+    
+Style: {style_descriptions.get(request.style, 'modern design')}
+{color_hint}
+{tagline_hint}
+{contact_hint}
+
+The design should be professional, visually appealing, and suitable for advertising in a property rental mobile app. Include the company name prominently. Make it look like a real advertisement poster with high visual impact. No photographic images of real people, use abstract or illustrative elements instead."""
+
+    try:
+        image_gen = OpenAIImageGeneration(api_key=EMERGENT_LLM_KEY)
+        
+        # Generate the image (this may take up to 60 seconds)
+        images = await image_gen.generate_images(
+            prompt=prompt,
+            model="gpt-image-1",
+            number_of_images=1
+        )
+        
+        if not images or len(images) == 0:
+            raise HTTPException(status_code=500, detail="No image was generated")
+        
+        # Convert to base64 for frontend
+        image_base64 = base64.b64encode(images[0]).decode('utf-8')
+        
+        # Save the generated ad record
+        generated_ad = {
+            "id": str(uuid.uuid4()),
+            "advertiser_id": current_user['id'],
+            "company_name": request.company_name,
+            "business_type": request.business_type,
+            "style": request.style,
+            "ad_type": request.ad_type,
+            "prompt_used": prompt[:500],  # Store truncated prompt
+            "image_base64": image_base64,
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+        
+        await db.generated_ads.insert_one(generated_ad)
+        
+        return {
+            "success": True,
+            "image_base64": image_base64,
+            "ad_id": generated_ad["id"],
+            "message": "AI advertisement generated successfully!"
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"AI generation failed: {str(e)}")
+
+
+@router.get("/generated-ads")
+async def get_generated_ads(current_user: dict = Depends(get_current_user)):
+    """Get all AI-generated ads for the current advertiser"""
+    ads = await db.generated_ads.find(
+        {"advertiser_id": current_user['id']},
+        {"_id": 0, "prompt_used": 0}  # Exclude large fields
+    ).sort("created_at", -1).to_list(50)
+    
+    return {"ads": ads}
+
+
+@router.delete("/generated-ads/{ad_id}")
+async def delete_generated_ad(ad_id: str, current_user: dict = Depends(get_current_user)):
+    """Delete a generated AI ad"""
+    result = await db.generated_ads.delete_one({
+        "id": ad_id,
+        "advertiser_id": current_user['id']
+    })
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Ad not found")
+    
+    return {"success": True, "message": "Generated ad deleted"}
+

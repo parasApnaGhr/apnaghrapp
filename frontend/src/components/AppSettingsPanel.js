@@ -1,16 +1,47 @@
 import React, { useState, useEffect, useRef } from 'react';
 import api from '../utils/api';
-import { Video, Upload, Check, Trash2, Play, AlertCircle } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { 
+  Video, Upload, Check, Trash2, AlertCircle, Settings, 
+  Sparkles, Calendar, Gift, Palette, Sun, Moon, PartyPopper,
+  Heart, Flower2, Star, Zap, Crown, Flame, Snowflake
+} from 'lucide-react';
 import { toast } from 'sonner';
 
 const AppSettingsPanel = () => {
   const [explainerVideo, setExplainerVideo] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [appSettings, setAppSettings] = useState({
+    seasonal_theme: 'none',
+    seasonal_banner_text: '',
+    seasonal_discount_percent: 0,
+    seasonal_active: false,
+    homepage_highlight: '',
+    accent_color: '#FF5A5F',
+    enable_animations: true,
+    show_offers_badge: false
+  });
+  const [savingSettings, setSavingSettings] = useState(false);
   const fileInputRef = useRef(null);
+
+  const seasonalThemes = [
+    { id: 'none', label: 'No Theme', icon: Settings, color: '#52525B', description: 'Standard platform appearance' },
+    { id: 'holi', label: 'Holi Festival', icon: Palette, color: '#FF5A5F', description: 'Colorful Holi celebrations with splash effects' },
+    { id: 'diwali', label: 'Diwali', icon: Sparkles, color: '#FFD166', description: 'Festive lights and diyas' },
+    { id: 'new_year', label: 'New Year', icon: PartyPopper, color: '#4ECDC4', description: 'Celebrate the new year' },
+    { id: 'valentine', label: "Valentine's Day", icon: Heart, color: '#FF6B8A', description: 'Love is in the air' },
+    { id: 'summer', label: 'Summer Sale', icon: Sun, color: '#FFA500', description: 'Hot summer deals' },
+    { id: 'monsoon', label: 'Monsoon Offers', icon: Flower2, color: '#4ECDC4', description: 'Rainy season specials' },
+    { id: 'christmas', label: 'Christmas', icon: Gift, color: '#E74C3C', description: 'Holiday season magic' },
+    { id: 'independence', label: 'Independence Day', icon: Star, color: '#FF9933', description: 'Patriotic celebrations' },
+    { id: 'navratri', label: 'Navratri', icon: Crown, color: '#9B59B6', description: 'Nine nights of celebration' },
+    { id: 'winter', label: 'Winter Warmth', icon: Snowflake, color: '#3498DB', description: 'Cozy winter deals' }
+  ];
 
   useEffect(() => {
     loadExplainerVideo();
+    loadAppSettings();
   }, []);
 
   const loadExplainerVideo = async () => {
@@ -24,17 +55,26 @@ const AppSettingsPanel = () => {
     }
   };
 
+  const loadAppSettings = async () => {
+    try {
+      const response = await api.get('/settings/app-customization');
+      if (response.data) {
+        setAppSettings(prev => ({ ...prev, ...response.data }));
+      }
+    } catch (error) {
+      console.log('Using default app settings');
+    }
+  };
+
   const handleVideoUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
-    // Validate file type
     if (!file.type.startsWith('video/')) {
       toast.error('Please select a video file');
       return;
     }
 
-    // Validate file size (max 100MB)
     if (file.size > 100 * 1024 * 1024) {
       toast.error('Video must be less than 100MB');
       return;
@@ -66,23 +106,253 @@ const AppSettingsPanel = () => {
   };
 
   const handleRemoveVideo = async () => {
-    // For now, just clear the UI - in production you'd also delete from storage
     try {
       await api.post('/settings/explainer-video', { video_url: null });
       setExplainerVideo(null);
       toast.success('Video removed');
     } catch (error) {
-      // Even if API fails, clear UI
       setExplainerVideo(null);
     }
   };
 
+  const handleSaveSettings = async () => {
+    setSavingSettings(true);
+    try {
+      await api.post('/settings/app-customization', appSettings);
+      toast.success('App customization settings saved!');
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Failed to save settings');
+    } finally {
+      setSavingSettings(false);
+    }
+  };
+
+  const handleThemeSelect = (themeId) => {
+    const theme = seasonalThemes.find(t => t.id === themeId);
+    setAppSettings(prev => ({
+      ...prev,
+      seasonal_theme: themeId,
+      seasonal_active: themeId !== 'none',
+      accent_color: theme?.color || '#FF5A5F'
+    }));
+  };
+
+  const getActiveTheme = () => seasonalThemes.find(t => t.id === appSettings.seasonal_theme);
+
   return (
-    <div>
-      <h2 className="text-2xl font-bold mb-6" style={{ fontFamily: 'Outfit' }}>App Settings</h2>
+    <div className="space-y-6">
+      <h2 className="text-2xl font-bold" style={{ fontFamily: 'Outfit' }}>App Settings & Customization</h2>
+
+      {/* Seasonal Theme Section */}
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="bg-white rounded-xl border-2 border-[#111111] shadow-[4px_4px_0px_#111111] p-6"
+      >
+        <div className="flex items-center gap-3 mb-6">
+          <div className="w-12 h-12 bg-gradient-to-br from-[#FFD166] to-[#FF5A5F] rounded-xl flex items-center justify-center">
+            <Sparkles className="w-6 h-6 text-white" />
+          </div>
+          <div>
+            <h3 className="font-bold text-lg">Seasonal Customization</h3>
+            <p className="text-sm text-[#52525B]">Transform the app for festivals & special occasions</p>
+          </div>
+          {appSettings.seasonal_active && (
+            <span className="ml-auto px-3 py-1 bg-[#2A9D8F] text-white text-xs font-bold rounded-full animate-pulse">
+              LIVE
+            </span>
+          )}
+        </div>
+
+        {/* Theme Grid */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 mb-6">
+          {seasonalThemes.map((theme) => {
+            const Icon = theme.icon;
+            const isSelected = appSettings.seasonal_theme === theme.id;
+            return (
+              <motion.button
+                key={theme.id}
+                onClick={() => handleThemeSelect(theme.id)}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className={`p-4 rounded-xl border-2 text-left transition-all ${
+                  isSelected
+                    ? 'border-[#111111] shadow-[3px_3px_0px_#111111]'
+                    : 'border-[#E5E3D8] hover:border-[#111111]'
+                }`}
+                style={{ backgroundColor: isSelected ? `${theme.color}20` : 'white' }}
+                data-testid={`theme-${theme.id}`}
+              >
+                <div 
+                  className="w-10 h-10 rounded-lg flex items-center justify-center mb-2"
+                  style={{ backgroundColor: `${theme.color}20` }}
+                >
+                  <Icon className="w-5 h-5" style={{ color: theme.color }} />
+                </div>
+                <div className="font-bold text-sm">{theme.label}</div>
+                <div className="text-xs text-[#52525B] mt-1 line-clamp-2">{theme.description}</div>
+                {isSelected && (
+                  <div className="mt-2 flex items-center gap-1 text-xs font-medium" style={{ color: theme.color }}>
+                    <Check className="w-3 h-3" />
+                    Active
+                  </div>
+                )}
+              </motion.button>
+            );
+          })}
+        </div>
+
+        {/* Theme Settings */}
+        <AnimatePresence>
+          {appSettings.seasonal_theme !== 'none' && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="border-t border-[#E5E3D8] pt-6 space-y-4"
+            >
+              <div className="grid md:grid-cols-2 gap-4">
+                {/* Banner Text */}
+                <div>
+                  <label className="block text-sm font-bold mb-2">
+                    <Gift className="w-4 h-4 inline mr-1" />
+                    Banner Message
+                  </label>
+                  <input
+                    type="text"
+                    value={appSettings.seasonal_banner_text}
+                    onChange={(e) => setAppSettings({ ...appSettings, seasonal_banner_text: e.target.value })}
+                    placeholder={`e.g., "Happy ${getActiveTheme()?.label || 'Festival'}! Special offers inside"`}
+                    className="w-full px-4 py-3 border-2 border-[#111111] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFD166]"
+                    data-testid="banner-text-input"
+                  />
+                </div>
+
+                {/* Discount Percent */}
+                <div>
+                  <label className="block text-sm font-bold mb-2">
+                    <Zap className="w-4 h-4 inline mr-1" />
+                    Special Discount (%)
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="50"
+                    value={appSettings.seasonal_discount_percent}
+                    onChange={(e) => setAppSettings({ ...appSettings, seasonal_discount_percent: parseInt(e.target.value) || 0 })}
+                    placeholder="e.g., 10"
+                    className="w-full px-4 py-3 border-2 border-[#111111] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFD166]"
+                    data-testid="discount-input"
+                  />
+                </div>
+              </div>
+
+              {/* Homepage Highlight */}
+              <div>
+                <label className="block text-sm font-bold mb-2">
+                  <Star className="w-4 h-4 inline mr-1" />
+                  Homepage Highlight Text
+                </label>
+                <input
+                  type="text"
+                  value={appSettings.homepage_highlight}
+                  onChange={(e) => setAppSettings({ ...appSettings, homepage_highlight: e.target.value })}
+                  placeholder="e.g., 'Book visits at just ₹180 this Holi!'"
+                  className="w-full px-4 py-3 border-2 border-[#111111] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFD166]"
+                  data-testid="highlight-input"
+                />
+              </div>
+
+              {/* Toggles */}
+              <div className="flex flex-wrap gap-4">
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <div className={`w-12 h-7 rounded-full transition-colors relative ${
+                    appSettings.enable_animations ? 'bg-[#2A9D8F]' : 'bg-[#E5E3D8]'
+                  }`}>
+                    <input
+                      type="checkbox"
+                      checked={appSettings.enable_animations}
+                      onChange={(e) => setAppSettings({ ...appSettings, enable_animations: e.target.checked })}
+                      className="sr-only"
+                      data-testid="animations-toggle"
+                    />
+                    <div className={`absolute top-1 w-5 h-5 bg-white rounded-full shadow transition-transform ${
+                      appSettings.enable_animations ? 'translate-x-6' : 'translate-x-1'
+                    }`} />
+                  </div>
+                  <span className="font-medium">Festive Animations</span>
+                </label>
+
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <div className={`w-12 h-7 rounded-full transition-colors relative ${
+                    appSettings.show_offers_badge ? 'bg-[#2A9D8F]' : 'bg-[#E5E3D8]'
+                  }`}>
+                    <input
+                      type="checkbox"
+                      checked={appSettings.show_offers_badge}
+                      onChange={(e) => setAppSettings({ ...appSettings, show_offers_badge: e.target.checked })}
+                      className="sr-only"
+                      data-testid="offers-badge-toggle"
+                    />
+                    <div className={`absolute top-1 w-5 h-5 bg-white rounded-full shadow transition-transform ${
+                      appSettings.show_offers_badge ? 'translate-x-6' : 'translate-x-1'
+                    }`} />
+                  </div>
+                  <span className="font-medium">Show Offers Badge</span>
+                </label>
+              </div>
+
+              {/* Preview */}
+              <div className="bg-[#FAF9F6] rounded-xl p-4 border border-[#E5E3D8]">
+                <p className="text-sm font-bold mb-2">Preview:</p>
+                <div 
+                  className="rounded-lg p-4 text-white text-center font-bold"
+                  style={{ backgroundColor: getActiveTheme()?.color || '#FF5A5F' }}
+                >
+                  {appSettings.seasonal_banner_text || `🎉 ${getActiveTheme()?.label || 'Festival'} Special - Book Now!`}
+                  {appSettings.seasonal_discount_percent > 0 && (
+                    <span className="ml-2 bg-white/20 px-2 py-1 rounded text-sm">
+                      {appSettings.seasonal_discount_percent}% OFF
+                    </span>
+                  )}
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Save Button */}
+        <div className="mt-6 pt-4 border-t border-[#E5E3D8]">
+          <motion.button
+            onClick={handleSaveSettings}
+            disabled={savingSettings}
+            whileHover={{ scale: savingSettings ? 1 : 1.02 }}
+            whileTap={{ scale: savingSettings ? 1 : 0.98 }}
+            className="btn-primary w-full flex items-center justify-center gap-2"
+            data-testid="save-settings-button"
+          >
+            {savingSettings ? (
+              <>
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                Saving...
+              </>
+            ) : (
+              <>
+                <Check className="w-5 h-5" />
+                Save Customization Settings
+              </>
+            )}
+          </motion.button>
+        </div>
+      </motion.div>
 
       {/* Explainer Video Section */}
-      <div className="bg-white rounded-xl border border-[#E5E3D8] p-6 mb-6">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+        className="bg-white rounded-xl border-2 border-[#111111] shadow-[4px_4px_0px_#111111] p-6"
+      >
         <div className="flex items-center gap-3 mb-4">
           <div className="w-10 h-10 bg-[#E07A5F]/10 rounded-lg flex items-center justify-center">
             <Video className="w-5 h-5 text-[#E07A5F]" />
@@ -95,7 +365,6 @@ const AppSettingsPanel = () => {
 
         {explainerVideo ? (
           <div className="space-y-4">
-            {/* Video Preview */}
             <div className="bg-black rounded-xl overflow-hidden aspect-video">
               <video 
                 controls 
@@ -106,7 +375,6 @@ const AppSettingsPanel = () => {
               </video>
             </div>
 
-            {/* Video Actions */}
             <div className="flex gap-3">
               <button
                 onClick={() => fileInputRef.current?.click()}
@@ -133,7 +401,6 @@ const AppSettingsPanel = () => {
           </div>
         ) : (
           <div className="space-y-4">
-            {/* Upload Area */}
             <div 
               onClick={() => !uploading && fileInputRef.current?.click()}
               className={`border-2 border-dashed rounded-xl p-12 text-center cursor-pointer transition ${
@@ -147,21 +414,10 @@ const AppSettingsPanel = () => {
                 <div>
                   <div className="w-16 h-16 mx-auto mb-4 relative">
                     <svg className="w-full h-full transform -rotate-90">
+                      <circle cx="32" cy="32" r="28" stroke="#E5E3D8" strokeWidth="4" fill="none" />
                       <circle
-                        cx="32"
-                        cy="32"
-                        r="28"
-                        stroke="#E5E3D8"
-                        strokeWidth="4"
-                        fill="none"
-                      />
-                      <circle
-                        cx="32"
-                        cy="32"
-                        r="28"
-                        stroke="#E07A5F"
-                        strokeWidth="4"
-                        fill="none"
+                        cx="32" cy="32" r="28"
+                        stroke="#E07A5F" strokeWidth="4" fill="none"
                         strokeDasharray={`${uploadProgress * 1.76} 176`}
                         strokeLinecap="round"
                       />
@@ -184,7 +440,6 @@ const AppSettingsPanel = () => {
               )}
             </div>
 
-            {/* Info Box */}
             <div className="bg-[#F0FDF9] rounded-xl p-4 flex items-start gap-3">
               <AlertCircle className="w-5 h-5 text-[#2A9D8F] flex-shrink-0 mt-0.5" />
               <div className="text-sm">
@@ -200,7 +455,6 @@ const AppSettingsPanel = () => {
           </div>
         )}
 
-        {/* Hidden File Input */}
         <input
           ref={fileInputRef}
           type="file"
@@ -209,13 +463,7 @@ const AppSettingsPanel = () => {
           className="hidden"
           data-testid="video-file-input"
         />
-      </div>
-
-      {/* Other Settings Placeholder */}
-      <div className="bg-white rounded-xl border border-[#E5E3D8] p-6">
-        <h3 className="font-bold mb-4">Other Settings</h3>
-        <p className="text-[#4A626C] text-sm">More settings coming soon...</p>
-      </div>
+      </motion.div>
     </div>
   );
 };

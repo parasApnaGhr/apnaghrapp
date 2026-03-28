@@ -3,9 +3,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import { propertyAPI } from '../utils/api';
 import { useNavigate } from 'react-router-dom';
-import { Search, SlidersHorizontal, Home, User, Heart, Calendar, LogOut, Truck, Megaphone, ShoppingCart, X, Flame, Eye } from 'lucide-react';
+import { Search, SlidersHorizontal, Home, User, Heart, Calendar, LogOut, Truck, Megaphone, ShoppingCart, X, Flame, Eye, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
 import Marquee from 'react-fast-marquee';
+import api from '../utils/api';
 
 const CustomerHome = () => {
   const { user, logout } = useAuth();
@@ -22,13 +23,26 @@ const CustomerHome = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [activeTab, setActiveTab] = useState('home');
   const [cartCount, setCartCount] = useState(0);
+  const [appSettings, setAppSettings] = useState(null);
 
   useEffect(() => {
     loadProperties();
+    loadAppSettings();
     // Load cart count from localStorage
     const cart = JSON.parse(localStorage.getItem('visitCart') || '[]');
     setCartCount(cart.length);
   }, []);
+
+  const loadAppSettings = async () => {
+    try {
+      const response = await api.get('/settings/app-customization');
+      if (response.data && response.data.seasonal_active) {
+        setAppSettings(response.data);
+      }
+    } catch (error) {
+      console.log('No seasonal settings');
+    }
+  };
 
   const loadProperties = async () => {
     try {
@@ -225,6 +239,56 @@ const CustomerHome = () => {
           <span className="marquee-text text-[#FF5A5F]">TRUSTED SERVICE</span>
         </Marquee>
       </div>
+
+      {/* Seasonal Banner - Shows when admin enables a theme */}
+      {appSettings && appSettings.seasonal_active && (
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="relative overflow-hidden"
+          style={{ backgroundColor: appSettings.accent_color || '#FF5A5F' }}
+        >
+          {appSettings.enable_animations && (
+            <div className="absolute inset-0 overflow-hidden">
+              {[...Array(20)].map((_, i) => (
+                <motion.div
+                  key={i}
+                  className="absolute w-2 h-2 rounded-full bg-white/30"
+                  style={{
+                    left: `${Math.random() * 100}%`,
+                    top: `${Math.random() * 100}%`,
+                  }}
+                  animate={{
+                    y: [0, -20, 0],
+                    opacity: [0.3, 1, 0.3],
+                  }}
+                  transition={{
+                    duration: 2 + Math.random() * 2,
+                    repeat: Infinity,
+                    delay: Math.random() * 2,
+                  }}
+                />
+              ))}
+            </div>
+          )}
+          <div className="relative max-w-7xl mx-auto px-4 py-3 flex items-center justify-center gap-3">
+            <Sparkles className="w-5 h-5 text-white animate-pulse" />
+            <p className="text-white font-bold text-center">
+              {appSettings.seasonal_banner_text || `Special ${appSettings.seasonal_theme} Offers!`}
+              {appSettings.seasonal_discount_percent > 0 && (
+                <span className="ml-2 bg-white/20 px-2 py-0.5 rounded-full text-sm">
+                  {appSettings.seasonal_discount_percent}% OFF
+                </span>
+              )}
+            </p>
+            {appSettings.show_offers_badge && (
+              <span className="bg-white text-[#111111] px-2 py-1 rounded-full text-xs font-bold animate-bounce">
+                LIMITED TIME
+              </span>
+            )}
+          </div>
+        </motion.div>
+      )}
 
       {/* Quick Services */}
       <div className="max-w-7xl mx-auto px-4 py-6">

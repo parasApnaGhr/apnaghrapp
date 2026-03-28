@@ -61,6 +61,10 @@ export const advertisingAPI = {
   pauseAd: (id) => api.post(`/advertising/ads/${id}/pause`),
   pay: (adId, originUrl) => api.post('/advertising/pay', { ad_id: adId, origin_url: originUrl }),
   getActiveAds: (placement) => api.get('/advertising/active', { params: { placement } }),
+  // AI Ad Generation
+  generateAd: (data) => api.post('/advertising/generate-ad', data),
+  getGeneratedAds: () => api.get('/advertising/generated-ads'),
+  deleteGeneratedAd: (adId) => api.delete(`/advertising/generated-ads/${adId}`),
 };
 
 export const visitAPI = {

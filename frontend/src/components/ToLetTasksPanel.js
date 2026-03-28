@@ -1,20 +1,24 @@
 import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import api from '../utils/api';
 import { 
   MapPin, Plus, Edit2, Trash2, User, Clock, IndianRupee, 
-  CheckCircle, XCircle, AlertCircle, Send, Eye
+  CheckCircle, XCircle, AlertCircle, Send, Eye, Camera, Image, X
 } from 'lucide-react';
 import { toast } from 'sonner';
 
 const ToLetTasksPanel = () => {
   const [tasks, setTasks] = useState([]);
   const [pendingApproval, setPendingApproval] = useState([]);
+  const [pendingVerification, setPendingVerification] = useState([]);
   const [riders, setRiders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showAssignModal, setShowAssignModal] = useState(null);
   const [editingRate, setEditingRate] = useState(null);
   const [newRate, setNewRate] = useState('');
+  const [viewingPhotos, setViewingPhotos] = useState(null);
+  const [rejectionReason, setRejectionReason] = useState('');
   
   const [newTask, setNewTask] = useState({
     title: '',
@@ -30,18 +34,37 @@ const ToLetTasksPanel = () => {
 
   const loadData = async () => {
     try {
-      const [tasksRes, pendingRes, ridersRes] = await Promise.all([
+      const [tasksRes, pendingRes, verificationRes, ridersRes] = await Promise.all([
         api.get('/admin/tolet-tasks'),
         api.get('/admin/tolet-tasks/pending-approval'),
+        api.get('/admin/tolet-tasks/pending-verification'),
         api.get('/admin/riders/online')
       ]);
       setTasks(tasksRes.data);
       setPendingApproval(pendingRes.data);
+      setPendingVerification(verificationRes.data || []);
       setRiders(ridersRes.data);
     } catch (error) {
       toast.error('Failed to load data');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleVerifyTask = async (taskId, approved) => {
+    try {
+      await api.post(`/admin/tolet-tasks/${taskId}/verify`, null, {
+        params: { 
+          approved, 
+          rejection_reason: !approved ? rejectionReason : undefined 
+        }
+      });
+      toast.success(approved ? 'Task verified! Rider will be paid.' : 'Task rejected.');
+      setViewingPhotos(null);
+      setRejectionReason('');
+      loadData();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Failed to verify task');
     }
   };
 
@@ -98,6 +121,7 @@ const ToLetTasksPanel = () => {
       assigned: { class: 'bg-purple-100 text-purple-800', text: 'Assigned' },
       in_progress: { class: 'bg-amber-100 text-amber-800', text: 'In Progress' },
       completed: { class: 'bg-green-100 text-green-800', text: 'Completed' },
+      pending_verification: { class: 'bg-orange-100 text-orange-800', text: 'Awaiting Review' },
       verified: { class: 'bg-emerald-100 text-emerald-800', text: 'Verified' },
       rejected: { class: 'bg-red-100 text-red-800', text: 'Rejected' }
     };
@@ -121,6 +145,181 @@ const ToLetTasksPanel = () => {
           Create Task
         </button>
       </div>
+
+      {/* Pending Photo Verification Section - New! */}
+      {pendingVerification.length > 0 && (
+        <div className="mb-6">
+          <h3 className="font-bold mb-3 flex items-center gap-2">
+            <Camera className="w-5 h-5 text-orange-500" />
+            Pending Photo Verification ({pendingVerification.length})
+          </h3>
+          <div className="grid md:grid-cols-2 gap-4">
+            {pendingVerification.map(task => (
+              <motion.div 
+                key={task.id} 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="bg-orange-50 border-2 border-orange-200 rounded-xl p-4"
+              >
+                <div className="flex items-start justify-between mb-3">
+                  <div>
+                    <h4 className="font-bold">{task.title}</h4>
+                    <p className="text-sm text-[#52525B]">{task.location}</p>
+                    {task.rider && (
+                      <p className="text-xs text-[#4ECDC4] mt-1">
+                        <User className="w-3 h-3 inline mr-1" />
+                        {task.rider.name} ({task.rider.phone})
+                      </p>
+                    )}
+                  </div>
+                  <span className="px-2 py-1 bg-orange-100 text-orange-700 rounded-full text-xs font-bold">
+                    {task.actual_boards_collected} boards
+                  </span>
+                </div>
+
+                {/* Photo Preview Grid */}
+                <div className="grid grid-cols-4 gap-2 mb-3">
+                  {(task.proof_images || []).slice(0, 4).map((img, idx) => (
+                    <div 
+                      key={idx} 
+                      className="aspect-square rounded-lg overflow-hidden border cursor-pointer hover:opacity-80"
+                      onClick={() => setViewingPhotos(task)}
+                    >
+                      <img src={img} alt={`Board ${idx+1}`} className="w-full h-full object-cover" />
+                    </div>
+                  ))}
+                  {(task.proof_images?.length || 0) > 4 && (
+                    <div 
+                      className="aspect-square rounded-lg bg-gray-200 flex items-center justify-center cursor-pointer"
+                      onClick={() => setViewingPhotos(task)}
+                    >
+                      <span className="text-sm font-bold">+{task.proof_images.length - 4}</span>
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex items-center justify-between pt-3 border-t">
+                  <span className="font-bold text-[#4ECDC4]">₹{task.earnings}</span>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => setViewingPhotos(task)}
+                      className="px-3 py-1.5 bg-gray-100 rounded-lg text-sm font-medium flex items-center gap-1"
+                      data-testid={`view-photos-${task.id}`}
+                    >
+                      <Eye className="w-4 h-4" />
+                      Review
+                    </button>
+                    <button
+                      onClick={() => handleVerifyTask(task.id, true)}
+                      className="px-3 py-1.5 bg-green-500 text-white rounded-lg text-sm font-medium flex items-center gap-1"
+                      data-testid={`approve-task-${task.id}`}
+                    >
+                      <CheckCircle className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => setViewingPhotos({ ...task, showReject: true })}
+                      className="px-3 py-1.5 bg-red-500 text-white rounded-lg text-sm font-medium flex items-center gap-1"
+                      data-testid={`reject-task-${task.id}`}
+                    >
+                      <XCircle className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Photo Viewing Modal */}
+      <AnimatePresence>
+        {viewingPhotos && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4"
+            onClick={() => setViewingPhotos(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.9 }}
+              animate={{ scale: 1 }}
+              exit={{ scale: 0.9 }}
+              className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="sticky top-0 bg-white p-4 border-b flex items-center justify-between">
+                <div>
+                  <h3 className="font-bold text-lg">{viewingPhotos.title}</h3>
+                  <p className="text-sm text-[#52525B]">
+                    {viewingPhotos.actual_boards_collected} boards • ₹{viewingPhotos.earnings}
+                  </p>
+                </div>
+                <button onClick={() => setViewingPhotos(null)} className="p-2 hover:bg-gray-100 rounded-full">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <div className="p-4">
+                {/* Photo Grid */}
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+                  {(viewingPhotos.proof_images || []).map((img, idx) => (
+                    <div key={idx} className="aspect-square rounded-xl overflow-hidden border-2 border-[#E5E3D8]">
+                      <img src={img} alt={`Board ${idx+1}`} className="w-full h-full object-cover" />
+                      <div className="bg-black/50 text-white text-xs text-center py-1">Board #{idx+1}</div>
+                    </div>
+                  ))}
+                </div>
+
+                {viewingPhotos.notes && (
+                  <div className="bg-gray-50 rounded-xl p-4 mb-6">
+                    <p className="text-sm font-medium mb-1">Rider Notes:</p>
+                    <p className="text-[#52525B]">{viewingPhotos.notes}</p>
+                  </div>
+                )}
+
+                {/* Reject Reason Input */}
+                {viewingPhotos.showReject && (
+                  <div className="mb-4">
+                    <label className="block text-sm font-bold mb-2">Rejection Reason</label>
+                    <textarea
+                      value={rejectionReason}
+                      onChange={(e) => setRejectionReason(e.target.value)}
+                      placeholder="Why are you rejecting this submission?"
+                      className="w-full px-4 py-3 border-2 border-[#111111] rounded-xl"
+                      rows={2}
+                    />
+                  </div>
+                )}
+
+                {/* Action Buttons */}
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => handleVerifyTask(viewingPhotos.id, true)}
+                    className="flex-1 py-3 bg-green-500 text-white font-bold rounded-xl flex items-center justify-center gap-2"
+                  >
+                    <CheckCircle className="w-5 h-5" />
+                    Approve & Pay ₹{viewingPhotos.earnings}
+                  </button>
+                  <button
+                    onClick={() => {
+                      if (!viewingPhotos.showReject) {
+                        setViewingPhotos({ ...viewingPhotos, showReject: true });
+                      } else {
+                        handleVerifyTask(viewingPhotos.id, false);
+                      }
+                    }}
+                    className="flex-1 py-3 bg-red-500 text-white font-bold rounded-xl flex items-center justify-center gap-2"
+                  >
+                    <XCircle className="w-5 h-5" />
+                    {viewingPhotos.showReject ? 'Confirm Reject' : 'Reject'}
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Pending Approval Section */}
       {pendingApproval.length > 0 && (

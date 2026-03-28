@@ -3,9 +3,10 @@ import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Marquee from 'react-fast-marquee';
-import { ArrowLeft, Zap, TrendingUp, Star, Crown, Check, Building2, Phone, Mail, ChevronRight, Users, Eye, MousePointer } from 'lucide-react';
+import { ArrowLeft, Zap, TrendingUp, Star, Crown, Check, Building2, Phone, Mail, ChevronRight, Users, Eye, MousePointer, Wand2 } from 'lucide-react';
 import { toast } from 'sonner';
 import api from '../utils/api';
+import AIAdGenerator from '../components/AIAdGenerator';
 
 const AdvertiseWithUs = () => {
   const { user } = useAuth();
@@ -15,6 +16,7 @@ const AdvertiseWithUs = () => {
   const [loading, setLoading] = useState(true);
   const [selectedPackage, setSelectedPackage] = useState(null);
   const [step, setStep] = useState(1); // 1: packages, 2: profile form, 3: ad details
+  const [activeTab, setActiveTab] = useState('packages'); // packages, ai-generator
   const [profileData, setProfileData] = useState({
     company_name: '',
     business_type: '',
@@ -196,24 +198,63 @@ const AdvertiseWithUs = () => {
       )}
 
       <div className="max-w-6xl mx-auto px-4 py-8">
-        {/* Step Indicator */}
-        <div className="flex items-center justify-center gap-2 mb-8">
-          {[1, 2, 3].map((s) => (
-            <div
-              key={s}
-              className={`w-10 h-10 rounded-full border-2 border-[#111111] flex items-center justify-center font-bold transition-all ${
-                step >= s 
-                  ? 'bg-[#FFD166] shadow-[2px_2px_0px_#111111]' 
-                  : 'bg-white'
-              }`}
-            >
-              {s}
+        {/* Tab Navigation for Step 1 */}
+        {step === 1 && (
+          <div className="flex justify-center mb-8">
+            <div className="inline-flex bg-white rounded-xl border-2 border-[#111111] p-1">
+              <button
+                onClick={() => setActiveTab('packages')}
+                className={`px-6 py-3 rounded-lg font-bold transition-all ${
+                  activeTab === 'packages'
+                    ? 'bg-[#FFD166] shadow-[2px_2px_0px_#111111]'
+                    : 'hover:bg-gray-100'
+                }`}
+                data-testid="tab-packages"
+              >
+                <Star className="w-4 h-4 inline mr-2" />
+                Ad Packages
+              </button>
+              <button
+                onClick={() => setActiveTab('ai-generator')}
+                className={`px-6 py-3 rounded-lg font-bold transition-all ${
+                  activeTab === 'ai-generator'
+                    ? 'bg-[#4ECDC4] text-white shadow-[2px_2px_0px_#111111]'
+                    : 'hover:bg-gray-100'
+                }`}
+                data-testid="tab-ai-generator"
+              >
+                <Wand2 className="w-4 h-4 inline mr-2" />
+                AI Ad Generator
+              </button>
             </div>
-          ))}
-        </div>
+          </div>
+        )}
+
+        {/* Step Indicator - Only show for packages flow */}
+        {step > 1 && (
+          <div className="flex items-center justify-center gap-2 mb-8">
+            {[1, 2, 3].map((s) => (
+              <div
+                key={s}
+                className={`w-10 h-10 rounded-full border-2 border-[#111111] flex items-center justify-center font-bold transition-all ${
+                  step >= s 
+                    ? 'bg-[#FFD166] shadow-[2px_2px_0px_#111111]' 
+                    : 'bg-white'
+                }`}
+              >
+                {s}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* AI Ad Generator Tab */}
+        {step === 1 && activeTab === 'ai-generator' && (
+          <AIAdGenerator />
+        )}
 
         {/* Step 1: Package Selection */}
-        {step === 1 && (
+        {step === 1 && activeTab === 'packages' && (
           <>
             {/* Stats Banner */}
             <div className="grid grid-cols-3 gap-4 mb-8">

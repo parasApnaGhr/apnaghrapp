@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import { visitAPI, riderAPI } from '../utils/api';
 import api from '../utils/api';
@@ -7,7 +7,7 @@ import VisitProofUpload from '../components/VisitProofUpload';
 import { 
   MapPin, Clock, CheckCircle, Phone, Camera, Navigation, 
   Home, User, ArrowRight, IndianRupee, Power, Wallet, 
-  ClipboardList, FileText, LogOut, RefreshCw
+  ClipboardList, FileText, LogOut, RefreshCw, Upload, X, Image, Trash2
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -25,6 +25,13 @@ const RiderDashboard = () => {
   // ToLet Tasks state
   const [availableTasks, setAvailableTasks] = useState([]);
   const [activeTask, setActiveTask] = useState(null);
+  const [taskCompletion, setTaskCompletion] = useState({
+    boardsCollected: 1,
+    proofImages: [],
+    uploading: false,
+    notes: ''
+  });
+  const taskFileInputRef = useRef(null);
   
   // Wallet state
   const [wallet, setWallet] = useState(null);
@@ -175,6 +182,77 @@ const RiderDashboard = () => {
       window.open(`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`, '_blank');
     } else {
       window.open(`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(address)}`, '_blank');
+    }
+  };
+
+  // ToLet Task Photo Upload handlers
+  const handleTaskPhotoUpload = async (e) => {
+    const files = Array.from(e.target.files);
+    if (!files.length) return;
+
+    setTaskCompletion(prev => ({ ...prev, uploading: true }));
+    
+    for (const file of files) {
+      if (!file.type.startsWith('image/')) {
+        toast.error('Please select only image files');
+        continue;
+      }
+      if (file.size > 10 * 1024 * 1024) {
+        toast.error('Image must be less than 10MB');
+        continue;
+      }
+
+      const formData = new FormData();
+      formData.append('file', file);
+
+      try {
+        const response = await api.post('/upload', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        
+        setTaskCompletion(prev => ({
+          ...prev,
+          proofImages: [...prev.proofImages, response.data.url]
+        }));
+        toast.success('Photo uploaded!');
+      } catch (error) {
+        toast.error('Failed to upload photo');
+      }
+    }
+    
+    setTaskCompletion(prev => ({ ...prev, uploading: false }));
+    if (taskFileInputRef.current) taskFileInputRef.current.value = '';
+  };
+
+  const removeTaskPhoto = (index) => {
+    setTaskCompletion(prev => ({
+      ...prev,
+      proofImages: prev.proofImages.filter((_, i) => i !== index)
+    }));
+  };
+
+  const handleCompleteTask = async () => {
+    if (taskCompletion.proofImages.length < taskCompletion.boardsCollected) {
+      toast.error(`Please upload at least ${taskCompletion.boardsCollected} photos (one per board)`);
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await api.post(`/tolet-tasks/${activeTask.id}/complete`, {
+        boards_collected: taskCompletion.boardsCollected,
+        proof_images: taskCompletion.proofImages,
+        notes: taskCompletion.notes
+      });
+      
+      toast.success('Task submitted for verification! Admin will review your photos.');
+      setActiveTask(null);
+      setTaskCompletion({ boardsCollected: 1, proofImages: [], uploading: false, notes: '' });
+      loadWallet();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Failed to complete task');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -557,7 +635,118 @@ const RiderDashboard = () => {
                   <span className="text-sm">Est. Boards: {activeTask.estimated_boards}</span>
                   <span className="font-bold text-[#4ECDC4]">₹{activeTask.rate_per_board}/board</span>
                 </div>
-                <button className="btn-secondary w-full">Complete Task</button>
+
+                {/* Task Completion Form */}
+                <div className="space-y-4">
+                  {/* Boards Collected */}
+                  <div>
+                    <label className="block text-sm font-bold mb-2">Boards Collected *</label>
+                    <input
+                      type="number"
+                      min="1"
+                      max={activeTask.estimated_boards * 2}
+                      value={taskCompletion.boardsCollected}
+                      onChange={(e) => setTaskCompletion({ 
+                        ...taskCompletion, 
+                        boardsCollected: parseInt(e.target.value) || 1 
+                      })}
+                      className="w-full px-4 py-3 border-2 border-[#111111] rounded-xl"
+                      data-testid="boards-collected-input"
+                    />
+                    <p className="text-xs text-[#52525B] mt-1">
+                      Estimated earnings: ₹{(taskCompletion.boardsCollected * activeTask.rate_per_board).toLocaleString()}
+                    </p>
+                  </div>
+
+                  {/* Photo Upload */}
+                  <div>
+                    <label className="block text-sm font-bold mb-2">
+                      <Camera className="w-4 h-4 inline mr-1" />
+                      Upload Board Photos * (one per board)
+                    </label>
+                    
+                    <div className="grid grid-cols-3 gap-2 mb-3">
+                      {taskCompletion.proofImages.map((url, index) => (
+                        <div key={index} className="relative aspect-square rounded-lg overflow-hidden border-2 border-[#E5E3D8]">
+                          <img src={url} alt={`Board ${index + 1}`} className="w-full h-full object-cover" />
+                          <button
+                            onClick={() => removeTaskPhoto(index)}
+                            className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full"
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                          <span className="absolute bottom-1 left-1 bg-black/50 text-white text-xs px-2 py-0.5 rounded">
+                            #{index + 1}
+                          </span>
+                        </div>
+                      ))}
+                      
+                      {/* Upload Button */}
+                      <button
+                        onClick={() => taskFileInputRef.current?.click()}
+                        disabled={taskCompletion.uploading}
+                        className="aspect-square rounded-lg border-2 border-dashed border-[#4ECDC4] bg-[#4ECDC4]/10 flex flex-col items-center justify-center hover:bg-[#4ECDC4]/20 transition-colors"
+                        data-testid="upload-task-photo-button"
+                      >
+                        {taskCompletion.uploading ? (
+                          <div className="w-6 h-6 border-2 border-[#4ECDC4] border-t-transparent rounded-full animate-spin" />
+                        ) : (
+                          <>
+                            <Upload className="w-6 h-6 text-[#4ECDC4] mb-1" />
+                            <span className="text-xs text-[#4ECDC4] font-medium">Add Photo</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+                    
+                    <input
+                      ref={taskFileInputRef}
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      onChange={handleTaskPhotoUpload}
+                      className="hidden"
+                    />
+                    
+                    {taskCompletion.proofImages.length < taskCompletion.boardsCollected && (
+                      <p className="text-xs text-[#FF5A5F] mt-1">
+                        ⚠️ Upload {taskCompletion.boardsCollected - taskCompletion.proofImages.length} more photo(s)
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Notes */}
+                  <div>
+                    <label className="block text-sm font-bold mb-2">Notes (optional)</label>
+                    <textarea
+                      value={taskCompletion.notes}
+                      onChange={(e) => setTaskCompletion({ ...taskCompletion, notes: e.target.value })}
+                      placeholder="Any additional notes..."
+                      className="w-full px-4 py-3 border-2 border-[#111111] rounded-xl resize-none"
+                      rows={2}
+                    />
+                  </div>
+
+                  {/* Submit Button */}
+                  <motion.button
+                    onClick={handleCompleteTask}
+                    disabled={loading || taskCompletion.proofImages.length < taskCompletion.boardsCollected}
+                    whileHover={{ scale: loading ? 1 : 1.02 }}
+                    whileTap={{ scale: loading ? 1 : 0.98 }}
+                    className={`w-full py-4 rounded-xl font-bold text-white transition-all ${
+                      taskCompletion.proofImages.length >= taskCompletion.boardsCollected
+                        ? 'bg-[#4ECDC4] shadow-[3px_3px_0px_#111111]'
+                        : 'bg-gray-400 cursor-not-allowed'
+                    }`}
+                    data-testid="complete-task-button"
+                  >
+                    {loading ? 'Submitting...' : 'Submit for Verification'}
+                  </motion.button>
+                  
+                  <p className="text-xs text-center text-[#52525B]">
+                    Your photos will be reviewed by admin before payout
+                  </p>
+                </div>
               </motion.div>
             )}
 

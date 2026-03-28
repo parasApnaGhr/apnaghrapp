@@ -75,6 +75,18 @@ class UserCreate(BaseModel):
     password: str
     role: str
 
+class UserResponse(BaseModel):
+    id: str
+    name: str
+    phone: str
+    email: Optional[str] = None
+    role: str
+    is_online: bool = False
+    current_lat: Optional[float] = None
+    current_lng: Optional[float] = None
+    last_location_update: Optional[datetime] = None
+    created_at: datetime
+
 class LoginRequest(BaseModel):
     phone: str
     password: str
@@ -269,6 +281,12 @@ class ToLetTaskUpdate(BaseModel):
     description: Optional[str] = None
     location: Optional[str] = None
 
+class ToLetTaskComplete(BaseModel):
+    boards_collected: int
+    proof_images: List[str]  # Required - one image per board
+    proof_video: Optional[str] = None
+    notes: Optional[str] = None
+
 class RiderWallet(BaseModel):
     """Rider's earnings wallet"""
     model_config = ConfigDict(extra="ignore")
@@ -348,7 +366,7 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
         raise HTTPException(status_code=401, detail="Invalid token")
 
 # Auth endpoints
-@api_router.post("/auth/register", response_model=User)
+@api_router.post("/auth/register", response_model=UserResponse)
 async def register(user_data: UserCreate):
     existing = await db.users.find_one({"phone": user_data.phone}, {"_id": 0})
     if existing:
@@ -363,9 +381,19 @@ async def register(user_data: UserCreate):
     doc['created_at'] = doc['created_at'].isoformat()
     await db.users.insert_one(doc)
     
-    response_user = user_obj.model_dump()
-    response_user.pop('password', None)
-    return response_user
+    # Return user without password
+    return UserResponse(
+        id=user_obj.id,
+        name=user_obj.name,
+        phone=user_obj.phone,
+        email=user_obj.email,
+        role=user_obj.role,
+        is_online=user_obj.is_online,
+        current_lat=user_obj.current_lat,
+        current_lng=user_obj.current_lng,
+        last_location_update=user_obj.last_location_update,
+        created_at=user_obj.created_at
+    )
 
 @api_router.post("/auth/login", response_model=LoginResponse)
 async def login(login_data: LoginRequest):
@@ -376,6 +404,143 @@ async def login(login_data: LoginRequest):
     token = create_jwt_token(user['id'], user['role'])
     user.pop('password', None)
     return {"token": token, "user": user}
+
+
+# ============ FORGOT PASSWORD ============
+import secrets
+import random
+
+class ForgotPasswordRequest(BaseModel):
+    phone: str
+    method: str = "sms"  # sms or email
+
+class VerifyOTPRequest(BaseModel):
+    phone: str
+    otp: str
+
+class ResetPasswordRequest(BaseModel):
+    phone: str
+    otp: str
+    new_password: str
+
+@api_router.post("/auth/forgot-password")
+async def forgot_password(request: ForgotPasswordRequest):
+    """Request password reset OTP via SMS or Email"""
+    user = await db.users.find_one({"phone": request.phone}, {"_id": 0})
+    if not user:
+        # Don't reveal if user exists
+        return {"message": "If this account exists, an OTP has been sent"}
+    
+    # Generate 6-digit OTP
+    otp = ''.join([str(random.randint(0, 9)) for _ in range(6)])
+    
+    # Store OTP with 10 min expiry
+    otp_doc = {
+        "phone": request.phone,
+        "otp": otp,
+        "method": request.method,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "expires_at": (datetime.now(timezone.utc) + timedelta(minutes=10)).isoformat(),
+        "used": False
+    }
+    
+    # Remove any existing OTPs for this phone
+    await db.password_reset_otps.delete_many({"phone": request.phone})
+    await db.password_reset_otps.insert_one(otp_doc)
+    
+    # In production, send OTP via SMS/Email service
+    # For now, log it (and return in dev mode for testing)
+    print(f"[PASSWORD RESET] OTP for {request.phone}: {otp}")
+    
+    response_data = {
+        "message": "OTP sent successfully",
+        "method": request.method,
+        "expires_in_minutes": 10
+    }
+    
+    # Include OTP in response for testing (remove in production)
+    response_data["otp_for_testing"] = otp
+    
+    if request.method == "email" and user.get('email'):
+        response_data["email_masked"] = user['email'][:3] + "***" + user['email'][user['email'].find('@'):]
+    
+    return response_data
+
+
+@api_router.post("/auth/verify-otp")
+async def verify_otp(request: VerifyOTPRequest):
+    """Verify OTP before allowing password reset"""
+    otp_doc = await db.password_reset_otps.find_one({
+        "phone": request.phone,
+        "otp": request.otp,
+        "used": False
+    }, {"_id": 0})
+    
+    if not otp_doc:
+        raise HTTPException(status_code=400, detail="Invalid or expired OTP")
+    
+    # Check if expired
+    expires_at = datetime.fromisoformat(otp_doc['expires_at'].replace('Z', '+00:00'))
+    if datetime.now(timezone.utc) > expires_at:
+        raise HTTPException(status_code=400, detail="OTP has expired. Please request a new one.")
+    
+    # Generate reset token
+    reset_token = secrets.token_urlsafe(32)
+    
+    # Store reset token with 5 min expiry
+    await db.password_reset_tokens.delete_many({"phone": request.phone})
+    await db.password_reset_tokens.insert_one({
+        "phone": request.phone,
+        "token": reset_token,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "expires_at": (datetime.now(timezone.utc) + timedelta(minutes=5)).isoformat()
+    })
+    
+    return {"valid": True, "reset_token": reset_token, "message": "OTP verified. You can now reset your password."}
+
+
+@api_router.post("/auth/reset-password")
+async def reset_password(request: ResetPasswordRequest):
+    """Reset password after OTP verification"""
+    # Verify OTP again
+    otp_doc = await db.password_reset_otps.find_one({
+        "phone": request.phone,
+        "otp": request.otp,
+        "used": False
+    }, {"_id": 0})
+    
+    if not otp_doc:
+        raise HTTPException(status_code=400, detail="Invalid or expired OTP")
+    
+    # Check if expired
+    expires_at = datetime.fromisoformat(otp_doc['expires_at'].replace('Z', '+00:00'))
+    if datetime.now(timezone.utc) > expires_at:
+        raise HTTPException(status_code=400, detail="OTP has expired. Please request a new one.")
+    
+    # Validate password
+    if len(request.new_password) < 6:
+        raise HTTPException(status_code=400, detail="Password must be at least 6 characters")
+    
+    # Update password
+    hashed_pw = hash_password(request.new_password)
+    result = await db.users.update_one(
+        {"phone": request.phone},
+        {"$set": {"password": hashed_pw}}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Mark OTP as used
+    await db.password_reset_otps.update_one(
+        {"phone": request.phone, "otp": request.otp},
+        {"$set": {"used": True}}
+    )
+    
+    # Clean up
+    await db.password_reset_tokens.delete_many({"phone": request.phone})
+    
+    return {"message": "Password reset successfully. You can now login with your new password."}
 
 @api_router.get("/auth/me")
 async def get_me(current_user: dict = Depends(get_current_user)):
@@ -1311,6 +1476,39 @@ async def upload_explainer_video(file: UploadFile = File(...), current_user: dic
     
     return {"url": video_url, "message": "Explainer video uploaded successfully"}
 
+# App Customization Settings (seasonal themes, banners, etc.)
+class AppCustomizationSettings(BaseModel):
+    seasonal_theme: str = "none"
+    seasonal_banner_text: str = ""
+    seasonal_discount_percent: int = 0
+    seasonal_active: bool = False
+    homepage_highlight: str = ""
+    accent_color: str = "#FF5A5F"
+    enable_animations: bool = True
+    show_offers_badge: bool = False
+
+@api_router.get("/settings/app-customization")
+async def get_app_customization():
+    """Get app customization settings"""
+    setting = await db.app_settings.find_one({"key": "app_customization"}, {"_id": 0})
+    if setting and setting.get("value"):
+        return setting.get("value")
+    return AppCustomizationSettings().model_dump()
+
+@api_router.post("/settings/app-customization")
+async def set_app_customization(settings: AppCustomizationSettings, current_user: dict = Depends(get_current_user)):
+    """Update app customization settings (admin only)"""
+    if current_user['role'] not in ['admin', 'inventory_admin']:
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    await db.app_settings.update_one(
+        {"key": "app_customization"},
+        {"$set": {"key": "app_customization", "value": settings.model_dump()}},
+        upsert=True
+    )
+    
+    return {"message": "App customization settings saved", "settings": settings.model_dump()}
+
 @api_router.post("/visits/{visit_id}/upload-proof")
 async def upload_visit_proof(
     visit_id: str,
@@ -1512,10 +1710,10 @@ async def start_tolet_task(task_id: str, current_user: dict = Depends(get_curren
 @api_router.post("/tolet-tasks/{task_id}/complete")
 async def complete_tolet_task(
     task_id: str, 
-    boards_collected: int,
+    completion_data: ToLetTaskComplete,
     current_user: dict = Depends(get_current_user)
 ):
-    """Rider completes ToLet task"""
+    """Rider completes ToLet task with proof images (one per board)"""
     if current_user['role'] != 'rider':
         raise HTTPException(status_code=403, detail="Riders only")
     
@@ -1523,19 +1721,30 @@ async def complete_tolet_task(
     if not task:
         raise HTTPException(status_code=404, detail="Task not found")
     
-    earnings = boards_collected * task['rate_per_board']
+    # Validate: must have at least one proof image per board collected
+    if len(completion_data.proof_images) < completion_data.boards_collected:
+        raise HTTPException(
+            status_code=400, 
+            detail=f"Please upload at least {completion_data.boards_collected} proof images (one per board collected)"
+        )
     
+    earnings = completion_data.boards_collected * task['rate_per_board']
+    
+    # Update task with pending_verification status (not completed until admin approves)
     await db.tolet_tasks.update_one(
         {"id": task_id},
         {"$set": {
-            "status": "completed",
-            "actual_boards_collected": boards_collected,
+            "status": "pending_verification",  # Changed from "completed"
+            "actual_boards_collected": completion_data.boards_collected,
+            "proof_images": completion_data.proof_images,
+            "proof_video": completion_data.proof_video,
+            "notes": completion_data.notes,
             "earnings": earnings,
             "completed_at": datetime.now(timezone.utc).isoformat()
         }}
     )
     
-    # Create pending transaction
+    # Create pending transaction (won't be approved until admin verifies)
     transaction = RiderTransaction(
         rider_id=current_user['id'],
         type="tolet_earning",
@@ -1543,7 +1752,7 @@ async def complete_tolet_task(
         status="pending",
         reference_id=task_id,
         reference_type="tolet_task",
-        description=f"ToLet boards collected: {boards_collected} x ₹{task['rate_per_board']}"
+        description=f"ToLet boards collected: {completion_data.boards_collected} x ₹{task['rate_per_board']} (awaiting verification)"
     )
     trans_doc = transaction.model_dump()
     trans_doc['created_at'] = trans_doc['created_at'].isoformat()
@@ -1559,14 +1768,14 @@ async def complete_tolet_task(
         upsert=True
     )
     
-    # Notify admins
+    # Notify admins about pending verification
     admins = await db.users.find({"role": {"$in": ["admin", "rider_admin"]}}, {"_id": 0}).to_list(50)
     for admin in admins:
         notification = Notification(
             user_id=admin['id'],
-            type="task_completed",
-            title="ToLet Task Completed",
-            message=f"Rider {current_user['name']} completed task - ₹{earnings} pending approval",
+            type="task_pending_verification",
+            title="ToLet Task - Photos Need Review",
+            message=f"Rider {current_user['name']} submitted {completion_data.boards_collected} board photos - ₹{earnings} pending your verification",
             reference_id=task_id,
             reference_type="tolet_task"
         )
@@ -1574,7 +1783,128 @@ async def complete_tolet_task(
         notif_doc['created_at'] = notif_doc['created_at'].isoformat()
         await db.notifications.insert_one(notif_doc)
     
-    return {"success": True, "earnings": earnings, "status": "pending_approval"}
+    return {"success": True, "earnings": earnings, "status": "pending_verification", "message": "Photos submitted for admin verification"}
+
+
+@api_router.post("/admin/tolet-tasks/{task_id}/verify")
+async def verify_tolet_task(
+    task_id: str,
+    approved: bool,
+    rejection_reason: Optional[str] = None,
+    current_user: dict = Depends(get_current_user)
+):
+    """Admin verifies/rejects ToLet task photos and approves payout"""
+    if current_user['role'] not in ['admin', 'rider_admin']:
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    task = await db.tolet_tasks.find_one({"id": task_id}, {"_id": 0})
+    if not task:
+        raise HTTPException(status_code=404, detail="Task not found")
+    
+    if task['status'] != 'pending_verification':
+        raise HTTPException(status_code=400, detail="Task is not pending verification")
+    
+    if approved:
+        # Approve the task
+        await db.tolet_tasks.update_one(
+            {"id": task_id},
+            {"$set": {
+                "status": "verified",
+                "verified_at": datetime.now(timezone.utc).isoformat(),
+                "verified_by": current_user['id']
+            }}
+        )
+        
+        # Approve the transaction
+        await db.rider_transactions.update_one(
+            {"reference_id": task_id, "reference_type": "tolet_task"},
+            {"$set": {"status": "approved"}}
+        )
+        
+        # Move from pending to approved earnings
+        await db.rider_wallets.update_one(
+            {"rider_id": task['rider_id']},
+            {"$inc": {
+                "pending_earnings": -task['earnings'],
+                "approved_earnings": task['earnings']
+            }}
+        )
+        
+        # Notify rider
+        notification = Notification(
+            user_id=task['rider_id'],
+            type="task_verified",
+            title="Task Approved! 🎉",
+            message=f"Your ToLet task was verified. ₹{task['earnings']} added to your wallet!",
+            reference_id=task_id,
+            reference_type="tolet_task"
+        )
+        notif_doc = notification.model_dump()
+        notif_doc['created_at'] = notif_doc['created_at'].isoformat()
+        await db.notifications.insert_one(notif_doc)
+        
+        return {"success": True, "status": "verified", "earnings_approved": task['earnings']}
+    else:
+        # Reject the task
+        await db.tolet_tasks.update_one(
+            {"id": task_id},
+            {"$set": {
+                "status": "rejected",
+                "rejection_reason": rejection_reason or "Photos did not meet requirements",
+                "verified_at": datetime.now(timezone.utc).isoformat(),
+                "verified_by": current_user['id']
+            }}
+        )
+        
+        # Cancel the transaction
+        await db.rider_transactions.update_one(
+            {"reference_id": task_id, "reference_type": "tolet_task"},
+            {"$set": {"status": "rejected", "description": f"Rejected: {rejection_reason}"}}
+        )
+        
+        # Remove from pending earnings
+        await db.rider_wallets.update_one(
+            {"rider_id": task['rider_id']},
+            {"$inc": {
+                "pending_earnings": -task['earnings'],
+                "total_earnings": -task['earnings']
+            }}
+        )
+        
+        # Notify rider
+        notification = Notification(
+            user_id=task['rider_id'],
+            type="task_rejected",
+            title="Task Rejected",
+            message=f"Your ToLet task was rejected: {rejection_reason or 'Photos did not meet requirements'}. Please resubmit with valid photos.",
+            reference_id=task_id,
+            reference_type="tolet_task"
+        )
+        notif_doc = notification.model_dump()
+        notif_doc['created_at'] = notif_doc['created_at'].isoformat()
+        await db.notifications.insert_one(notif_doc)
+        
+        return {"success": True, "status": "rejected", "reason": rejection_reason}
+
+
+@api_router.get("/admin/tolet-tasks/pending-verification")
+async def get_tolet_tasks_pending_verification(current_user: dict = Depends(get_current_user)):
+    """Get all ToLet tasks that need photo verification"""
+    if current_user['role'] not in ['admin', 'rider_admin']:
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    tasks = await db.tolet_tasks.find(
+        {"status": "pending_verification"},
+        {"_id": 0}
+    ).sort("completed_at", -1).to_list(100)
+    
+    # Enrich with rider info
+    for task in tasks:
+        if task.get('rider_id'):
+            rider = await db.users.find_one({"id": task['rider_id']}, {"_id": 0, "password": 0})
+            task['rider'] = rider
+    
+    return tasks
 
 
 # ============ ADMIN: VISIT MANAGEMENT & ASSIGNMENT ============
