@@ -409,6 +409,7 @@ async def login(login_data: LoginRequest):
 # ============ FORGOT PASSWORD ============
 import secrets
 import random
+from services.notification_service import send_sms_otp, send_email_otp, get_notification_status
 
 class ForgotPasswordRequest(BaseModel):
     phone: str
@@ -428,8 +429,8 @@ async def forgot_password(request: ForgotPasswordRequest):
     """Request password reset OTP via SMS or Email"""
     user = await db.users.find_one({"phone": request.phone}, {"_id": 0})
     if not user:
-        # Don't reveal if user exists
-        return {"message": "If this account exists, an OTP has been sent"}
+        # Don't reveal if user exists - still return success
+        return {"message": "If this account exists, an OTP has been sent", "method": request.method}
     
     # Generate 6-digit OTP
     otp = ''.join([str(random.randint(0, 9)) for _ in range(6)])
@@ -448,23 +449,44 @@ async def forgot_password(request: ForgotPasswordRequest):
     await db.password_reset_otps.delete_many({"phone": request.phone})
     await db.password_reset_otps.insert_one(otp_doc)
     
-    # In production, send OTP via SMS/Email service
-    # For now, log it (and return in dev mode for testing)
-    print(f"[PASSWORD RESET] OTP for {request.phone}: {otp}")
-    
+    # Send OTP via selected method
     response_data = {
         "message": "OTP sent successfully",
         "method": request.method,
         "expires_in_minutes": 10
     }
     
-    # Include OTP in response for testing (remove in production)
-    response_data["otp_for_testing"] = otp
-    
-    if request.method == "email" and user.get('email'):
+    if request.method == "email":
+        if not user.get('email'):
+            raise HTTPException(status_code=400, detail="No email address registered. Please use SMS.")
+        
+        result = await send_email_otp(
+            email=user['email'],
+            otp=otp,
+            user_name=user.get('name', 'User')
+        )
         response_data["email_masked"] = user['email'][:3] + "***" + user['email'][user['email'].find('@'):]
+        
+        # Include OTP for testing if in dev mode
+        if result.get('otp_for_testing'):
+            response_data["otp_for_testing"] = result['otp_for_testing']
+            response_data["dev_mode"] = True
+    else:
+        # SMS
+        result = await send_sms_otp(phone=request.phone, otp=otp)
+        
+        # Include OTP for testing if in dev mode
+        if result.get('otp_for_testing'):
+            response_data["otp_for_testing"] = result['otp_for_testing']
+            response_data["dev_mode"] = True
     
     return response_data
+
+
+@api_router.get("/auth/notification-status")
+async def notification_status():
+    """Check SMS/Email service status"""
+    return get_notification_status()
 
 
 @api_router.post("/auth/verify-otp")

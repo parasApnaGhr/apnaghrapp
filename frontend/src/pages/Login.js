@@ -97,7 +97,20 @@ const Login = () => {
         phone: forgotData.phone,
         method: forgotData.method
       });
-      toast.success('OTP sent to your phone!');
+      
+      // Check if dev mode - show OTP in toast for testing
+      if (response.data.dev_mode && response.data.otp_for_testing) {
+        toast.success(
+          <div>
+            <p>OTP sent! (Dev Mode)</p>
+            <p className="text-lg font-bold mt-1">OTP: {response.data.otp_for_testing}</p>
+          </div>,
+          { duration: 15000 }
+        );
+      } else {
+        toast.success(`OTP sent to your ${forgotData.method === 'email' ? 'email' : 'phone'}!`);
+      }
+      
       setForgotStep(2);
     } catch (error) {
       toast.error(error.response?.data?.detail || 'Failed to send OTP');
