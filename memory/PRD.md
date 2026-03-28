@@ -20,25 +20,41 @@ ApnaGhr Visit Platform is a production-ready multi-role rental property platform
 ## Latest Updates (March 2026)
 
 ### ✅ Features Completed This Session
-1. **Forgot Password Flow**
+1. **AI Chatbot for Property Assistance (NEW)** ✅
+   - Conversational AI using Emergent LLM Key (OpenAI gpt-4o-mini)
+   - Taste matching - understands user preferences (budget, BHK, location, amenities)
+   - Property search and recommendations
+   - Beautiful Neo-Brutalist floating chatbot UI
+   - Quick start prompts for common searches
+   - Property cards with images, rent, location
+   - Session management for conversation history
+   - Endpoints: /api/chatbot/new-session, /api/chatbot/send, /api/chatbot/history
+
+2. **Media URL Fix (Production Critical)** ✅
+   - Fixed /uploads/ path routing issue for Kubernetes ingress
+   - Changed static file mount from /uploads to /api/uploads
+   - Updated getMediaUrl() helper to convert legacy URLs
+   - All images now load correctly in production
+
+3. **Forgot Password Flow**
    - SMS OTP and Email options
    - 6-digit OTP verification
    - Password reset with OTP
    - Full UI flow in Login page
 
-2. **App Customization Settings (Admin)**
+4. **App Customization Settings (Admin)**
    - 11 seasonal themes (Holi, Diwali, Christmas, etc.)
    - Customizable banner text and discount percentage
    - Animated seasonal banner on customer homepage
    - Festive animations toggle
 
-3. **ToLet Board Photo Verification**
+5. **ToLet Board Photo Verification**
    - Riders must upload photos (one per board collected)
    - Photos go to "Pending Verification" queue
    - Admin reviews photos before approving payout
    - Reject option with reason input
 
-4. **Real Account Registration**
+6. **Real Account Registration**
    - Removed all mock credentials
    - Registration supports all 4 roles
    - JWT authentication working
@@ -60,21 +76,13 @@ See `/app/memory/test_credentials.md`
 
 ## Pending Features
 
-### P0 - AI Features
-1. **AI Ad Poster Generation** (Backend ready, needs OpenAI/Gemini integration)
-   - Form created in AdvertiseWithUs page
-   - Endpoint: POST /api/advertising/generate-ad
-
-2. **AI Help Bot**
-   - Customer assistance chatbot
-   - Property recommendations
-
 ### P1 - Enhancements
-1. **Real SMS/Email OTP** - Currently returns OTP in response
+1. **Real SMS/Email OTP** - Currently returns OTP in response (Dev Mode)
 2. **Real-time WebSockets** - For live rider tracking (currently polling)
+3. **Cashfree Webhook Configuration** - User needs to configure webhook URL in Cashfree dashboard
 
 ### P2 - Refactoring
-1. **Backend modularization** - Move remaining server.py endpoints to /routes/
+1. **Backend modularization** - Move remaining server.py (~2700 lines) endpoints to /routes/
 
 ## Architecture
 ```

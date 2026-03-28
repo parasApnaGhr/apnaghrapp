@@ -9,7 +9,7 @@
 
 ### Customer Account
 - **Phone**: 6987654321
-- **Password**: test123
+- **Password**: newpass123
 - **Role**: customer
 
 ### Rider Account
