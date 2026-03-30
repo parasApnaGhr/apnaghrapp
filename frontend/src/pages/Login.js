@@ -3,8 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { Home, User, Phone, Mail, Lock, ChevronRight, Eye, EyeOff, KeyRound, ArrowLeft } from 'lucide-react';
-import api from '../utils/api';
+import { Home, User, Phone, Mail, Lock, ChevronRight, Eye, EyeOff, KeyRound, ArrowLeft, Briefcase } from 'lucide-react';
+import api, { sellerAPI } from '../utils/api';
 
 const Login = () => {
   const [isRegister, setIsRegister] = useState(false);
@@ -17,6 +17,7 @@ const Login = () => {
     email: '',
     password: '',
     role: 'customer',
+    city: '', // For seller registration
   });
   const [forgotData, setForgotData] = useState({
     phone: '',
@@ -60,10 +61,25 @@ const Login = () => {
 
     try {
       if (isRegister) {
-        await register(formData);
-        toast.success('Account created successfully! Please login.');
-        setIsRegister(false);
-        setFormData({ ...formData, name: '', password: '' });
+        // Special handling for seller registration (requires admin approval)
+        if (formData.role === 'seller') {
+          const response = await sellerAPI.register({
+            name: formData.name,
+            phone: formData.phone,
+            email: formData.email,
+            password: formData.password,
+            city: formData.city || '',
+            experience_years: 0
+          });
+          toast.success(response.data.message || 'Registration submitted! Awaiting admin approval.');
+          setIsRegister(false);
+          setFormData({ ...formData, name: '', password: '', city: '' });
+        } else {
+          await register(formData);
+          toast.success('Account created successfully! Please login.');
+          setIsRegister(false);
+          setFormData({ ...formData, name: '', password: '' });
+        }
       } else {
         const user = await login(formData.phone, formData.password);
         toast.success(`Welcome back, ${user.name || 'User'}!`);
@@ -173,6 +189,7 @@ const Login = () => {
 
   const roleOptions = [
     { value: 'customer', label: 'Find a Home', desc: 'Browse & book visits', icon: Home },
+    { value: 'seller', label: 'Join as Seller', desc: 'Earn commissions', icon: Briefcase },
     { value: 'rider', label: 'Join as Rider', desc: 'Earn with visits', icon: User },
     { value: 'advertiser', label: 'Advertise', desc: 'Promote your business', icon: Mail },
     { value: 'builder', label: 'List Properties', desc: 'Builder/Owner account', icon: Home }
@@ -451,6 +468,30 @@ const Login = () => {
                         placeholder="your@email.com"
                       />
                     </div>
+                  </motion.div>
+                )}
+
+                {isRegister && formData.role === 'seller' && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                  >
+                    <label className="premium-label">City *</label>
+                    <div className="relative">
+                      <Home className="w-4 h-4 text-[#4A4D53] absolute left-4 top-1/2 -translate-y-1/2" strokeWidth={1.5} />
+                      <input
+                        type="text"
+                        data-testid="register-city-input"
+                        value={formData.city}
+                        onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                        className="premium-input pl-12"
+                        placeholder="Your city (e.g., Mohali, Chandigarh)"
+                        required
+                      />
+                    </div>
+                    <p className="text-xs text-[#C6A87C] mt-2 bg-[#C6A87C]/10 p-2">
+                      Seller accounts require admin approval before activation
+                    </p>
                   </motion.div>
                 )}
 
