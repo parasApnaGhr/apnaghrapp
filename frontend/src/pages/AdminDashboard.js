@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import { 
   Users, Package, Bike, LogOut, Home, DollarSign, 
-  Settings, MapPin, CheckSquare, CreditCard, BarChart3, Image
+  Settings, MapPin, CheckSquare, CreditCard, BarChart3, Image, Upload
 } from 'lucide-react';
 import CustomerSupportPanel from '../components/CustomerSupportPanel';
 import InventoryPanel from '../components/InventoryPanel';
@@ -16,11 +16,13 @@ import LiveTrackingPanel from '../components/LiveTrackingPanel';
 import PropertyAnalyticsPanel from '../components/PropertyAnalyticsPanel';
 import NotificationsDropdown from '../components/NotificationsDropdown';
 import ImageMigrationTool from '../components/ImageMigrationTool';
+import BulkImageUploader from '../components/BulkImageUploader';
 
 const AdminDashboard = () => {
   const { user, logout } = useAuth();
   const [activePanel, setActivePanel] = useState('overview');
   const [showImageTool, setShowImageTool] = useState(false);
+  const [showBulkUploader, setShowBulkUploader] = useState(false);
 
   const tabs = [
     { id: 'overview', label: 'Overview', icon: null },
@@ -162,6 +164,14 @@ const AdminDashboard = () => {
                     <Image className="w-4 h-4 text-[#C6A87C]" strokeWidth={1.5} />
                     <span className="text-[#1A1C20] font-medium">Fix Broken Images</span>
                   </button>
+                  <button
+                    onClick={() => setShowBulkUploader(true)}
+                    className="w-full text-left px-4 py-3 bg-[#04473C] text-white hover:bg-[#03352D] transition-all flex items-center gap-2"
+                    data-testid="bulk-upload-btn"
+                  >
+                    <Upload className="w-4 h-4" strokeWidth={1.5} />
+                    <span className="font-medium">📷 Upload Property Photos (Bulk)</span>
+                  </button>
                 </div>
               </div>
 
@@ -202,6 +212,11 @@ const AdminDashboard = () => {
       {/* Image Migration Tool Modal */}
       {showImageTool && (
         <ImageMigrationTool onClose={() => setShowImageTool(false)} />
+      )}
+      
+      {/* Bulk Image Uploader Modal */}
+      {showBulkUploader && (
+        <BulkImageUploader onClose={() => setShowBulkUploader(false)} />
       )}
     </div>
   );
