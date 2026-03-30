@@ -308,10 +308,9 @@
       "latitude": 30.7046,
       "longitude": 76.7179,
       "images": [
-        "https://images.unsplash.com/photo-1772103628874-1b084bdae27b?crop=entropy&cs=srgb&fm=jpg&q=85",
-        "https://images.pexels.com/photos/2462015/pexels-photo-2462015.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940"
+        "/api/uploads/0e5a6efe-dbd5-4883-906e-50c50b29e861.png"
       ],
-      "video_url": "",
+      "video_url": "/api/uploads/77d63aef-40c8-40e8-8e9d-38b8b84cfc21.mp4",
       "amenities": [
         "Parking",
         "Security",
@@ -344,10 +343,9 @@
       "latitude": 30.6421,
       "longitude": 76.8185,
       "images": [
-        "https://images.unsplash.com/photo-1759148955043-2e6cc5b97b81?crop=entropy&cs=srgb&fm=jpg&q=85",
-        "https://images.pexels.com/photos/6970070/pexels-photo-6970070.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940"
+        "/api/uploads/488d5d4a-fdb3-4a83-8b52-a932a4532f46.jpeg"
       ],
-      "video_url": "",
+      "video_url": "/api/uploads/b9b467af-bcee-4a49-b60b-46a241175a17.mp4",
       "amenities": [
         "Garden",
         "Parking",
@@ -379,9 +377,9 @@
       "latitude": 30.3398,
       "longitude": 76.3869,
       "images": [
-        "https://images.unsplash.com/photo-1639059851892-95c80412298c?crop=entropy&cs=srgb&fm=jpg&q=85"
+        "/api/uploads/4ab2ad9f-d6bc-4a3f-a075-a15be5370f57.png"
       ],
-      "video_url": "",
+      "video_url": "/api/uploads/explainer_video.mp4",
       "amenities": [
         "Parking",
         "Water Supply"
@@ -409,11 +407,9 @@
       "latitude": null,
       "longitude": null,
       "images": [
-        "https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=800",
-        "https://images.unsplash.com/photo-1484154218962-a197022b25ba?w=800",
-        "https://images.unsplash.com/photo-1560184897-ae75f418493e?w=800"
+        "/api/uploads/4d962f81-ecf0-4d6d-bb38-e8d450c769e6.jpg"
       ],
-      "video_url": "",
+      "video_url": "/api/uploads/77d63aef-40c8-40e8-8e9d-38b8b84cfc21.mp4",
       "amenities": [],
       "available": true,
       "verified_owner": false,
@@ -439,11 +435,9 @@
       "latitude": null,
       "longitude": null,
       "images": [
-        "https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=800",
-        "https://images.unsplash.com/photo-1484154218962-a197022b25ba?w=800",
-        "https://images.unsplash.com/photo-1560184897-ae75f418493e?w=800"
+        "/api/uploads/59b10994-f834-488a-8368-a57f79cb32a9.jpg"
       ],
-      "video_url": "",
+      "video_url": "/api/uploads/b9b467af-bcee-4a49-b60b-46a241175a17.mp4",
       "amenities": [],
       "available": true,
       "verified_owner": false,
@@ -469,11 +463,9 @@
       "latitude": null,
       "longitude": null,
       "images": [
-        "https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=800",
-        "https://images.unsplash.com/photo-1484154218962-a197022b25ba?w=800",
-        "https://images.unsplash.com/photo-1560184897-ae75f418493e?w=800"
+        "/api/uploads/6c4db423-80f2-4155-880a-d9068e24aa56.png"
       ],
-      "video_url": "",
+      "video_url": "/api/uploads/explainer_video.mp4",
       "amenities": [
         "Parking",
         "Gym"
@@ -505,11 +497,9 @@
       "latitude": null,
       "longitude": null,
       "images": [
-        "https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=800",
-        "https://images.unsplash.com/photo-1484154218962-a197022b25ba?w=800",
-        "https://images.unsplash.com/photo-1560184897-ae75f418493e?w=800"
+        "/api/uploads/829c782f-d852-4a5a-9842-8fc05572e987.png"
       ],
-      "video_url": "",
+      "video_url": "/api/uploads/77d63aef-40c8-40e8-8e9d-38b8b84cfc21.mp4",
       "amenities": [
         "Parking",
         "Gym"
@@ -541,11 +531,9 @@
       "latitude": null,
       "longitude": null,
       "images": [
-        "https://images.unsplash.com/photo-1560185127-6ed189bf02f4?w=800",
-        "https://images.unsplash.com/photo-1565182999561-18d7dc61c393?w=800",
-        "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800"
+        "/api/uploads/aea76eec-0c61-4a71-abc8-2b55185d417d.jpg"
       ],
-      "video_url": "https://field-rider-ops.preview.emergentagent.com/uploads/77d63aef-40c8-40e8-8e9d-38b8b84cfc21.mp4",
+      "video_url": "/api/uploads/b9b467af-bcee-4a49-b60b-46a241175a17.mp4",
       "amenities": [
         "Parking"
       ],
@@ -580,10 +568,11 @@
         "Security"
       ],
       "images": [
-        "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800"
+        "/api/uploads/e8b5809c-655c-42d1-b30e-3bf3556a0eba.png"
       ],
       "created_at": "2026-03-28T11:02:43.162549+00:00",
-      "updated_at": "2026-03-28T11:02:43.162558+00:00"
+      "updated_at": "2026-03-28T11:02:43.162558+00:00",
+      "video_url": "/api/uploads/explainer_video.mp4"
     },
     {
       "id": "71aa08c5-aabc-47ea-95c8-123d36dcc448",
@@ -604,10 +593,11 @@
         "Security"
       ],
       "images": [
-        "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800"
+        "/api/uploads/edaea7c1-53f6-460a-8772-18c59085f176.png"
       ],
       "created_at": "2026-03-28T11:02:43.162565+00:00",
-      "updated_at": "2026-03-28T11:02:43.162567+00:00"
+      "updated_at": "2026-03-28T11:02:43.162567+00:00",
+      "video_url": "/api/uploads/77d63aef-40c8-40e8-8e9d-38b8b84cfc21.mp4"
     },
     {
       "id": "23ec0656-404c-4600-88de-2ccad7d17d74",
@@ -628,7 +618,8 @@
         "https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=800"
       ],
       "created_at": "2026-03-28T11:02:43.162571+00:00",
-      "updated_at": "2026-03-28T11:02:43.162573+00:00"
+      "updated_at": "2026-03-28T11:02:43.162573+00:00",
+      "video_url": "/api/uploads/b9b467af-bcee-4a49-b60b-46a241175a17.mp4"
     },
     {
       "id": "746df854-8c86-4394-9052-b526bd7ef38a",
@@ -654,7 +645,8 @@
         "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800"
       ],
       "created_at": "2026-03-28T11:02:43.162581+00:00",
-      "updated_at": "2026-03-28T11:02:43.162582+00:00"
+      "updated_at": "2026-03-28T11:02:43.162582+00:00",
+      "video_url": "/api/uploads/explainer_video.mp4"
     },
     {
       "id": "fef77212-af85-4f8d-bd38-4d5501d254d7",
@@ -677,7 +669,41 @@
         "https://images.unsplash.com/photo-1560185127-6ed189bf02f4?w=800"
       ],
       "created_at": "2026-03-28T11:02:43.162587+00:00",
-      "updated_at": "2026-03-28T11:02:43.162588+00:00"
+      "updated_at": "2026-03-28T11:02:43.162588+00:00",
+      "video_url": "/api/uploads/77d63aef-40c8-40e8-8e9d-38b8b84cfc21.mp4"
+    },
+    {
+      "id": "7bc6c3a2-6c55-4e2e-9d99-41bdd1021b17",
+      "title": "Premium 3BHK Apartment",
+      "description": "Luxurious apartment with modern amenities",
+      "property_type": "Apartment",
+      "bhk": 3,
+      "rent": 35000.0,
+      "furnishing": "Fully Furnished",
+      "area_name": "Bandra West",
+      "city": "Mumbai",
+      "exact_address": "123 Bandra West, Mumbai",
+      "latitude": null,
+      "longitude": null,
+      "images": [],
+      "video_url": "/api/uploads/b9b467af-bcee-4a49-b60b-46a241175a17.mp4",
+      "amenities": [
+        "Gym",
+        "Swimming Pool",
+        "Parking"
+      ],
+      "available": true,
+      "verified_owner": false,
+      "premium_listing": false,
+      "visit_count": 0,
+      "weekly_visits": 0,
+      "last_visited": null,
+      "status": "available",
+      "last_status_check": null,
+      "status_verified_by": null,
+      "status_notes": null,
+      "is_hot": false,
+      "created_at": "2026-03-30T09:50:42.004897+00:00"
     }
   ],
   "advertisements": [
