@@ -1,73 +1,146 @@
 {
-  "theme": "Light",
-  "archetype": "Archetype 3 (Pastel & Soft) mixed with Neo-Brutalist Kinetic Energy",
-  "reasoning": "The user explicitly requested a MORE LIVELY AND ANIMATED UI for the ApnaGhr app. Moving away from standard, boring corporate real estate apps to a tactile, kinetic 'Neo-Brutalist' pastel approach. This makes the platform feel like a fun, premium consumer product with high engagement, perfect for property hunting, booking movers, and buying ads.",
+  "theme": "light",
+  "archetype": "5",
+  "archetype_name": "Jewel & Luxury / Premium Real Estate",
+  "design_philosophy": "High-end, sophisticated property marketplace. Replaces the brutalist, playful design with a 'Godly' execution. Uses massive negative space, crisp typography, and deep rich accents to create a ₹10-20 Lakh premium aesthetic.",
   "colors": {
-    "background": "#FAF9F6",
-    "primary": "#FF5A5F",
-    "secondary": "#4ECDC4",
-    "accent": "#FFD166",
-    "surface": "#FFFFFF",
-    "text_main": "#111111",
-    "text_muted": "#52525B",
-    "border": "#111111"
+    "background": {
+      "default": "#FDFCFB",
+      "secondary": "#F5F3F0",
+      "dark_accent": "#1A1C20"
+    },
+    "text": {
+      "primary": "#1A1C20",
+      "secondary": "#4A4D53",
+      "inverse": "#FDFCFB"
+    },
+    "primary": {
+      "default": "#04473C",
+      "hover": "#03352D",
+      "light": "#E6F0EE"
+    },
+    "accent": {
+      "gold": "#C6A87C",
+      "destructive": "#8F2727"
+    },
+    "borders": {
+      "default": "#E5E1DB",
+      "strong": "#D0C9C0"
+    }
   },
   "typography": {
-    "heading_font": "Outfit",
-    "body_font": "DM Sans",
+    "fonts": {
+      "heading": "Playfair Display, serif",
+      "body": "Outfit, sans-serif",
+      "mono": "JetBrains Mono, monospace"
+    },
     "scales": {
-      "h1": "text-4xl sm:text-5xl lg:text-6xl tracking-tighter font-black",
-      "h2": "text-2xl sm:text-3xl lg:text-4xl tracking-tight font-bold",
-      "h3": "text-xl sm:text-2xl font-bold",
-      "body": "text-base leading-relaxed",
-      "small": "text-sm font-medium tracking-wide"
+      "h1": "text-4xl sm:text-5xl lg:text-6xl tracking-tighter leading-none font-medium",
+      "h2": "text-2xl sm:text-3xl lg:text-4xl tracking-tight leading-tight",
+      "h3": "text-xl sm:text-2xl tracking-tight",
+      "body": "text-base leading-relaxed font-light",
+      "small": "text-sm tracking-wide uppercase font-medium",
+      "overline": "text-xs tracking-[0.2em] uppercase font-bold text-secondary"
     }
   },
-  "spacing_and_layout": {
-    "philosophy": "Generous spacing. Overlapping elements for kinetic feel.",
-    "container_padding": "p-6 md:p-8 lg:p-12",
-    "card_padding": "p-6",
-    "grid_system": "Bento Grid (Mode A for Marketing, Mode B for Dashboards) with tight gaps (gap-4 or gap-6) but bold borders."
-  },
-  "surfaces_and_borders": {
-    "cards": "bg-white border-2 border-[#111111] shadow-[4px_4px_0px_#111111] rounded-xl transition-all duration-200 hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_#111111]",
-    "glass": "backdrop-blur-xl bg-white/80 border-b-2 border-[#111111]",
-    "buttons_primary": "bg-[#FF5A5F] text-white border-2 border-[#111111] shadow-[4px_4px_0px_#111111] rounded-full font-bold uppercase tracking-wide hover:bg-[#ff4449] active:translate-y-[2px] active:translate-x-[2px] active:shadow-[0px_0px_0px_#111111] transition-all"
-  },
-  "components": {
-    "navigation": "Floating bottom nav for mobile (Crystal Glass style). Desktop gets a sticky header.",
-    "property_card": "Image takes top 60%, bottom 40% has bold title, price, and a vibrant 'Hot' badge (#FFD166) overlapping the image border. Card must use the solid shadow hover effect.",
-    "packages_list": "Horizontal scroll with 'snap-x' or CSS Grid. Movers packages (Basic, Standard, Premium, Elite, Intercity) use distinct pastel background colors (Mint, Peach, Lavender, Lemon, Sky Blue) with solid black borders.",
-    "marquee": "Use a marquee for the 'Advertise With Us' brands/partners or animated text like 'GROW YOUR BUSINESS • PREMIUM ADS • REACH RENTERS' using react-fast-marquee."
-  },
-  "motion_and_interactions": {
-    "library": "framer-motion",
-    "page_transitions": "Slide up and fade in (y: 20, opacity: 0 -> y: 0, opacity: 1).",
-    "hover_states": "Tactile 'push down' effect for buttons. Cards lift up and cast a larger solid shadow.",
-    "loading": "Kinetic spinning geometric shapes, avoiding standard spinners."
-  },
-  "assets": {
-    "icons": "lucide-react with 2px stroke width to match the neo-brutalist border style.",
-    "images": {
-      "property_placeholder_1": "https://images.unsplash.com/photo-1666282167632-c613fbeb163c?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjY2NzF8MHwxfHNlYXJjaHwyfHxtb2Rlcm4lMjBhcGFydG1lbnQlMjBpbnRlcmlvcnxlbnwwfHx8fDE3NzQ2MTcxODN8MA&ixlib=rb-4.1.0&q=85",
-      "property_placeholder_2": "https://images.pexels.com/photos/279719/pexels-photo-279719.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
-      "movers_hero": "https://images.pexels.com/photos/7464510/pexels-photo-7464510.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
-      "ads_hero": "https://images.pexels.com/photos/1486222/pexels-photo-1486222.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940"
+  "layout_and_spacing": {
+    "spacing_scale": "Use p-6, p-8, p-12 generously. Components with borders must have internal padding (p-6/p-8) to prevent text collision.",
+    "container_width": "max-w-7xl mx-auto px-6 lg:px-12",
+    "grids": {
+      "property_cards": "grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8",
+      "bento_dashboard": "grid-cols-1 md:grid-cols-4 gap-6",
+      "marketing_hero": "grid-cols-1 lg:grid-cols-12 gap-12"
     }
   },
-  "accessibility": {
-    "contrast": "Extremely high due to 2px black borders and solid shadows.",
-    "focus": "focus:outline-none focus:ring-4 focus:ring-[#4ECDC4] focus:ring-offset-2",
-    "testing": "All interactive elements MUST have data-testid attributes (e.g., data-testid='book-movers-btn')."
+  "surfaces_and_components": {
+    "header": "Crystal Glass variant: bg-white/70 backdrop-blur-xl border-b border-white/40 shadow-sm z-50",
+    "property_cards": "Flat Solid variant. bg-white, 1px subtle border (#E5E1DB), no shadow by default. Hover: -translate-y-1 shadow-xl border-[#D0C9C0] transition-all duration-300.",
+    "buttons": {
+      "primary": "bg-[#04473C] text-white hover:bg-[#03352D] rounded-none px-8 py-4 font-medium tracking-wide transition-colors",
+      "secondary": "bg-transparent border border-[#04473C] text-[#04473C] hover:bg-[#E6F0EE] rounded-none px-8 py-4 font-medium transition-colors"
+    },
+    "inputs_and_forms": "Shadcn based. border-[#E5E1DB] bg-[#FDFCFB] focus:ring-1 focus:ring-[#04473C] focus:border-[#04473C] rounded-none p-4. Labels should be uppercase, tracking-[0.1em], text-xs.",
+    "radius": "Avoid heavy rounding. Use rounded-none or rounded-sm (max 4px) for a sharp, architectural, premium look."
+  },
+  "motion": {
+    "hover": "Subtle transforms and opacity changes. Images in cards zoom 105% on hover.",
+    "page_load": "Staggered fade-up (Framer Motion) for lists and grids.",
+    "transitions": "transition-all duration-300 ease-in-out"
+  },
+  "media": {
+    "hero_overlay": "Gradient overlay from black/60 via black/30 to transparent to ensure text readability.",
+    "image_style": "High-contrast, professional architectural photography. Images should feel wide, bright, and expensive.",
+    "urls": {
+      "hero_backgrounds": [
+        {
+          "url": "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA4Mzl8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBob3VzZSUyMGV4dGVyaW9yfGVufDB8fHx8MTc3NDg2MzA5OXww&ixlib=rb-4.1.0&q=85",
+          "category": "hero",
+          "description": "Premium modern white concrete house, ideal for main landing page hero."
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1512914890251-2f96a9b0bbe2?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA2ODl8MHwxfHNlYXJjaHw0fHxsdXh1cnklMjBhcGFydG1lbnQlMjBpbnRlcmlvcnxlbnwwfHx8fDE3NzQ4NjMwOTl8MA&ixlib=rb-4.1.0&q=85",
+          "category": "hero_alternate",
+          "description": "Luxurious kitchen island, bright and inviting."
+        }
+      ],
+      "property_listings": [
+        {
+          "url": "https://images.unsplash.com/photo-1638454668466-e8dbd5462f20?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA2ODl8MHwxfHNlYXJjaHwxfHxsdXh1cnklMjBhcGFydG1lbnQlMjBpbnRlcmlvcnxlbnwwfHx8fDE3NzQ4NjMwOTl8MA&ixlib=rb-4.1.0&q=85",
+          "category": "property",
+          "description": "Premium bedroom interior."
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1738168279272-c08d6dd22002?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA2ODl8MHwxfHNlYXJjaHwyfHxsdXh1cnklMjBhcGFydG1lbnQlMjBpbnRlcmlvcnxlbnwwfHx8fDE3NzQ4NjMwOTl8MA&ixlib=rb-4.1.0&q=85",
+          "category": "property",
+          "description": "Luxurious living room setup."
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1523217582562-09d0def993a6?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA8Mzl8MHwxfHNlYXJjaHwyfHxtb2Rlcm4lMjBob3VzZSUyMGV4dGVyaW9yfGVufDB8fHx8MTc3NDg2MzA5OXww&ixlib=rb-4.1.0&q=85",
+          "category": "property",
+          "description": "Modern exterior near trees."
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1691425700585-c108acad6467?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA8Mzl8MHwxfHNlYXJjaHwzfHxtb2Rlcm4lMjBob3VzZSUyMGV4dGVyaW9yfGVufDB8fHx8MTc3NDg2MzA5OXww&ixlib=rb-4.1.0&q=85",
+          "category": "property",
+          "description": "Large white exterior with wooden doors."
+        }
+      ],
+      "abstract_textures": [
+        {
+          "url": "https://images.unsplash.com/photo-1764263996484-73fed2cf6b98?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzOTB8MHwxfHNlYXJjaHwxfHxhYnN0cmFjdCUyMGx1eHVyeSUyMHRleHR1cmV8ZW58MHx8fHwxNzc0ODYzMTE1fDA&ixlib=rb-4.1.0&q=85",
+          "category": "background",
+          "description": "Abstract textured gold/black for premium banners or card overlays."
+        }
+      ],
+      "logos": [
+        {
+          "url": "https://images.unsplash.com/photo-1761437855598-011cf89b2ad4?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzOTB8MHwxfHNlYXJjaHwzfHxhYnN0cmFjdCUyMGx1eHVyeSUyMHRleHR1cmV8ZW58MHx8fHwxNzc0ODYzMTE1fDA&ixlib=rb-4.1.0&q=85",
+          "category": "sponsor",
+          "description": "Use as a premium badge or mock sponsor logo backdrop."
+        }
+      ]
+    }
+  },
+  "specific_pages": {
+    "dashboard_rider_admin": "Use strict bento grid (grid-cols-1 md:grid-cols-4) with gap-6. Keep it clean with #FDFCFB backgrounds. Highlight actionable elements in #04473C.",
+    "marketing_landing": "High impact. Use Playfair Display H1 text. Implement lenis for smooth scrolling. Overlap images creatively with high z-index. Hero section should feel like an architectural digest cover.",
+    "visit_cart_payment": "Clean, trustworthy, minimal friction. Right side order summary with sticky positioning. Left side detailed cart. Use crisp borders and clear typography."
+  },
+  "icons": {
+    "library": "lucide-react",
+    "style": "Use thin stroke widths (1.5) for a sharper, more delicate and premium look."
+  },
+  "testing": {
+    "attributes": "Add data-testid to all interactive components (buttons, links, form inputs) to ensure automated testing readiness."
   },
   "instructions_to_main_agent": [
-    "Run: yarn add framer-motion react-fast-marquee",
-    "Update tailwind.config.js with the custom colors (primary: #FF5A5F, secondary: #4ECDC4, accent: #FFD166, surface: #FFFFFF, border: #111111).",
-    "Import Outfit and DM Sans fonts via Google Fonts in index.html or index.css. Do NOT use Inter.",
-    "Apply the Neo-Brutalist card styles globally for Shadcn cards (border-2 border-[#111111] shadow-[4px_4px_0px_#111111] rounded-xl).",
-    "For 'Packers & Movers' and 'Advertise With Us', create dedicated animated sections. Use framer-motion for staggering the appearance of the 5 moving packages and 4 ad packages.",
-    "Ensure the mobile bottom nav floats with backdrop-blur-xl and a solid top border.",
-    "Use the provided image URLs for the respective sections. NEVER use placeholder text or dummy image URLs.",
-    "Replace the existing muted colors with this vibrant, highly animated kinetic theme to perfectly hit the user's request for a lively app."
+    "Strictly follow the color palette. Do NOT use default blue/indigo or playful neo-brutalist solid black shadows.",
+    "Remove all heavy box-shadows (e.g., 4px 4px 0px #000) and neo-brutalist aesthetics. Replace with sharp, flat designs and subtle 1px #E5E1DB borders.",
+    "For typography, import Playfair Display and Outfit via Google Fonts. Apply Playfair to all headings and Outfit to body text.",
+    "Apply data-testid to any new or modified interactive elements.",
+    "Use the specific Unsplash URLs provided in 'media' for placeholders instead of generic image services.",
+    "All property cards must have a clean, architectural look with internal padding of at least p-6. Never use full corner rounding, keep it sharp (max rounded-sm).",
+    "Ensure the hero image uses the dark overlay provided to maintain text readability.",
+    "Write components primarily for .js files (JSX) as the current environment uses .js for React files."
   ]
 }
