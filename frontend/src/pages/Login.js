@@ -412,7 +412,7 @@ const Login = () => {
                 <div>
                   <label className="premium-label">Phone Number</label>
                   <div className="relative">
-                    <Phone className="w-4 h-4 text-[#4A4D53] absolute left-4 top-1/2 -translate-y-1/2" strokeWidth={1.5} />
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#4A4D53] text-sm font-medium">+91</span>
                     <input
                       type="tel"
                       data-testid="login-phone-input"
@@ -421,8 +421,8 @@ const Login = () => {
                         const value = e.target.value.replace(/\D/g, '').slice(0, 10);
                         setFormData({ ...formData, phone: value });
                       }}
-                      placeholder="10-digit mobile number"
-                      className="premium-input pl-12"
+                      placeholder="Enter mobile number"
+                      className="premium-input pl-14"
                       maxLength={10}
                       required
                     />
@@ -455,14 +455,13 @@ const Login = () => {
                 <div>
                   <label className="premium-label">Password</label>
                   <div className="relative">
-                    <Lock className="w-4 h-4 text-[#4A4D53] absolute left-4 top-1/2 -translate-y-1/2" strokeWidth={1.5} />
                     <input
                       type={showPassword ? "text" : "password"}
                       data-testid="login-password-input"
                       value={formData.password}
                       onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                      placeholder={isRegister ? "Create a password" : "Enter your password"}
-                      className="premium-input pl-12 pr-12"
+                      placeholder={isRegister ? "Create a password (min 6 chars)" : "Enter your password"}
+                      className="premium-input pr-12"
                       required
                     />
                     <button

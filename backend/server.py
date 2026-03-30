@@ -2605,6 +2605,28 @@ async def get_all_admin_properties(current_user: dict = Depends(get_current_user
     return properties
 
 
+@api_router.get("/admin/server-files")
+async def get_server_files(current_user: dict = Depends(get_current_user)):
+    """Get list of uploaded files on server"""
+    if current_user['role'] not in ['admin', 'inventory_admin', 'support_admin']:
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    uploads_dir = "/app/uploads"
+    images = []
+    videos = []
+    
+    if os.path.exists(uploads_dir):
+        for filename in os.listdir(uploads_dir):
+            filepath = f"/api/uploads/{filename}"
+            if filename.endswith(('.mp4', '.mov', '.avi', '.webm')):
+                videos.append(filepath)
+            elif filename.endswith(('.jpg', '.jpeg', '.png', '.gif', '.webp')):
+                images.append(filepath)
+    
+    return {"images": images, "videos": videos}
+
+
+
 @api_router.put("/admin/properties/{property_id}")
 async def update_admin_property(property_id: str, property_data: PropertyCreate, current_user: dict = Depends(get_current_user)):
     """Update a property"""

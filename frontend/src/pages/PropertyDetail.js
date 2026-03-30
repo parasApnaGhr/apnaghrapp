@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import { propertyAPI, paymentAPI, getMediaUrl } from '../utils/api';
 import api from '../utils/api';
-import { ArrowLeft, MapPin, Bed, Sofa, Home, Lock, Video, ShoppingCart, Plus, Check, Play } from 'lucide-react';
+import { ArrowLeft, MapPin, Bed, Sofa, Home, Lock, Video, ShoppingCart, Plus, Check, Play, X, ChevronLeft, ChevronRight, ZoomIn } from 'lucide-react';
 import { toast } from 'sonner';
 
 const PropertyDetail = () => {
@@ -16,6 +16,7 @@ const PropertyDetail = () => {
   const [processingPayment, setProcessingPayment] = useState(false);
   const [selectedImage, setSelectedImage] = useState(0);
   const [explainerVideo, setExplainerVideo] = useState(null);
+  const [showLightbox, setShowLightbox] = useState(false);
   
   const [cart, setCart] = useState(() => {
     const saved = localStorage.getItem('visitCart');
@@ -125,6 +126,74 @@ const PropertyDetail = () => {
 
   return (
     <div className="min-h-screen bg-[#FDFCFB] pb-32">
+      {/* Image Lightbox Modal */}
+      {showLightbox && property?.images && (
+        <div 
+          className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center"
+          onClick={() => setShowLightbox(false)}
+        >
+          <button 
+            className="absolute top-4 right-4 p-3 bg-white/10 hover:bg-white/20 transition-colors"
+            onClick={() => setShowLightbox(false)}
+          >
+            <X className="w-6 h-6 text-white" strokeWidth={1.5} />
+          </button>
+          
+          {property.images.length > 1 && (
+            <>
+              <button 
+                className="absolute left-4 p-3 bg-white/10 hover:bg-white/20 transition-colors"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setSelectedImage((prev) => (prev - 1 + property.images.length) % property.images.length);
+                }}
+              >
+                <ChevronLeft className="w-8 h-8 text-white" strokeWidth={1.5} />
+              </button>
+              <button 
+                className="absolute right-4 p-3 bg-white/10 hover:bg-white/20 transition-colors"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setSelectedImage((prev) => (prev + 1) % property.images.length);
+                }}
+              >
+                <ChevronRight className="w-8 h-8 text-white" strokeWidth={1.5} />
+              </button>
+            </>
+          )}
+          
+          <img
+            src={getMediaUrl(property.images[selectedImage])}
+            alt={property.title}
+            className="max-w-[90vw] max-h-[85vh] object-contain"
+            onClick={(e) => e.stopPropagation()}
+            onError={(e) => {
+              e.target.onerror = null;
+              e.target.src = 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80';
+            }}
+          />
+          
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+            {property.images.map((_, idx) => (
+              <button
+                key={idx}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setSelectedImage(idx);
+                }}
+                className={`w-2 h-2 rounded-full transition-all ${
+                  idx === selectedImage ? 'bg-white w-6' : 'bg-white/50'
+                }`}
+              />
+            ))}
+          </div>
+          
+          <p className="absolute bottom-12 left-1/2 -translate-x-1/2 text-white/70 text-sm">
+            {selectedImage + 1} / {property.images.length}
+          </p>
+        </div>
+      )}
+
       {/* Premium Header */}
       <header className="glass-header sticky top-0 z-50">
         <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
@@ -164,17 +233,27 @@ const PropertyDetail = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
         >
-          <div className="relative aspect-[16/10] bg-[#F5F3F0] overflow-hidden mb-4">
+          <div 
+            className="relative aspect-[16/10] bg-[#F5F3F0] overflow-hidden mb-4 cursor-pointer group"
+            onClick={() => property?.images?.length > 0 && setShowLightbox(true)}
+          >
             {property.images && property.images[selectedImage] ? (
-              <img
-                src={getMediaUrl(property.images[selectedImage])}
-                alt={property.title}
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  e.target.onerror = null;
-                  e.target.src = 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80';
-                }}
-              />
+              <>
+                <img
+                  src={getMediaUrl(property.images[selectedImage])}
+                  alt={property.title}
+                  className="w-full h-full object-cover transition-transform group-hover:scale-105"
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80';
+                  }}
+                />
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+                  <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-white/90 p-3">
+                    <ZoomIn className="w-6 h-6 text-[#04473C]" strokeWidth={1.5} />
+                  </div>
+                </div>
+              </>
             ) : (
               <div className="flex items-center justify-center h-full">
                 <Home className="w-16 h-16 text-[#D0C9C0]" strokeWidth={1} />
@@ -190,6 +269,13 @@ const PropertyDetail = () => {
                 <span className="verified-badge">Verified Owner</span>
               )}
             </div>
+            
+            {/* Image count indicator */}
+            {property.images && property.images.length > 1 && (
+              <div className="absolute bottom-4 right-4 bg-black/70 text-white text-sm px-3 py-1.5 font-medium">
+                {selectedImage + 1} / {property.images.length}
+              </div>
+            )}
           </div>
 
           {property.images && property.images.length > 1 && (
