@@ -1888,6 +1888,81 @@ async def set_app_customization(settings: AppCustomizationSettings, current_user
     
     return {"message": "App customization settings saved", "settings": settings.model_dump()}
 
+# ============ ADMIN: PROMOTIONS & OFFERS ============
+
+@api_router.get("/admin/promotions")
+async def get_promotions(current_user: dict = Depends(get_current_user)):
+    """Get all promotions settings (admin only)"""
+    if current_user['role'] not in ['admin', 'inventory_admin']:
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    settings_doc = await db.app_settings.find_one({"key": "promotions"}, {"_id": 0})
+    offers_doc = await db.app_settings.find_one({"key": "custom_offers"}, {"_id": 0})
+    
+    return {
+        "settings": settings_doc.get("value", {}) if settings_doc else {},
+        "custom_offers": offers_doc.get("value", []) if offers_doc else []
+    }
+
+@api_router.post("/admin/promotions")
+async def save_promotions(data: dict, current_user: dict = Depends(get_current_user)):
+    """Save promotions settings (admin only)"""
+    if current_user['role'] not in ['admin', 'inventory_admin']:
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    # Save promotion settings
+    if "settings" in data:
+        await db.app_settings.update_one(
+            {"key": "promotions"},
+            {"$set": {"key": "promotions", "value": data["settings"]}},
+            upsert=True
+        )
+    
+    # Save custom offers
+    if "custom_offers" in data:
+        await db.app_settings.update_one(
+            {"key": "custom_offers"},
+            {"$set": {"key": "custom_offers", "value": data["custom_offers"]}},
+            upsert=True
+        )
+    
+    return {"success": True, "message": "Promotions saved successfully"}
+
+@api_router.get("/promotions/active")
+async def get_active_promotions():
+    """Get active promotions for public display (no auth)"""
+    settings_doc = await db.app_settings.find_one({"key": "promotions"}, {"_id": 0})
+    offers_doc = await db.app_settings.find_one({"key": "custom_offers"}, {"_id": 0})
+    
+    settings = settings_doc.get("value", {}) if settings_doc else {}
+    offers = offers_doc.get("value", []) if offers_doc else []
+    
+    # Filter only active promotions
+    active_offers = [o for o in offers if o.get("active", False)]
+    
+    return {
+        "customer": {
+            "active": settings.get("customer_promotion_active", False),
+            "message": settings.get("customer_promotion_message", ""),
+            "first_visit_discount": settings.get("customer_first_visit_discount", 0),
+            "referral_credit": settings.get("customer_referral_credit", 0)
+        },
+        "rider": {
+            "active": settings.get("rider_promotion_active", False),
+            "message": settings.get("rider_promotion_message", ""),
+            "per_visit_bonus": settings.get("rider_per_visit_bonus", 0),
+            "milestone_visits": settings.get("rider_bonus_after_visits", 10),
+            "milestone_bonus": settings.get("rider_bonus_amount", 500)
+        },
+        "seller": {
+            "active": settings.get("seller_promotion_active", False),
+            "message": settings.get("seller_promotion_message", ""),
+            "commission_percent": settings.get("seller_commission_percent", 5),
+            "first_deal_bonus": settings.get("seller_bonus_on_first_deal", 1000)
+        },
+        "promo_codes": active_offers
+    }
+
 @api_router.post("/visits/{visit_id}/upload-proof")
 async def upload_visit_proof(
     visit_id: str,

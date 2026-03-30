@@ -26,17 +26,17 @@ const AppSettingsPanel = () => {
   const fileInputRef = useRef(null);
 
   const seasonalThemes = [
-    { id: 'none', label: 'No Theme', icon: Settings, color: '#52525B', description: 'Standard platform appearance' },
-    { id: 'holi', label: 'Holi Festival', icon: Palette, color: '#FF5A5F', description: 'Colorful Holi celebrations with splash effects' },
-    { id: 'diwali', label: 'Diwali', icon: Sparkles, color: '#FFD166', description: 'Festive lights and diyas' },
-    { id: 'new_year', label: 'New Year', icon: PartyPopper, color: '#4ECDC4', description: 'Celebrate the new year' },
-    { id: 'valentine', label: "Valentine's Day", icon: Heart, color: '#FF6B8A', description: 'Love is in the air' },
-    { id: 'summer', label: 'Summer Sale', icon: Sun, color: '#FFA500', description: 'Hot summer deals' },
-    { id: 'monsoon', label: 'Monsoon Offers', icon: Flower2, color: '#4ECDC4', description: 'Rainy season specials' },
-    { id: 'christmas', label: 'Christmas', icon: Gift, color: '#E74C3C', description: 'Holiday season magic' },
-    { id: 'independence', label: 'Independence Day', icon: Star, color: '#FF9933', description: 'Patriotic celebrations' },
-    { id: 'navratri', label: 'Navratri', icon: Crown, color: '#9B59B6', description: 'Nine nights of celebration' },
-    { id: 'winter', label: 'Winter Warmth', icon: Snowflake, color: '#3498DB', description: 'Cozy winter deals' }
+    { id: 'none', label: 'No Theme', icon: Settings, color: '#52525B', description: 'Standard platform appearance', defaultBanner: '' },
+    { id: 'holi', label: 'Holi Festival', icon: Palette, color: '#FF5A5F', description: 'Colorful Holi celebrations with splash effects', defaultBanner: '🎨 Happy Holi! Splash into savings - Book visits at special rates!' },
+    { id: 'diwali', label: 'Diwali', icon: Sparkles, color: '#FFD166', description: 'Festive lights and diyas', defaultBanner: '🪔 Diwali Dhamaka! Light up your new home search with festive discounts!' },
+    { id: 'new_year', label: 'New Year', icon: PartyPopper, color: '#4ECDC4', description: 'Celebrate the new year', defaultBanner: '🎉 New Year, New Home! Start 2026 with amazing property deals!' },
+    { id: 'valentine', label: "Valentine's Day", icon: Heart, color: '#FF6B8A', description: 'Love is in the air', defaultBanner: '💕 Fall in love with your dream home this Valentine\'s!' },
+    { id: 'summer', label: 'Summer Sale', icon: Sun, color: '#FFA500', description: 'Hot summer deals', defaultBanner: '☀️ Summer Sale! Hot deals on property visits - Beat the heat!' },
+    { id: 'monsoon', label: 'Monsoon Offers', icon: Flower2, color: '#4ECDC4', description: 'Rainy season specials', defaultBanner: '🌧️ Monsoon Magic! Rainy season discounts on all visits!' },
+    { id: 'christmas', label: 'Christmas', icon: Gift, color: '#E74C3C', description: 'Holiday season magic', defaultBanner: '🎄 Christmas Special! Gift yourself a new home this holiday!' },
+    { id: 'independence', label: 'Independence Day', icon: Star, color: '#FF9933', description: 'Patriotic celebrations', defaultBanner: '🇮🇳 Azadi Sale! Freedom to find your dream home at best prices!' },
+    { id: 'navratri', label: 'Navratri', icon: Crown, color: '#9B59B6', description: 'Nine nights of celebration', defaultBanner: '🙏 Navratri Special! 9 days of divine deals on property visits!' },
+    { id: 'winter', label: 'Winter Warmth', icon: Snowflake, color: '#3498DB', description: 'Cozy winter deals', defaultBanner: '❄️ Winter Warmth! Cozy up to great deals on your new home!' }
   ];
 
   useEffect(() => {
@@ -133,6 +133,7 @@ const AppSettingsPanel = () => {
       ...prev,
       seasonal_theme: themeId,
       seasonal_active: themeId !== 'none',
+      seasonal_banner_text: theme?.defaultBanner || '',
       accent_color: theme?.color || '#FF5A5F'
     }));
   };
