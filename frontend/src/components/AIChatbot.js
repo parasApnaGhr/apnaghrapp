@@ -97,13 +97,16 @@ const AIChatbot = () => {
 
   return (
     <>
-      {/* Floating Chat Button - Premium Design */}
+      {/* Floating Chat Button - Premium Design with Breathing Glow */}
       <motion.button
         data-testid="chatbot-toggle-btn"
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-24 right-6 z-50 w-14 h-14 bg-[#04473C] shadow-xl flex items-center justify-center group"
+        className="fixed bottom-24 right-6 z-50 w-14 h-14 bg-[#04473C] shadow-xl flex items-center justify-center group breathe-glow"
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
+        initial={{ scale: 0 }}
+        animate={{ scale: 1 }}
+        transition={{ type: "spring", stiffness: 200, damping: 15 }}
       >
         <AnimatePresence mode="wait">
           {isOpen ? (
@@ -126,12 +129,25 @@ const AIChatbot = () => {
               <MessageCircle className="w-6 h-6 text-white" strokeWidth={1.5} />
               <motion.span
                 className="absolute -top-1 -right-1 w-3 h-3 bg-[#C6A87C] rounded-full"
-                animate={{ scale: [1, 1.2, 1] }}
-                transition={{ repeat: Infinity, duration: 2 }}
+                animate={{ scale: [1, 1.3, 1] }}
+                transition={{ repeat: Infinity, duration: 1.5 }}
               />
             </motion.div>
           )}
         </AnimatePresence>
+        
+        {/* Tooltip - only shows when chat is closed */}
+        {!isOpen && (
+          <motion.div
+            initial={{ opacity: 0, x: 10 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 2 }}
+            className="absolute right-full mr-3 bg-white px-3 py-2 text-sm text-[#1A1C20] whitespace-nowrap border border-[#E5E1DB] shadow-lg hidden group-hover:block"
+          >
+            <span className="text-[#C6A87C] font-medium">AI</span> Property Assistant
+            <div className="absolute top-1/2 -right-1.5 -translate-y-1/2 w-3 h-3 bg-white border-r border-b border-[#E5E1DB] rotate-[-45deg]" />
+          </motion.div>
+        )}
       </motion.button>
 
       {/* Chat Window - Premium Design */}

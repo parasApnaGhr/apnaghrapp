@@ -327,18 +327,42 @@ const RiderDashboard = () => {
       <header className="glass-header sticky top-0 z-50">
         <div className="max-w-2xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
-            <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-xl font-medium" style={{ fontFamily: 'Playfair Display, serif' }}>
-                  Apna<span className="text-[#04473C]">Ghr</span>
-                </h1>
-                <span className="text-[10px] bg-[#04473C] text-white px-2 py-0.5">RIDER</span>
+            <div className="flex items-center gap-4">
+              {/* Branded Rider Photo */}
+              <div className="relative">
+                <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-[#C6A87C] shadow-lg">
+                  <img 
+                    src={user?.profile_photo || `https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop`}
+                    alt={user?.name || 'Rider'}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'R')}&background=04473C&color=fff&size=100`;
+                    }}
+                  />
+                </div>
+                {/* ApnaGhr Badge */}
+                <div className="absolute -bottom-1 -right-1 bg-[#04473C] text-white text-[8px] font-bold px-1.5 py-0.5 rounded-sm shadow-md">
+                  AG
+                </div>
+                {/* Online Indicator */}
+                {isOnline && (
+                  <div className="absolute top-0 right-0 w-4 h-4 bg-green-500 border-2 border-white rounded-full animate-pulse" />
+                )}
               </div>
-              <p className="text-sm text-[#4A4D53]">Welcome, {user?.name}</p>
+              <div>
+                <div className="flex items-center gap-2">
+                  <h1 className="text-xl font-medium" style={{ fontFamily: 'Playfair Display, serif' }}>
+                    Apna<span className="text-[#04473C]">Ghr</span>
+                  </h1>
+                  <span className="text-[10px] bg-[#04473C] text-white px-2 py-0.5 tracking-wider">RIDER</span>
+                </div>
+                <p className="text-sm text-[#4A4D53]">Welcome, <span className="font-medium text-[#04473C]">{user?.name}</span></p>
+              </div>
             </div>
             <button 
               onClick={logout}
-              className="p-2 hover:bg-[#F5F3F0] transition-colors"
+              className="p-2 hover:bg-[#F5F3F0] transition-colors rounded-full"
               data-testid="logout-button"
             >
               <LogOut className="w-5 h-5 text-[#4A4D53]" strokeWidth={1.5} />
@@ -348,20 +372,41 @@ const RiderDashboard = () => {
       </header>
 
       <main className="max-w-2xl mx-auto px-6 py-6">
-        {/* Earnings Banner */}
+        {/* Animated Earnings Banner */}
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-gradient-to-r from-[#04473C] to-[#065446] text-white p-4 mb-4"
+          className="earnings-banner text-white p-5 mb-4 relative overflow-hidden"
         >
-          <div className="flex items-center justify-between">
+          {/* Decorative Elements */}
+          <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
+          <div className="absolute bottom-0 left-0 w-20 h-20 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2" />
+          
+          <div className="flex items-center justify-between relative z-10">
             <div>
-              <p className="text-xs text-white/70">Your Earnings Potential</p>
-              <p className="text-lg font-medium">₹150/visit • Daily Payouts</p>
+              <p className="text-xs text-white/70 tracking-wider uppercase">Your Earnings Potential</p>
+              <motion.p 
+                className="text-xl font-semibold mt-1"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.2 }}
+              >
+                ₹150<span className="text-sm font-normal">/visit</span> • Daily Payouts
+              </motion.p>
             </div>
             <div className="text-right">
-              <p className="text-xs text-[#C6A87C]">10 visits = ₹1500 + ₹500 bonus</p>
-              <p className="text-[10px] text-white/60">Powered by ApnaGhr</p>
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.3 }}
+                className="bg-[#C6A87C] text-[#1A1C20] px-3 py-1.5 text-xs font-bold tracking-wide"
+              >
+                10 visits = ₹2000
+              </motion.div>
+              <p className="text-[10px] text-white/60 mt-2 flex items-center justify-end gap-1">
+                <span className="inline-block w-1 h-1 bg-[#C6A87C] rounded-full animate-pulse"></span>
+                Powered by ApnaGhr
+              </p>
             </div>
           </div>
         </motion.div>

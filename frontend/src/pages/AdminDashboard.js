@@ -45,21 +45,32 @@ const AdminDashboard = () => {
       <header className="glass-header sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl tracking-tight" style={{ fontFamily: 'Playfair Display, serif' }}>
-                Admin Control Center
-              </h1>
-              <p className="text-sm text-[#4A4D53]">ApnaGhr Platform Management</p>
+            <div className="flex items-center gap-4">
+              {/* Admin Avatar */}
+              <div className="relative">
+                <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-[#04473C] shadow-lg bg-gradient-to-br from-[#04473C] to-[#065F4E] flex items-center justify-center">
+                  <span className="text-white font-bold text-lg">{user?.name?.[0] || 'A'}</span>
+                </div>
+                <div className="absolute -bottom-1 -right-1 bg-[#C6A87C] text-[#1A1C20] text-[7px] font-bold px-1.5 py-0.5 rounded-sm shadow-md">
+                  ADMIN
+                </div>
+              </div>
+              <div>
+                <h1 className="text-xl tracking-tight" style={{ fontFamily: 'Playfair Display, serif' }}>
+                  Apna<span className="text-[#04473C]">Ghr</span>
+                  <span className="ml-2 text-[10px] bg-[#04473C] text-white px-2 py-0.5 tracking-wider align-middle">CONTROL CENTER</span>
+                </h1>
+                <p className="text-sm text-[#4A4D53]">Platform Management • <span className="text-[#04473C] font-medium">{user?.name}</span></p>
+              </div>
             </div>
             <div className="flex items-center gap-3">
               <NotificationsDropdown />
               <button
                 onClick={logout}
-                className="btn-secondary flex items-center gap-2"
+                className="p-2 hover:bg-[#F5F3F0] transition-colors rounded-full"
                 data-testid="logout-button"
               >
-                <LogOut className="w-4 h-4" strokeWidth={1.5} />
-                Logout
+                <LogOut className="w-5 h-5 text-[#4A4D53]" strokeWidth={1.5} />
               </button>
             </div>
           </div>
@@ -96,7 +107,27 @@ const AdminDashboard = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
           >
-            <h2 className="text-2xl mb-8" style={{ fontFamily: 'Playfair Display, serif' }}>Platform Overview</h2>
+            {/* Admin Welcome Banner */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="bg-gradient-to-r from-[#04473C] via-[#065F4E] to-[#04473C] text-white p-6 mb-8 relative overflow-hidden"
+            >
+              <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
+              <div className="absolute bottom-0 left-0 w-40 h-40 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2" />
+              <div className="relative z-10 flex items-center justify-between">
+                <div>
+                  <h2 className="text-2xl mb-2" style={{ fontFamily: 'Playfair Display, serif' }}>
+                    Welcome back, {user?.name?.split(' ')[0] || 'Admin'}!
+                  </h2>
+                  <p className="text-white/80 text-sm">Manage your platform, track visits, and grow your business.</p>
+                </div>
+                <div className="text-right hidden md:block">
+                  <p className="text-3xl font-bold" style={{ fontFamily: 'Playfair Display, serif' }}>ApnaGhr</p>
+                  <p className="text-xs text-[#C6A87C] tracking-widest">PREMIUM PROPERTY PLATFORM</p>
+                </div>
+              </div>
+            </motion.div>
             
             {/* Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -111,16 +142,31 @@ const AdminDashboard = () => {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: idx * 0.1 }}
-                  className="bg-white border border-[#E5E1DB] p-6 hover:shadow-lg transition-shadow"
+                  whileHover={{ y: -5, boxShadow: '0 20px 40px rgba(0,0,0,0.1)' }}
+                  className="bg-white border border-[#E5E1DB] p-6 transition-all cursor-pointer"
                 >
                   <div className="flex items-center justify-between mb-4">
                     <p className="text-sm text-[#4A4D53] tracking-wide uppercase">{stat.label}</p>
-                    <div className="w-10 h-10 flex items-center justify-center" style={{ backgroundColor: `${stat.color}10` }}>
+                    <motion.div 
+                      whileHover={{ scale: 1.1, rotate: 5 }}
+                      className="w-10 h-10 flex items-center justify-center" 
+                      style={{ backgroundColor: `${stat.color}15` }}
+                    >
                       <stat.icon className="w-5 h-5" style={{ color: stat.color }} strokeWidth={1.5} />
-                    </div>
+                    </motion.div>
                   </div>
-                  <p className="price-display text-3xl">{stat.value}</p>
-                  <p className="text-xs text-[#04473C] mt-2">{stat.change}</p>
+                  <motion.p 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: idx * 0.1 + 0.2 }}
+                    className="price-display text-3xl"
+                  >
+                    {stat.value}
+                  </motion.p>
+                  <p className="text-xs text-[#04473C] mt-2 flex items-center gap-1">
+                    <span className="inline-block w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                    {stat.change}
+                  </p>
                 </motion.div>
               ))}
             </div>

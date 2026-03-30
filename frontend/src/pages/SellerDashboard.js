@@ -269,23 +269,48 @@ const SellerDashboard = () => {
 
   return (
     <div className="min-h-screen bg-[#FDFCFB] pb-24">
-      {/* Header */}
+      {/* Header with Seller Profile */}
       <header className="glass-header sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl tracking-tight" style={{ fontFamily: 'Playfair Display, serif' }}>
-                Seller Dashboard
-              </h1>
-              <p className="text-sm text-[#4A4D53]">Welcome, {user?.name}</p>
+            <div className="flex items-center gap-4">
+              {/* Seller Profile Photo */}
+              <div className="relative">
+                <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-[#C6A87C] shadow-lg">
+                  <img 
+                    src={user?.profile_photo || `https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop`}
+                    alt={user?.name || 'Seller'}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'S')}&background=C6A87C&color=1A1C20&size=100`;
+                    }}
+                  />
+                </div>
+                {/* ApnaGhr Badge */}
+                <div className="absolute -bottom-1 -right-1 bg-[#C6A87C] text-[#1A1C20] text-[8px] font-bold px-1.5 py-0.5 rounded-sm shadow-md">
+                  PRO
+                </div>
+              </div>
+              <div>
+                <h1 className="text-xl tracking-tight" style={{ fontFamily: 'Playfair Display, serif' }}>
+                  Apna<span className="text-[#04473C]">Ghr</span>
+                  <span className="ml-2 text-[10px] bg-[#C6A87C] text-[#1A1C20] px-2 py-0.5 tracking-wider align-middle">SELLER</span>
+                </h1>
+                <p className="text-sm text-[#4A4D53]">Welcome, <span className="font-medium text-[#04473C]">{user?.name}</span></p>
+              </div>
             </div>
             <div className="flex items-center gap-3">
-              <div className="px-3 py-1 bg-[#E6F0EE] text-[#04473C] text-sm font-medium">
-                Code: {user?.referral_code || dashboard?.referral_code}
-              </div>
-              <button onClick={logout} className="btn-secondary flex items-center gap-2" data-testid="logout-button">
-                <LogOut className="w-4 h-4" strokeWidth={1.5} />
-                Logout
+              <motion.div 
+                initial={{ scale: 0.9 }}
+                animate={{ scale: 1 }}
+                className="px-4 py-2 bg-gradient-to-r from-[#04473C] to-[#065F4E] text-white text-sm font-medium flex items-center gap-2"
+              >
+                <Copy className="w-4 h-4" />
+                Code: <span className="font-bold">{user?.referral_code || dashboard?.referral_code}</span>
+              </motion.div>
+              <button onClick={logout} className="p-2 hover:bg-[#F5F3F0] transition-colors rounded-full" data-testid="logout-button">
+                <LogOut className="w-5 h-5 text-[#4A4D53]" strokeWidth={1.5} />
               </button>
             </div>
           </div>
@@ -322,6 +347,27 @@ const SellerDashboard = () => {
       </div>
 
       <main className="max-w-7xl mx-auto px-6 py-8">
+        {/* Seller Earnings Potential Banner */}
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-gradient-to-r from-[#C6A87C] to-[#D4BC98] text-[#1A1C20] p-5 mb-6 relative overflow-hidden"
+        >
+          <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2" />
+          <div className="flex items-center justify-between relative z-10">
+            <div>
+              <p className="text-xs font-medium uppercase tracking-wider opacity-70">Your Earning Potential</p>
+              <p className="text-2xl font-bold mt-1">₹500 - ₹10,000 <span className="text-sm font-normal">per deal</span></p>
+            </div>
+            <div className="text-right">
+              <div className="bg-[#04473C] text-white px-3 py-1.5 text-xs font-bold tracking-wide mb-1">
+                UNLIMITED EARNINGS
+              </div>
+              <p className="text-[10px] opacity-70">Share properties • Earn commissions</p>
+            </div>
+          </div>
+        </motion.div>
+
         {/* Dashboard Overview */}
         {activeTab === 'dashboard' && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>

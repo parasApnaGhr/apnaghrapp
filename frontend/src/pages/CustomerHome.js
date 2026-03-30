@@ -437,72 +437,114 @@ const CustomerHome = () => {
 
         {/* Testimonials & Trust Section */}
         <section className="mt-12 mb-8">
-          <div className="text-center mb-6">
-            <h2 className="text-xl mb-2" style={{ fontFamily: 'Playfair Display, serif' }}>
-              What Our Customers Say
-            </h2>
-            <p className="text-sm text-[#4A4D53]">Trusted by thousands of happy customers</p>
+          <div className="text-center mb-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+            >
+              <p className="overline text-[#C6A87C] mb-2">Customer Stories</p>
+              <h2 className="text-2xl mb-2" style={{ fontFamily: 'Playfair Display, serif' }}>
+                What Our Customers Say
+              </h2>
+              <p className="text-sm text-[#4A4D53]">Join thousands of happy homeowners</p>
+            </motion.div>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
-              { name: 'Priya Sharma', city: 'Chandigarh', text: 'Found my dream home in just 2 visits! The rider was very professional.', rating: 5 },
-              { name: 'Rahul Verma', city: 'Mohali', text: 'ApnaGhr made house hunting so easy. No more dealing with fake brokers!', rating: 5 },
-              { name: 'Anita Kaur', city: 'Kharar', text: 'Transparent pricing and genuine properties. Highly recommended!', rating: 5 }
+              { name: 'Priya Sharma', city: 'Chandigarh', text: 'Found my dream home in just 2 visits! The rider was very professional and the entire process was seamless.', rating: 5, image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop' },
+              { name: 'Rahul Verma', city: 'Mohali', text: 'ApnaGhr made house hunting so easy. No more dealing with fake brokers! Genuine properties only.', rating: 5, image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop' },
+              { name: 'Anita Kaur', city: 'Kharar', text: 'Transparent pricing and genuine properties. The field rider was punctual and helpful. Highly recommended!', rating: 5, image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop' }
             ].map((testimonial, idx) => (
               <motion.div
                 key={idx}
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: idx * 0.1 }}
-                className="bg-white border border-[#E5E1DB] p-5"
+                transition={{ delay: idx * 0.15, duration: 0.5 }}
+                whileHover={{ y: -5 }}
+                className="bg-white border border-[#E5E1DB] p-6 hover:shadow-xl transition-all duration-300 hover:border-[#C6A87C]/30"
               >
-                <div className="flex items-center gap-1 mb-3">
+                <div className="flex items-center gap-1 mb-4">
                   {[...Array(testimonial.rating)].map((_, i) => (
-                    <Sparkles key={i} className="w-4 h-4 text-[#C6A87C]" fill="#C6A87C" />
+                    <motion.div
+                      key={i}
+                      initial={{ opacity: 0, scale: 0 }}
+                      whileInView={{ opacity: 1, scale: 1 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: idx * 0.1 + i * 0.05 }}
+                    >
+                      <Sparkles className="w-4 h-4 text-[#C6A87C]" fill="#C6A87C" />
+                    </motion.div>
                   ))}
                 </div>
-                <p className="text-sm text-[#4A4D53] mb-4 italic">"{testimonial.text}"</p>
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-[#04473C] text-white flex items-center justify-center font-medium">
-                    {testimonial.name[0]}
-                  </div>
+                <p className="text-sm text-[#4A4D53] mb-5 leading-relaxed">"{testimonial.text}"</p>
+                <div className="flex items-center gap-3 pt-4 border-t border-[#E5E1DB]">
+                  <img 
+                    src={testimonial.image} 
+                    alt={testimonial.name}
+                    className="w-12 h-12 rounded-full object-cover border-2 border-[#C6A87C]/30"
+                  />
                   <div>
-                    <p className="font-medium text-sm">{testimonial.name}</p>
-                    <p className="text-xs text-[#4A4D53]">{testimonial.city}</p>
+                    <p className="font-medium text-sm text-[#1A1C20]">{testimonial.name}</p>
+                    <p className="text-xs text-[#4A4D53] flex items-center gap-1">
+                      <MapPin className="w-3 h-3" /> {testimonial.city}
+                    </p>
                   </div>
                 </div>
               </motion.div>
             ))}
           </div>
 
-          {/* Trust Badges */}
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-6 py-6 border-y border-[#E5E1DB]">
-            <div className="text-center">
-              <p className="text-2xl font-bold text-[#04473C]">1000+</p>
-              <p className="text-xs text-[#4A4D53]">Happy Customers</p>
+          {/* Animated Trust Badges */}
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mt-10 py-8 px-6 bg-gradient-to-r from-[#04473C] to-[#065F4E] text-white"
+          >
+            <div className="max-w-4xl mx-auto">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+                {[
+                  { value: '1000+', label: 'Happy Customers', icon: '🏠' },
+                  { value: '500+', label: 'Verified Properties', icon: '✓' },
+                  { value: '50+', label: 'Field Riders', icon: '🛵' },
+                  { value: '4.8★', label: 'Average Rating', icon: '⭐' }
+                ].map((stat, idx) => (
+                  <motion.div
+                    key={idx}
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: idx * 0.1 }}
+                    className="p-4"
+                  >
+                    <motion.p 
+                      className="text-3xl md:text-4xl font-bold mb-1"
+                      style={{ fontFamily: 'Playfair Display, serif' }}
+                      initial={{ opacity: 0 }}
+                      whileInView={{ opacity: 1 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: idx * 0.1 + 0.2 }}
+                    >
+                      {stat.value}
+                    </motion.p>
+                    <p className="text-xs md:text-sm text-white/80 tracking-wide">{stat.label}</p>
+                  </motion.div>
+                ))}
+              </div>
             </div>
-            <div className="w-px h-10 bg-[#E5E1DB]" />
-            <div className="text-center">
-              <p className="text-2xl font-bold text-[#04473C]">500+</p>
-              <p className="text-xs text-[#4A4D53]">Verified Properties</p>
-            </div>
-            <div className="w-px h-10 bg-[#E5E1DB]" />
-            <div className="text-center">
-              <p className="text-2xl font-bold text-[#04473C]">50+</p>
-              <p className="text-xs text-[#4A4D53]">Field Riders</p>
-            </div>
-            <div className="w-px h-10 bg-[#E5E1DB]" />
-            <div className="text-center">
-              <p className="text-2xl font-bold text-[#C6A87C]">4.8★</p>
-              <p className="text-xs text-[#4A4D53]">Average Rating</p>
-            </div>
-          </div>
+          </motion.div>
           
-          <p className="text-center text-xs text-[#C6A87C] mt-4 font-medium">
-            Powered by ApnaGhr • India's Trusted Property Visit Platform
-          </p>
+          <motion.p 
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            className="text-center text-xs text-[#C6A87C] mt-6 font-medium tracking-wide"
+          >
+            ✦ Powered by ApnaGhr • India's Most Trusted Property Visit Platform ✦
+          </motion.p>
         </section>
       </main>
 
