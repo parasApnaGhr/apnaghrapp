@@ -883,10 +883,12 @@ async def get_payment_status(order_id: str, current_user: dict = Depends(get_cur
         order_status = await cashfree_service.get_order_status(order_id)
         
         cf_status = order_status.get('order_status', '').upper()
-        logging.info(f"Cashfree order {order_id} status: {cf_status}")
+        logging.info(f"Cashfree order {order_id} status check: {cf_status}")
         
-        # Handle PAID status
-        if cf_status == "PAID" and transaction['payment_status'] != "paid":
+        # Handle PAID/SUCCESS status - Cashfree may return either
+        if cf_status in ["PAID", "SUCCESS", "ACTIVE"] and transaction['payment_status'] != "paid":
+            logging.info(f"Processing successful payment for {order_id}")
+            
             await db.payment_transactions.update_one(
                 {"session_id": order_id},
                 {"$set": {"payment_status": "paid", "payment_id": order_status.get('cf_order_id')}}
@@ -897,21 +899,31 @@ async def get_payment_status(order_id: str, current_user: dict = Depends(get_cur
             
             # Handle visit packages
             if 'visits' in package:
-                visit_package = VisitPackage(
-                    customer_id=transaction['user_id'],
-                    package_type=transaction['package_type'],
-                    total_visits=package['visits'],
-                    visits_used=0,
-                    amount_paid=transaction['amount'],
-                    valid_until=datetime.now(timezone.utc) + timedelta(days=package['validity_days'])
-                )
-                pkg_doc = visit_package.model_dump()
-                pkg_doc['created_at'] = pkg_doc['created_at'].isoformat()
-                pkg_doc['valid_until'] = pkg_doc['valid_until'].isoformat()
-                await db.visit_packages.insert_one(pkg_doc)
+                # Check if package already exists (avoid duplicates)
+                existing_pkg = await db.visit_packages.find_one({
+                    "customer_id": transaction['user_id'],
+                    "package_type": transaction['package_type'],
+                    "amount_paid": transaction['amount'],
+                    "created_at": {"$gt": (datetime.now(timezone.utc) - timedelta(minutes=5)).isoformat()}
+                })
+                
+                if not existing_pkg:
+                    visit_package = VisitPackage(
+                        customer_id=transaction['user_id'],
+                        package_type=transaction['package_type'],
+                        total_visits=package['visits'],
+                        visits_used=0,
+                        amount_paid=transaction['amount'],
+                        valid_until=datetime.now(timezone.utc) + timedelta(days=package['validity_days'])
+                    )
+                    pkg_doc = visit_package.model_dump()
+                    pkg_doc['created_at'] = pkg_doc['created_at'].isoformat()
+                    pkg_doc['valid_until'] = pkg_doc['valid_until'].isoformat()
+                    await db.visit_packages.insert_one(pkg_doc)
+                    logging.info(f"Created visit package for {transaction['user_id']}")
             
             # Handle property lock
-            if transaction['package_type'] == "property_lock" and transaction['metadata'].get('property_id'):
+            if transaction['package_type'] == "property_lock" and transaction.get('metadata', {}).get('property_id'):
                 lock = PropertyLock(
                     customer_id=transaction['user_id'],
                     property_id=transaction['metadata']['property_id']
@@ -921,7 +933,7 @@ async def get_payment_status(order_id: str, current_user: dict = Depends(get_cur
                 await db.property_locks.insert_one(lock_doc)
             
             # Handle packers booking confirmation
-            if package_type == "packers" and transaction['metadata'].get('booking_id'):
+            if package_type == "packers" and transaction.get('metadata', {}).get('booking_id'):
                 booking_id = transaction['metadata']['booking_id']
                 await db.shifting_bookings.update_one(
                     {"id": booking_id},
@@ -934,7 +946,7 @@ async def get_payment_status(order_id: str, current_user: dict = Depends(get_cur
                 )
             
             # Handle advertising payment
-            if package_type == "advertising" and transaction['metadata'].get('ad_id'):
+            if package_type == "advertising" and transaction.get('metadata', {}).get('ad_id'):
                 ad_id = transaction['metadata']['ad_id']
                 await db.advertisements.update_one(
                     {"id": ad_id},
@@ -947,6 +959,12 @@ async def get_payment_status(order_id: str, current_user: dict = Depends(get_cur
                 )
             
             transaction['payment_status'] = "paid"
+        elif cf_status in ["EXPIRED", "CANCELLED", "FAILED", "TERMINATED"]:
+            await db.payment_transactions.update_one(
+                {"session_id": order_id},
+                {"$set": {"payment_status": "failed"}}
+            )
+            transaction['payment_status'] = "failed"
         
         # Handle FAILED/EXPIRED/CANCELLED status
         elif cf_status in ["EXPIRED", "CANCELLED", "FAILED", "VOID"]:

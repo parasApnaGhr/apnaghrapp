@@ -22,7 +22,7 @@ const PaymentSuccess = () => {
   }, [orderId]);
 
   const pollPaymentStatus = async (attempts = 0) => {
-    const maxAttempts = 15;
+    const maxAttempts = 20; // Increased from 15 to 20 attempts (40 seconds total)
 
     if (attempts >= maxAttempts) {
       setStatus('timeout');
@@ -34,15 +34,19 @@ const PaymentSuccess = () => {
       setTransaction(response.data);
       
       const paymentStatus = response.data.payment_status?.toLowerCase();
+      console.log(`Payment status check #${attempts + 1}: ${paymentStatus}`);
 
       if (paymentStatus === 'paid' || paymentStatus === 'success') {
         setStatus('success');
       } else if (paymentStatus === 'failed' || paymentStatus === 'cancelled' || paymentStatus === 'expired') {
         setStatus('error');
       } else {
+        // Still pending - keep polling
         setTimeout(() => pollPaymentStatus(attempts + 1), 2000);
       }
     } catch (error) {
+      console.error('Payment status check error:', error);
+      // On error, keep trying
       setTimeout(() => pollPaymentStatus(attempts + 1), 2000);
     }
   };
