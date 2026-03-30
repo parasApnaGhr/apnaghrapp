@@ -805,7 +805,14 @@ async def create_checkout(
         trans_doc = transaction.model_dump()
         trans_doc['created_at'] = trans_doc['created_at'].isoformat()
         trans_doc['payment_session_id'] = order_response['payment_session_id']
-        await db.payment_transactions.insert_one(trans_doc)
+        
+        # Debug: Log before insert
+        logging.info(f"Inserting transaction: {trans_doc.get('session_id')}")
+        
+        insert_result = await db.payment_transactions.insert_one(trans_doc)
+        
+        # Debug: Confirm insert
+        logging.info(f"Transaction inserted with id: {insert_result.inserted_id}")
         
         # Return Cashfree checkout URL (using payment_session_id for JS SDK or redirect)
         cashfree_env = os.environ.get('CASHFREE_ENVIRONMENT', 'SANDBOX')
@@ -823,6 +830,43 @@ async def create_checkout(
     except Exception as e:
         logging.error(f"Cashfree checkout error: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Payment initialization failed: {str(e)}")
+
+@api_router.get("/wallet")
+async def get_customer_wallet(current_user: dict = Depends(get_current_user)):
+    """Get customer wallet with available visits and packages."""
+    customer_id = current_user['id']
+    
+    # Get active visit packages
+    now = datetime.now(timezone.utc).isoformat()
+    packages = await db.visit_packages.find({
+        "customer_id": customer_id,
+        "valid_until": {"$gt": now}
+    }, {"_id": 0}).to_list(20)
+    
+    # Calculate total available visits
+    visits_available = sum(
+        max(0, p.get('total_visits', 0) - p.get('visits_used', 0)) 
+        for p in packages
+    )
+    
+    # Get property locks
+    locks = await db.property_locks.find({
+        "customer_id": customer_id,
+        "valid_until": {"$gt": now}
+    }, {"_id": 0}).to_list(20)
+    
+    # Get recent transactions
+    transactions = await db.payment_transactions.find({
+        "user_id": customer_id
+    }, {"_id": 0}).sort("created_at", -1).limit(10).to_list(10)
+    
+    return {
+        "balance": 0,  # Placeholder for future wallet balance feature
+        "visits_available": visits_available,
+        "active_packages": packages,
+        "property_locks": locks,
+        "recent_transactions": transactions
+    }
 
 @api_router.get("/payments/status/{order_id}")
 async def get_payment_status(order_id: str, current_user: dict = Depends(get_current_user)):
