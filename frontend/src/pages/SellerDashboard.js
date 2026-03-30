@@ -127,7 +127,8 @@ const SellerDashboard = () => {
 
   const getShareLink = () => {
     if (shareData && shareProperty) {
-      return `${window.location.origin}/customer/property/${shareProperty.id}${shareData.share_url}`;
+      // Use public property URL (no auth required)
+      return `${window.location.origin}/property/${shareProperty.id}${shareData.share_url}`;
     }
     return '';
   };
@@ -510,7 +511,7 @@ const SellerDashboard = () => {
                 <div key={property.id} className="bg-white border border-[#E5E1DB] overflow-hidden group">
                   <div 
                     className="aspect-[4/3] bg-[#F5F3F0] cursor-pointer relative"
-                    onClick={() => window.open(`/customer/property/${property.id}`, '_blank')}
+                    onClick={() => window.open(`/property/${property.id}`, '_blank')}
                   >
                     {property.images?.[0] ? (
                       <img
@@ -534,7 +535,7 @@ const SellerDashboard = () => {
                   <div className="p-4">
                     <h3 
                       className="font-medium text-lg mb-1 cursor-pointer hover:text-[#04473C]"
-                      onClick={() => window.open(`/customer/property/${property.id}`, '_blank')}
+                      onClick={() => window.open(`/property/${property.id}`, '_blank')}
                     >
                       {property.title}
                     </h3>

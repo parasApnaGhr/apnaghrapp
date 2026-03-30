@@ -10,6 +10,7 @@ ApnaGhr Visit Platform is a production-ready multi-role rental property platform
 - **Premium Luxury UI design** (Updated March 2026)
 - AI Chatbot for property assistance
 - SMS/Email OTP system (ready for Twilio/Resend integration)
+- **Public Property Links** - Share properties without requiring login (NEW)
 
 ## Deployment Status: ✅ READY
 
@@ -22,6 +23,21 @@ ApnaGhr Visit Platform is a production-ready multi-role rental property platform
 - ✅ Production seed migration script
 
 ## Latest Updates (March 30, 2026)
+
+### ✅ Public Property Links (NEW)
+- Added `/property/:id` public route for shared property links
+- Customers can view property details WITHOUT logging in
+- "Book Visit" button prompts auth modal with:
+  - "Sign in to Book Visit" message
+  - "SIGN IN / REGISTER" CTA button
+  - "CONTINUE BROWSING" option
+- Backend endpoint: `GET /api/public/property/:id` (no auth required)
+- Seller share links now use public URL: `/property/:id?ref=CODE`
+
+### ✅ Seller Property Click Fix
+- Properties in Seller Dashboard now open in new tab correctly
+- Changed from `/customer/property/:id` to `/property/:id` (public URL)
+- Sellers can also access protected `/customer/property/:id` route now
 
 ### ✅ UI/UX Final Touches & Enhancements
 Premium visual enhancements across all dashboards:

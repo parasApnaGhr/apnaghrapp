@@ -725,6 +725,18 @@ async def get_properties(
     properties = await db.properties.find(query, {"_id": 0, "exact_address": 0, "latitude": 0, "longitude": 0}).limit(50).to_list(None)
     return properties
 
+# PUBLIC endpoint - no auth required for viewing property (for shared links)
+@api_router.get("/public/property/{property_id}")
+async def get_public_property(property_id: str):
+    """Get property details without authentication - for shared links"""
+    property_data = await db.properties.find_one(
+        {"id": property_id}, 
+        {"_id": 0, "exact_address": 0, "latitude": 0, "longitude": 0, "owner_phone": 0}
+    )
+    if not property_data:
+        raise HTTPException(status_code=404, detail="Property not found")
+    return property_data
+
 @api_router.get("/properties/{property_id}")
 async def get_property(property_id: str, current_user: dict = Depends(get_current_user)):
     property_data = await db.properties.find_one({"id": property_id}, {"_id": 0, "exact_address": 0, "latitude": 0, "longitude": 0})

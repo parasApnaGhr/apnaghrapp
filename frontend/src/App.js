@@ -5,6 +5,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import Login from './pages/Login';
 import CustomerHome from './pages/CustomerHome';
 import PropertyDetail from './pages/PropertyDetail';
+import PublicPropertyDetail from './pages/PublicPropertyDetail';
 import CustomerBookings from './pages/CustomerBookings';
 import VisitCart from './pages/VisitCart';
 import PaymentSuccess from './pages/PaymentSuccess';
@@ -58,6 +59,9 @@ const AppRoutes = () => {
     <Routes>
       <Route path="/" element={user ? <Navigate to={getRedirectPath(user.role)} replace /> : <Login />} />
 
+      {/* PUBLIC ROUTE - Property view without auth (for shared links) */}
+      <Route path="/property/:id" element={<PublicPropertyDetail />} />
+
       <Route
         path="/customer"
         element={
@@ -70,7 +74,7 @@ const AppRoutes = () => {
       <Route
         path="/customer/property/:id"
         element={
-          <ProtectedRoute allowedRoles={['customer', 'advertiser', 'builder']}>
+          <ProtectedRoute allowedRoles={['customer', 'advertiser', 'builder', 'seller']}>
             <PropertyDetail />
           </ProtectedRoute>
         }
