@@ -127,6 +127,78 @@ class CashfreePaymentService:
             logger.error(f"Error creating Cashfree order: {str(e)}")
             raise
     
+    async def create_order_with_id(
+        self,
+        order_id: str,
+        order_amount: float,
+        customer_id: str,
+        customer_phone: str,
+        customer_email: Optional[str] = None,
+        customer_name: Optional[str] = None,
+        return_url: str = None,
+        notify_url: str = None,
+        order_note: Optional[str] = None,
+        order_tags: Optional[Dict] = None
+    ) -> Dict[str, Any]:
+        """Create a payment order with a pre-generated order ID."""
+        try:
+            # Create customer details object
+            customer_details = CustomerDetails(
+                customer_id=customer_id[:50],
+                customer_phone=customer_phone,
+                customer_email=customer_email or f"{customer_id[:20]}@apnaghr.com",
+                customer_name=customer_name or "ApnaGhr Customer"
+            )
+            
+            # Create order metadata
+            order_meta = OrderMeta(
+                return_url=return_url,
+                notify_url=notify_url
+            )
+            
+            # Filter out empty string values from order_tags
+            clean_tags = None
+            if order_tags:
+                clean_tags = {k: str(v) for k, v in order_tags.items() if v}
+            
+            # Create order request
+            create_order_request = CreateOrderRequest(
+                order_id=order_id,
+                order_amount=float(order_amount),
+                order_currency="INR",
+                customer_details=customer_details,
+                order_meta=order_meta,
+                order_note=order_note,
+                order_tags=clean_tags
+            )
+            
+            # Call Cashfree API
+            api_response = self.cashfree.PGCreateOrder(
+                x_api_version=self.api_version,
+                create_order_request=create_order_request
+            )
+            
+            if api_response and api_response.data:
+                order_data = api_response.data
+                logger.info(f"Order created successfully: {order_data.order_id}")
+                
+                return {
+                    'order_id': order_data.order_id,
+                    'cf_order_id': str(order_data.cf_order_id) if order_data.cf_order_id else None,
+                    'payment_session_id': order_data.payment_session_id,
+                    'order_amount': order_data.order_amount,
+                    'order_currency': order_data.order_currency,
+                    'order_status': order_data.order_status,
+                    'created_at': str(order_data.created_at) if order_data.created_at else None,
+                    'order_expiry_time': str(order_data.order_expiry_time) if order_data.order_expiry_time else None
+                }
+            else:
+                raise Exception("Failed to create order - no response data")
+                
+        except Exception as e:
+            logger.error(f"Error creating Cashfree order with ID: {str(e)}")
+            raise
+    
     async def get_order_status(self, order_id: str) -> Dict[str, Any]:
         """
         Fetch order status from Cashfree.

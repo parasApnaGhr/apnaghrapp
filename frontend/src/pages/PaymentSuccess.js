@@ -23,7 +23,7 @@ const PaymentSuccess = () => {
   }, [orderId]);
 
   const pollPaymentStatus = async (attempts = 0) => {
-    const maxAttempts = 10;
+    const maxAttempts = 15;  // Increased attempts
 
     if (attempts >= maxAttempts) {
       setStatus('timeout');
@@ -33,10 +33,15 @@ const PaymentSuccess = () => {
     try {
       const response = await paymentAPI.getPaymentStatus(orderId);
       setTransaction(response.data);
+      
+      const paymentStatus = response.data.payment_status?.toLowerCase();
 
-      if (response.data.payment_status === 'paid') {
+      if (paymentStatus === 'paid' || paymentStatus === 'success') {
         setStatus('success');
+      } else if (paymentStatus === 'failed' || paymentStatus === 'cancelled' || paymentStatus === 'expired') {
+        setStatus('error');
       } else {
+        // Still pending, check again
         setTimeout(() => pollPaymentStatus(attempts + 1), 2000);
       }
     } catch (error) {

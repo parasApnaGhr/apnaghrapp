@@ -767,13 +767,17 @@ async def create_checkout(
     try:
         cashfree_service = get_cashfree_service()
         
-        order_response = await cashfree_service.create_order(
+        # Generate order_id first so we can use it in return_url
+        order_id = cashfree_service.generate_order_id()
+        
+        order_response = await cashfree_service.create_order_with_id(
+            order_id=order_id,
             order_amount=amount,
             customer_id=current_user['id'],
             customer_phone=current_user.get('phone', '9999999999'),
             customer_email=current_user.get('email'),
             customer_name=current_user.get('name'),
-            return_url=f"{origin_url}/payment-success?order_id={{order_id}}",
+            return_url=f"{origin_url}/payment-success?order_id={order_id}",
             notify_url=webhook_url,
             order_note=f"ApnaGhr {request.package_id} payment",
             order_tags=metadata
@@ -827,8 +831,11 @@ async def get_payment_status(order_id: str, current_user: dict = Depends(get_cur
         cashfree_service = get_cashfree_service()
         order_status = await cashfree_service.get_order_status(order_id)
         
-        # Check if payment is successful
-        if order_status.get('order_status') == "PAID" and transaction['payment_status'] != "paid":
+        cf_status = order_status.get('order_status', '').upper()
+        logging.info(f"Cashfree order {order_id} status: {cf_status}")
+        
+        # Handle PAID status
+        if cf_status == "PAID" and transaction['payment_status'] != "paid":
             await db.payment_transactions.update_one(
                 {"session_id": order_id},
                 {"$set": {"payment_status": "paid", "payment_id": order_status.get('cf_order_id')}}
@@ -889,6 +896,14 @@ async def get_payment_status(order_id: str, current_user: dict = Depends(get_cur
                 )
             
             transaction['payment_status'] = "paid"
+        
+        # Handle FAILED/EXPIRED/CANCELLED status
+        elif cf_status in ["EXPIRED", "CANCELLED", "FAILED", "VOID"]:
+            await db.payment_transactions.update_one(
+                {"session_id": order_id},
+                {"$set": {"payment_status": "failed"}}
+            )
+            transaction['payment_status'] = "failed"
         
         return transaction
         
