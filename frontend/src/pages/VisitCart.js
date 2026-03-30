@@ -5,7 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { paymentAPI, getMediaUrl } from '../utils/api';
 import { 
   ArrowLeft, Trash2, MapPin, Home, Calendar, Clock, 
-  IndianRupee, ShoppingCart, CreditCard, Check, ChevronRight
+  ShoppingCart, CreditCard, Check, ChevronRight
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -13,7 +13,6 @@ const VisitCart = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   
-  // Get cart from localStorage
   const [cart, setCart] = useState(() => {
     const saved = localStorage.getItem('visitCart');
     return saved ? JSON.parse(saved) : [];
@@ -28,12 +27,10 @@ const VisitCart = () => {
   const [loading, setLoading] = useState(false);
   const [selectedPackage, setSelectedPackage] = useState(null);
 
-  // Save cart to localStorage
   useEffect(() => {
     localStorage.setItem('visitCart', JSON.stringify(cart));
   }, [cart]);
 
-  // Set default date to tomorrow
   useEffect(() => {
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
@@ -43,7 +40,6 @@ const VisitCart = () => {
     }));
   }, []);
 
-  // Auto-select package based on cart size
   useEffect(() => {
     if (cart.length === 1) {
       setSelectedPackage('single_visit');
@@ -88,7 +84,6 @@ const VisitCart = () => {
       return;
     }
 
-    // Store booking data for after payment
     localStorage.setItem('pendingVisitBooking', JSON.stringify({
       property_ids: cart.map(p => p.id),
       ...bookingData
@@ -105,7 +100,6 @@ const VisitCart = () => {
     }
   };
 
-  // Calculate estimated duration
   const estimatedMinutes = cart.length > 0 ? cart.length * 15 + (cart.length - 1) * 20 + 30 : 0;
   const hours = Math.floor(estimatedMinutes / 60);
   const mins = estimatedMinutes % 60;
@@ -114,28 +108,28 @@ const VisitCart = () => {
   const selectedPkg = packages.find(p => p.id === selectedPackage);
 
   return (
-    <div className="min-h-screen pb-32">
-      {/* Header */}
-      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-xl border-b-2 border-[#111111]">
-        <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
+    <div className="min-h-screen bg-[#FDFCFB] pb-32">
+      {/* Premium Header */}
+      <header className="glass-header sticky top-0 z-50">
+        <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-4">
             <button
               onClick={() => navigate('/customer')}
-              className="p-2 hover:bg-gray-100 rounded-full"
+              className="p-2 hover:bg-[#F5F3F0] transition-colors"
               data-testid="back-button"
             >
-              <ArrowLeft className="w-5 h-5" />
+              <ArrowLeft className="w-5 h-5 text-[#1A1C20]" strokeWidth={1.5} />
             </button>
             <div>
-              <h1 className="text-xl font-black" style={{ fontFamily: 'Outfit' }}>Visit Cart</h1>
-              <p className="text-sm text-[#52525B]">{cart.length} properties selected</p>
+              <h1 className="text-xl font-medium" style={{ fontFamily: 'Playfair Display, serif' }}>Visit Cart</h1>
+              <p className="text-sm text-[#4A4D53]">{cart.length} properties selected</p>
             </div>
           </div>
           
           {cart.length > 0 && (
             <button
               onClick={clearCart}
-              className="text-[#FF5A5F] text-sm font-bold hover:underline"
+              className="text-[#8F2727] text-sm font-medium hover:underline"
               data-testid="clear-cart-button"
             >
               Clear All
@@ -144,17 +138,18 @@ const VisitCart = () => {
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto px-4 py-6">
+      <main className="max-w-4xl mx-auto px-6 py-8">
         {cart.length === 0 ? (
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="text-center py-20"
           >
-            <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-[#F3F4F6] border-2 border-[#111111] flex items-center justify-center">
-              <ShoppingCart className="w-10 h-10 text-[#9CA3AF]" />
+            <div className="w-20 h-20 mx-auto mb-6 bg-[#F5F3F0] flex items-center justify-center">
+              <ShoppingCart className="w-10 h-10 text-[#D0C9C0]" strokeWidth={1} />
             </div>
-            <p className="text-[#52525B] mb-4 text-lg">Your visit cart is empty</p>
+            <h2 className="text-xl mb-2" style={{ fontFamily: 'Playfair Display, serif' }}>Your cart is empty</h2>
+            <p className="text-[#4A4D53] mb-6">Add properties to schedule visits</p>
             <button 
               onClick={() => navigate('/customer')} 
               className="btn-primary"
@@ -166,17 +161,17 @@ const VisitCart = () => {
         ) : (
           <>
             {/* Cart Items */}
-            <div className="space-y-4 mb-6">
+            <div className="space-y-4 mb-8">
               {cart.map((property, index) => (
                 <motion.div
                   key={property.id}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.1 }}
-                  className="neo-card p-4 flex gap-4"
+                  className="bg-white border border-[#E5E1DB] p-5 flex gap-4"
                   data-testid={`cart-item-${property.id}`}
                 >
-                  <div className="w-10 h-10 bg-[#FF5A5F] text-white rounded-full border-2 border-[#111111] flex items-center justify-center font-bold flex-shrink-0 shadow-[2px_2px_0px_#111111]">
+                  <div className="w-10 h-10 bg-[#04473C] text-white flex items-center justify-center font-medium flex-shrink-0">
                     {index + 1}
                   </div>
                   
@@ -186,25 +181,31 @@ const VisitCart = () => {
                         <img 
                           src={getMediaUrl(property.images[0])} 
                           alt="" 
-                          className="w-20 h-20 rounded-xl object-cover flex-shrink-0 border-2 border-[#111111]"
+                          className="w-20 h-20 object-cover flex-shrink-0"
+                          onError={(e) => {
+                            e.target.onerror = null;
+                            e.target.src = 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80';
+                          }}
                         />
                       ) : (
-                        <div className="w-20 h-20 bg-[#F3F4F6] rounded-xl border-2 border-[#111111] flex items-center justify-center flex-shrink-0">
-                          <Home className="w-8 h-8 text-[#9CA3AF]" />
+                        <div className="w-20 h-20 bg-[#F5F3F0] flex items-center justify-center flex-shrink-0">
+                          <Home className="w-8 h-8 text-[#D0C9C0]" strokeWidth={1} />
                         </div>
                       )}
                       
                       <div className="flex-1 min-w-0">
-                        <h3 className="font-bold truncate">{property.title}</h3>
-                        <p className="text-sm text-[#52525B]">
-                          {property.bhk} BHK • {property.furnishing}
+                        <h3 className="font-medium truncate text-[#1A1C20]">{property.title}</h3>
+                        <p className="text-sm text-[#4A4D53]">
+                          {property.bhk} BHK · {property.furnishing}
                         </p>
-                        <p className="text-sm text-[#52525B] flex items-center gap-1">
-                          <MapPin className="w-3 h-3" />
+                        <p className="text-sm text-[#4A4D53] flex items-center gap-1 mt-1">
+                          <MapPin className="w-3 h-3" strokeWidth={1.5} />
                           {property.area_name}
                         </p>
-                        <p className="text-[#FF5A5F] font-bold mt-1">
-                          ₹{property.rent?.toLocaleString()}/mo
+                        <p className="price-display text-lg mt-2">
+                          <span className="price-currency text-sm">₹</span>
+                          {property.rent?.toLocaleString('en-IN')}
+                          <span className="text-[#4A4D53] text-sm font-normal">/mo</span>
                         </p>
                       </div>
                     </div>
@@ -212,38 +213,38 @@ const VisitCart = () => {
                   
                   <button
                     onClick={() => removeFromCart(property.id)}
-                    className="p-2 text-[#FF5A5F] hover:bg-red-50 rounded-lg self-start"
+                    className="p-2 text-[#8F2727] hover:bg-red-50 self-start"
                     data-testid={`remove-${property.id}`}
                   >
-                    <Trash2 className="w-5 h-5" />
+                    <Trash2 className="w-5 h-5" strokeWidth={1.5} />
                   </button>
                 </motion.div>
               ))}
             </div>
 
             {/* Visit Summary */}
-            <div className="neo-card p-6 mb-6 bg-gradient-to-br from-[#4ECDC4]/10 to-white">
-              <h3 className="font-bold mb-4 text-[#111111]">Visit Summary</h3>
+            <div className="bg-[#E6F0EE] border border-[#04473C]/20 p-6 mb-8">
+              <h3 className="text-sm font-medium tracking-wide uppercase text-[#04473C] mb-4">Visit Summary</h3>
               <div className="space-y-3 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-[#52525B]">Properties</span>
-                  <span className="font-bold">{cart.length}</span>
+                  <span className="text-[#4A4D53]">Properties</span>
+                  <span className="font-medium text-[#1A1C20]">{cart.length}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-[#52525B]">Est. Duration</span>
-                  <span className="font-bold">{estimatedDuration}</span>
+                  <span className="text-[#4A4D53]">Est. Duration</span>
+                  <span className="font-medium text-[#1A1C20]">{estimatedDuration}</span>
                 </div>
               </div>
             </div>
 
-            {/* Visit Packages - PAYMENT REQUIRED */}
-            <div className="neo-card p-6 mb-6">
-              <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
-                <CreditCard className="w-5 h-5" />
+            {/* Visit Packages */}
+            <div className="bg-white border border-[#E5E1DB] p-6 mb-8">
+              <h3 className="text-lg mb-2 flex items-center gap-2" style={{ fontFamily: 'Playfair Display, serif' }}>
+                <CreditCard className="w-5 h-5 text-[#04473C]" strokeWidth={1.5} />
                 Select Visit Package
               </h3>
-              <p className="text-sm text-[#52525B] mb-4">
-                Payment is required before booking visits
+              <p className="text-sm text-[#4A4D53] mb-6">
+                Payment required before booking visits
               </p>
               
               <div className="space-y-3">
@@ -252,41 +253,43 @@ const VisitCart = () => {
                     key={pkg.id}
                     onClick={() => setSelectedPackage(pkg.id)}
                     disabled={pkg.visits < cart.length}
-                    className={`w-full p-4 rounded-xl border-2 text-left transition-all ${
+                    className={`w-full p-5 border text-left transition-all relative ${
                       selectedPackage === pkg.id
-                        ? 'border-[#111111] bg-[#FFD166] shadow-[3px_3px_0px_#111111]'
+                        ? 'border-[#04473C] bg-[#E6F0EE]'
                         : pkg.visits < cart.length
-                          ? 'border-gray-200 bg-gray-50 opacity-50 cursor-not-allowed'
-                          : 'border-[#111111] bg-white hover:shadow-[3px_3px_0px_#111111]'
+                          ? 'border-[#E5E1DB] bg-[#F5F3F0] opacity-50 cursor-not-allowed'
+                          : 'border-[#E5E1DB] hover:border-[#D0C9C0]'
                     }`}
                     data-testid={`package-${pkg.id}`}
                   >
+                    {pkg.popular && (
+                      <span className="absolute -top-3 right-4 premium-badge">Popular</span>
+                    )}
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className={`w-6 h-6 rounded-full border-2 border-[#111111] flex items-center justify-center ${
-                          selectedPackage === pkg.id ? 'bg-[#111111]' : 'bg-white'
+                      <div className="flex items-center gap-4">
+                        <div className={`w-5 h-5 border flex items-center justify-center ${
+                          selectedPackage === pkg.id 
+                            ? 'border-[#04473C] bg-[#04473C]' 
+                            : 'border-[#D0C9C0]'
                         }`}>
-                          {selectedPackage === pkg.id && <Check className="w-4 h-4 text-white" />}
+                          {selectedPackage === pkg.id && <Check className="w-3 h-3 text-white" strokeWidth={2} />}
                         </div>
                         <div>
-                          <div className="flex items-center gap-2">
-                            <span className="font-bold">{pkg.visits} Visit{pkg.visits > 1 ? 's' : ''}</span>
-                            {pkg.popular && (
-                              <span className="badge badge-hot text-xs px-2 py-0.5">POPULAR</span>
-                            )}
-                          </div>
-                          <span className="text-sm text-[#52525B]">Valid for {pkg.validity}</span>
+                          <span className="font-medium text-[#1A1C20]">{pkg.visits} Visit{pkg.visits > 1 ? 's' : ''}</span>
+                          <span className="text-sm text-[#4A4D53] ml-2">· Valid for {pkg.validity}</span>
                         </div>
                       </div>
                       <div className="text-right">
-                        <span className="text-2xl font-black" style={{ fontFamily: 'Outfit' }}>₹{pkg.price}</span>
+                        <span className="price-display text-xl">
+                          <span className="price-currency text-sm">₹</span>{pkg.price}
+                        </span>
                         {pkg.visits > 1 && (
-                          <p className="text-xs text-[#52525B]">₹{Math.round(pkg.price / pkg.visits)}/visit</p>
+                          <p className="text-xs text-[#4A4D53]">₹{Math.round(pkg.price / pkg.visits)}/visit</p>
                         )}
                       </div>
                     </div>
                     {pkg.visits < cart.length && (
-                      <p className="text-xs text-red-500 mt-2">
+                      <p className="text-xs text-[#8F2727] mt-2">
                         Not enough visits for {cart.length} properties
                       </p>
                     )}
@@ -296,13 +299,13 @@ const VisitCart = () => {
             </div>
 
             {/* Booking Details Form */}
-            <div className="neo-card p-6 mb-6">
-              <h3 className="font-bold text-lg mb-4">Schedule Your Visit</h3>
+            <div className="bg-white border border-[#E5E1DB] p-6 mb-8">
+              <h3 className="text-lg mb-6" style={{ fontFamily: 'Playfair Display, serif' }}>Schedule Your Visit</h3>
               
-              <div className="space-y-4">
+              <div className="space-y-5">
                 <div>
-                  <label className="block text-sm font-bold mb-2">
-                    <Calendar className="w-4 h-4 inline mr-2" />
+                  <label className="premium-label flex items-center gap-2">
+                    <Calendar className="w-4 h-4" strokeWidth={1.5} />
                     Visit Date
                   </label>
                   <input
@@ -310,20 +313,20 @@ const VisitCart = () => {
                     value={bookingData.scheduled_date}
                     onChange={(e) => setBookingData(prev => ({ ...prev, scheduled_date: e.target.value }))}
                     min={new Date().toISOString().split('T')[0]}
-                    className="input-field"
+                    className="premium-input"
                     data-testid="scheduled-date-input"
                   />
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-bold mb-2">
-                    <Clock className="w-4 h-4 inline mr-2" />
+                  <label className="premium-label flex items-center gap-2">
+                    <Clock className="w-4 h-4" strokeWidth={1.5} />
                     Preferred Time
                   </label>
                   <select
                     value={bookingData.scheduled_time}
                     onChange={(e) => setBookingData(prev => ({ ...prev, scheduled_time: e.target.value }))}
-                    className="input-field"
+                    className="premium-input"
                     data-testid="scheduled-time-input"
                   >
                     <option value="">Select a time</option>
@@ -339,8 +342,8 @@ const VisitCart = () => {
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-bold mb-2">
-                    <MapPin className="w-4 h-4 inline mr-2" />
+                  <label className="premium-label flex items-center gap-2">
+                    <MapPin className="w-4 h-4" strokeWidth={1.5} />
                     Pickup Location
                   </label>
                   <input
@@ -348,36 +351,35 @@ const VisitCart = () => {
                     value={bookingData.pickup_location}
                     onChange={(e) => setBookingData(prev => ({ ...prev, pickup_location: e.target.value }))}
                     placeholder="Where should we pick you up?"
-                    className="input-field"
+                    className="premium-input"
                     data-testid="pickup-location-input"
                   />
                 </div>
               </div>
             </div>
 
-            {/* Pay & Book Button */}
-            <div className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-[#111111] p-4">
+            {/* Pay & Book Button - Fixed Bottom */}
+            <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-[#E5E1DB] p-4 z-40">
               <div className="max-w-4xl mx-auto flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-[#52525B]">Total Payment</p>
-                  <p className="text-2xl font-black" style={{ fontFamily: 'Outfit' }}>
-                    ₹{selectedPkg?.price || 0}
+                  <p className="text-xs text-[#4A4D53] uppercase tracking-wide">Total Payment</p>
+                  <p className="price-display text-2xl">
+                    <span className="price-currency text-base">₹</span>
+                    {selectedPkg?.price || 0}
                   </p>
                 </div>
                 <button
                   onClick={handlePayAndBook}
                   disabled={loading || !selectedPackage || cart.length === 0}
-                  className="btn-primary flex items-center gap-2"
+                  className="btn-primary flex items-center gap-2 disabled:opacity-50"
                   data-testid="pay-and-book-button"
                 >
                   {loading ? (
-                    <div className="kinetic-loader" style={{ transform: 'scale(0.4)' }}>
-                      <span></span><span></span><span></span>
-                    </div>
+                    <span className="inline-block w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                   ) : (
                     <>
                       Pay & Book
-                      <ChevronRight className="w-5 h-5" />
+                      <ChevronRight className="w-5 h-5" strokeWidth={1.5} />
                     </>
                   )}
                 </button>

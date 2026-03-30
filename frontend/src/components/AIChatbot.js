@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MessageCircle, Send, X, Home, MapPin, Sparkles, Bot, User, ChevronRight, Plus, Trash2 } from 'lucide-react';
+import { MessageCircle, Send, X, Home, MapPin, Sparkles, Bot, User, ChevronRight, Plus } from 'lucide-react';
 import { chatbotAPI, getMediaUrl } from '../utils/api';
 
 const AIChatbot = () => {
@@ -20,14 +20,13 @@ const AIChatbot = () => {
     scrollToBottom();
   }, [messages]);
 
-  // Start new session when chat opens
   const startNewSession = async () => {
     try {
       const response = await chatbotAPI.newSession();
       setSessionId(response.data.session_id);
       setMessages([{
         role: 'assistant',
-        content: response.data.message || "Namaste! 🏠 I'm your ApnaGhr assistant. Tell me about your dream home - what's your budget, preferred location, or BHK type?",
+        content: response.data.message || "Welcome to ApnaGhr. I'm here to help you find your perfect home. What's your budget, preferred location, or property type?",
         timestamp: new Date()
       }]);
       setShowPropertyCards([]);
@@ -74,7 +73,7 @@ const AIChatbot = () => {
       console.error('Chat error:', error);
       setMessages(prev => [...prev, {
         role: 'assistant',
-        content: 'Oops! Something went wrong. Please try again.',
+        content: 'I apologize, something went wrong. Please try again.',
         timestamp: new Date()
       }]);
     } finally {
@@ -98,14 +97,13 @@ const AIChatbot = () => {
 
   return (
     <>
-      {/* Floating Chat Button */}
+      {/* Floating Chat Button - Premium Design */}
       <motion.button
         data-testid="chatbot-toggle-btn"
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-24 right-6 z-50 w-16 h-16 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 shadow-brutal-lg flex items-center justify-center border-3 border-black"
-        whileHover={{ scale: 1.1, rotate: 5 }}
+        className="fixed bottom-24 right-6 z-50 w-14 h-14 bg-[#04473C] shadow-xl flex items-center justify-center group"
+        whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
-        style={{ boxShadow: '4px 4px 0px 0px rgba(0,0,0,1)' }}
       >
         <AnimatePresence mode="wait">
           {isOpen ? (
@@ -115,7 +113,7 @@ const AIChatbot = () => {
               animate={{ rotate: 0, opacity: 1 }}
               exit={{ rotate: 90, opacity: 0 }}
             >
-              <X className="w-7 h-7 text-black" />
+              <X className="w-6 h-6 text-white" strokeWidth={1.5} />
             </motion.div>
           ) : (
             <motion.div
@@ -125,9 +123,9 @@ const AIChatbot = () => {
               exit={{ rotate: -90, opacity: 0 }}
               className="relative"
             >
-              <Bot className="w-7 h-7 text-black" />
+              <MessageCircle className="w-6 h-6 text-white" strokeWidth={1.5} />
               <motion.span
-                className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full border-2 border-black"
+                className="absolute -top-1 -right-1 w-3 h-3 bg-[#C6A87C] rounded-full"
                 animate={{ scale: [1, 1.2, 1] }}
                 transition={{ repeat: Infinity, duration: 2 }}
               />
@@ -136,72 +134,66 @@ const AIChatbot = () => {
         </AnimatePresence>
       </motion.button>
 
-      {/* Chat Window */}
+      {/* Chat Window - Premium Design */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
             data-testid="chatbot-window"
-            initial={{ opacity: 0, y: 100, scale: 0.9 }}
+            initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 100, scale: 0.9 }}
-            className="fixed bottom-44 right-6 z-50 w-96 h-[500px] max-h-[70vh] bg-white rounded-2xl border-3 border-black overflow-hidden flex flex-col"
-            style={{ boxShadow: '8px 8px 0px 0px rgba(0,0,0,1)' }}
+            exit={{ opacity: 0, y: 20, scale: 0.95 }}
+            transition={{ duration: 0.2 }}
+            className="fixed bottom-44 right-6 z-50 w-96 h-[500px] max-h-[70vh] bg-white border border-[#E5E1DB] overflow-hidden flex flex-col shadow-2xl"
           >
             {/* Header */}
-            <div className="bg-gradient-to-r from-amber-400 to-orange-500 p-4 border-b-3 border-black">
+            <div className="bg-[#04473C] p-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <motion.div
-                    className="w-10 h-10 bg-white rounded-full border-2 border-black flex items-center justify-center"
-                    animate={{ rotate: [0, 10, -10, 0] }}
-                    transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
-                  >
-                    <Sparkles className="w-5 h-5 text-amber-500" />
-                  </motion.div>
+                  <div className="w-10 h-10 bg-white/10 flex items-center justify-center">
+                    <Sparkles className="w-5 h-5 text-[#C6A87C]" strokeWidth={1.5} />
+                  </div>
                   <div>
-                    <h3 className="font-black text-lg text-black">ApnaGhr AI</h3>
-                    <p className="text-xs font-bold text-black/70">Your Property Assistant</p>
+                    <h3 className="font-medium text-white" style={{ fontFamily: 'Playfair Display, serif' }}>ApnaGhr AI</h3>
+                    <p className="text-xs text-white/60">Property Assistant</p>
                   </div>
                 </div>
                 <button
                   data-testid="new-chat-btn"
                   onClick={startNewSession}
-                  className="p-2 hover:bg-black/10 rounded-lg transition-colors"
+                  className="p-2 hover:bg-white/10 transition-colors"
                   title="New Chat"
                 >
-                  <Plus className="w-5 h-5 text-black" />
+                  <Plus className="w-5 h-5 text-white" strokeWidth={1.5} />
                 </button>
               </div>
             </div>
 
             {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
+            <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-[#FDFCFB]">
               {messages.map((msg, idx) => (
                 <motion.div
                   key={idx}
-                  initial={{ opacity: 0, y: 20 }}
+                  initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: idx * 0.05 }}
+                  transition={{ delay: idx * 0.03 }}
                   className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
                 >
                   <div className={`flex items-start gap-2 max-w-[85%] ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
-                    <div className={`w-8 h-8 rounded-full border-2 border-black flex items-center justify-center flex-shrink-0 ${
-                      msg.role === 'user' ? 'bg-blue-400' : 'bg-amber-400'
+                    <div className={`w-7 h-7 flex items-center justify-center flex-shrink-0 ${
+                      msg.role === 'user' ? 'bg-[#04473C]' : 'bg-[#C6A87C]'
                     }`}>
                       {msg.role === 'user' ? (
-                        <User className="w-4 h-4 text-black" />
+                        <User className="w-4 h-4 text-white" strokeWidth={1.5} />
                       ) : (
-                        <Bot className="w-4 h-4 text-black" />
+                        <Bot className="w-4 h-4 text-[#1A1C20]" strokeWidth={1.5} />
                       )}
                     </div>
-                    <div className={`rounded-2xl p-3 border-2 border-black ${
+                    <div className={`p-3 ${
                       msg.role === 'user' 
-                        ? 'bg-blue-400 text-black' 
-                        : 'bg-white text-black'
-                    }`}
-                      style={{ boxShadow: '3px 3px 0px 0px rgba(0,0,0,1)' }}
-                    >
-                      <p className="text-sm font-medium whitespace-pre-wrap">{msg.content}</p>
+                        ? 'bg-[#04473C] text-white' 
+                        : 'bg-white border border-[#E5E1DB] text-[#1A1C20]'
+                    }`}>
+                      <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.content}</p>
                     </div>
                   </div>
                 </motion.div>
@@ -214,20 +206,20 @@ const AIChatbot = () => {
                   animate={{ opacity: 1 }}
                   className="flex items-center gap-2"
                 >
-                  <div className="w-8 h-8 rounded-full bg-amber-400 border-2 border-black flex items-center justify-center">
-                    <Bot className="w-4 h-4 text-black" />
+                  <div className="w-7 h-7 bg-[#C6A87C] flex items-center justify-center">
+                    <Bot className="w-4 h-4 text-[#1A1C20]" strokeWidth={1.5} />
                   </div>
-                  <div className="bg-white rounded-2xl p-3 border-2 border-black" style={{ boxShadow: '3px 3px 0px 0px rgba(0,0,0,1)' }}>
-                    <motion.div className="flex gap-1">
+                  <div className="bg-white border border-[#E5E1DB] p-3">
+                    <div className="flex gap-1">
                       {[0, 1, 2].map(i => (
                         <motion.span
                           key={i}
-                          className="w-2 h-2 bg-amber-400 rounded-full"
-                          animate={{ y: [0, -6, 0] }}
-                          transition={{ repeat: Infinity, duration: 0.6, delay: i * 0.1 }}
+                          className="w-2 h-2 bg-[#04473C] rounded-full"
+                          animate={{ y: [0, -4, 0] }}
+                          transition={{ repeat: Infinity, duration: 0.5, delay: i * 0.1 }}
                         />
                       ))}
-                    </motion.div>
+                    </div>
                   </div>
                 </motion.div>
               )}
@@ -235,20 +227,19 @@ const AIChatbot = () => {
               {/* Property Cards */}
               {showPropertyCards.length > 0 && (
                 <motion.div
-                  initial={{ opacity: 0, y: 20 }}
+                  initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   className="space-y-3 mt-4"
                 >
-                  <p className="text-xs font-bold text-gray-500 uppercase tracking-wide">Recommended Properties</p>
+                  <p className="text-xs font-medium tracking-wide uppercase text-[#4A4D53]">Recommended Properties</p>
                   {showPropertyCards.map((property, idx) => (
                     <motion.div
                       key={property.id}
-                      initial={{ opacity: 0, x: -20 }}
+                      initial={{ opacity: 0, x: -10 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: idx * 0.1 }}
                       data-testid={`property-card-${property.id}`}
-                      className="bg-white rounded-xl border-2 border-black overflow-hidden cursor-pointer hover:translate-x-1 hover:-translate-y-1 transition-transform"
-                      style={{ boxShadow: '4px 4px 0px 0px rgba(0,0,0,1)' }}
+                      className="bg-white border border-[#E5E1DB] overflow-hidden cursor-pointer hover:-translate-y-1 hover:shadow-lg transition-all"
                       onClick={() => window.open(`/property/${property.id}`, '_blank')}
                     >
                       <div className="flex">
@@ -256,7 +247,7 @@ const AIChatbot = () => {
                           <img
                             src={getMediaUrl(property.images[0])}
                             alt={property.title}
-                            className="w-20 h-20 object-cover border-r-2 border-black"
+                            className="w-20 h-20 object-cover border-r border-[#E5E1DB]"
                             onError={(e) => {
                               e.target.onerror = null;
                               e.target.src = 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80';
@@ -264,14 +255,18 @@ const AIChatbot = () => {
                           />
                         )}
                         <div className="flex-1 p-3">
-                          <h4 className="font-bold text-sm truncate">{property.title}</h4>
-                          <div className="flex items-center gap-1 text-xs text-gray-600 mt-1">
-                            <MapPin className="w-3 h-3" />
+                          <h4 className="font-medium text-sm truncate text-[#1A1C20]">{property.title}</h4>
+                          <div className="flex items-center gap-1 text-xs text-[#4A4D53] mt-1">
+                            <MapPin className="w-3 h-3" strokeWidth={1.5} />
                             <span className="truncate">{property.location}</span>
                           </div>
                           <div className="flex items-center justify-between mt-2">
-                            <span className="font-black text-green-600">₹{property.rent?.toLocaleString()}/mo</span>
-                            <ChevronRight className="w-4 h-4 text-gray-400" />
+                            <span className="price-display text-sm">
+                              <span className="price-currency text-xs">₹</span>
+                              {property.rent?.toLocaleString('en-IN')}
+                              <span className="text-[#4A4D53] text-xs font-normal">/mo</span>
+                            </span>
+                            <ChevronRight className="w-4 h-4 text-[#D0C9C0]" strokeWidth={1.5} />
                           </div>
                         </div>
                       </div>
@@ -285,20 +280,19 @@ const AIChatbot = () => {
 
             {/* Quick Prompts */}
             {messages.length <= 1 && (
-              <div className="px-4 py-2 border-t-2 border-black bg-gray-100">
-                <p className="text-xs font-bold text-gray-500 mb-2">Quick Start:</p>
+              <div className="px-4 py-3 border-t border-[#E5E1DB] bg-[#F5F3F0]">
+                <p className="text-xs font-medium tracking-wide uppercase text-[#4A4D53] mb-2">Quick Start</p>
                 <div className="flex flex-wrap gap-2">
                   {quickPrompts.map((prompt, idx) => (
                     <motion.button
                       key={idx}
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
                       onClick={() => {
                         setInput(prompt);
                         setTimeout(() => handleSendMessage(), 100);
                       }}
-                      className="px-3 py-1 bg-white rounded-full border-2 border-black text-xs font-bold hover:bg-amber-100 transition-colors"
-                      style={{ boxShadow: '2px 2px 0px 0px rgba(0,0,0,1)' }}
+                      className="px-3 py-1.5 bg-white border border-[#E5E1DB] text-xs font-medium text-[#1A1C20] hover:border-[#04473C] transition-colors"
                     >
                       {prompt}
                     </motion.button>
@@ -308,30 +302,26 @@ const AIChatbot = () => {
             )}
 
             {/* Input Area */}
-            <div className="p-4 border-t-3 border-black bg-white">
-              <div className="flex gap-2">
+            <div className="p-4 border-t border-[#E5E1DB] bg-white">
+              <div className="flex gap-3">
                 <input
                   data-testid="chatbot-input"
                   type="text"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyPress={handleKeyPress}
-                  placeholder="Tell me about your ideal home..."
-                  className="flex-1 px-4 py-3 rounded-xl border-2 border-black font-medium text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
-                  style={{ boxShadow: '3px 3px 0px 0px rgba(0,0,0,0.1)' }}
+                  placeholder="Describe your ideal home..."
+                  className="flex-1 px-4 py-3 border border-[#E5E1DB] text-sm focus:outline-none focus:border-[#04473C] transition-colors"
                   disabled={isLoading}
                 />
-                <motion.button
+                <button
                   data-testid="chatbot-send-btn"
                   onClick={handleSendMessage}
                   disabled={!input.trim() || isLoading}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="w-12 h-12 bg-gradient-to-br from-amber-400 to-orange-500 rounded-xl border-2 border-black flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
-                  style={{ boxShadow: '3px 3px 0px 0px rgba(0,0,0,1)' }}
+                  className="w-12 h-12 bg-[#04473C] flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[#03352D] transition-colors"
                 >
-                  <Send className="w-5 h-5 text-black" />
-                </motion.button>
+                  <Send className="w-5 h-5 text-white" strokeWidth={1.5} />
+                </button>
               </div>
             </div>
           </motion.div>

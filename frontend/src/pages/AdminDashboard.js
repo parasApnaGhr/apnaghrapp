@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
+import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import { 
-  Users, Package, Bike, LogOut, Home, DollarSign, TrendingUp, 
-  Settings, MapPin, CheckSquare, CreditCard, Bell, BarChart3, Image
+  Users, Package, Bike, LogOut, Home, DollarSign, 
+  Settings, MapPin, CheckSquare, CreditCard, BarChart3, Image
 } from 'lucide-react';
 import CustomerSupportPanel from '../components/CustomerSupportPanel';
 import InventoryPanel from '../components/InventoryPanel';
@@ -21,15 +22,30 @@ const AdminDashboard = () => {
   const [activePanel, setActivePanel] = useState('overview');
   const [showImageTool, setShowImageTool] = useState(false);
 
+  const tabs = [
+    { id: 'overview', label: 'Overview', icon: null },
+    { id: 'tracking', label: 'Live Tracking', icon: MapPin },
+    { id: 'approvals', label: 'Visit Approvals', icon: CheckSquare },
+    { id: 'tolet', label: 'ToLet Tasks', icon: Home },
+    { id: 'payouts', label: 'Payouts', icon: CreditCard },
+    { id: 'analytics', label: 'Property Analytics', icon: BarChart3 },
+    { id: 'riders', label: 'Riders', icon: Bike },
+    { id: 'support', label: 'Support', icon: Users },
+    { id: 'inventory', label: 'Inventory', icon: Package },
+    { id: 'settings', label: 'Settings', icon: Settings }
+  ];
+
   return (
-    <div className="min-h-screen bg-[#FAF9F6]">
-      {/* Header */}
-      <header className="bg-white border-b border-[#E5E3D8] sticky top-0 z-50">
+    <div className="min-h-screen bg-[#FDFCFB]">
+      {/* Premium Header */}
+      <header className="glass-header sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold" style={{ fontFamily: 'Outfit' }}>Admin Control Center</h1>
-              <p className="text-sm text-[#4A626C]">ApnaGhr Visit Platform Management</p>
+              <h1 className="text-2xl tracking-tight" style={{ fontFamily: 'Playfair Display, serif' }}>
+                Admin Control Center
+              </h1>
+              <p className="text-sm text-[#4A4D53]">ApnaGhr Platform Management</p>
             </div>
             <div className="flex items-center gap-3">
               <NotificationsDropdown />
@@ -38,7 +54,7 @@ const AdminDashboard = () => {
                 className="btn-secondary flex items-center gap-2"
                 data-testid="logout-button"
               >
-                <LogOut className="w-4 h-4" />
+                <LogOut className="w-4 h-4" strokeWidth={1.5} />
                 Logout
               </button>
             </div>
@@ -46,248 +62,130 @@ const AdminDashboard = () => {
         </div>
       </header>
 
-      {/* Navigation Tabs - Two Rows */}
-      <div className="bg-white border-b border-[#E5E3D8]">
+      {/* Navigation Tabs */}
+      <div className="bg-white border-b border-[#E5E1DB]">
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex flex-wrap gap-1">
-            <button
-              onClick={() => setActivePanel('overview')}
-              className={`px-4 py-3 font-medium text-sm transition ${
-                activePanel === 'overview'
-                  ? 'text-[#E07A5F] border-b-2 border-[#E07A5F]'
-                  : 'text-[#4A626C] hover:text-[#264653]'
-              }`}
-              data-testid="tab-overview"
-            >
-              Overview
-            </button>
-            <button
-              onClick={() => setActivePanel('tracking')}
-              className={`px-4 py-3 font-medium text-sm transition flex items-center gap-2 ${
-                activePanel === 'tracking'
-                  ? 'text-[#E07A5F] border-b-2 border-[#E07A5F]'
-                  : 'text-[#4A626C] hover:text-[#264653]'
-              }`}
-              data-testid="tab-tracking"
-            >
-              <MapPin className="w-4 h-4" />
-              Live Tracking
-            </button>
-            <button
-              onClick={() => setActivePanel('approvals')}
-              className={`px-4 py-3 font-medium text-sm transition flex items-center gap-2 ${
-                activePanel === 'approvals'
-                  ? 'text-[#E07A5F] border-b-2 border-[#E07A5F]'
-                  : 'text-[#4A626C] hover:text-[#264653]'
-              }`}
-              data-testid="tab-approvals"
-            >
-              <CheckSquare className="w-4 h-4" />
-              Visit Approvals
-            </button>
-            <button
-              onClick={() => setActivePanel('tolet')}
-              className={`px-4 py-3 font-medium text-sm transition flex items-center gap-2 ${
-                activePanel === 'tolet'
-                  ? 'text-[#E07A5F] border-b-2 border-[#E07A5F]'
-                  : 'text-[#4A626C] hover:text-[#264653]'
-              }`}
-              data-testid="tab-tolet"
-            >
-              <Home className="w-4 h-4" />
-              ToLet Tasks
-            </button>
-            <button
-              onClick={() => setActivePanel('payouts')}
-              className={`px-4 py-3 font-medium text-sm transition flex items-center gap-2 ${
-                activePanel === 'payouts'
-                  ? 'text-[#E07A5F] border-b-2 border-[#E07A5F]'
-                  : 'text-[#4A626C] hover:text-[#264653]'
-              }`}
-              data-testid="tab-payouts"
-            >
-              <CreditCard className="w-4 h-4" />
-              Payouts
-            </button>
-            <button
-              onClick={() => setActivePanel('analytics')}
-              className={`px-4 py-3 font-medium text-sm transition flex items-center gap-2 ${
-                activePanel === 'analytics'
-                  ? 'text-[#E07A5F] border-b-2 border-[#E07A5F]'
-                  : 'text-[#4A626C] hover:text-[#264653]'
-              }`}
-              data-testid="tab-analytics"
-            >
-              <BarChart3 className="w-4 h-4" />
-              Property Analytics
-            </button>
-            <button
-              onClick={() => setActivePanel('riders')}
-              className={`px-4 py-3 font-medium text-sm transition flex items-center gap-2 ${
-                activePanel === 'riders'
-                  ? 'text-[#E07A5F] border-b-2 border-[#E07A5F]'
-                  : 'text-[#4A626C] hover:text-[#264653]'
-              }`}
-              data-testid="tab-riders"
-            >
-              <Bike className="w-4 h-4" />
-              Riders
-            </button>
-            <button
-              onClick={() => setActivePanel('support')}
-              className={`px-4 py-3 font-medium text-sm transition flex items-center gap-2 ${
-                activePanel === 'support'
-                  ? 'text-[#E07A5F] border-b-2 border-[#E07A5F]'
-                  : 'text-[#4A626C] hover:text-[#264653]'
-              }`}
-              data-testid="tab-support"
-            >
-              <Users className="w-4 h-4" />
-              Support
-            </button>
-            <button
-              onClick={() => setActivePanel('inventory')}
-              className={`px-4 py-3 font-medium text-sm transition flex items-center gap-2 ${
-                activePanel === 'inventory'
-                  ? 'text-[#E07A5F] border-b-2 border-[#E07A5F]'
-                  : 'text-[#4A626C] hover:text-[#264653]'
-              }`}
-              data-testid="tab-inventory"
-            >
-              <Package className="w-4 h-4" />
-              Inventory
-            </button>
-            <button
-              onClick={() => setActivePanel('settings')}
-              className={`px-4 py-3 font-medium text-sm transition flex items-center gap-2 ${
-                activePanel === 'settings'
-                  ? 'text-[#E07A5F] border-b-2 border-[#E07A5F]'
-                  : 'text-[#4A626C] hover:text-[#264653]'
-              }`}
-              data-testid="tab-settings"
-            >
-              <Settings className="w-4 h-4" />
-              Settings
-            </button>
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActivePanel(tab.id)}
+                className={`px-4 py-3 text-sm font-medium transition-all flex items-center gap-2 ${
+                  activePanel === tab.id
+                    ? 'text-[#04473C] border-b-2 border-[#04473C]'
+                    : 'text-[#4A4D53] hover:text-[#1A1C20]'
+                }`}
+                data-testid={`tab-${tab.id}`}
+              >
+                {tab.icon && <tab.icon className="w-4 h-4" strokeWidth={1.5} />}
+                {tab.label}
+              </button>
+            ))}
           </div>
         </div>
       </div>
 
       {/* Content */}
-      <main className="max-w-7xl mx-auto px-6 py-6">
+      <main className="max-w-7xl mx-auto px-6 py-8">
         {activePanel === 'overview' && (
-          <div>
-            <h2 className="text-2xl font-bold mb-6" style={{ fontFamily: 'Outfit' }}>Platform Overview</h2>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            <h2 className="text-2xl mb-8" style={{ fontFamily: 'Playfair Display, serif' }}>Platform Overview</h2>
             
-            <div className="admin-bento mb-6">
-              <div className="stat-card">
-                <div className="flex items-center justify-between mb-2">
-                  <p className="text-sm text-[#4A626C]">Total Properties</p>
-                  <Home className="w-5 h-5 text-[#E07A5F]" />
-                </div>
-                <p className="text-3xl font-bold" style={{ fontFamily: 'Outfit' }}>156</p>
-                <p className="text-xs text-[#2A9D8F] mt-1">+12 this week</p>
-              </div>
-
-              <div className="stat-card">
-                <div className="flex items-center justify-between mb-2">
-                  <p className="text-sm text-[#4A626C]">Active Riders</p>
-                  <Bike className="w-5 h-5 text-[#E07A5F]" />
-                </div>
-                <p className="text-3xl font-bold" style={{ fontFamily: 'Outfit' }}>24</p>
-                <p className="text-xs text-[#2A9D8F] mt-1">12 on duty</p>
-              </div>
-
-              <div className="stat-card">
-                <div className="flex items-center justify-between mb-2">
-                  <p className="text-sm text-[#4A626C]">Visits Today</p>
-                  <Users className="w-5 h-5 text-[#E07A5F]" />
-                </div>
-                <p className="text-3xl font-bold" style={{ fontFamily: 'Outfit' }}>47</p>
-                <p className="text-xs text-[#2A9D8F] mt-1">+18% vs yesterday</p>
-              </div>
-
-              <div className="stat-card">
-                <div className="flex items-center justify-between mb-2">
-                  <p className="text-sm text-[#4A626C]">Revenue Today</p>
-                  <DollarSign className="w-5 h-5 text-[#E07A5F]" />
-                </div>
-                <p className="text-3xl font-bold" style={{ fontFamily: 'Outfit' }}>₹11,400</p>
-                <p className="text-xs text-[#2A9D8F] mt-1">+₹2,100</p>
-              </div>
+            {/* Stats Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+              {[
+                { label: 'Total Properties', value: '156', change: '+12 this week', icon: Home, color: '#04473C' },
+                { label: 'Active Riders', value: '24', change: '12 on duty', icon: Bike, color: '#C6A87C' },
+                { label: 'Visits Today', value: '47', change: '+18% vs yesterday', icon: Users, color: '#04473C' },
+                { label: 'Revenue Today', value: '₹11,400', change: '+₹2,100', icon: DollarSign, color: '#C6A87C' }
+              ].map((stat, idx) => (
+                <motion.div
+                  key={stat.label}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: idx * 0.1 }}
+                  className="bg-white border border-[#E5E1DB] p-6 hover:shadow-lg transition-shadow"
+                >
+                  <div className="flex items-center justify-between mb-4">
+                    <p className="text-sm text-[#4A4D53] tracking-wide uppercase">{stat.label}</p>
+                    <div className="w-10 h-10 flex items-center justify-center" style={{ backgroundColor: `${stat.color}10` }}>
+                      <stat.icon className="w-5 h-5" style={{ color: stat.color }} strokeWidth={1.5} />
+                    </div>
+                  </div>
+                  <p className="price-display text-3xl">{stat.value}</p>
+                  <p className="text-xs text-[#04473C] mt-2">{stat.change}</p>
+                </motion.div>
+              ))}
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div className="bg-white rounded-xl border border-[#E5E3D8] p-6">
-                <h3 className="font-bold mb-4">Quick Actions</h3>
-                <div className="space-y-2">
+              {/* Quick Actions */}
+              <div className="bg-white border border-[#E5E1DB] p-6">
+                <h3 className="text-lg mb-4" style={{ fontFamily: 'Playfair Display, serif' }}>Quick Actions</h3>
+                <div className="space-y-3">
                   <button
                     onClick={() => setActivePanel('tracking')}
                     className="btn-primary w-full text-left flex items-center gap-2"
                   >
-                    <MapPin className="w-4 h-4" />
+                    <MapPin className="w-4 h-4" strokeWidth={1.5} />
                     View Live Tracking
                   </button>
                   <button
                     onClick={() => setActivePanel('approvals')}
                     className="btn-secondary w-full text-left flex items-center gap-2"
                   >
-                    <CheckSquare className="w-4 h-4" />
+                    <CheckSquare className="w-4 h-4" strokeWidth={1.5} />
                     Review Pending Visits
                   </button>
                   <button
                     onClick={() => setActivePanel('tolet')}
-                    className="w-full text-left px-4 py-3 border border-[#E5E3D8] rounded-lg hover:bg-[#F3F2EB] transition flex items-center gap-2"
+                    className="w-full text-left px-4 py-3 border border-[#E5E1DB] hover:border-[#D0C9C0] hover:bg-[#F5F3F0] transition-all flex items-center gap-2"
                   >
-                    <Home className="w-4 h-4" />
+                    <Home className="w-4 h-4" strokeWidth={1.5} />
                     Create ToLet Task
                   </button>
                   <button
                     onClick={() => setActivePanel('payouts')}
-                    className="w-full text-left px-4 py-3 border border-[#E5E3D8] rounded-lg hover:bg-[#F3F2EB] transition flex items-center gap-2"
+                    className="w-full text-left px-4 py-3 border border-[#E5E1DB] hover:border-[#D0C9C0] hover:bg-[#F5F3F0] transition-all flex items-center gap-2"
                   >
-                    <CreditCard className="w-4 h-4" />
+                    <CreditCard className="w-4 h-4" strokeWidth={1.5} />
                     Process Payouts
                   </button>
                   <button
                     onClick={() => setShowImageTool(true)}
-                    className="w-full text-left px-4 py-3 bg-amber-100 border border-amber-400 rounded-lg hover:bg-amber-200 transition flex items-center gap-2"
+                    className="w-full text-left px-4 py-3 bg-[#C6A87C]/10 border border-[#C6A87C] hover:bg-[#C6A87C]/20 transition-all flex items-center gap-2"
                     data-testid="image-migration-btn"
                   >
-                    <Image className="w-4 h-4 text-amber-600" />
-                    <span className="text-amber-800 font-medium">Fix Broken Images</span>
+                    <Image className="w-4 h-4 text-[#C6A87C]" strokeWidth={1.5} />
+                    <span className="text-[#1A1C20] font-medium">Fix Broken Images</span>
                   </button>
                 </div>
               </div>
 
-              <div className="bg-white rounded-xl border border-[#E5E3D8] p-6">
-                <h3 className="font-bold mb-4">Recent Activity</h3>
+              {/* Recent Activity */}
+              <div className="bg-white border border-[#E5E1DB] p-6">
+                <h3 className="text-lg mb-4" style={{ fontFamily: 'Playfair Display, serif' }}>Recent Activity</h3>
                 <div className="space-y-3">
-                  <div className="flex items-center gap-3 p-3 bg-[#F3F2EB] rounded-lg">
-                    <div className="w-2 h-2 rounded-full bg-[#2A9D8F]"></div>
-                    <div className="flex-1">
-                      <p className="text-sm font-medium">New visit booked</p>
-                      <p className="text-xs text-[#4A626C]">2 minutes ago</p>
+                  {[
+                    { text: 'New visit booked', time: '2 minutes ago', color: '#04473C' },
+                    { text: 'Rider completed visit', time: '15 minutes ago', color: '#C6A87C' },
+                    { text: 'ToLet task created', time: '28 minutes ago', color: '#04473C' }
+                  ].map((activity, idx) => (
+                    <div key={idx} className="flex items-center gap-3 p-4 bg-[#F5F3F0]">
+                      <div className="w-2 h-2 rounded-full" style={{ backgroundColor: activity.color }}></div>
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-[#1A1C20]">{activity.text}</p>
+                        <p className="text-xs text-[#4A4D53]">{activity.time}</p>
+                      </div>
                     </div>
-                  </div>
-                  <div className="flex items-center gap-3 p-3 bg-[#F3F2EB] rounded-lg">
-                    <div className="w-2 h-2 rounded-full bg-[#E07A5F]"></div>
-                    <div className="flex-1">
-                      <p className="text-sm font-medium">Rider completed visit</p>
-                      <p className="text-xs text-[#4A626C]">15 minutes ago</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3 p-3 bg-[#F3F2EB] rounded-lg">
-                    <div className="w-2 h-2 rounded-full bg-[#F4A261]"></div>
-                    <div className="flex-1">
-                      <p className="text-sm font-medium">ToLet task created</p>
-                      <p className="text-xs text-[#4A626C]">28 minutes ago</p>
-                    </div>
-                  </div>
+                  ))}
                 </div>
               </div>
             </div>
-          </div>
+          </motion.div>
         )}
 
         {activePanel === 'tracking' && <LiveTrackingPanel />}
