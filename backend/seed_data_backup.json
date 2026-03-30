@@ -1,0 +1,3554 @@
+{
+  "users": [
+    {
+      "id": "customer-001",
+      "name": "Rahul Kumar",
+      "phone": "9999999999",
+      "email": "rahul@example.com",
+      "password": "$2b$12$b5JFFU6Pkgr6xxUodoikZuH2dLC7Uw6vxw2KmhjdSUBtMaGccgJsO",
+      "role": "advertiser"
+    },
+    {
+      "id": "rider-001",
+      "name": "Aman Singh",
+      "phone": "8888888888",
+      "email": "aman@example.com",
+      "password": "$2b$12$W.TRRWTMllvGQW2hHfLRIefzNIiVvnzsGrDNIN58aw9xZrJr2zAwW",
+      "role": "rider",
+      "is_online": false,
+      "last_location_update": "2026-03-28T13:08:45.924809+00:00",
+      "current_lat": 30.7046,
+      "current_lng": 76.7179
+    },
+    {
+      "id": "admin-001",
+      "name": "Admin User",
+      "phone": "7777777777",
+      "email": "admin@apnaghr.com",
+      "password": "$2b$12$f2RXBQbWvhvWN1LNjaj5huKxawgrP4s07hTTU.joK2TNXozH30/b2",
+      "role": "admin"
+    },
+    {
+      "id": "inventory-admin-001",
+      "name": "Property Manager",
+      "phone": "6666666666",
+      "email": "inventory@apnaghr.com",
+      "password": "$2b$12$JrfXGGF05bJEhUJPgDWDhOQRvbNHLtmKVqp3I3MBxebxs4uLPjy8G",
+      "role": "inventory_admin"
+    },
+    {
+      "id": "2720c98f-1dce-4a0d-b01b-77ce2941f1f9",
+      "name": "Paras",
+      "phone": "9915413810",
+      "email": "",
+      "password": "$2b$12$pfdXA9X9RGefSrJa0LylVuNdTBFDhiqrtuMCl7xLN9ogBOwImwXZm",
+      "role": "rider",
+      "created_at": "2026-03-26T09:59:09.306038+00:00"
+    },
+    {
+      "id": "3011534a-3d99-43e3-828f-427b5bcfdd31",
+      "name": "Paras",
+      "phone": "9877848925",
+      "email": "",
+      "password": "$2b$12$pfdXA9X9RGefSrJa0LylVuNdTBFDhiqrtuMCl7xLN9ogBOwImwXZm",
+      "role": "rider",
+      "is_online": false,
+      "current_lat": null,
+      "current_lng": null,
+      "last_location_update": null,
+      "created_at": "2026-03-27T19:29:16.667854+00:00"
+    },
+    {
+      "id": "4eb8267f-342d-4b89-bc59-729498d97a93",
+      "name": "Paras",
+      "phone": "7696046257",
+      "email": "Parass0206@gmail.com",
+      "password": "$2b$12$pfdXA9X9RGefSrJa0LylVuNdTBFDhiqrtuMCl7xLN9ogBOwImwXZm",
+      "role": "customer",
+      "is_online": false,
+      "current_lat": null,
+      "current_lng": null,
+      "last_location_update": null,
+      "created_at": "2026-03-27T20:57:05.509999+00:00"
+    },
+    {
+      "id": "c420faa7-8a0a-4a5a-b550-54d90f08300a",
+      "name": "Test Customer",
+      "phone": "6123456789",
+      "email": null,
+      "password": "$2b$12$B7dgp5mmDE/cwBBvbZ2gIewsMg9UGN9AenAwzXIlUhN7WOYnUC2cq",
+      "role": "customer",
+      "is_online": false,
+      "current_lat": null,
+      "current_lng": null,
+      "last_location_update": null,
+      "created_at": "2026-03-27T22:24:47.541151+00:00"
+    },
+    {
+      "id": "080020e9-386d-46ad-9295-5d58e4889d7d",
+      "name": "Test Customer 2",
+      "phone": "6234567890",
+      "email": null,
+      "password": "$2b$12$P928yW8dzykyHzRyJK2fCuwxk5x624psBwQ/0YawXxv9y4ym8N6/6",
+      "role": "customer",
+      "is_online": false,
+      "current_lat": null,
+      "current_lng": null,
+      "last_location_update": null,
+      "created_at": "2026-03-27T22:24:54.668645+00:00"
+    },
+    {
+      "id": "bc371b32-e267-4842-a240-789fc34e601b",
+      "name": "New Customer Test",
+      "phone": "6987654321",
+      "email": null,
+      "password": "$2b$12$PKSn4bCxiHVv7SklhAGQwOlxnmnZxS8T4plT.ydZo6qTbnpRi0N5C",
+      "role": "customer",
+      "is_online": false,
+      "current_lat": null,
+      "current_lng": null,
+      "last_location_update": null,
+      "created_at": "2026-03-27T22:25:24.092320+00:00"
+    },
+    {
+      "id": "f634647c-1710-45d3-8920-84371889ce04",
+      "name": "Test Rider",
+      "phone": "6111222333",
+      "email": null,
+      "password": "$2b$12$ggECDhnrfi.vHXeRTpS3WeRg5Ws8I5ozqUVWjoN2ReXQF359fveTC",
+      "role": "rider",
+      "is_online": false,
+      "current_lat": null,
+      "current_lng": null,
+      "last_location_update": null,
+      "created_at": "2026-03-27T22:25:33.494572+00:00"
+    },
+    {
+      "id": "9735b7ca-be7e-40d2-bd5f-c7f1469240b8",
+      "name": "Test Advertiser",
+      "phone": "6222333444",
+      "email": null,
+      "password": "$2b$12$RwvIpAEZBw/BmYO.S8zkzeizofc..gNiMcOcWFhGyG8MKr5C4t.n2",
+      "role": "advertiser",
+      "is_online": false,
+      "current_lat": null,
+      "current_lng": null,
+      "last_location_update": null,
+      "created_at": "2026-03-27T22:25:33.824970+00:00"
+    },
+    {
+      "id": "934c162c-a227-4bad-9912-bf4415e8473c",
+      "name": "Test Builder",
+      "phone": "6333444555",
+      "email": null,
+      "password": "$2b$12$4NIHBcJJt1qfpKEwiCwuz.n5fjmv.NO8GzWA3kFwGkDa6RRj1XmR.",
+      "role": "builder",
+      "is_online": false,
+      "current_lat": null,
+      "current_lng": null,
+      "last_location_update": null,
+      "created_at": "2026-03-27T22:25:34.187156+00:00"
+    },
+    {
+      "id": "a44ff6dc-224b-4517-8e27-1c7386b78567",
+      "name": "Frontend Test User",
+      "phone": "6777888999",
+      "email": "",
+      "password": "$2b$12$pkciV8.zShD3A56NPbzWAeUPvlXtBvXTgF0AvHRZR6TuWEWBNR3v6",
+      "role": "customer",
+      "is_online": false,
+      "current_lat": null,
+      "current_lng": null,
+      "last_location_update": null,
+      "created_at": "2026-03-27T22:26:04.975079+00:00"
+    },
+    {
+      "id": "ce1b34d0-8169-4621-a24e-dde22c19ec47",
+      "name": "Paras",
+      "phone": "9915087635",
+      "email": "parass0206@gmail.com",
+      "password": "$2b$12$pfdXA9X9RGefSrJa0LylVuNdTBFDhiqrtuMCl7xLN9ogBOwImwXZm",
+      "role": "customer",
+      "is_online": false,
+      "current_lat": null,
+      "current_lng": null,
+      "last_location_update": null,
+      "created_at": "2026-03-27T22:26:08.493040+00:00"
+    },
+    {
+      "id": "0f18a338-a29d-49e8-9e48-761d2b5df105",
+      "name": "TEST_2ee94c18_Customer",
+      "phone": "6490535473",
+      "email": "TEST_2ee94c18@test.com",
+      "password": "$2b$12$Qa6x6UhUYWVmNPWWPV4AN.gWz9qkFflfJnrFFigLy37iWJp7/Zz7i",
+      "role": "customer",
+      "is_online": false,
+      "current_lat": null,
+      "current_lng": null,
+      "last_location_update": null,
+      "created_at": "2026-03-27T22:37:27.074495+00:00"
+    },
+    {
+      "id": "71bcb779-f42b-4dc6-83af-602bd158f597",
+      "name": "TEST_ce8e392f_Rider",
+      "phone": "6898796162",
+      "email": null,
+      "password": "$2b$12$o0Qr6FpaKNHjLcwaZLzrvOCu8HXIpYeg12EWMtOVDj.jdWSTMW5fq",
+      "role": "rider",
+      "is_online": false,
+      "current_lat": null,
+      "current_lng": null,
+      "last_location_update": null,
+      "created_at": "2026-03-27T22:37:27.671218+00:00"
+    },
+    {
+      "id": "17c8d5fa-79c5-4204-98c9-28d58f877dd9",
+      "name": "TEST_71af535b_Advertiser",
+      "phone": "6094341956",
+      "email": "TEST_71af535b_adv@test.com",
+      "password": "$2b$12$MVof11BBjy/ASbTAXPHGDusA5.va0R3oRQcB4SV9m/XXHoV372SmO",
+      "role": "advertiser",
+      "is_online": false,
+      "current_lat": null,
+      "current_lng": null,
+      "last_location_update": null,
+      "created_at": "2026-03-27T22:37:28.281034+00:00"
+    },
+    {
+      "id": "9c24abdc-6bb6-4d0e-9b07-e6b3fb2a4d9f",
+      "name": "TEST_2448f6a4_Builder",
+      "phone": "6458341265",
+      "email": null,
+      "password": "$2b$12$3Ao2g0lvIL2Es6OfpwoRs.MDlTzyHCSaaZ9xdDw/xvyZwwvKY95rm",
+      "role": "builder",
+      "is_online": false,
+      "current_lat": null,
+      "current_lng": null,
+      "last_location_update": null,
+      "created_at": "2026-03-27T22:37:28.874710+00:00"
+    },
+    {
+      "id": "bcc44d1b-85d4-4e3a-9c13-785a43d56c1c",
+      "name": "First User",
+      "phone": "6467092806",
+      "email": null,
+      "password": "$2b$12$tZOa15cNH6y2ezNX7VyxxuQYHxxNh.bJ6.051On81ilHXmUdX0maC",
+      "role": "customer",
+      "is_online": false,
+      "current_lat": null,
+      "current_lng": null,
+      "last_location_update": null,
+      "created_at": "2026-03-27T22:37:29.468673+00:00"
+    },
+    {
+      "id": "f49d80f8-ae1c-4460-b8ff-a8acb7910655",
+      "name": "Test User",
+      "phone": "6779849845",
+      "email": null,
+      "password": "$2b$12$Uj9DywcWpeJkbHcsOTn4XO1Jt/X3QQEpwUGvIxE4Ll0T8V3g/r2pK",
+      "role": "customer",
+      "is_online": false,
+      "current_lat": null,
+      "current_lng": null,
+      "last_location_update": null,
+      "created_at": "2026-03-27T22:37:29.863304+00:00"
+    },
+    {
+      "id": "f67b713b-4bbc-44db-be07-8e5d516a314e",
+      "name": "Naitik Sharma",
+      "phone": "8196884631",
+      "email": "naitikchess0000@gmail.com",
+      "password": "$2b$12$JRmfwzXVsxPXsrHM4Tvva.iOg6Xfc7lCXwdu7bv6y4Aen386gJyVG",
+      "role": "customer",
+      "is_online": false,
+      "current_lat": null,
+      "current_lng": null,
+      "last_location_update": null,
+      "created_at": "2026-03-28T04:58:59.159889+00:00"
+    },
+    {
+      "id": "b969d879-8fdb-4350-84e2-7f6ee93eb4e8",
+      "name": "Test New User",
+      "phone": "9799250767",
+      "email": "",
+      "password": "$2b$12$pfdXA9X9RGefSrJa0LylVuNdTBFDhiqrtuMCl7xLN9ogBOwImwXZm",
+      "role": "customer",
+      "is_online": false,
+      "current_lat": null,
+      "current_lng": null,
+      "last_location_update": null,
+      "created_at": "2026-03-28T07:58:10.625738+00:00"
+    },
+    {
+      "id": "06d386dd-c095-4f29-8838-aee00fc1e029",
+      "name": "Test Right Now",
+      "phone": "9000000001",
+      "email": null,
+      "password": "$2b$12$uY17nfkgEQtr/8aovyHyqevg38ovnDW2G3bVDuJEkjzT4FrxtUQ3m",
+      "role": "customer",
+      "is_online": false,
+      "current_lat": null,
+      "current_lng": null,
+      "last_location_update": null,
+      "created_at": "2026-03-28T11:19:46.992182+00:00"
+    }
+  ],
+  "properties": [
+    {
+      "id": "prop-001",
+      "title": "Modern 2BHK Apartment in Sector 70",
+      "description": "Spacious 2BHK apartment with modern amenities, parking, and 24/7 security.",
+      "property_type": "Apartment",
+      "bhk": 2,
+      "rent": 25000.0,
+      "furnishing": "Semi-Furnished",
+      "area_name": "Sector 70",
+      "city": "Mohali",
+      "exact_address": "Block A, Sector 70, Mohali, Punjab 160071",
+      "latitude": 30.7046,
+      "longitude": 76.7179,
+      "images": [
+        "https://images.unsplash.com/photo-1772103628874-1b084bdae27b?crop=entropy&cs=srgb&fm=jpg&q=85",
+        "https://images.pexels.com/photos/2462015/pexels-photo-2462015.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940"
+      ],
+      "video_url": "",
+      "amenities": [
+        "Parking",
+        "Security",
+        "Gym",
+        "Power Backup"
+      ],
+      "available": true,
+      "verified_owner": true,
+      "premium_listing": false,
+      "is_hot": true,
+      "last_status_check": "2026-03-27T19:20:23.046427+00:00",
+      "status": "available",
+      "visit_count": 51,
+      "weekly_visits": 10,
+      "status_notes": "Need to confirm with owner",
+      "status_verified_by": "admin-001",
+      "last_visited": "2026-03-27T20:49:45.452512+00:00"
+    },
+    {
+      "id": "prop-002",
+      "title": "Luxury 3BHK Villa in Zirakpur",
+      "description": "Beautiful 3BHK villa with garden, modern kitchen, and premium fittings.",
+      "property_type": "Villa",
+      "bhk": 3,
+      "rent": 45000.0,
+      "furnishing": "Fully-Furnished",
+      "area_name": "Zirakpur",
+      "city": "Zirakpur",
+      "exact_address": "Villa Complex, Zirakpur Highway, Punjab 140603",
+      "latitude": 30.6421,
+      "longitude": 76.8185,
+      "images": [
+        "https://images.unsplash.com/photo-1759148955043-2e6cc5b97b81?crop=entropy&cs=srgb&fm=jpg&q=85",
+        "https://images.pexels.com/photos/6970070/pexels-photo-6970070.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940"
+      ],
+      "video_url": "",
+      "amenities": [
+        "Garden",
+        "Parking",
+        "Security",
+        "Club House",
+        "Swimming Pool"
+      ],
+      "available": true,
+      "verified_owner": true,
+      "premium_listing": true,
+      "is_hot": true,
+      "last_status_check": "2026-03-27T08:16:27.165731+00:00",
+      "status": "available",
+      "visit_count": 35,
+      "weekly_visits": 14,
+      "last_visited": "2026-03-27T20:50:03.868069+00:00"
+    },
+    {
+      "id": "prop-003",
+      "title": "Affordable 1BHK in Patiala",
+      "description": "Compact and well-maintained 1BHK apartment perfect for singles or couples.",
+      "property_type": "Apartment",
+      "bhk": 1,
+      "rent": 12000.0,
+      "furnishing": "Unfurnished",
+      "area_name": "Model Town",
+      "city": "Patiala",
+      "exact_address": "Model Town, Patiala, Punjab 147001",
+      "latitude": 30.3398,
+      "longitude": 76.3869,
+      "images": [
+        "https://images.unsplash.com/photo-1639059851892-95c80412298c?crop=entropy&cs=srgb&fm=jpg&q=85"
+      ],
+      "video_url": "",
+      "amenities": [
+        "Parking",
+        "Water Supply"
+      ],
+      "available": true,
+      "verified_owner": false,
+      "premium_listing": false,
+      "is_hot": false,
+      "last_status_check": "2026-03-26T01:16:27.166431+00:00",
+      "status": "available",
+      "visit_count": 8,
+      "weekly_visits": 7
+    },
+    {
+      "id": "965bfa11-6ff3-453b-a567-920232a5bbf9",
+      "title": "house  for rent  in bathinda ",
+      "description": "Beautiful location with great ammenities ",
+      "property_type": "House",
+      "bhk": 2,
+      "rent": 24998.0,
+      "furnishing": "Semi-Furnished",
+      "area_name": "ganpati enclave ",
+      "city": "Bathinda ",
+      "exact_address": "Ganpati enclave bathinda\n",
+      "latitude": null,
+      "longitude": null,
+      "images": [
+        "https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=800",
+        "https://images.unsplash.com/photo-1484154218962-a197022b25ba?w=800",
+        "https://images.unsplash.com/photo-1560184897-ae75f418493e?w=800"
+      ],
+      "video_url": "",
+      "amenities": [],
+      "available": true,
+      "verified_owner": false,
+      "premium_listing": false,
+      "created_at": "2026-03-26T10:11:07.738415+00:00",
+      "is_hot": false,
+      "last_status_check": "2026-03-25T19:16:27.167006+00:00",
+      "status": "available",
+      "visit_count": 21,
+      "weekly_visits": 0
+    },
+    {
+      "id": "1ac7e6fe-4c27-4387-bec8-8ddec194470a",
+      "title": "House ",
+      "description": "Beautiful ",
+      "property_type": "House",
+      "bhk": 3,
+      "rent": 40000.0,
+      "furnishing": "Semi-Furnished",
+      "area_name": "Sector 70",
+      "city": "Mohali",
+      "exact_address": "Sector 70 house no-1124 Near Suhana ",
+      "latitude": null,
+      "longitude": null,
+      "images": [
+        "https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=800",
+        "https://images.unsplash.com/photo-1484154218962-a197022b25ba?w=800",
+        "https://images.unsplash.com/photo-1560184897-ae75f418493e?w=800"
+      ],
+      "video_url": "",
+      "amenities": [],
+      "available": true,
+      "verified_owner": false,
+      "premium_listing": false,
+      "created_at": "2026-03-26T10:27:39.186257+00:00",
+      "is_hot": false,
+      "last_status_check": "2026-03-27T12:16:27.167603+00:00",
+      "status": "available",
+      "visit_count": 17,
+      "weekly_visits": 2
+    },
+    {
+      "id": "3658b790-4a37-41bf-b385-1df9f835b56e",
+      "title": "TEST_Admin Created Property",
+      "description": "Test property created by admin",
+      "property_type": "Apartment",
+      "bhk": 2,
+      "rent": 25000.0,
+      "furnishing": "Semi-Furnished",
+      "area_name": "Sector 22",
+      "city": "Chandigarh",
+      "exact_address": "123 Test Street, Sector 22",
+      "latitude": null,
+      "longitude": null,
+      "images": [
+        "https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=800",
+        "https://images.unsplash.com/photo-1484154218962-a197022b25ba?w=800",
+        "https://images.unsplash.com/photo-1560184897-ae75f418493e?w=800"
+      ],
+      "video_url": "",
+      "amenities": [
+        "Parking",
+        "Gym"
+      ],
+      "available": true,
+      "verified_owner": false,
+      "premium_listing": false,
+      "visit_count": 0,
+      "weekly_visits": 0,
+      "last_visited": null,
+      "status": "available",
+      "last_status_check": null,
+      "status_verified_by": null,
+      "status_notes": null,
+      "is_hot": false,
+      "created_at": "2026-03-27T22:13:14.956642+00:00"
+    },
+    {
+      "id": "cd8a3b9f-df77-4d5f-86ae-a3320874f6b6",
+      "title": "TEST_Admin Created Property",
+      "description": "Test property created by admin",
+      "property_type": "Apartment",
+      "bhk": 2,
+      "rent": 25000.0,
+      "furnishing": "Semi-Furnished",
+      "area_name": "Sector 22",
+      "city": "Chandigarh",
+      "exact_address": "123 Test Street, Sector 22",
+      "latitude": null,
+      "longitude": null,
+      "images": [
+        "https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=800",
+        "https://images.unsplash.com/photo-1484154218962-a197022b25ba?w=800",
+        "https://images.unsplash.com/photo-1560184897-ae75f418493e?w=800"
+      ],
+      "video_url": "",
+      "amenities": [
+        "Parking",
+        "Gym"
+      ],
+      "available": true,
+      "verified_owner": false,
+      "premium_listing": false,
+      "visit_count": 0,
+      "weekly_visits": 0,
+      "last_visited": null,
+      "status": "available",
+      "last_status_check": null,
+      "status_verified_by": null,
+      "status_notes": null,
+      "is_hot": false,
+      "created_at": "2026-03-27T22:14:14.833525+00:00"
+    },
+    {
+      "id": "859c92d6-5b76-4166-83da-37056a3ce26e",
+      "title": "2bhk apart ",
+      "description": "On Dabwali roas",
+      "property_type": "Apartment",
+      "bhk": 2,
+      "rent": 15000.0,
+      "furnishing": "Semi-Furnished",
+      "area_name": "Sheesh mahal",
+      "city": "Bathinda",
+      "exact_address": "Sheesh Mahal near Ganpati enclave ",
+      "latitude": null,
+      "longitude": null,
+      "images": [
+        "https://images.unsplash.com/photo-1560185127-6ed189bf02f4?w=800",
+        "https://images.unsplash.com/photo-1565182999561-18d7dc61c393?w=800",
+        "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800"
+      ],
+      "video_url": "https://field-rider-ops.preview.emergentagent.com/uploads/77d63aef-40c8-40e8-8e9d-38b8b84cfc21.mp4",
+      "amenities": [
+        "Parking"
+      ],
+      "available": true,
+      "verified_owner": false,
+      "premium_listing": false,
+      "visit_count": 0,
+      "weekly_visits": 0,
+      "last_visited": null,
+      "status": "available",
+      "last_status_check": null,
+      "status_verified_by": null,
+      "status_notes": null,
+      "is_hot": false,
+      "created_at": "2026-03-27T22:42:26.175286+00:00"
+    },
+    {
+      "id": "9fb4ab4f-05ec-41e6-b967-34cb3e33d8fd",
+      "title": "2BHK Modern Apartment in Koramangala",
+      "description": "Spacious 2BHK with modern amenities, close to metro station",
+      "rent": 14000,
+      "location": "Koramangala, Bangalore",
+      "address": "4th Block, Koramangala",
+      "latitude": 12.9352,
+      "longitude": 77.6245,
+      "bhk": "2BHK",
+      "is_available": true,
+      "amenities": [
+        "Parking",
+        "AC",
+        "Lift",
+        "Security"
+      ],
+      "images": [
+        "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800"
+      ],
+      "created_at": "2026-03-28T11:02:43.162549+00:00",
+      "updated_at": "2026-03-28T11:02:43.162558+00:00"
+    },
+    {
+      "id": "71aa08c5-aabc-47ea-95c8-123d36dcc448",
+      "title": "Furnished 2BHK near Metro",
+      "description": "Fully furnished flat with all amenities included",
+      "rent": 18000,
+      "location": "HSR Layout, Bangalore",
+      "address": "Sector 2, HSR Layout",
+      "latitude": 12.9116,
+      "longitude": 77.6389,
+      "bhk": "2BHK",
+      "is_available": true,
+      "amenities": [
+        "Parking",
+        "AC",
+        "Furnished",
+        "Gym",
+        "Security"
+      ],
+      "images": [
+        "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800"
+      ],
+      "created_at": "2026-03-28T11:02:43.162565+00:00",
+      "updated_at": "2026-03-28T11:02:43.162567+00:00"
+    },
+    {
+      "id": "23ec0656-404c-4600-88de-2ccad7d17d74",
+      "title": "Budget 1BHK in Whitefield",
+      "description": "Compact 1BHK perfect for bachelors",
+      "rent": 10000,
+      "location": "Whitefield, Bangalore",
+      "address": "ITPL Road, Whitefield",
+      "latitude": 12.9698,
+      "longitude": 77.75,
+      "bhk": "1BHK",
+      "is_available": true,
+      "amenities": [
+        "Parking",
+        "Security"
+      ],
+      "images": [
+        "https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=800"
+      ],
+      "created_at": "2026-03-28T11:02:43.162571+00:00",
+      "updated_at": "2026-03-28T11:02:43.162573+00:00"
+    },
+    {
+      "id": "746df854-8c86-4394-9052-b526bd7ef38a",
+      "title": "Spacious 3BHK Family Apartment",
+      "description": "Large 3BHK ideal for families, gated community",
+      "rent": 35000,
+      "location": "Indiranagar, Bangalore",
+      "address": "100 Feet Road, Indiranagar",
+      "latitude": 12.9719,
+      "longitude": 77.6412,
+      "bhk": "3BHK",
+      "is_available": true,
+      "amenities": [
+        "Parking",
+        "AC",
+        "Furnished",
+        "Gym",
+        "Pool",
+        "Garden",
+        "Security"
+      ],
+      "images": [
+        "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800"
+      ],
+      "created_at": "2026-03-28T11:02:43.162581+00:00",
+      "updated_at": "2026-03-28T11:02:43.162582+00:00"
+    },
+    {
+      "id": "fef77212-af85-4f8d-bd38-4d5501d254d7",
+      "title": "Pet Friendly 2BHK",
+      "description": "Pet-friendly apartment with garden access",
+      "rent": 16000,
+      "location": "Marathahalli, Bangalore",
+      "address": "Near Marathahalli Bridge",
+      "latitude": 12.9591,
+      "longitude": 77.6971,
+      "bhk": "2BHK",
+      "is_available": true,
+      "amenities": [
+        "Parking",
+        "Garden",
+        "Pet Friendly",
+        "Security"
+      ],
+      "images": [
+        "https://images.unsplash.com/photo-1560185127-6ed189bf02f4?w=800"
+      ],
+      "created_at": "2026-03-28T11:02:43.162587+00:00",
+      "updated_at": "2026-03-28T11:02:43.162588+00:00"
+    }
+  ],
+  "advertisements": [
+    {
+      "id": "985b82c3-b188-4d4b-b67e-87a47caeae3e",
+      "advertiser_id": "customer-001",
+      "company_name": "TEST_Company Ltd",
+      "package_tier": "starter",
+      "poster_images": [],
+      "video_url": null,
+      "target_url": null,
+      "description": "TEST_Best packers and movers in town!",
+      "placement": [
+        "home"
+      ],
+      "status": "pending",
+      "impressions": 0,
+      "clicks": 0,
+      "start_date": "2026-03-27",
+      "end_date": "2026-04-26",
+      "amount_paid": 2999.0,
+      "rejection_reason": null,
+      "created_at": "2026-03-27T20:24:02.516018+00:00",
+      "banner_image": "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800"
+    },
+    {
+      "id": "6af1428c-b3c2-413d-858b-93164f255ce0",
+      "advertiser_id": "customer-001",
+      "company_name": "TEST_Company Ltd",
+      "package_tier": "starter",
+      "poster_images": [],
+      "video_url": null,
+      "target_url": null,
+      "description": "TEST_Best packers and movers in town!",
+      "placement": [
+        "home"
+      ],
+      "status": "pending",
+      "impressions": 0,
+      "clicks": 0,
+      "start_date": "2026-03-27",
+      "end_date": "2026-04-26",
+      "amount_paid": 2999.0,
+      "rejection_reason": null,
+      "created_at": "2026-03-27T20:24:17.490817+00:00",
+      "banner_image": "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800"
+    },
+    {
+      "id": "59f62768-528b-419b-8a28-f6a8ecb2919a",
+      "advertiser_id": "customer-001",
+      "company_name": "TEST_Ad Company",
+      "package_tier": "starter",
+      "poster_images": [
+        "https://example.com/poster1.jpg"
+      ],
+      "video_url": null,
+      "target_url": null,
+      "description": "Test advertisement for payment testing",
+      "placement": [
+        "home_screen"
+      ],
+      "status": "pending",
+      "payment_status": null,
+      "payment_session_id": null,
+      "impressions": 0,
+      "clicks": 0,
+      "start_date": "2026-04-01",
+      "end_date": "2026-04-30",
+      "amount_paid": 2999.0,
+      "rejection_reason": null,
+      "created_at": "2026-03-27T21:58:09.637516+00:00",
+      "banner_image": "https://images.unsplash.com/photo-1600573472550-8090b5e0745e?w=800"
+    },
+    {
+      "id": "25e0eb05-8e0c-47b0-ba53-f404140618b8",
+      "advertiser_id": "customer-001",
+      "company_name": "TEST_Payment Ad Company",
+      "package_tier": "growth",
+      "poster_images": [],
+      "video_url": null,
+      "target_url": null,
+      "description": "Test ad for payment initiation",
+      "placement": [
+        "home_screen",
+        "property_detail"
+      ],
+      "status": "payment_pending",
+      "payment_status": null,
+      "payment_session_id": "apnaghr_4302259ffb36",
+      "impressions": 0,
+      "clicks": 0,
+      "start_date": "2026-04-01",
+      "end_date": "2026-04-30",
+      "amount_paid": 7999.0,
+      "rejection_reason": null,
+      "created_at": "2026-03-27T21:58:09.761295+00:00",
+      "banner_image": "https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?w=800"
+    },
+    {
+      "id": "2f1f7a9c-45ca-4c26-963a-0859e45e90c8",
+      "advertiser_id": "customer-001",
+      "company_name": "Test Verify Company",
+      "package_tier": "premium",
+      "poster_images": [],
+      "video_url": null,
+      "target_url": null,
+      "description": "Test ad",
+      "placement": [
+        "home_screen"
+      ],
+      "status": "payment_pending",
+      "payment_status": null,
+      "payment_session_id": "apnaghr_4340c7956ef5",
+      "impressions": 0,
+      "clicks": 0,
+      "start_date": "2026-04-01",
+      "end_date": "2026-04-30",
+      "amount_paid": 14999.0,
+      "rejection_reason": null,
+      "created_at": "2026-03-27T21:58:35.973651+00:00",
+      "banner_image": "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800"
+    },
+    {
+      "id": "d24c1191-d549-4e4f-854a-b84935b23f21",
+      "advertiser_id": "customer-001",
+      "company_name": "Apnaghr.com",
+      "package_tier": "starter",
+      "poster_images": [],
+      "video_url": null,
+      "target_url": "https://apnaghr.com/",
+      "description": "Construction business ",
+      "placement": [
+        "home",
+        "featured",
+        "property_detail"
+      ],
+      "status": "payment_pending",
+      "payment_status": null,
+      "payment_session_id": "apnaghr_349be75d0adb",
+      "impressions": 0,
+      "clicks": 0,
+      "start_date": "2026-03-28",
+      "end_date": "2026-04-28",
+      "amount_paid": 2999.0,
+      "rejection_reason": null,
+      "created_at": "2026-03-27T22:51:44.514083+00:00",
+      "banner_image": "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800"
+    },
+    {
+      "id": "3948c749-b9a6-40b3-83bb-9f5ce9169e6a",
+      "advertiser_id": "sample_advertiser_1",
+      "company_name": "Shivam Silk Store",
+      "tagline": "Exclusive Wedding Collection",
+      "business_type": "Fashion & Wedding",
+      "image_url": "https://static.prod-images.emergentagent.com/jobs/c5c63c21-f087-4ea8-ae34-ba53073071fc/images/ecf93641a2b386b345c66621f49e2fee5da4be159704b9f10e11b04553b85cab.png",
+      "target_url": "https://example.com/shivam-silk",
+      "placement": [
+        "home",
+        "property"
+      ],
+      "package_type": "premium",
+      "status": "active",
+      "impressions": 1250,
+      "clicks": 46,
+      "start_date": "2026-03-28T07:17:08.064536+00:00",
+      "end_date": "2026-04-27T07:17:08.064544+00:00",
+      "created_at": "2026-03-28T07:17:08.064558+00:00",
+      "banner_image": "https://images.unsplash.com/photo-1600573472550-8090b5e0745e?w=800"
+    },
+    {
+      "id": "c0c691ff-b77b-438c-83fd-81ecda6f267b",
+      "advertiser_id": "sample_advertiser_2",
+      "company_name": "BondedHomes",
+      "tagline": "Your Dream Home Awaits",
+      "business_type": "Real Estate",
+      "image_url": "https://images.pexels.com/photos/323780/pexels-photo-323780.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+      "target_url": "https://example.com/bondedhomes",
+      "placement": [
+        "home"
+      ],
+      "package_type": "elite",
+      "status": "active",
+      "impressions": 2100,
+      "clicks": 89,
+      "start_date": "2026-03-28T07:17:08.064565+00:00",
+      "end_date": "2026-04-27T07:17:08.064567+00:00",
+      "created_at": "2026-03-28T07:17:08.064569+00:00",
+      "banner_image": "https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?w=800"
+    },
+    {
+      "id": "e627b283-73a4-40a7-9dec-fecc1e46e1b5",
+      "advertiser_id": "sample_advertiser_3",
+      "company_name": "Sharma Sanitary",
+      "tagline": "Premium Bath Solutions",
+      "business_type": "Sanitary & Bathroom",
+      "image_url": "https://static.prod-images.emergentagent.com/jobs/c5c63c21-f087-4ea8-ae34-ba53073071fc/images/62ab24ecd664b2413ede802a25b86bef4812edcc3f669936e2051c4d47fb5529.png",
+      "target_url": "https://example.com/sharma-sanitary",
+      "placement": [
+        "home",
+        "property"
+      ],
+      "package_type": "starter",
+      "status": "active",
+      "impressions": 890,
+      "clicks": 32,
+      "start_date": "2026-03-28T07:17:08.064575+00:00",
+      "end_date": "2026-04-27T07:17:08.064576+00:00",
+      "created_at": "2026-03-28T07:17:08.064578+00:00",
+      "banner_image": "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800"
+    },
+    {
+      "id": "04d0d576-ebf5-47c0-bbea-b819e7481e59",
+      "advertiser_id": "sample_advertiser_4",
+      "company_name": "Gupta Plywood & Hardware",
+      "tagline": "Quality Wood Solutions Since 1995",
+      "business_type": "Plywood & Hardware",
+      "image_url": "https://static.prod-images.emergentagent.com/jobs/c5c63c21-f087-4ea8-ae34-ba53073071fc/images/22a47974f1d113989ccb38d4b8ceaa22edd982181509219f30b7ffabe21b1842.png",
+      "target_url": "https://example.com/gupta-plywood",
+      "placement": [
+        "home"
+      ],
+      "package_type": "growth",
+      "status": "active",
+      "impressions": 1560,
+      "clicks": 67,
+      "start_date": "2026-03-28T07:17:08.064587+00:00",
+      "end_date": "2026-04-27T07:17:08.064589+00:00",
+      "created_at": "2026-03-28T07:17:08.064590+00:00",
+      "banner_image": "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800"
+    }
+  ],
+  "advertiser_profiles": [
+    {
+      "id": "c06d3580-a26f-453a-9052-57fe002f8b6f",
+      "user_id": "customer-001",
+      "company_name": "Apnaghr.com",
+      "business_type": "builder",
+      "contact_email": "support@Apnaghr.com",
+      "contact_phone": "9999999999",
+      "gst_number": "",
+      "address": "Apnaghr.com",
+      "logo_url": null,
+      "verified": false,
+      "created_at": "2026-03-27T20:23:26.357546+00:00"
+    }
+  ],
+  "app_settings": [
+    {
+      "key": "explainer_video",
+      "value": "/uploads/explainer_video.mp4"
+    },
+    {
+      "key": "app_customization",
+      "value": {
+        "seasonal_theme": "holi",
+        "seasonal_banner_text": "Happy Holi! Get 10% off on visit bookings",
+        "seasonal_discount_percent": 10,
+        "seasonal_active": true,
+        "homepage_highlight": "",
+        "accent_color": "#FF5A5F",
+        "enable_animations": true,
+        "show_offers_badge": true
+      }
+    }
+  ],
+  "visit_bookings": [
+    {
+      "id": "visit-aef04bab",
+      "customer_id": "customer-001",
+      "property_ids": [
+        "prop-001",
+        "prop-002",
+        "prop-003"
+      ],
+      "package_id": null,
+      "scheduled_date": "2026-03-28",
+      "scheduled_time": "10:00 AM",
+      "status": "completed",
+      "current_step": "completed",
+      "current_property_index": 2,
+      "rider_id": "rider-001",
+      "otp": "123456",
+      "total_properties": 3,
+      "estimated_duration": "2h 5m",
+      "pickup_location": "Sector 17 Bus Stand, Chandigarh",
+      "pickup_lat": 30.7413,
+      "pickup_lng": 76.7832,
+      "properties_completed": [
+        "prop-001",
+        "prop-002",
+        "prop-003"
+      ],
+      "property_proofs": {},
+      "total_earnings": 300.0,
+      "created_at": "2026-03-27T18:20:34.112533+00:00",
+      "visit_end_time": "2026-03-27T18:22:20.641482+00:00",
+      "admin_approved": true,
+      "admin_verified": true,
+      "verified_at": "2026-03-27T21:01:51.204841+00:00",
+      "verified_by": "admin-001"
+    },
+    {
+      "id": "0fc9c739-12ee-4366-bd66-2e3a7d792e8f",
+      "customer_id": "customer-001",
+      "property_ids": [
+        "prop-001",
+        "prop-002"
+      ],
+      "package_id": "pkg-934b87be",
+      "scheduled_date": "2026-03-28",
+      "scheduled_time": "05:00 PM",
+      "status": "completed",
+      "current_step": "completed",
+      "current_property_index": 1,
+      "rider_id": "rider-001",
+      "otp": "232546",
+      "total_properties": 2,
+      "total_earnings": 200.0,
+      "estimated_duration": "1h 20m",
+      "pickup_location": "Bathinda bus stand ",
+      "pickup_lat": null,
+      "pickup_lng": null,
+      "properties_completed": [
+        "prop-001",
+        "prop-002"
+      ],
+      "property_proofs": {},
+      "visit_start_time": null,
+      "visit_end_time": "2026-03-27T20:49:51.771229+00:00",
+      "customer_feedback": null,
+      "rating": null,
+      "created_at": "2026-03-27T18:34:16.660124+00:00",
+      "admin_approved": true,
+      "admin_verified": true,
+      "verified_at": "2026-03-27T21:01:56.464637+00:00",
+      "verified_by": "admin-001"
+    },
+    {
+      "id": "e5bc23dd-8ac5-4801-af8a-3454c2af41be",
+      "customer_id": "customer-001",
+      "property_ids": [
+        "prop-002"
+      ],
+      "package_id": "pkg-934b87be",
+      "scheduled_date": "2026-03-28",
+      "scheduled_time": "05:00 PM",
+      "status": "completed",
+      "current_step": "completed",
+      "current_property_index": 0,
+      "rider_id": "rider-001",
+      "otp": "274015",
+      "total_properties": 1,
+      "total_earnings": 100.0,
+      "estimated_duration": "45m",
+      "pickup_location": "Bus stand patiala",
+      "pickup_lat": null,
+      "pickup_lng": null,
+      "properties_completed": [
+        "prop-002"
+      ],
+      "property_proofs": {},
+      "visit_start_time": null,
+      "visit_end_time": "2026-03-27T20:50:03.868035+00:00",
+      "customer_feedback": null,
+      "rating": null,
+      "created_at": "2026-03-27T20:46:13.775696+00:00",
+      "admin_approved": true,
+      "admin_verified": true,
+      "verified_at": "2026-03-27T21:01:58.638204+00:00",
+      "verified_by": "admin-001"
+    },
+    {
+      "id": "e40455a6-79ca-446d-8347-ec10274b3ace",
+      "customer_id": "customer-001",
+      "property_ids": [
+        "prop-001",
+        "1ac7e6fe-4c27-4387-bec8-8ddec194470a"
+      ],
+      "package_id": "pkg-934b87be",
+      "scheduled_date": "2026-03-29",
+      "scheduled_time": "05:00 PM",
+      "status": "navigating",
+      "current_step": "go_to_property_0",
+      "current_property_index": 0,
+      "rider_id": "rider-001",
+      "otp": "296668",
+      "total_properties": 2,
+      "total_earnings": 200.0,
+      "estimated_duration": "1h 20m",
+      "pickup_location": "bathinda",
+      "pickup_lat": null,
+      "pickup_lng": null,
+      "properties_completed": [],
+      "property_proofs": {},
+      "visit_start_time": null,
+      "visit_end_time": null,
+      "customer_feedback": null,
+      "rating": null,
+      "created_at": "2026-03-27T21:13:33.760008+00:00"
+    }
+  ],
+  "visit_packages": [
+    {
+      "id": "pkg-934b87be",
+      "customer_id": "customer-001",
+      "package_type": "five_visits",
+      "total_visits": 5,
+      "visits_used": 5,
+      "amount_paid": 500.0,
+      "valid_until": "2026-04-26T18:20:34.094360+00:00",
+      "created_at": "2026-03-27T18:20:34.094367+00:00"
+    }
+  ],
+  "payment_transactions": [
+    {
+      "id": "7f25d775-a9ea-40c4-801f-b63defb98ccf",
+      "user_id": "customer-001",
+      "session_id": "apnaghr_06d8bc1ca533",
+      "payment_id": "5612902503",
+      "amount": 200.0,
+      "currency": "inr",
+      "package_type": "single_visit",
+      "payment_status": "pending",
+      "metadata": {
+        "user_id": "customer-001",
+        "package_id": "single_visit",
+        "type": "visit"
+      },
+      "created_at": "2026-03-27T21:55:27.582812+00:00",
+      "payment_session_id": "session_nKLoiLPifUY3rx4cxzP-IxNNDow91c4vMTcRFh1xV_xW3DcMEOOFKHNtTU8ctE_4Qg29xobuYR2BbR0-RevLORR_X5Ez043AS8usPUTeV9qE58K5zJ4OoEYq92gpayment"
+    },
+    {
+      "id": "556b74e9-8e17-4a66-b9b6-0eae61d4f00d",
+      "user_id": "customer-001",
+      "session_id": "apnaghr_a21239c445ea",
+      "payment_id": "5612902629",
+      "amount": 500.0,
+      "currency": "inr",
+      "package_type": "five_visits",
+      "payment_status": "pending",
+      "metadata": {
+        "user_id": "customer-001",
+        "package_id": "five_visits",
+        "type": "visit"
+      },
+      "created_at": "2026-03-27T21:55:34.491894+00:00",
+      "payment_session_id": "session_Mm0SCSoQW2hlfX9YSe8n37wO_FwIltLgwPEgAik0D5b5Lpmgg_ppR124oeQWgX_EVb1ajJt_jwlp89ygJcbtsiw0C_83x71YdCBIrg6nnkBvEsxLGxdCB6v008kpayment"
+    },
+    {
+      "id": "ca24576c-513d-46e6-8b9a-fb196e394d23",
+      "user_id": "customer-001",
+      "session_id": "apnaghr_a36d2198d294",
+      "payment_id": "5612905481",
+      "amount": 200.0,
+      "currency": "inr",
+      "package_type": "single_visit",
+      "payment_status": "pending",
+      "metadata": {
+        "user_id": "customer-001",
+        "package_id": "single_visit",
+        "type": "visit"
+      },
+      "created_at": "2026-03-27T21:58:07.190738+00:00",
+      "payment_session_id": "session_ygDFM4bycsRMQHV1Onf0473yc-YqmApyZmNLnUG2WIlvEqy7nW0FN9EQaOBNaXK7H76a_fHfxpKHTaBRJtT4k1aA5i81HVYjTwC27wWhXSw2HeCQm67EjUZ3p-Ipayment"
+    },
+    {
+      "id": "bf929173-bd51-4aac-bc52-862071a13025",
+      "user_id": "customer-001",
+      "session_id": "apnaghr_ec281038b682",
+      "payment_id": "5612905491",
+      "amount": 350.0,
+      "currency": "inr",
+      "package_type": "three_visits",
+      "payment_status": "pending",
+      "metadata": {
+        "user_id": "customer-001",
+        "package_id": "three_visits",
+        "type": "visit"
+      },
+      "created_at": "2026-03-27T21:58:07.530745+00:00",
+      "payment_session_id": "session_-EmwFx7B9z6RncYRsJHhtfRVt846sGEQ3s6oZI2JhJ4DrUV01BWzxsHnppMpJJEUj1q1ogACTaGcPdT_jlHe4asyJi8F8ujQC-2yctJnMFWzySvtAl4G6k0qFEspayment"
+    },
+    {
+      "id": "2a2848ab-5b32-40ef-b0fc-ec1fd7c89206",
+      "user_id": "customer-001",
+      "session_id": "apnaghr_ecd05147ec9f",
+      "payment_id": "5612905499",
+      "amount": 500.0,
+      "currency": "inr",
+      "package_type": "five_visits",
+      "payment_status": "pending",
+      "metadata": {
+        "user_id": "customer-001",
+        "package_id": "five_visits",
+        "type": "visit"
+      },
+      "created_at": "2026-03-27T21:58:07.913357+00:00",
+      "payment_session_id": "session_E1Eky0QSWO6nqHjrCzyI-AJfEn2M60YCTwX_boQu5VdvRBqIFt8M64XKgdh6wMGN0gEQhMuY6r6vXAmGxaTFOgBsAjS-GPGvrZMaC7fAUnCJfIm1B564fZbT0Vkpayment"
+    },
+    {
+      "id": "40a4df6c-c172-4b08-89b4-bfdb5f2901bd",
+      "user_id": "customer-001",
+      "session_id": "apnaghr_788f1d28d8ae",
+      "payment_id": "5612905504",
+      "amount": 999.0,
+      "currency": "inr",
+      "package_type": "property_lock",
+      "payment_status": "pending",
+      "metadata": {
+        "user_id": "customer-001",
+        "package_id": "property_lock",
+        "type": "lock",
+        "property_id": "test_property_123"
+      },
+      "created_at": "2026-03-27T21:58:08.254141+00:00",
+      "payment_session_id": "session_w5kPlJzxvUYOHSk5MUd7JXYTzsBMhfH66CwxEsvgjJ20ELCK33RlNVTpeVb7UXldFAt1WMw_EcIodDDsyaXoKSVBZxHflXWvQoavUt2FalylGYtX_58M4cLc5QIpayment"
+    },
+    {
+      "id": "0ed98894-3f3f-4cea-8907-611130f45a24",
+      "user_id": "customer-001",
+      "session_id": "apnaghr_4e4aa4c98585",
+      "payment_id": "5612905523",
+      "amount": 5999,
+      "currency": "inr",
+      "package_type": "packers_standard",
+      "payment_status": "pending",
+      "payment_session_id": "session_lQrA4r-vv4VYZM2gchq4FRm2xwtO0DeWnP3R1unXd6AoIEaZDH5WmP43x2_2PXUYStimVG1t62-6TOYTcdUGEJKd_hIVxOq1o9lO6We6ttf_Sty0rdx6Ntz1UmIpayment",
+      "metadata": {
+        "user_id": "customer-001",
+        "package_id": "packers_standard",
+        "booking_id": "8d67a974-50e8-465f-9499-1bc465bf91cb",
+        "type": "packers"
+      },
+      "created_at": "2026-03-27T21:58:09.418224+00:00"
+    },
+    {
+      "id": "18809379-beab-4068-b849-9a7a9d825921",
+      "user_id": "customer-001",
+      "session_id": "apnaghr_4302259ffb36",
+      "payment_id": "5612905545",
+      "amount": 7999,
+      "currency": "inr",
+      "package_type": "ads_growth",
+      "payment_status": "pending",
+      "payment_session_id": "session_jTsCk2egVszchp-r5HZMz5I3PTCmjU5fbogo2W1B1B2XphH2uYSUROSG5X_sKyo0LZ0HqkWnkcX9cS9mbJgaxp1ETnoeZEHaMoUe-AXvL8ibWIF9dIu0GtMs8Tspayment",
+      "metadata": {
+        "user_id": "customer-001",
+        "package_id": "ads_growth",
+        "ad_id": "25e0eb05-8e0c-47b0-ba53-f404140618b8",
+        "type": "advertising"
+      },
+      "created_at": "2026-03-27T21:58:10.479352+00:00"
+    },
+    {
+      "id": "34e1486c-cceb-4ac5-9f46-f84d316202da",
+      "user_id": "customer-001",
+      "session_id": "apnaghr_bbb62bfe932c",
+      "payment_id": "5612905552",
+      "amount": 200.0,
+      "currency": "inr",
+      "package_type": "single_visit",
+      "payment_status": "pending",
+      "metadata": {
+        "user_id": "customer-001",
+        "package_id": "single_visit",
+        "type": "visit"
+      },
+      "created_at": "2026-03-27T21:58:10.849932+00:00",
+      "payment_session_id": "session_vskDWJtsfjrYRv-Bk9EVByVqotUBf5eTicsLEen3p8xlzqxWdvba8Sn_hTuq5nUvm95AJWf14bG0BQeTeJ_JLCPXYzrjsO-cxKWzSXVkTH-akB65kOWvEYAjCHIpayment"
+    },
+    {
+      "id": "48dd9063-e5a3-46fb-aa98-445ec92a0df2",
+      "user_id": "customer-001",
+      "session_id": "apnaghr_5bd3fe0612b5",
+      "payment_id": "5612905569",
+      "amount": 200.0,
+      "currency": "inr",
+      "package_type": "single_visit",
+      "payment_status": "pending",
+      "metadata": {
+        "user_id": "customer-001",
+        "package_id": "single_visit",
+        "type": "visit"
+      },
+      "created_at": "2026-03-27T21:58:11.668000+00:00",
+      "payment_session_id": "session_uQKzye5ET9O50Xq3_mwBb_tOFGgvzv6fLgyG6XEgH7pVBOumIQ1pzA-vkL7r4YaI3d7On4vnDmyAROqhMJ_-mo-N82VA0TrHpsP-iT2loofUMs9mWrM07XSbG8spayment"
+    },
+    {
+      "id": "51713eaf-e166-457a-90ad-3826de243703",
+      "user_id": "customer-001",
+      "session_id": "apnaghr_197242b585b4",
+      "payment_id": "5612905578",
+      "amount": 350.0,
+      "currency": "inr",
+      "package_type": "three_visits",
+      "payment_status": "pending",
+      "metadata": {
+        "user_id": "customer-001",
+        "package_id": "three_visits",
+        "type": "visit"
+      },
+      "created_at": "2026-03-27T21:58:12.066496+00:00",
+      "payment_session_id": "session_pngseFWz3tT6haI7zWNrUT0_iC4xnAUqKlm-7Lg_D9B66ovn_UVKjLLnu-GgC5ngY8d3apu7xfSOa-Sr08pOoJAeTMagFia39LSB5C1k-OvnruXCCT03_Di_3DQpayment"
+    },
+    {
+      "id": "3fff4c59-cea5-4acb-a333-64b69e257036",
+      "user_id": "customer-001",
+      "session_id": "apnaghr_499fd50db69e",
+      "payment_id": "5612905586",
+      "amount": 500.0,
+      "currency": "inr",
+      "package_type": "five_visits",
+      "payment_status": "pending",
+      "metadata": {
+        "user_id": "customer-001",
+        "package_id": "five_visits",
+        "type": "visit"
+      },
+      "created_at": "2026-03-27T21:58:12.409600+00:00",
+      "payment_session_id": "session_4p6bDduatsKRfx30AuLz0l8WewXNpO5H9qrEX27I5dzaKXVJzNwBHmYMcPnhLhAFJqpmJZpmmxqewtFO-pjUwfs11c6JnazZdZOaDGzMBrnb__KOfikkOcag3fkpayment"
+    },
+    {
+      "id": "473abf3d-d2f8-4d20-94d5-9e91138a635a",
+      "user_id": "customer-001",
+      "session_id": "apnaghr_46d263c51e86",
+      "payment_id": "5612905599",
+      "amount": 999.0,
+      "currency": "inr",
+      "package_type": "property_lock",
+      "payment_status": "pending",
+      "metadata": {
+        "user_id": "customer-001",
+        "package_id": "property_lock",
+        "type": "lock"
+      },
+      "created_at": "2026-03-27T21:58:13.144355+00:00",
+      "payment_session_id": "session_7g9NHK6tDls-geNiZ4cwlRwIFmyEaLg6hjPzEm8e7Ry66xwHUnR-cBoBG726OeSZyv1ZRmrPyX0AARHgm-m4xdu3mAVQ1ktQvAzxwBb5dCtk3ktprtaGU3QDJJopayment"
+    },
+    {
+      "id": "ac571c4c-4239-4e50-8d6b-7317dc02857c",
+      "user_id": "customer-001",
+      "session_id": "apnaghr_d340845b28e0",
+      "payment_id": "5612905609",
+      "amount": 200.0,
+      "currency": "inr",
+      "package_type": "single_visit",
+      "payment_status": "pending",
+      "metadata": {
+        "user_id": "customer-001",
+        "package_id": "single_visit",
+        "type": "visit"
+      },
+      "created_at": "2026-03-27T21:58:13.479094+00:00",
+      "payment_session_id": "session_RJ8QPRENC_UOHS3JFbmSy8SYG6JKbpqAce6pxfZ2s2AIJX5Hf85mhcrZPFB-xwqX8HkNBZgKbqjxnIn8Krk20SiB22KP0EYfIUqkRyDy2UkzX8RrAeCWeLdUWJ4payment"
+    },
+    {
+      "id": "23ada531-2bb8-4642-84e3-2750452379fc",
+      "user_id": "customer-001",
+      "session_id": "apnaghr_e41309107221",
+      "payment_id": "5612905767",
+      "amount": 200.0,
+      "currency": "inr",
+      "package_type": "single_visit",
+      "payment_status": "pending",
+      "metadata": {
+        "user_id": "customer-001",
+        "package_id": "single_visit",
+        "type": "visit"
+      },
+      "created_at": "2026-03-27T21:58:23.020683+00:00",
+      "payment_session_id": "session_XOid-5xSOqFtK670MbMJs_KFCqR3sbk2eNwUHHxqduhPlX38gso472Z674soRG-w_c1eWbfy0QFydCEeQUS_JMARhm_94ktHXUSGJo0qrg2t2cgt_O7w3EspK-opayment"
+    },
+    {
+      "id": "c8f8e987-12c1-4a84-b456-85ede4991887",
+      "user_id": "customer-001",
+      "session_id": "apnaghr_a77f3b4916ab",
+      "payment_id": "5612905983",
+      "amount": 10999,
+      "currency": "inr",
+      "package_type": "packers_premium",
+      "payment_status": "pending",
+      "payment_session_id": "session_-Db5R2ofvEmdHohPBwGNpJf9hQa7bMrtp8rhYpxXUGjTXR8dtA8JLr92wCVoOFgeOiH8zFSuDKmxOeH0CgXkXSnba9-HcmpmtcbIAjFKchHA5ZHu3CoA7Ja3PP8payment",
+      "metadata": {
+        "user_id": "customer-001",
+        "package_id": "packers_premium",
+        "booking_id": "b70e4977-a08f-4bae-8153-9c2ac5c2d8ca",
+        "type": "packers"
+      },
+      "created_at": "2026-03-27T21:58:35.741677+00:00"
+    },
+    {
+      "id": "7826dc64-0984-4dc5-ab37-db91d695cf8e",
+      "user_id": "customer-001",
+      "session_id": "apnaghr_4340c7956ef5",
+      "payment_id": "5612905996",
+      "amount": 14999,
+      "currency": "inr",
+      "package_type": "ads_premium",
+      "payment_status": "pending",
+      "payment_session_id": "session_c24_hlhfuiHS8KnmwB8PG2H-r842h6MxkCW_O0jke0sRLMJBetr0A07FVtPJu9t0TG_ooy2aUeB0yQ5paE0tYRzA94UzDD0SkGeD0mh_4yYynbSKWk4CyYFcgzIpayment",
+      "metadata": {
+        "user_id": "customer-001",
+        "package_id": "ads_premium",
+        "ad_id": "2f1f7a9c-45ca-4c26-963a-0859e45e90c8",
+        "type": "advertising"
+      },
+      "created_at": "2026-03-27T21:58:36.442755+00:00"
+    },
+    {
+      "id": "ca738008-cf72-41d1-8246-a0eed18cc816",
+      "user_id": "customer-001",
+      "session_id": "apnaghr_fe7f37576a36",
+      "payment_id": "5612907058",
+      "amount": 500.0,
+      "currency": "inr",
+      "package_type": "five_visits",
+      "payment_status": "pending",
+      "metadata": {
+        "user_id": "customer-001",
+        "package_id": "five_visits",
+        "type": "visit"
+      },
+      "created_at": "2026-03-27T21:59:38.845257+00:00",
+      "payment_session_id": "session_jtdjWCkcfhw4F5eQOY4vA1dwKz5wY8WrN656QB8zn2yC0xJ_4JnYn7lOdrtgJFP97E1j44VwMdOuUM46NvDhdURgtcJ3PPuvCtcQUn5_pRoV3vpcbGy4J0rtfqkpayment"
+    },
+    {
+      "id": "0fcb3c38-f959-4439-b237-9bbd1f05397a",
+      "user_id": "customer-001",
+      "session_id": "apnaghr_349be75d0adb",
+      "payment_id": "5612936947",
+      "amount": 2999,
+      "currency": "inr",
+      "package_type": "ads_starter",
+      "payment_status": "pending",
+      "payment_session_id": "session_i7OzBDoGSYWEeRY4ztcO_vtcKqe-SAUwTfNJVY7-Cb02JRtTE6BFW4M7Nf62Fm-jwygnBx1xyvZt0lHz7Pkan6pjVwO9zHDyj-c81UNq6McTB9Rwyp3XBKzi5jMpayment",
+      "metadata": {
+        "user_id": "customer-001",
+        "package_id": "ads_starter",
+        "ad_id": "d24c1191-d549-4e4f-854a-b84935b23f21",
+        "type": "advertising"
+      },
+      "created_at": "2026-03-27T22:51:45.888290+00:00"
+    },
+    {
+      "id": "6e21fad6-23f3-4107-a637-b51fc194345c",
+      "user_id": "customer-001",
+      "session_id": "apnaghr_6033089b8c24",
+      "payment_id": "5614427730",
+      "amount": 350.0,
+      "currency": "inr",
+      "package_type": "three_visits",
+      "payment_status": "pending",
+      "metadata": {
+        "user_id": "customer-001",
+        "package_id": "three_visits",
+        "type": "visit"
+      },
+      "created_at": "2026-03-28T05:10:04.322642+00:00",
+      "payment_session_id": "session_Jn1QYrZKH0tFbyQ90MF2EhmQzUTUyc1BorqcipON8G56lal23ezn4zQ7UfomHqVNW2upXd_NONVWczywZJ88okp3A8XYFgU03udZCnU3noaDcAyQ3gSM0MJ-cPopayment"
+    },
+    {
+      "id": "d6cd4694-a8d0-49ab-b685-49e93390eb64",
+      "user_id": "admin-001",
+      "session_id": "apnaghr_eea6fe69596c",
+      "payment_id": "5615520989",
+      "amount": 200.0,
+      "currency": "inr",
+      "package_type": "single_visit",
+      "payment_status": "pending",
+      "metadata": {
+        "user_id": "admin-001",
+        "package_id": "single_visit",
+        "type": "visit"
+      },
+      "created_at": "2026-03-28T08:49:21.437212+00:00",
+      "payment_session_id": "session_kXm-Illin0_7bKDZ9DkZZFDz8A_tH-Kx0-A75QmhGb48PLQTnC5fR3-kze_rlMR7Dduyt0kcLdxXGT_1zus_XWQBO3F9Wy5ENMq2jqM1oyIYJfOOo_OLajUHweIpayment"
+    }
+  ],
+  "rider_wallets": [
+    {
+      "rider_id": "rider-001",
+      "total_earnings": 300.0,
+      "pending_earnings": -300.0,
+      "approved_earnings": 0,
+      "paid_earnings": 600.0,
+      "next_payout_date": "2026-04-01",
+      "last_payout_date": "2026-03-27T21:24:57.294845+00:00"
+    },
+    {
+      "rider_id": "f634647c-1710-45d3-8920-84371889ce04",
+      "approved_earnings": 80.0,
+      "paid_earnings": 0,
+      "pending_earnings": 60.0,
+      "total_earnings": 140.0
+    },
+    {
+      "rider_id": "2720c98f-1dce-4a0d-b01b-77ce2941f1f9",
+      "total_earnings": 0,
+      "pending_earnings": 0,
+      "approved_earnings": 0,
+      "paid_earnings": 0,
+      "next_payout_date": "2026-04-01"
+    }
+  ],
+  "rider_transactions": [
+    {
+      "id": "c39f4f00-1cc8-4ea0-b4ea-8a3744413cd6",
+      "rider_id": "rider-001",
+      "type": "visit_earning",
+      "amount": 200.0,
+      "status": "approved",
+      "reference_id": "0fc9c739-12ee-4366-bd66-2e3a7d792e8f",
+      "reference_type": "visit",
+      "description": "Visit completed: 2 properties",
+      "approved_by": "admin-001",
+      "approved_at": "2026-03-27T21:01:56.465184+00:00",
+      "paid_at": null,
+      "created_at": "2026-03-27T20:49:51.771765+00:00"
+    },
+    {
+      "id": "4d8af7d4-caea-40cd-9d47-5984410f6d60",
+      "rider_id": "rider-001",
+      "type": "visit_earning",
+      "amount": 100.0,
+      "status": "approved",
+      "reference_id": "e5bc23dd-8ac5-4801-af8a-3454c2af41be",
+      "reference_type": "visit",
+      "description": "Visit completed: 1 properties",
+      "approved_by": "admin-001",
+      "approved_at": "2026-03-27T21:01:58.638837+00:00",
+      "paid_at": null,
+      "created_at": "2026-03-27T20:50:03.868665+00:00"
+    },
+    {
+      "id": "582e46f6-4eda-44df-86f0-4423345a8f4c",
+      "rider_id": "rider-001",
+      "type": "payout",
+      "amount": -600.0,
+      "status": "paid",
+      "reference_id": null,
+      "reference_type": null,
+      "description": "Bi-weekly payout",
+      "approved_by": null,
+      "approved_at": null,
+      "paid_at": "2026-03-27T21:24:57.290265+00:00",
+      "created_at": "2026-03-27T21:24:57.290306+00:00"
+    },
+    {
+      "id": "e1e3ff98-b61c-4005-8f63-4ee827144540",
+      "rider_id": "f634647c-1710-45d3-8920-84371889ce04",
+      "type": "tolet_earning",
+      "amount": 30.0,
+      "status": "pending",
+      "reference_id": "fc1b171e-6cac-4e2f-aa43-b41cb43c9c57",
+      "reference_type": "tolet_task",
+      "description": "ToLet boards collected: 3 x \u20b910.0 (awaiting verification)",
+      "approved_by": null,
+      "approved_at": null,
+      "paid_at": null,
+      "created_at": "2026-03-28T06:53:51.151719+00:00"
+    },
+    {
+      "id": "4ef5aaf4-1653-4dcf-b4a7-db6d3fb4b51f",
+      "rider_id": "f634647c-1710-45d3-8920-84371889ce04",
+      "type": "tolet_earning",
+      "amount": 40.0,
+      "status": "approved",
+      "reference_id": "37206d32-e403-4498-9002-59cf1e0388bb",
+      "reference_type": "tolet_task",
+      "description": "ToLet boards collected: 2 x \u20b920.0 (awaiting verification)",
+      "approved_by": null,
+      "approved_at": null,
+      "paid_at": null,
+      "created_at": "2026-03-28T06:53:52.707764+00:00"
+    },
+    {
+      "id": "d2c0a858-8892-4a86-96d6-328a7397bbee",
+      "rider_id": "f634647c-1710-45d3-8920-84371889ce04",
+      "type": "tolet_earning",
+      "amount": 30.0,
+      "status": "rejected",
+      "reference_id": "53bf5043-4e75-438f-91ab-02d6a0a97951",
+      "reference_type": "tolet_task",
+      "description": "Rejected: Photos are blurry, please retake",
+      "approved_by": null,
+      "approved_at": null,
+      "paid_at": null,
+      "created_at": "2026-03-28T06:53:53.925887+00:00"
+    },
+    {
+      "id": "7925116f-0635-4203-86b6-d9d5ff8342c2",
+      "rider_id": "f634647c-1710-45d3-8920-84371889ce04",
+      "type": "tolet_earning",
+      "amount": 30.0,
+      "status": "pending",
+      "reference_id": "ff4d7050-b273-47b1-a632-631aa969ef66",
+      "reference_type": "tolet_task",
+      "description": "ToLet boards collected: 3 x \u20b910.0 (awaiting verification)",
+      "approved_by": null,
+      "approved_at": null,
+      "paid_at": null,
+      "created_at": "2026-03-28T06:55:31.867383+00:00"
+    },
+    {
+      "id": "5bc4a082-1528-413b-9339-eae4fa181a4c",
+      "rider_id": "f634647c-1710-45d3-8920-84371889ce04",
+      "type": "tolet_earning",
+      "amount": 40.0,
+      "status": "approved",
+      "reference_id": "05a045fe-7875-427b-b14e-3dd7f46a27cc",
+      "reference_type": "tolet_task",
+      "description": "ToLet boards collected: 2 x \u20b920.0 (awaiting verification)",
+      "approved_by": null,
+      "approved_at": null,
+      "paid_at": null,
+      "created_at": "2026-03-28T06:55:33.393041+00:00"
+    },
+    {
+      "id": "2149c7ed-b8c5-46d6-b0f0-3c72e7074bff",
+      "rider_id": "f634647c-1710-45d3-8920-84371889ce04",
+      "type": "tolet_earning",
+      "amount": 30.0,
+      "status": "rejected",
+      "reference_id": "3a48a3a4-5418-40f6-9031-93bdc6bc6873",
+      "reference_type": "tolet_task",
+      "description": "Rejected: Photos are blurry, please retake",
+      "approved_by": null,
+      "approved_at": null,
+      "paid_at": null,
+      "created_at": "2026-03-28T06:55:34.555765+00:00"
+    }
+  ],
+  "tolet_tasks": [
+    {
+      "id": "d641b06a-7800-4eaf-807c-3f9c8dd2fa26",
+      "title": "Collect boards from Sector 17",
+      "description": "",
+      "location": "Near Sector 17 market, Chandigarh",
+      "latitude": null,
+      "longitude": null,
+      "rate_per_board": 15.0,
+      "estimated_boards": 1,
+      "actual_boards_collected": 0,
+      "status": "assigned",
+      "rider_id": "rider-001",
+      "assigned_by": null,
+      "proof_images": [],
+      "proof_video": null,
+      "started_at": null,
+      "completed_at": null,
+      "verified_at": null,
+      "verified_by": null,
+      "earnings": 0.0,
+      "notes": null,
+      "created_at": "2026-03-27T19:07:56.807534+00:00"
+    },
+    {
+      "id": "1dc923b1-068a-48a3-880f-e649acfd9321",
+      "title": "TEST_ToLet Board Collection - Sector 17",
+      "description": "Collect ToLet boards from Sector 17 area",
+      "location": "Sector 17, Chandigarh",
+      "latitude": 30.7333,
+      "longitude": 76.7794,
+      "rate_per_board": 20.0,
+      "estimated_boards": 5,
+      "actual_boards_collected": 0,
+      "status": "assigned",
+      "rider_id": "rider-001",
+      "assigned_by": "admin-001",
+      "proof_images": [],
+      "proof_video": null,
+      "started_at": null,
+      "completed_at": null,
+      "verified_at": null,
+      "verified_by": null,
+      "earnings": 0.0,
+      "notes": null,
+      "created_at": "2026-03-27T19:19:29.500627+00:00"
+    },
+    {
+      "id": "38b07e21-3e1c-48a1-a51a-fa72f4c7479b",
+      "title": "TEST_ToLet Board Collection - Sector 17",
+      "description": "Collect ToLet boards from Sector 17 area",
+      "location": "Sector 17, Chandigarh",
+      "latitude": 30.7333,
+      "longitude": 76.7794,
+      "rate_per_board": 20.0,
+      "estimated_boards": 5,
+      "actual_boards_collected": 0,
+      "status": "assigned",
+      "rider_id": "rider-001",
+      "assigned_by": "admin-001",
+      "proof_images": [],
+      "proof_video": null,
+      "started_at": null,
+      "completed_at": null,
+      "verified_at": null,
+      "verified_by": null,
+      "earnings": 0.0,
+      "notes": null,
+      "created_at": "2026-03-27T19:20:25.798127+00:00"
+    },
+    {
+      "id": "383a91e8-37f9-4233-8a25-7a94a16504b7",
+      "title": "Collect boards from ganpati enclave ",
+      "description": "2/3 bhk if possible ",
+      "location": "Ganpati enclave Bathinda ",
+      "latitude": null,
+      "longitude": null,
+      "rate_per_board": 10.0,
+      "estimated_boards": 1,
+      "actual_boards_collected": 0,
+      "status": "assigned",
+      "rider_id": "rider-001",
+      "assigned_by": "admin-001",
+      "proof_images": [],
+      "proof_video": null,
+      "started_at": null,
+      "completed_at": null,
+      "verified_at": null,
+      "verified_by": null,
+      "earnings": 0.0,
+      "notes": null,
+      "created_at": "2026-03-27T20:48:30.200785+00:00"
+    },
+    {
+      "id": "bccd4f0a-34bd-4d93-986f-19d27f4ae058",
+      "title": "TEST_ToLet Board Collection",
+      "description": "Collect ToLet boards from Sector 17",
+      "location": "Sector 17, Chandigarh",
+      "latitude": null,
+      "longitude": null,
+      "rate_per_board": 15.0,
+      "estimated_boards": 5,
+      "actual_boards_collected": 0,
+      "status": "open",
+      "rider_id": null,
+      "assigned_by": null,
+      "proof_images": [],
+      "proof_video": null,
+      "started_at": null,
+      "completed_at": null,
+      "verified_at": null,
+      "verified_by": null,
+      "earnings": 0.0,
+      "notes": null,
+      "created_at": "2026-03-27T22:13:11.496310+00:00"
+    },
+    {
+      "id": "642f35e7-5084-4f4b-90fc-bcc3052ab203",
+      "title": "TEST_ToLet Board Collection",
+      "description": "Collect ToLet boards from Sector 17",
+      "location": "Sector 17, Chandigarh",
+      "latitude": null,
+      "longitude": null,
+      "rate_per_board": 15.0,
+      "estimated_boards": 5,
+      "actual_boards_collected": 0,
+      "status": "open",
+      "rider_id": null,
+      "assigned_by": null,
+      "proof_images": [],
+      "proof_video": null,
+      "started_at": null,
+      "completed_at": null,
+      "verified_at": null,
+      "verified_by": null,
+      "earnings": 0.0,
+      "notes": null,
+      "created_at": "2026-03-27T22:14:09.576051+00:00"
+    },
+    {
+      "id": "254b3707-581d-4123-8886-d9a7c0d2d3e3",
+      "title": "TEST_Collect boards from Sector 22",
+      "description": "Collect ToLet boards from main market area",
+      "location": "Sector 22, Chandigarh",
+      "latitude": null,
+      "longitude": null,
+      "rate_per_board": 15.0,
+      "estimated_boards": 5,
+      "actual_boards_collected": 0,
+      "status": "open",
+      "rider_id": null,
+      "assigned_by": null,
+      "proof_images": [],
+      "proof_video": null,
+      "started_at": null,
+      "completed_at": null,
+      "verified_at": null,
+      "verified_by": null,
+      "earnings": 0.0,
+      "notes": null,
+      "created_at": "2026-03-28T06:53:49.458586+00:00"
+    },
+    {
+      "id": "fc1b171e-6cac-4e2f-aa43-b41cb43c9c57",
+      "title": "TEST_Photo verification task",
+      "description": "Test task for photo verification",
+      "location": "Test Location",
+      "latitude": null,
+      "longitude": null,
+      "rate_per_board": 10.0,
+      "estimated_boards": 3,
+      "actual_boards_collected": 3,
+      "status": "pending_verification",
+      "rider_id": "f634647c-1710-45d3-8920-84371889ce04",
+      "assigned_by": "admin-001",
+      "proof_images": [
+        "https://example.com/board1.jpg",
+        "https://example.com/board2.jpg",
+        "https://example.com/board3.jpg"
+      ],
+      "proof_video": null,
+      "started_at": null,
+      "completed_at": "2026-03-28T06:53:51.151026+00:00",
+      "verified_at": null,
+      "verified_by": null,
+      "earnings": 30.0,
+      "notes": "Collected all boards from test location",
+      "created_at": "2026-03-28T06:53:50.709256+00:00"
+    },
+    {
+      "id": "37206d32-e403-4498-9002-59cf1e0388bb",
+      "title": "TEST_Approval test task",
+      "description": "Task for testing approval",
+      "location": "Approval Test Location",
+      "latitude": null,
+      "longitude": null,
+      "rate_per_board": 20.0,
+      "estimated_boards": 2,
+      "actual_boards_collected": 2,
+      "status": "verified",
+      "rider_id": "f634647c-1710-45d3-8920-84371889ce04",
+      "assigned_by": "admin-001",
+      "proof_images": [
+        "https://example.com/approve1.jpg",
+        "https://example.com/approve2.jpg"
+      ],
+      "proof_video": null,
+      "started_at": null,
+      "completed_at": "2026-03-28T06:53:52.707086+00:00",
+      "verified_at": "2026-03-28T06:53:52.826097+00:00",
+      "verified_by": "admin-001",
+      "earnings": 40.0,
+      "notes": "Ready for approval",
+      "created_at": "2026-03-28T06:53:52.395664+00:00"
+    },
+    {
+      "id": "53bf5043-4e75-438f-91ab-02d6a0a97951",
+      "title": "TEST_Rejection test task",
+      "description": "Task for testing rejection",
+      "location": "Rejection Test Location",
+      "latitude": null,
+      "longitude": null,
+      "rate_per_board": 15.0,
+      "estimated_boards": 2,
+      "actual_boards_collected": 2,
+      "status": "rejected",
+      "rider_id": "f634647c-1710-45d3-8920-84371889ce04",
+      "assigned_by": "admin-001",
+      "proof_images": [
+        "https://example.com/reject1.jpg",
+        "https://example.com/reject2.jpg"
+      ],
+      "proof_video": null,
+      "started_at": null,
+      "completed_at": "2026-03-28T06:53:53.925122+00:00",
+      "verified_at": "2026-03-28T06:53:54.041319+00:00",
+      "verified_by": "admin-001",
+      "earnings": 30.0,
+      "notes": "Test rejection",
+      "created_at": "2026-03-28T06:53:53.614189+00:00",
+      "rejection_reason": "Photos are blurry, please retake"
+    },
+    {
+      "id": "32d439b5-9b3d-48cc-b5d9-054a59aa2af8",
+      "title": "TEST_Collect boards from Sector 22",
+      "description": "Collect ToLet boards from main market area",
+      "location": "Sector 22, Chandigarh",
+      "latitude": null,
+      "longitude": null,
+      "rate_per_board": 15.0,
+      "estimated_boards": 5,
+      "actual_boards_collected": 0,
+      "status": "open",
+      "rider_id": null,
+      "assigned_by": null,
+      "proof_images": [],
+      "proof_video": null,
+      "started_at": null,
+      "completed_at": null,
+      "verified_at": null,
+      "verified_by": null,
+      "earnings": 0.0,
+      "notes": null,
+      "created_at": "2026-03-28T06:55:30.188354+00:00"
+    },
+    {
+      "id": "ff4d7050-b273-47b1-a632-631aa969ef66",
+      "title": "TEST_Photo verification task",
+      "description": "Test task for photo verification",
+      "location": "Test Location",
+      "latitude": null,
+      "longitude": null,
+      "rate_per_board": 10.0,
+      "estimated_boards": 3,
+      "actual_boards_collected": 3,
+      "status": "pending_verification",
+      "rider_id": "f634647c-1710-45d3-8920-84371889ce04",
+      "assigned_by": "admin-001",
+      "proof_images": [
+        "https://example.com/board1.jpg",
+        "https://example.com/board2.jpg",
+        "https://example.com/board3.jpg"
+      ],
+      "proof_video": null,
+      "started_at": null,
+      "completed_at": "2026-03-28T06:55:31.866652+00:00",
+      "verified_at": null,
+      "verified_by": null,
+      "earnings": 30.0,
+      "notes": "Collected all boards from test location",
+      "created_at": "2026-03-28T06:55:31.398186+00:00"
+    },
+    {
+      "id": "05a045fe-7875-427b-b14e-3dd7f46a27cc",
+      "title": "TEST_Approval test task",
+      "description": "Task for testing approval",
+      "location": "Approval Test Location",
+      "latitude": null,
+      "longitude": null,
+      "rate_per_board": 20.0,
+      "estimated_boards": 2,
+      "actual_boards_collected": 2,
+      "status": "verified",
+      "rider_id": "f634647c-1710-45d3-8920-84371889ce04",
+      "assigned_by": "admin-001",
+      "proof_images": [
+        "https://example.com/approve1.jpg",
+        "https://example.com/approve2.jpg"
+      ],
+      "proof_video": null,
+      "started_at": null,
+      "completed_at": "2026-03-28T06:55:33.392363+00:00",
+      "verified_at": "2026-03-28T06:55:33.490691+00:00",
+      "verified_by": "admin-001",
+      "earnings": 40.0,
+      "notes": "Ready for approval",
+      "created_at": "2026-03-28T06:55:33.082695+00:00"
+    },
+    {
+      "id": "3a48a3a4-5418-40f6-9031-93bdc6bc6873",
+      "title": "TEST_Rejection test task",
+      "description": "Task for testing rejection",
+      "location": "Rejection Test Location",
+      "latitude": null,
+      "longitude": null,
+      "rate_per_board": 15.0,
+      "estimated_boards": 2,
+      "actual_boards_collected": 2,
+      "status": "rejected",
+      "rider_id": "f634647c-1710-45d3-8920-84371889ce04",
+      "assigned_by": "admin-001",
+      "proof_images": [
+        "https://example.com/reject1.jpg",
+        "https://example.com/reject2.jpg"
+      ],
+      "proof_video": null,
+      "started_at": null,
+      "completed_at": "2026-03-28T06:55:34.554935+00:00",
+      "verified_at": "2026-03-28T06:55:34.666833+00:00",
+      "verified_by": "admin-001",
+      "earnings": 30.0,
+      "notes": "Test rejection",
+      "created_at": "2026-03-28T06:55:34.242423+00:00",
+      "rejection_reason": "Photos are blurry, please retake"
+    }
+  ],
+  "shifting_bookings": [
+    {
+      "id": "c5850f30-b0be-47cd-bd31-70a75611d57d",
+      "customer_id": "customer-001",
+      "package_tier": "standard",
+      "from_address": "TEST_123 Main Street, Andheri",
+      "to_address": "TEST_456 Park Avenue, Bandra",
+      "from_city": "Mumbai",
+      "to_city": "Mumbai",
+      "scheduled_date": "2026-04-03",
+      "contact_phone": "9999999999",
+      "items_description": "2 beds, 1 sofa, 1 fridge",
+      "add_ons": [
+        "extra_packing"
+      ],
+      "estimated_price": 10749.0,
+      "final_price": null,
+      "status": "pending",
+      "assigned_vendor": null,
+      "notes": null,
+      "created_at": "2026-03-27T20:23:26.058839+00:00"
+    },
+    {
+      "id": "0b4637a3-953e-4538-8b5f-66456b0acad8",
+      "customer_id": "customer-001",
+      "package_tier": "standard",
+      "from_address": "TEST_123 Main Street, Andheri",
+      "to_address": "TEST_456 Park Avenue, Bandra",
+      "from_city": "Mumbai",
+      "to_city": "Mumbai",
+      "scheduled_date": "2026-04-03",
+      "contact_phone": "9999999999",
+      "items_description": "2 beds, 1 sofa, 1 fridge",
+      "add_ons": [
+        "extra_packing"
+      ],
+      "estimated_price": 10749.0,
+      "final_price": null,
+      "status": "pending",
+      "assigned_vendor": null,
+      "notes": null,
+      "created_at": "2026-03-27T20:24:01.972737+00:00"
+    },
+    {
+      "id": "53ecbb0f-9acb-4e67-8096-58b012ccec23",
+      "customer_id": "customer-001",
+      "package_tier": "standard",
+      "from_address": "TEST_123 Main Street, Andheri",
+      "to_address": "TEST_456 Park Avenue, Bandra",
+      "from_city": "Mumbai",
+      "to_city": "Mumbai",
+      "scheduled_date": "2026-04-03",
+      "contact_phone": "9999999999",
+      "items_description": "2 beds, 1 sofa, 1 fridge",
+      "add_ons": [
+        "extra_packing"
+      ],
+      "estimated_price": 10749.0,
+      "final_price": null,
+      "status": "pending",
+      "assigned_vendor": null,
+      "notes": null,
+      "created_at": "2026-03-27T20:24:17.095378+00:00"
+    },
+    {
+      "id": "22fdb102-7a32-4128-9891-f62e26c744e2",
+      "customer_id": "customer-001",
+      "package_tier": "basic",
+      "from_address": "Test From Address, Sector 17",
+      "to_address": "Test To Address, Sector 22",
+      "from_city": "Chandigarh",
+      "to_city": "Chandigarh",
+      "scheduled_date": "2026-04-15",
+      "contact_phone": "9999999999",
+      "items_description": "1BHK furniture",
+      "add_ons": [],
+      "estimated_price": 4999.0,
+      "final_price": null,
+      "status": "pending",
+      "payment_status": null,
+      "payment_session_id": null,
+      "assigned_vendor": null,
+      "notes": null,
+      "created_at": "2026-03-27T21:58:08.415202+00:00"
+    },
+    {
+      "id": "8d67a974-50e8-465f-9499-1bc465bf91cb",
+      "customer_id": "customer-001",
+      "package_tier": "standard",
+      "from_address": "TEST_Payment From Address",
+      "to_address": "TEST_Payment To Address",
+      "from_city": "Mohali",
+      "to_city": "Chandigarh",
+      "scheduled_date": "2026-04-20",
+      "contact_phone": "9999999999",
+      "items_description": "2BHK furniture for payment test",
+      "add_ons": [],
+      "estimated_price": 9499.0,
+      "final_price": null,
+      "status": "payment_pending",
+      "payment_status": null,
+      "payment_session_id": "apnaghr_4e4aa4c98585",
+      "assigned_vendor": null,
+      "notes": null,
+      "created_at": "2026-03-27T21:58:08.482220+00:00"
+    },
+    {
+      "id": "b70e4977-a08f-4bae-8153-9c2ac5c2d8ca",
+      "customer_id": "customer-001",
+      "package_tier": "premium",
+      "from_address": "Test From",
+      "to_address": "Test To",
+      "from_city": "Chandigarh",
+      "to_city": "Mohali",
+      "scheduled_date": "2026-04-25",
+      "contact_phone": "9999999999",
+      "items_description": null,
+      "add_ons": [],
+      "estimated_price": 15999.0,
+      "final_price": null,
+      "status": "payment_pending",
+      "payment_status": null,
+      "payment_session_id": "apnaghr_a77f3b4916ab",
+      "assigned_vendor": null,
+      "notes": null,
+      "created_at": "2026-03-27T21:58:34.949369+00:00"
+    }
+  ],
+  "property_locks": [],
+  "notifications": [
+    {
+      "id": "300b503a-fe21-4051-bfc6-4786b284be53",
+      "user_id": "rider-001",
+      "type": "new_tolet_task",
+      "title": "New ToLet Board Task",
+      "message": "New task: Collect boards from Sector 17 - \u20b915.0/board",
+      "reference_id": "d641b06a-7800-4eaf-807c-3f9c8dd2fa26",
+      "reference_type": "tolet_task",
+      "read": false,
+      "created_at": "2026-03-27T19:07:56.825990+00:00"
+    },
+    {
+      "id": "e6f7f06f-76d1-43dd-951c-e8dd4a7afa82",
+      "user_id": "rider-001",
+      "type": "new_tolet_task",
+      "title": "New ToLet Board Task",
+      "message": "New task: TEST_ToLet Board Collection - Sector 17 - \u20b915.0/board",
+      "reference_id": "1dc923b1-068a-48a3-880f-e649acfd9321",
+      "reference_type": "tolet_task",
+      "read": false,
+      "created_at": "2026-03-27T19:19:29.509374+00:00"
+    },
+    {
+      "id": "61ce1423-47be-4d8a-900e-28f2a8ac0557",
+      "user_id": "rider-001",
+      "type": "task_assigned",
+      "title": "Task Assigned to You",
+      "message": "You've been assigned: TEST_ToLet Board Collection - Sector 17",
+      "reference_id": "1dc923b1-068a-48a3-880f-e649acfd9321",
+      "reference_type": "tolet_task",
+      "read": false,
+      "created_at": "2026-03-27T19:19:31.817495+00:00"
+    },
+    {
+      "id": "94efb527-cc23-40d6-ba90-e1625de1d61c",
+      "user_id": "rider-001",
+      "type": "new_tolet_task",
+      "title": "New ToLet Board Task",
+      "message": "New task: TEST_ToLet Board Collection - Sector 17 - \u20b915.0/board",
+      "reference_id": "38b07e21-3e1c-48a1-a51a-fa72f4c7479b",
+      "reference_type": "tolet_task",
+      "read": false,
+      "created_at": "2026-03-27T19:20:25.800976+00:00"
+    },
+    {
+      "id": "e416a5aa-8f36-4b0a-b08b-86dda7ba863f",
+      "user_id": "rider-001",
+      "type": "task_assigned",
+      "title": "Task Assigned to You",
+      "message": "You've been assigned: TEST_ToLet Board Collection - Sector 17",
+      "reference_id": "38b07e21-3e1c-48a1-a51a-fa72f4c7479b",
+      "reference_type": "tolet_task",
+      "read": false,
+      "created_at": "2026-03-27T19:20:28.936945+00:00"
+    },
+    {
+      "id": "876ec799-e06b-475d-8a2b-53e20228fbd9",
+      "user_id": "rider-001",
+      "type": "new_tolet_task",
+      "title": "New ToLet Board Task",
+      "message": "New task: Collect boards from ganpati enclave  - \u20b910.0/board",
+      "reference_id": "383a91e8-37f9-4233-8a25-7a94a16504b7",
+      "reference_type": "tolet_task",
+      "read": false,
+      "created_at": "2026-03-27T20:48:30.202142+00:00"
+    },
+    {
+      "id": "d17359db-0482-4b4b-9558-fedcfd39376b",
+      "user_id": "admin-001",
+      "type": "ride_update",
+      "title": "Ride Completed",
+      "message": "Rider Aman Singh completed visit - 2 properties",
+      "reference_id": "0fc9c739-12ee-4366-bd66-2e3a7d792e8f",
+      "reference_type": "visit",
+      "read": true,
+      "created_at": "2026-03-27T20:49:51.790363+00:00"
+    },
+    {
+      "id": "f07ae897-22a7-4d27-b6aa-f584c85eb897",
+      "user_id": "admin-001",
+      "type": "ride_update",
+      "title": "Ride Completed",
+      "message": "Rider Aman Singh completed visit - 1 properties",
+      "reference_id": "e5bc23dd-8ac5-4801-af8a-3454c2af41be",
+      "reference_type": "visit",
+      "read": true,
+      "created_at": "2026-03-27T20:50:03.870544+00:00"
+    },
+    {
+      "id": "6a0bdfd5-2846-404d-9014-69c785018ff6",
+      "user_id": "rider-001",
+      "type": "task_assigned",
+      "title": "Task Assigned to You",
+      "message": "You've been assigned: Collect boards from ganpati enclave ",
+      "reference_id": "383a91e8-37f9-4233-8a25-7a94a16504b7",
+      "reference_type": "tolet_task",
+      "read": false,
+      "created_at": "2026-03-27T20:50:50.889476+00:00"
+    },
+    {
+      "id": "e22a7766-bb49-4a85-a672-8ba699d3514d",
+      "user_id": "rider-001",
+      "type": "visit_approved",
+      "title": "Visit Approved!",
+      "message": "Your visit was approved! \u20b9300.0 added to your wallet",
+      "reference_id": "visit-aef04bab",
+      "reference_type": "visit",
+      "read": false,
+      "created_at": "2026-03-27T21:01:51.206736+00:00"
+    },
+    {
+      "id": "2e03aadc-64ac-4338-adfc-174e5b9da70c",
+      "user_id": "rider-001",
+      "type": "visit_approved",
+      "title": "Visit Approved!",
+      "message": "Your visit was approved! \u20b9200.0 added to your wallet",
+      "reference_id": "0fc9c739-12ee-4366-bd66-2e3a7d792e8f",
+      "reference_type": "visit",
+      "read": false,
+      "created_at": "2026-03-27T21:01:56.466277+00:00"
+    },
+    {
+      "id": "80071006-1f86-4172-aec5-fc93c688893b",
+      "user_id": "rider-001",
+      "type": "visit_approved",
+      "title": "Visit Approved!",
+      "message": "Your visit was approved! \u20b9100.0 added to your wallet",
+      "reference_id": "e5bc23dd-8ac5-4801-af8a-3454c2af41be",
+      "reference_type": "visit",
+      "read": false,
+      "created_at": "2026-03-27T21:01:58.641207+00:00"
+    },
+    {
+      "id": "ba2f5c3b-1b6d-4e0a-a913-4f307a54463f",
+      "user_id": "rider-001",
+      "type": "payout_processed",
+      "title": "Payout Processed!",
+      "message": "\u20b9600.0 has been transferred to your account",
+      "reference_id": null,
+      "reference_type": "payout",
+      "read": false,
+      "created_at": "2026-03-27T21:24:57.296877+00:00"
+    },
+    {
+      "id": "0112ea4f-ce00-437c-9240-93aced45e31e",
+      "user_id": "rider-001",
+      "type": "new_tolet_task",
+      "title": "New ToLet Board Task",
+      "message": "New task: TEST_Collect boards from Sector 22 - \u20b915.0/board",
+      "reference_id": "254b3707-581d-4123-8886-d9a7c0d2d3e3",
+      "reference_type": "tolet_task",
+      "read": false,
+      "created_at": "2026-03-28T06:53:49.462483+00:00"
+    },
+    {
+      "id": "c0d28787-3fe7-465d-b516-915b36c60b18",
+      "user_id": "rider-001",
+      "type": "new_tolet_task",
+      "title": "New ToLet Board Task",
+      "message": "New task: TEST_Photo verification task - \u20b910.0/board",
+      "reference_id": "fc1b171e-6cac-4e2f-aa43-b41cb43c9c57",
+      "reference_type": "tolet_task",
+      "read": false,
+      "created_at": "2026-03-28T06:53:50.710720+00:00"
+    },
+    {
+      "id": "52162a2c-bda2-4633-bc82-1d4be1b92d1b",
+      "user_id": "f634647c-1710-45d3-8920-84371889ce04",
+      "type": "task_assigned",
+      "title": "Task Assigned to You",
+      "message": "You've been assigned: TEST_Photo verification task",
+      "reference_id": "fc1b171e-6cac-4e2f-aa43-b41cb43c9c57",
+      "reference_type": "tolet_task",
+      "read": false,
+      "created_at": "2026-03-28T06:53:50.916295+00:00"
+    },
+    {
+      "id": "8a88a83d-447b-4ebf-95fe-e7e2c7dda355",
+      "user_id": "admin-001",
+      "type": "task_pending_verification",
+      "title": "ToLet Task - Photos Need Review",
+      "message": "Rider Test Rider submitted 3 board photos - \u20b930.0 pending your verification",
+      "reference_id": "fc1b171e-6cac-4e2f-aa43-b41cb43c9c57",
+      "reference_type": "tolet_task",
+      "read": false,
+      "created_at": "2026-03-28T06:53:51.156198+00:00"
+    },
+    {
+      "id": "94157aef-017e-4878-bc19-40cbf3b7f261",
+      "user_id": "rider-001",
+      "type": "new_tolet_task",
+      "title": "New ToLet Board Task",
+      "message": "New task: TEST_Approval test task - \u20b920.0/board",
+      "reference_id": "37206d32-e403-4498-9002-59cf1e0388bb",
+      "reference_type": "tolet_task",
+      "read": false,
+      "created_at": "2026-03-28T06:53:52.396970+00:00"
+    },
+    {
+      "id": "a626ef46-75d9-4411-a55b-2e1932f6ae26",
+      "user_id": "f634647c-1710-45d3-8920-84371889ce04",
+      "type": "task_assigned",
+      "title": "Task Assigned to You",
+      "message": "You've been assigned: TEST_Approval test task",
+      "reference_id": "37206d32-e403-4498-9002-59cf1e0388bb",
+      "reference_type": "tolet_task",
+      "read": false,
+      "created_at": "2026-03-28T06:53:52.602092+00:00"
+    },
+    {
+      "id": "bbf7025b-2740-47d5-8c2d-240fcd2a1ea0",
+      "user_id": "admin-001",
+      "type": "task_pending_verification",
+      "title": "ToLet Task - Photos Need Review",
+      "message": "Rider Test Rider submitted 2 board photos - \u20b940.0 pending your verification",
+      "reference_id": "37206d32-e403-4498-9002-59cf1e0388bb",
+      "reference_type": "tolet_task",
+      "read": false,
+      "created_at": "2026-03-28T06:53:52.709422+00:00"
+    },
+    {
+      "id": "80a57f51-40a8-478c-bce1-6b9fb6fdfb06",
+      "user_id": "f634647c-1710-45d3-8920-84371889ce04",
+      "type": "task_verified",
+      "title": "Task Approved! \ud83c\udf89",
+      "message": "Your ToLet task was verified. \u20b940.0 added to your wallet!",
+      "reference_id": "37206d32-e403-4498-9002-59cf1e0388bb",
+      "reference_type": "tolet_task",
+      "read": false,
+      "created_at": "2026-03-28T06:53:52.827591+00:00"
+    },
+    {
+      "id": "3b06093b-f37a-4dc7-8295-7fe6ec31ec62",
+      "user_id": "rider-001",
+      "type": "new_tolet_task",
+      "title": "New ToLet Board Task",
+      "message": "New task: TEST_Rejection test task - \u20b915.0/board",
+      "reference_id": "53bf5043-4e75-438f-91ab-02d6a0a97951",
+      "reference_type": "tolet_task",
+      "read": false,
+      "created_at": "2026-03-28T06:53:53.615641+00:00"
+    },
+    {
+      "id": "ac5236bc-4599-4318-9c13-f37c710ae739",
+      "user_id": "f634647c-1710-45d3-8920-84371889ce04",
+      "type": "task_assigned",
+      "title": "Task Assigned to You",
+      "message": "You've been assigned: TEST_Rejection test task",
+      "reference_id": "53bf5043-4e75-438f-91ab-02d6a0a97951",
+      "reference_type": "tolet_task",
+      "read": false,
+      "created_at": "2026-03-28T06:53:53.816694+00:00"
+    },
+    {
+      "id": "474c972c-3ec9-4d37-a599-3d28e9f288b0",
+      "user_id": "admin-001",
+      "type": "task_pending_verification",
+      "title": "ToLet Task - Photos Need Review",
+      "message": "Rider Test Rider submitted 2 board photos - \u20b930.0 pending your verification",
+      "reference_id": "53bf5043-4e75-438f-91ab-02d6a0a97951",
+      "reference_type": "tolet_task",
+      "read": false,
+      "created_at": "2026-03-28T06:53:53.927468+00:00"
+    },
+    {
+      "id": "f157a0c5-409e-4ec9-be55-09dc45e0aae7",
+      "user_id": "f634647c-1710-45d3-8920-84371889ce04",
+      "type": "task_rejected",
+      "title": "Task Rejected",
+      "message": "Your ToLet task was rejected: Photos are blurry, please retake. Please resubmit with valid photos.",
+      "reference_id": "53bf5043-4e75-438f-91ab-02d6a0a97951",
+      "reference_type": "tolet_task",
+      "read": false,
+      "created_at": "2026-03-28T06:53:54.042761+00:00"
+    },
+    {
+      "id": "e4ad3a5d-bbb1-4103-b0af-78f383611f40",
+      "user_id": "rider-001",
+      "type": "new_tolet_task",
+      "title": "New ToLet Board Task",
+      "message": "New task: TEST_Collect boards from Sector 22 - \u20b915.0/board",
+      "reference_id": "32d439b5-9b3d-48cc-b5d9-054a59aa2af8",
+      "reference_type": "tolet_task",
+      "read": false,
+      "created_at": "2026-03-28T06:55:30.191079+00:00"
+    },
+    {
+      "id": "da8f7049-102e-4798-bb29-617151b1321a",
+      "user_id": "rider-001",
+      "type": "new_tolet_task",
+      "title": "New ToLet Board Task",
+      "message": "New task: TEST_Photo verification task - \u20b910.0/board",
+      "reference_id": "ff4d7050-b273-47b1-a632-631aa969ef66",
+      "reference_type": "tolet_task",
+      "read": false,
+      "created_at": "2026-03-28T06:55:31.399469+00:00"
+    },
+    {
+      "id": "1e103643-cb8d-4272-8606-8cba8d8cfd8a",
+      "user_id": "f634647c-1710-45d3-8920-84371889ce04",
+      "type": "task_assigned",
+      "title": "Task Assigned to You",
+      "message": "You've been assigned: TEST_Photo verification task",
+      "reference_id": "ff4d7050-b273-47b1-a632-631aa969ef66",
+      "reference_type": "tolet_task",
+      "read": false,
+      "created_at": "2026-03-28T06:55:31.645123+00:00"
+    },
+    {
+      "id": "11866ff5-5527-412b-9c7c-b2bda7726419",
+      "user_id": "admin-001",
+      "type": "task_pending_verification",
+      "title": "ToLet Task - Photos Need Review",
+      "message": "Rider Test Rider submitted 3 board photos - \u20b930.0 pending your verification",
+      "reference_id": "ff4d7050-b273-47b1-a632-631aa969ef66",
+      "reference_type": "tolet_task",
+      "read": false,
+      "created_at": "2026-03-28T06:55:31.871013+00:00"
+    },
+    {
+      "id": "1e3836f1-c525-4f22-bb63-86131b935033",
+      "user_id": "rider-001",
+      "type": "new_tolet_task",
+      "title": "New ToLet Board Task",
+      "message": "New task: TEST_Approval test task - \u20b920.0/board",
+      "reference_id": "05a045fe-7875-427b-b14e-3dd7f46a27cc",
+      "reference_type": "tolet_task",
+      "read": false,
+      "created_at": "2026-03-28T06:55:33.084066+00:00"
+    },
+    {
+      "id": "a7ee93bd-97bc-4bc9-80f6-8a05d0ce7b37",
+      "user_id": "f634647c-1710-45d3-8920-84371889ce04",
+      "type": "task_assigned",
+      "title": "Task Assigned to You",
+      "message": "You've been assigned: TEST_Approval test task",
+      "reference_id": "05a045fe-7875-427b-b14e-3dd7f46a27cc",
+      "reference_type": "tolet_task",
+      "read": false,
+      "created_at": "2026-03-28T06:55:33.286864+00:00"
+    },
+    {
+      "id": "0285e3a1-1039-4357-b14b-fc7dfb96894c",
+      "user_id": "admin-001",
+      "type": "task_pending_verification",
+      "title": "ToLet Task - Photos Need Review",
+      "message": "Rider Test Rider submitted 2 board photos - \u20b940.0 pending your verification",
+      "reference_id": "05a045fe-7875-427b-b14e-3dd7f46a27cc",
+      "reference_type": "tolet_task",
+      "read": false,
+      "created_at": "2026-03-28T06:55:33.394500+00:00"
+    },
+    {
+      "id": "a92f1a3d-8de8-412b-ac0b-755510c0bdd8",
+      "user_id": "f634647c-1710-45d3-8920-84371889ce04",
+      "type": "task_verified",
+      "title": "Task Approved! \ud83c\udf89",
+      "message": "Your ToLet task was verified. \u20b940.0 added to your wallet!",
+      "reference_id": "05a045fe-7875-427b-b14e-3dd7f46a27cc",
+      "reference_type": "tolet_task",
+      "read": false,
+      "created_at": "2026-03-28T06:55:33.492356+00:00"
+    },
+    {
+      "id": "7c5fede7-e6a9-4346-b314-f9c9022edfd5",
+      "user_id": "rider-001",
+      "type": "new_tolet_task",
+      "title": "New ToLet Board Task",
+      "message": "New task: TEST_Rejection test task - \u20b915.0/board",
+      "reference_id": "3a48a3a4-5418-40f6-9031-93bdc6bc6873",
+      "reference_type": "tolet_task",
+      "read": false,
+      "created_at": "2026-03-28T06:55:34.243743+00:00"
+    },
+    {
+      "id": "6e983a6d-2cdf-4846-a5ed-a9c31fc410dc",
+      "user_id": "f634647c-1710-45d3-8920-84371889ce04",
+      "type": "task_assigned",
+      "title": "Task Assigned to You",
+      "message": "You've been assigned: TEST_Rejection test task",
+      "reference_id": "3a48a3a4-5418-40f6-9031-93bdc6bc6873",
+      "reference_type": "tolet_task",
+      "read": false,
+      "created_at": "2026-03-28T06:55:34.444614+00:00"
+    },
+    {
+      "id": "af2f3fbf-8034-4f5f-9e31-e9e102740432",
+      "user_id": "admin-001",
+      "type": "task_pending_verification",
+      "title": "ToLet Task - Photos Need Review",
+      "message": "Rider Test Rider submitted 2 board photos - \u20b930.0 pending your verification",
+      "reference_id": "3a48a3a4-5418-40f6-9031-93bdc6bc6873",
+      "reference_type": "tolet_task",
+      "read": false,
+      "created_at": "2026-03-28T06:55:34.557597+00:00"
+    },
+    {
+      "id": "3224f8f0-157e-4808-b477-569992e01f9f",
+      "user_id": "f634647c-1710-45d3-8920-84371889ce04",
+      "type": "task_rejected",
+      "title": "Task Rejected",
+      "message": "Your ToLet task was rejected: Photos are blurry, please retake. Please resubmit with valid photos.",
+      "reference_id": "3a48a3a4-5418-40f6-9031-93bdc6bc6873",
+      "reference_type": "tolet_task",
+      "read": false,
+      "created_at": "2026-03-28T06:55:34.670048+00:00"
+    }
+  ],
+  "chat_sessions": [
+    {
+      "id": "c3aed373-ffc7-4b25-9af8-e91dab40874d",
+      "user_id": "bc371b32-e267-4842-a240-789fc34e601b",
+      "messages": [],
+      "preferences": {},
+      "created_at": "2026-03-28 11:01:16.809000",
+      "updated_at": "2026-03-28 11:01:16.809000"
+    },
+    {
+      "id": "1aec0cce-43d6-4b7f-9898-677b159ee5b8",
+      "user_id": "bc371b32-e267-4842-a240-789fc34e601b",
+      "messages": [
+        {
+          "role": "user",
+          "content": "I am looking for a 2BHK under 15000 rent",
+          "timestamp": "2026-03-28 11:01:23.169000"
+        },
+        {
+          "role": "assistant",
+          "content": "Great choice! 2BHKs are perfect for comfort. Do you have a specific location in mind where you'd like to find this property?",
+          "timestamp": "2026-03-28 11:01:23.169000",
+          "properties": null
+        },
+        {
+          "role": "user",
+          "content": "I prefer Koramangala or any area close to metro",
+          "timestamp": "2026-03-28 11:01:36.725000"
+        },
+        {
+          "role": "assistant",
+          "content": "Awesome! Koramangala is a vibrant area, and public transport makes it convenient. Do you have any specific amenities in mind, like parking, AC, or furnished options?",
+          "timestamp": "2026-03-28 11:01:36.725000",
+          "properties": null
+        },
+        {
+          "role": "user",
+          "content": "I need parking and AC, please search for properties now",
+          "timestamp": "2026-03-28 11:01:47.044000"
+        },
+        {
+          "role": "assistant",
+          "content": "Awesome! Let me find some 2BHK properties for you in Koramangala with parking and AC, under a budget of 15,000. One moment, please!\n\n\n\nI'll share the options with you shortly!",
+          "timestamp": "2026-03-28 11:01:47.044000",
+          "properties": []
+        }
+      ],
+      "preferences": {},
+      "created_at": "2026-03-28 11:01:21.828000",
+      "updated_at": "2026-03-28 11:01:47.044000"
+    },
+    {
+      "id": "0730da0a-e61a-4023-8bec-227b6e9a5bc4",
+      "user_id": "bc371b32-e267-4842-a240-789fc34e601b",
+      "messages": [
+        {
+          "role": "user",
+          "content": "I want a 2BHK under 15000",
+          "timestamp": "2026-03-28 11:02:10.930000"
+        },
+        {
+          "role": "assistant",
+          "content": "Great choice! A 2BHK under 15000 sounds perfect. Do you have a specific location in mind or any must-have amenities like parking or AC?",
+          "timestamp": "2026-03-28 11:02:10.930000",
+          "properties": null
+        }
+      ],
+      "preferences": {},
+      "created_at": "2026-03-28 11:02:09.513000",
+      "updated_at": "2026-03-28 11:02:10.930000"
+    },
+    {
+      "id": "8a14c0bd-8651-4563-b3b3-18ea588f7f97",
+      "user_id": "bc371b32-e267-4842-a240-789fc34e601b",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Show me 2BHK apartments under 20000",
+          "timestamp": "2026-03-28 11:02:49.767000"
+        },
+        {
+          "role": "assistant",
+          "content": "Kya baat hai! 2BHK apartments chahiye aapko, aur budget 20,000 ke niche hai. Kahan par dekhenge aap yeh apartments? Koi specific location hai?",
+          "timestamp": "2026-03-28 11:02:49.767000",
+          "properties": null
+        }
+      ],
+      "preferences": {},
+      "created_at": "2026-03-28 11:02:48.410000",
+      "updated_at": "2026-03-28 11:02:49.767000"
+    },
+    {
+      "id": "3c439bb1-bb72-4878-a4ed-fdff7fbff130",
+      "user_id": "bc371b32-e267-4842-a240-789fc34e601b",
+      "messages": [
+        {
+          "role": "user",
+          "content": "I want 2BHK under 20000",
+          "timestamp": "2026-03-28 11:03:22.762000"
+        },
+        {
+          "role": "assistant",
+          "content": "I found some great 2BHK options for you! Check these out:\n\n\ud83c\udfe0 **2BHK Modern Apartment in Koramangala** - \u20b914,000/month  \n\ud83d\udccd Koramangala, Bangalore  \n\u2728 Parking, AC, Lift, Security  \n\n\ud83c\udfe0 **Furnished 2BHK near Metro** - \u20b918,000/month  \n\ud83d\udccd HSR Layout, Bangalore  \n\u2728 Parking, AC, Furnished, Gym  \n\n\ud83c\udfe0 **Pet Friendly 2BHK** - \u20b916,000/month  \n\ud83d\udccd Marathahalli, Bangalore  \n\u2728 Parking, Garden, Pet Friendly, Security  \n\nDo any of these catch your eye?",
+          "timestamp": "2026-03-28 11:03:22.762000",
+          "properties": [
+            {
+              "id": "9fb4ab4f-05ec-41e6-b967-34cb3e33d8fd",
+              "title": "2BHK Modern Apartment in Koramangala",
+              "description": "Spacious 2BHK with modern amenities, close to metro station",
+              "rent": 14000,
+              "location": "Koramangala, Bangalore",
+              "address": "4th Block, Koramangala",
+              "latitude": 12.9352,
+              "longitude": 77.6245,
+              "bhk": "2BHK",
+              "is_available": true,
+              "amenities": [
+                "Parking",
+                "AC",
+                "Lift",
+                "Security"
+              ],
+              "images": [
+                "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800"
+              ],
+              "created_at": "2026-03-28T11:02:43.162549+00:00",
+              "updated_at": "2026-03-28T11:02:43.162558+00:00"
+            },
+            {
+              "id": "71aa08c5-aabc-47ea-95c8-123d36dcc448",
+              "title": "Furnished 2BHK near Metro",
+              "description": "Fully furnished flat with all amenities included",
+              "rent": 18000,
+              "location": "HSR Layout, Bangalore",
+              "address": "Sector 2, HSR Layout",
+              "latitude": 12.9116,
+              "longitude": 77.6389,
+              "bhk": "2BHK",
+              "is_available": true,
+              "amenities": [
+                "Parking",
+                "AC",
+                "Furnished",
+                "Gym",
+                "Security"
+              ],
+              "images": [
+                "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800"
+              ],
+              "created_at": "2026-03-28T11:02:43.162565+00:00",
+              "updated_at": "2026-03-28T11:02:43.162567+00:00"
+            },
+            {
+              "id": "fef77212-af85-4f8d-bd38-4d5501d254d7",
+              "title": "Pet Friendly 2BHK",
+              "description": "Pet-friendly apartment with garden access",
+              "rent": 16000,
+              "location": "Marathahalli, Bangalore",
+              "address": "Near Marathahalli Bridge",
+              "latitude": 12.9591,
+              "longitude": 77.6971,
+              "bhk": "2BHK",
+              "is_available": true,
+              "amenities": [
+                "Parking",
+                "Garden",
+                "Pet Friendly",
+                "Security"
+              ],
+              "images": [
+                "https://images.unsplash.com/photo-1560185127-6ed189bf02f4?w=800"
+              ],
+              "created_at": "2026-03-28T11:02:43.162587+00:00",
+              "updated_at": "2026-03-28T11:02:43.162588+00:00"
+            }
+          ]
+        }
+      ],
+      "preferences": {},
+      "created_at": "2026-03-28 11:03:17.702000",
+      "updated_at": "2026-03-28 11:03:22.762000"
+    },
+    {
+      "id": "6f533a24-e316-4469-b282-8377ecf9d205",
+      "user_id": "bc371b32-e267-4842-a240-789fc34e601b",
+      "messages": [],
+      "preferences": {},
+      "created_at": "2026-03-28 11:05:20.325000",
+      "updated_at": "2026-03-28 11:05:20.325000"
+    },
+    {
+      "id": "58e78ca4-e193-4d45-bc5d-22b65bcbb0a0",
+      "user_id": "bc371b32-e267-4842-a240-789fc34e601b",
+      "messages": [
+        {
+          "role": "user",
+          "content": "I want 2BHK under 20000",
+          "timestamp": "2026-03-28 11:05:50.553000"
+        },
+        {
+          "role": "assistant",
+          "content": "Maine kuch awesome 2BHK options dhoond liye hain! Dekho:\n\n\ud83c\udfe0 **2BHK Modern Apartment in Koramangala** - \u20b914,000/month  \n\ud83d\udccd Koramangala, Bangalore  \n\u2728 Amenities: Parking, AC, Lift, Security\n\n\ud83c\udfe0 **Furnished 2BHK near Metro** - \u20b918,000/month  \n\ud83d\udccd HSR Layout, Bangalore  \n\u2728 Amenities: Parking, AC, Furnished, Gym\n\n\ud83c\udfe0 **Pet Friendly 2BHK** - \u20b916,000/month  \n\ud83d\udccd Marathahalli, Bangalore  \n\u2728 Amenities: Parking, Garden, Pet Friendly, Security\n\nKoi property achi lagi?",
+          "timestamp": "2026-03-28 11:05:50.553000",
+          "properties": [
+            {
+              "id": "9fb4ab4f-05ec-41e6-b967-34cb3e33d8fd",
+              "title": "2BHK Modern Apartment in Koramangala",
+              "description": "Spacious 2BHK with modern amenities, close to metro station",
+              "rent": 14000,
+              "location": "Koramangala, Bangalore",
+              "address": "4th Block, Koramangala",
+              "latitude": 12.9352,
+              "longitude": 77.6245,
+              "bhk": "2BHK",
+              "is_available": true,
+              "amenities": [
+                "Parking",
+                "AC",
+                "Lift",
+                "Security"
+              ],
+              "images": [
+                "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800"
+              ],
+              "created_at": "2026-03-28T11:02:43.162549+00:00",
+              "updated_at": "2026-03-28T11:02:43.162558+00:00"
+            },
+            {
+              "id": "71aa08c5-aabc-47ea-95c8-123d36dcc448",
+              "title": "Furnished 2BHK near Metro",
+              "description": "Fully furnished flat with all amenities included",
+              "rent": 18000,
+              "location": "HSR Layout, Bangalore",
+              "address": "Sector 2, HSR Layout",
+              "latitude": 12.9116,
+              "longitude": 77.6389,
+              "bhk": "2BHK",
+              "is_available": true,
+              "amenities": [
+                "Parking",
+                "AC",
+                "Furnished",
+                "Gym",
+                "Security"
+              ],
+              "images": [
+                "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800"
+              ],
+              "created_at": "2026-03-28T11:02:43.162565+00:00",
+              "updated_at": "2026-03-28T11:02:43.162567+00:00"
+            },
+            {
+              "id": "fef77212-af85-4f8d-bd38-4d5501d254d7",
+              "title": "Pet Friendly 2BHK",
+              "description": "Pet-friendly apartment with garden access",
+              "rent": 16000,
+              "location": "Marathahalli, Bangalore",
+              "address": "Near Marathahalli Bridge",
+              "latitude": 12.9591,
+              "longitude": 77.6971,
+              "bhk": "2BHK",
+              "is_available": true,
+              "amenities": [
+                "Parking",
+                "Garden",
+                "Pet Friendly",
+                "Security"
+              ],
+              "images": [
+                "https://images.unsplash.com/photo-1560185127-6ed189bf02f4?w=800"
+              ],
+              "created_at": "2026-03-28T11:02:43.162587+00:00",
+              "updated_at": "2026-03-28T11:02:43.162588+00:00"
+            }
+          ]
+        }
+      ],
+      "preferences": {},
+      "created_at": "2026-03-28 11:05:42.920000",
+      "updated_at": "2026-03-28 11:05:50.553000"
+    },
+    {
+      "id": "30bf3374-c07b-4677-b3c6-b4d70fff80bb",
+      "user_id": "bc371b32-e267-4842-a240-789fc34e601b",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Show me 2BHK apartments under 20000",
+          "timestamp": "2026-03-28 11:06:15.962000"
+        },
+        {
+          "role": "assistant",
+          "content": "Yay! I found some great options for you:\n\n1. \ud83c\udfe0 **2BHK Modern Apartment in Koramangala** - \u20b914,000/month  \n   \ud83d\udccd Koramangala, Bangalore  \n   \u2728 Parking, AC, Lift, Security\n\n2. \ud83c\udfe0 **Furnished 2BHK near Metro** - \u20b918,000/month  \n   \ud83d\udccd HSR Layout, Bangalore  \n   \u2728 Parking, AC, Furnished, Gym \n\n3. \ud83c\udfe0 **Pet Friendly 2BHK** - \u20b916,000/month  \n   \ud83d\udccd Marathahalli, Bangalore  \n   \u2728 Parking, Garden, Pet Friendly, Security\n\nLet me know if any of these catch your eye!",
+          "timestamp": "2026-03-28 11:06:15.962000",
+          "properties": [
+            {
+              "id": "9fb4ab4f-05ec-41e6-b967-34cb3e33d8fd",
+              "title": "2BHK Modern Apartment in Koramangala",
+              "description": "Spacious 2BHK with modern amenities, close to metro station",
+              "rent": 14000,
+              "location": "Koramangala, Bangalore",
+              "address": "4th Block, Koramangala",
+              "latitude": 12.9352,
+              "longitude": 77.6245,
+              "bhk": "2BHK",
+              "is_available": true,
+              "amenities": [
+                "Parking",
+                "AC",
+                "Lift",
+                "Security"
+              ],
+              "images": [
+                "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800"
+              ],
+              "created_at": "2026-03-28T11:02:43.162549+00:00",
+              "updated_at": "2026-03-28T11:02:43.162558+00:00"
+            },
+            {
+              "id": "71aa08c5-aabc-47ea-95c8-123d36dcc448",
+              "title": "Furnished 2BHK near Metro",
+              "description": "Fully furnished flat with all amenities included",
+              "rent": 18000,
+              "location": "HSR Layout, Bangalore",
+              "address": "Sector 2, HSR Layout",
+              "latitude": 12.9116,
+              "longitude": 77.6389,
+              "bhk": "2BHK",
+              "is_available": true,
+              "amenities": [
+                "Parking",
+                "AC",
+                "Furnished",
+                "Gym",
+                "Security"
+              ],
+              "images": [
+                "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800"
+              ],
+              "created_at": "2026-03-28T11:02:43.162565+00:00",
+              "updated_at": "2026-03-28T11:02:43.162567+00:00"
+            },
+            {
+              "id": "fef77212-af85-4f8d-bd38-4d5501d254d7",
+              "title": "Pet Friendly 2BHK",
+              "description": "Pet-friendly apartment with garden access",
+              "rent": 16000,
+              "location": "Marathahalli, Bangalore",
+              "address": "Near Marathahalli Bridge",
+              "latitude": 12.9591,
+              "longitude": 77.6971,
+              "bhk": "2BHK",
+              "is_available": true,
+              "amenities": [
+                "Parking",
+                "Garden",
+                "Pet Friendly",
+                "Security"
+              ],
+              "images": [
+                "https://images.unsplash.com/photo-1560185127-6ed189bf02f4?w=800"
+              ],
+              "created_at": "2026-03-28T11:02:43.162587+00:00",
+              "updated_at": "2026-03-28T11:02:43.162588+00:00"
+            }
+          ]
+        }
+      ],
+      "preferences": {},
+      "created_at": "2026-03-28 11:06:07.273000",
+      "updated_at": "2026-03-28 11:06:15.962000"
+    },
+    {
+      "id": "51e51af7-2ace-42ae-b07c-a35b5133995d",
+      "user_id": "bc371b32-e267-4842-a240-789fc34e601b",
+      "messages": [],
+      "preferences": {},
+      "created_at": "2026-03-28 11:07:35.464000",
+      "updated_at": "2026-03-28 11:07:35.464000"
+    },
+    {
+      "id": "8e90fabf-d502-424a-9a60-92bf5dbd2d35",
+      "user_id": "bc371b32-e267-4842-a240-789fc34e601b",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Hello, I'm looking for a home",
+          "timestamp": "2026-03-28 11:07:37.239000"
+        },
+        {
+          "role": "assistant",
+          "content": "Hi there! That's great to hear. Could you please share your budget, preferred BHK type, and any specific location or amenities you're looking for? This will help me find the best options for you!",
+          "timestamp": "2026-03-28 11:07:37.239000",
+          "properties": null
+        }
+      ],
+      "preferences": {},
+      "created_at": "2026-03-28 11:07:35.837000",
+      "updated_at": "2026-03-28 11:07:37.239000"
+    },
+    {
+      "id": "791e6456-5cae-410e-be34-d6d5e2550e09",
+      "user_id": "bc371b32-e267-4842-a240-789fc34e601b",
+      "messages": [
+        {
+          "role": "user",
+          "content": "I need a 2BHK under 15000 rupees",
+          "timestamp": "2026-03-28 11:07:40.777000"
+        },
+        {
+          "role": "assistant",
+          "content": "Great news! I found a 2BHK for you: \n\n\ud83c\udfe0 **Modern Apartment in Koramangala** - \u20b914,000/month  \n\ud83d\udccd Koramangala, Bangalore  \n\u2728 Amenities include Parking, AC, Lift, and Security.\n\nInterested in this one?",
+          "timestamp": "2026-03-28 11:07:40.777000",
+          "properties": [
+            {
+              "id": "9fb4ab4f-05ec-41e6-b967-34cb3e33d8fd",
+              "title": "2BHK Modern Apartment in Koramangala",
+              "description": "Spacious 2BHK with modern amenities, close to metro station",
+              "rent": 14000,
+              "location": "Koramangala, Bangalore",
+              "address": "4th Block, Koramangala",
+              "latitude": 12.9352,
+              "longitude": 77.6245,
+              "bhk": "2BHK",
+              "is_available": true,
+              "amenities": [
+                "Parking",
+                "AC",
+                "Lift",
+                "Security"
+              ],
+              "images": [
+                "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800"
+              ],
+              "created_at": "2026-03-28T11:02:43.162549+00:00",
+              "updated_at": "2026-03-28T11:02:43.162558+00:00"
+            }
+          ]
+        }
+      ],
+      "preferences": {},
+      "created_at": "2026-03-28 11:07:37.630000",
+      "updated_at": "2026-03-28 11:07:40.777000"
+    },
+    {
+      "id": "ac3c56b1-e21a-4835-a336-58bfd1cfe1be",
+      "user_id": "bc371b32-e267-4842-a240-789fc34e601b",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Show me properties in Koramangala",
+          "timestamp": "2026-03-28 11:07:42.438000"
+        },
+        {
+          "role": "assistant",
+          "content": "Sure! Could you please tell me your budget and the type of BHK you're looking for? This way, I can find the best options for you in Koramangala!",
+          "timestamp": "2026-03-28 11:07:42.438000",
+          "properties": null
+        }
+      ],
+      "preferences": {},
+      "created_at": "2026-03-28 11:07:41.168000",
+      "updated_at": "2026-03-28 11:07:42.438000"
+    },
+    {
+      "id": "28e916cb-52fb-43ab-bacb-13d7bd1585b6",
+      "user_id": "bc371b32-e267-4842-a240-789fc34e601b",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Hello",
+          "timestamp": "2026-03-28 11:07:43.601000"
+        },
+        {
+          "role": "assistant",
+          "content": "Hello! Kaise ho? Aapko kis tarah ki property ki talash hai?",
+          "timestamp": "2026-03-28 11:07:43.601000",
+          "properties": null
+        }
+      ],
+      "preferences": {},
+      "created_at": "2026-03-28 11:07:42.860000",
+      "updated_at": "2026-03-28 11:07:43.601000"
+    },
+    {
+      "id": "dbcd0892-d243-423c-a5f3-5989c249aee2",
+      "user_id": "bc371b32-e267-4842-a240-789fc34e601b",
+      "messages": [],
+      "preferences": {},
+      "created_at": "2026-03-28 11:07:44.035000",
+      "updated_at": "2026-03-28 11:07:44.035000"
+    },
+    {
+      "id": "65de121a-6a6d-4799-bc5c-74b4fa665cab",
+      "user_id": "bc371b32-e267-4842-a240-789fc34e601b",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Find me properties under 20000 rupees",
+          "timestamp": "2026-03-28 11:07:49.539000"
+        },
+        {
+          "role": "assistant",
+          "content": "I've found some great options for you! Here you go:\n\n\ud83c\udfe0 **2BHK Modern Apartment in Koramangala** - \u20b914,000/month  \n\ud83d\udccd Koramangala, Bangalore  \n\u2728 Parking, AC, Lift, Security  \n\n\ud83c\udfe0 **Furnished 2BHK near Metro** - \u20b918,000/month  \n\ud83d\udccd HSR Layout, Bangalore  \n\u2728 Parking, AC, Furnished, Gym  \n\n\ud83c\udfe0 **Budget 1BHK in Whitefield** - \u20b910,000/month  \n\ud83d\udccd Whitefield, Bangalore  \n\u2728 Parking, Security  \n\nLet me know if any of these catch your eye or if you need more options!",
+          "timestamp": "2026-03-28 11:07:49.539000",
+          "properties": [
+            {
+              "id": "9fb4ab4f-05ec-41e6-b967-34cb3e33d8fd",
+              "title": "2BHK Modern Apartment in Koramangala",
+              "description": "Spacious 2BHK with modern amenities, close to metro station",
+              "rent": 14000,
+              "location": "Koramangala, Bangalore",
+              "address": "4th Block, Koramangala",
+              "latitude": 12.9352,
+              "longitude": 77.6245,
+              "bhk": "2BHK",
+              "is_available": true,
+              "amenities": [
+                "Parking",
+                "AC",
+                "Lift",
+                "Security"
+              ],
+              "images": [
+                "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800"
+              ],
+              "created_at": "2026-03-28T11:02:43.162549+00:00",
+              "updated_at": "2026-03-28T11:02:43.162558+00:00"
+            },
+            {
+              "id": "71aa08c5-aabc-47ea-95c8-123d36dcc448",
+              "title": "Furnished 2BHK near Metro",
+              "description": "Fully furnished flat with all amenities included",
+              "rent": 18000,
+              "location": "HSR Layout, Bangalore",
+              "address": "Sector 2, HSR Layout",
+              "latitude": 12.9116,
+              "longitude": 77.6389,
+              "bhk": "2BHK",
+              "is_available": true,
+              "amenities": [
+                "Parking",
+                "AC",
+                "Furnished",
+                "Gym",
+                "Security"
+              ],
+              "images": [
+                "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800"
+              ],
+              "created_at": "2026-03-28T11:02:43.162565+00:00",
+              "updated_at": "2026-03-28T11:02:43.162567+00:00"
+            },
+            {
+              "id": "23ec0656-404c-4600-88de-2ccad7d17d74",
+              "title": "Budget 1BHK in Whitefield",
+              "description": "Compact 1BHK perfect for bachelors",
+              "rent": 10000,
+              "location": "Whitefield, Bangalore",
+              "address": "ITPL Road, Whitefield",
+              "latitude": 12.9698,
+              "longitude": 77.75,
+              "bhk": "1BHK",
+              "is_available": true,
+              "amenities": [
+                "Parking",
+                "Security"
+              ],
+              "images": [
+                "https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=800"
+              ],
+              "created_at": "2026-03-28T11:02:43.162571+00:00",
+              "updated_at": "2026-03-28T11:02:43.162573+00:00"
+            },
+            {
+              "id": "fef77212-af85-4f8d-bd38-4d5501d254d7",
+              "title": "Pet Friendly 2BHK",
+              "description": "Pet-friendly apartment with garden access",
+              "rent": 16000,
+              "location": "Marathahalli, Bangalore",
+              "address": "Near Marathahalli Bridge",
+              "latitude": 12.9591,
+              "longitude": 77.6971,
+              "bhk": "2BHK",
+              "is_available": true,
+              "amenities": [
+                "Parking",
+                "Garden",
+                "Pet Friendly",
+                "Security"
+              ],
+              "images": [
+                "https://images.unsplash.com/photo-1560185127-6ed189bf02f4?w=800"
+              ],
+              "created_at": "2026-03-28T11:02:43.162587+00:00",
+              "updated_at": "2026-03-28T11:02:43.162588+00:00"
+            }
+          ]
+        }
+      ],
+      "preferences": {},
+      "created_at": "2026-03-28 11:07:45.366000",
+      "updated_at": "2026-03-28 11:07:49.539000"
+    },
+    {
+      "id": "76348fcc-f38e-4eb9-8104-8d6cd836be3c",
+      "user_id": "bc371b32-e267-4842-a240-789fc34e601b",
+      "messages": [
+        {
+          "role": "user",
+          "content": "I want a 3BHK apartment",
+          "timestamp": "2026-03-28 11:07:52.900000"
+        },
+        {
+          "role": "assistant",
+          "content": "I found a great option for you! Check out this spacious 3BHK family apartment in Indiranagar for \u20b935,000/month. It comes with parking, AC, is furnished, and has a gym! Interested? \ud83d\ude0a",
+          "timestamp": "2026-03-28 11:07:52.900000",
+          "properties": [
+            {
+              "id": "746df854-8c86-4394-9052-b526bd7ef38a",
+              "title": "Spacious 3BHK Family Apartment",
+              "description": "Large 3BHK ideal for families, gated community",
+              "rent": 35000,
+              "location": "Indiranagar, Bangalore",
+              "address": "100 Feet Road, Indiranagar",
+              "latitude": 12.9719,
+              "longitude": 77.6412,
+              "bhk": "3BHK",
+              "is_available": true,
+              "amenities": [
+                "Parking",
+                "AC",
+                "Furnished",
+                "Gym",
+                "Pool",
+                "Garden",
+                "Security"
+              ],
+              "images": [
+                "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800"
+              ],
+              "created_at": "2026-03-28T11:02:43.162581+00:00",
+              "updated_at": "2026-03-28T11:02:43.162582+00:00"
+            }
+          ]
+        }
+      ],
+      "preferences": {},
+      "created_at": "2026-03-28 11:07:49.940000",
+      "updated_at": "2026-03-28 11:07:52.900000"
+    },
+    {
+      "id": "75e1ef76-6c89-4401-93d7-25f781ea1e1c",
+      "user_id": "bc371b32-e267-4842-a240-789fc34e601b",
+      "messages": [
+        {
+          "role": "user",
+          "content": "I need a 2BHK under 15000 rupees",
+          "timestamp": "2026-03-28 11:09:29.976000"
+        },
+        {
+          "role": "assistant",
+          "content": "Great news! I found a lovely option for you: \n\n\ud83c\udfe0 **2BHK Modern Apartment in Koramangala** - \u20b914,000/month  \n\ud83d\udccd Located in Koramangala, Bangalore  \n\u2728 It comes with parking, AC, lift, and security!  \n\nIs there anything else you'd like to know or any other requirements?",
+          "timestamp": "2026-03-28 11:09:29.976000",
+          "properties": [
+            {
+              "id": "9fb4ab4f-05ec-41e6-b967-34cb3e33d8fd",
+              "title": "2BHK Modern Apartment in Koramangala",
+              "description": "Spacious 2BHK with modern amenities, close to metro station",
+              "rent": 14000,
+              "location": "Koramangala, Bangalore",
+              "address": "4th Block, Koramangala",
+              "latitude": 12.9352,
+              "longitude": 77.6245,
+              "bhk": "2BHK",
+              "is_available": true,
+              "amenities": [
+                "Parking",
+                "AC",
+                "Lift",
+                "Security"
+              ],
+              "images": [
+                "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800"
+              ],
+              "created_at": "2026-03-28T11:02:43.162549+00:00",
+              "updated_at": "2026-03-28T11:02:43.162558+00:00"
+            }
+          ]
+        }
+      ],
+      "preferences": {},
+      "created_at": "2026-03-28 11:09:23.765000",
+      "updated_at": "2026-03-28 11:09:29.976000"
+    },
+    {
+      "id": "bb41fa6b-eecc-43f6-836a-9c826853251a",
+      "user_id": "bc371b32-e267-4842-a240-789fc34e601b",
+      "messages": [],
+      "preferences": {},
+      "created_at": "2026-03-28 11:09:37.246000",
+      "updated_at": "2026-03-28 11:09:37.246000"
+    },
+    {
+      "id": "248d267b-ddd4-4114-9d91-f9f195fca963",
+      "user_id": "bc371b32-e267-4842-a240-789fc34e601b",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Show me properties in Koramangala with parking",
+          "timestamp": "2026-03-28 11:10:24.488000"
+        },
+        {
+          "role": "assistant",
+          "content": "I found a great option for you! Check out this **2BHK Modern Apartment in Koramangala** for just \u20b914,000/month. It comes with parking, AC, lift, and security. Sounds good?",
+          "timestamp": "2026-03-28 11:10:24.488000",
+          "properties": [
+            {
+              "id": "9fb4ab4f-05ec-41e6-b967-34cb3e33d8fd",
+              "title": "2BHK Modern Apartment in Koramangala",
+              "description": "Spacious 2BHK with modern amenities, close to metro station",
+              "rent": 14000,
+              "location": "Koramangala, Bangalore",
+              "address": "4th Block, Koramangala",
+              "latitude": 12.9352,
+              "longitude": 77.6245,
+              "bhk": "2BHK",
+              "is_available": true,
+              "amenities": [
+                "Parking",
+                "AC",
+                "Lift",
+                "Security"
+              ],
+              "images": [
+                "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800"
+              ],
+              "created_at": "2026-03-28T11:02:43.162549+00:00",
+              "updated_at": "2026-03-28T11:02:43.162558+00:00",
+              "match_score": 1
+            }
+          ]
+        }
+      ],
+      "preferences": {},
+      "created_at": "2026-03-28 11:10:18.367000",
+      "updated_at": "2026-03-28 11:10:24.488000"
+    },
+    {
+      "id": "d5990809-7f4d-4e81-930f-7757cb738bb5",
+      "user_id": "bc371b32-e267-4842-a240-789fc34e601b",
+      "messages": [],
+      "preferences": {},
+      "created_at": "2026-03-28 11:10:44.282000",
+      "updated_at": "2026-03-28 11:10:44.282000"
+    },
+    {
+      "id": "f5f56487-c31d-4549-b6b3-c38bdda833e7",
+      "user_id": "bc371b32-e267-4842-a240-789fc34e601b",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Hello, I'm looking for a home",
+          "timestamp": "2026-03-28 11:10:45.969000"
+        },
+        {
+          "role": "assistant",
+          "content": "Hello! That's great to hear! Can you tell me what kind of home you're looking for? Kya aapka budget, BHK type ya location specify kar sakte ho?",
+          "timestamp": "2026-03-28 11:10:45.969000",
+          "properties": null
+        }
+      ],
+      "preferences": {},
+      "created_at": "2026-03-28 11:10:44.656000",
+      "updated_at": "2026-03-28 11:10:45.969000"
+    },
+    {
+      "id": "972b1f21-e0bb-45b3-8ad1-568861b2f383",
+      "user_id": "bc371b32-e267-4842-a240-789fc34e601b",
+      "messages": [
+        {
+          "role": "user",
+          "content": "I need a 2BHK under 15000 rupees",
+          "timestamp": "2026-03-28 11:10:50.003000"
+        },
+        {
+          "role": "assistant",
+          "content": "Great news! I found a property for you: \n\n\ud83c\udfe0 **2BHK Modern Apartment in Koramangala** - \u20b914,000/month  \n\ud83d\udccd Koramangala, Bangalore  \n\u2728 Amenities: Parking, AC, Lift, Security  \n\nKaisa laga? Let me know if you want more options or details!",
+          "timestamp": "2026-03-28 11:10:50.003000",
+          "properties": [
+            {
+              "id": "9fb4ab4f-05ec-41e6-b967-34cb3e33d8fd",
+              "title": "2BHK Modern Apartment in Koramangala",
+              "description": "Spacious 2BHK with modern amenities, close to metro station",
+              "rent": 14000,
+              "location": "Koramangala, Bangalore",
+              "address": "4th Block, Koramangala",
+              "latitude": 12.9352,
+              "longitude": 77.6245,
+              "bhk": "2BHK",
+              "is_available": true,
+              "amenities": [
+                "Parking",
+                "AC",
+                "Lift",
+                "Security"
+              ],
+              "images": [
+                "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800"
+              ],
+              "created_at": "2026-03-28T11:02:43.162549+00:00",
+              "updated_at": "2026-03-28T11:02:43.162558+00:00"
+            }
+          ]
+        }
+      ],
+      "preferences": {},
+      "created_at": "2026-03-28 11:10:46.384000",
+      "updated_at": "2026-03-28 11:10:50.003000"
+    },
+    {
+      "id": "62b30ecd-5c28-4daf-aaa0-654c28b90495",
+      "user_id": "bc371b32-e267-4842-a240-789fc34e601b",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Show me properties in Koramangala",
+          "timestamp": "2026-03-28 11:10:51.666000"
+        },
+        {
+          "role": "assistant",
+          "content": "Sure! I can help you find properties in Koramangala. Do you have any specific budget, BHK type, or amenities in mind? It will help me narrow down the search.",
+          "timestamp": "2026-03-28 11:10:51.666000",
+          "properties": null
+        }
+      ],
+      "preferences": {},
+      "created_at": "2026-03-28 11:10:50.409000",
+      "updated_at": "2026-03-28 11:10:51.666000"
+    },
+    {
+      "id": "003e6112-a47e-410e-8a11-2f7e9cd0eafa",
+      "user_id": "bc371b32-e267-4842-a240-789fc34e601b",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Hello",
+          "timestamp": "2026-03-28 11:10:52.906000"
+        },
+        {
+          "role": "assistant",
+          "content": "Hello! Kaise ho? Aapko property ki koi requirement hai? I'm here to help!",
+          "timestamp": "2026-03-28 11:10:52.906000",
+          "properties": null
+        }
+      ],
+      "preferences": {},
+      "created_at": "2026-03-28 11:10:52.033000",
+      "updated_at": "2026-03-28 11:10:52.906000"
+    },
+    {
+      "id": "ef8a3cec-3c90-4a11-9e7a-223539d4d721",
+      "user_id": "bc371b32-e267-4842-a240-789fc34e601b",
+      "messages": [],
+      "preferences": {},
+      "created_at": "2026-03-28 11:10:53.347000",
+      "updated_at": "2026-03-28 11:10:53.347000"
+    },
+    {
+      "id": "bdbebe94-b691-488c-b565-e0e180d5d53c",
+      "user_id": "bc371b32-e267-4842-a240-789fc34e601b",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Find me properties under 20000 rupees",
+          "timestamp": "2026-03-28 11:11:00.126000"
+        },
+        {
+          "role": "assistant",
+          "content": "Yay! Here are some properties under \u20b920,000 that I found for you:\n\n1. \ud83c\udfe0 **2BHK Modern Apartment in Koramangala** - \u20b914,000/month  \n   \ud83d\udccd Koramangala, Bangalore  \n   \u2728 Amenities: Parking, AC, Lift, Security\n\n2. \ud83c\udfe0 **Furnished 2BHK near Metro** - \u20b918,000/month  \n   \ud83d\udccd HSR Layout, Bangalore  \n   \u2728 Amenities: Parking, AC, Furnished, Gym\n\n3. \ud83c\udfe0 **Budget 1BHK in Whitefield** - \u20b910,000/month  \n   \ud83d\udccd Whitefield, Bangalore  \n   \u2728 Amenities: Parking, Security\n\nKya aapko inme se koi pasand aaya?",
+          "timestamp": "2026-03-28 11:11:00.126000",
+          "properties": [
+            {
+              "id": "9fb4ab4f-05ec-41e6-b967-34cb3e33d8fd",
+              "title": "2BHK Modern Apartment in Koramangala",
+              "description": "Spacious 2BHK with modern amenities, close to metro station",
+              "rent": 14000,
+              "location": "Koramangala, Bangalore",
+              "address": "4th Block, Koramangala",
+              "latitude": 12.9352,
+              "longitude": 77.6245,
+              "bhk": "2BHK",
+              "is_available": true,
+              "amenities": [
+                "Parking",
+                "AC",
+                "Lift",
+                "Security"
+              ],
+              "images": [
+                "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800"
+              ],
+              "created_at": "2026-03-28T11:02:43.162549+00:00",
+              "updated_at": "2026-03-28T11:02:43.162558+00:00"
+            },
+            {
+              "id": "71aa08c5-aabc-47ea-95c8-123d36dcc448",
+              "title": "Furnished 2BHK near Metro",
+              "description": "Fully furnished flat with all amenities included",
+              "rent": 18000,
+              "location": "HSR Layout, Bangalore",
+              "address": "Sector 2, HSR Layout",
+              "latitude": 12.9116,
+              "longitude": 77.6389,
+              "bhk": "2BHK",
+              "is_available": true,
+              "amenities": [
+                "Parking",
+                "AC",
+                "Furnished",
+                "Gym",
+                "Security"
+              ],
+              "images": [
+                "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800"
+              ],
+              "created_at": "2026-03-28T11:02:43.162565+00:00",
+              "updated_at": "2026-03-28T11:02:43.162567+00:00"
+            },
+            {
+              "id": "23ec0656-404c-4600-88de-2ccad7d17d74",
+              "title": "Budget 1BHK in Whitefield",
+              "description": "Compact 1BHK perfect for bachelors",
+              "rent": 10000,
+              "location": "Whitefield, Bangalore",
+              "address": "ITPL Road, Whitefield",
+              "latitude": 12.9698,
+              "longitude": 77.75,
+              "bhk": "1BHK",
+              "is_available": true,
+              "amenities": [
+                "Parking",
+                "Security"
+              ],
+              "images": [
+                "https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=800"
+              ],
+              "created_at": "2026-03-28T11:02:43.162571+00:00",
+              "updated_at": "2026-03-28T11:02:43.162573+00:00"
+            },
+            {
+              "id": "fef77212-af85-4f8d-bd38-4d5501d254d7",
+              "title": "Pet Friendly 2BHK",
+              "description": "Pet-friendly apartment with garden access",
+              "rent": 16000,
+              "location": "Marathahalli, Bangalore",
+              "address": "Near Marathahalli Bridge",
+              "latitude": 12.9591,
+              "longitude": 77.6971,
+              "bhk": "2BHK",
+              "is_available": true,
+              "amenities": [
+                "Parking",
+                "Garden",
+                "Pet Friendly",
+                "Security"
+              ],
+              "images": [
+                "https://images.unsplash.com/photo-1560185127-6ed189bf02f4?w=800"
+              ],
+              "created_at": "2026-03-28T11:02:43.162587+00:00",
+              "updated_at": "2026-03-28T11:02:43.162588+00:00"
+            }
+          ]
+        }
+      ],
+      "preferences": {},
+      "created_at": "2026-03-28 11:10:54.706000",
+      "updated_at": "2026-03-28 11:11:00.126000"
+    },
+    {
+      "id": "34903ebe-5d24-46c1-9bff-480e1f6b5b33",
+      "user_id": "bc371b32-e267-4842-a240-789fc34e601b",
+      "messages": [
+        {
+          "role": "user",
+          "content": "I want a 3BHK apartment",
+          "timestamp": "2026-03-28 11:11:04.228000"
+        },
+        {
+          "role": "assistant",
+          "content": "I found a lovely option for you! Check out this **Spacious 3BHK Family Apartment** in **Indiranagar** for \u20b935,000/month. It comes with parking, AC, is furnished, and has a gym! Interested in more details?",
+          "timestamp": "2026-03-28 11:11:04.228000",
+          "properties": [
+            {
+              "id": "746df854-8c86-4394-9052-b526bd7ef38a",
+              "title": "Spacious 3BHK Family Apartment",
+              "description": "Large 3BHK ideal for families, gated community",
+              "rent": 35000,
+              "location": "Indiranagar, Bangalore",
+              "address": "100 Feet Road, Indiranagar",
+              "latitude": 12.9719,
+              "longitude": 77.6412,
+              "bhk": "3BHK",
+              "is_available": true,
+              "amenities": [
+                "Parking",
+                "AC",
+                "Furnished",
+                "Gym",
+                "Pool",
+                "Garden",
+                "Security"
+              ],
+              "images": [
+                "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800"
+              ],
+              "created_at": "2026-03-28T11:02:43.162581+00:00",
+              "updated_at": "2026-03-28T11:02:43.162582+00:00"
+            }
+          ]
+        }
+      ],
+      "preferences": {},
+      "created_at": "2026-03-28 11:11:00.526000",
+      "updated_at": "2026-03-28 11:11:04.228000"
+    },
+    {
+      "id": "4b21106a-dbf8-4837-a923-a6d0a46b5ffb",
+      "user_id": "f67b713b-4bbc-44db-be07-8e5d516a314e",
+      "messages": [],
+      "preferences": {},
+      "created_at": "2026-03-28 13:10:09.099000",
+      "updated_at": "2026-03-28 13:10:09.099000"
+    },
+    {
+      "id": "94a4256e-8260-4a94-a386-11f734df796d",
+      "user_id": "f67b713b-4bbc-44db-be07-8e5d516a314e",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Furnished flat near metro",
+          "timestamp": "2026-03-28 13:10:52.778000"
+        },
+        {
+          "role": "assistant",
+          "content": "Kya aapko specific budget ya BHK type bata sakte hain? Toh main aapke liye furnished flat search kar sakun jo metro ke paas ho.",
+          "timestamp": "2026-03-28 13:10:52.778000",
+          "properties": []
+        }
+      ],
+      "preferences": {},
+      "created_at": "2026-03-28 13:10:44.552000",
+      "updated_at": "2026-03-28 13:10:52.778000"
+    }
+  ],
+  "chat_messages": []
+}

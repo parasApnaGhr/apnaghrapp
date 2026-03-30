@@ -599,6 +599,50 @@ async def api_health_check():
     except Exception as e:
         return {"status": "unhealthy", "error": str(e)}
 
+# Data integrity check endpoint for admin
+@api_router.get("/admin/data-status")
+async def get_data_status(current_user: dict = Depends(get_current_user)):
+    """Check the status of all data collections - Admin only"""
+    if current_user['role'] != 'admin':
+        raise HTTPException(status_code=403, detail="Admin only")
+    
+    try:
+        status = {
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "collections": {},
+            "images": {"external": 0, "local": 0, "mongodb": 0},
+            "health": "ok"
+        }
+        
+        # Check all collections
+        collections = ['users', 'properties', 'advertisements', 'visit_bookings', 
+                      'payment_transactions', 'rider_wallets', 'tolet_tasks', 'notifications']
+        
+        for coll_name in collections:
+            count = await db[coll_name].count_documents({})
+            status["collections"][coll_name] = count
+        
+        # Check image URLs in properties
+        properties = await db.properties.find({}, {"_id": 0, "images": 1}).to_list(100)
+        for p in properties:
+            for img in p.get('images', []):
+                if img.startswith('https://'):
+                    status["images"]["external"] += 1
+                elif img.startswith('/api/images/'):
+                    status["images"]["mongodb"] += 1
+                else:
+                    status["images"]["local"] += 1
+        
+        # Set health status
+        if status["images"]["local"] > 0:
+            status["health"] = "warning"
+            status["warning"] = f"{status['images']['local']} images use local storage"
+        
+        return status
+        
+    except Exception as e:
+        return {"health": "error", "error": str(e)}
+
 @api_router.get("/users")
 async def get_all_users(current_user: dict = Depends(get_current_user)):
     if current_user['role'] not in ['admin', 'support_admin', 'rider_admin']:
