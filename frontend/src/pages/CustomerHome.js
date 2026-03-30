@@ -57,10 +57,19 @@ const CustomerHome = () => {
   const loadProperties = async () => {
     setLoading(true);
     try {
-      const response = await propertyAPI.getAll();
+      // Clean up filters - only include non-empty values
+      const cleanFilters = {};
+      if (filters.city && filters.city.trim()) cleanFilters.city = filters.city.trim();
+      if (filters.min_rent && filters.min_rent !== '') cleanFilters.min_rent = filters.min_rent;
+      if (filters.max_rent && filters.max_rent !== '') cleanFilters.max_rent = filters.max_rent;
+      if (filters.bhk && filters.bhk !== '') cleanFilters.bhk = filters.bhk;
+      if (filters.furnishing && filters.furnishing !== '') cleanFilters.furnishing = filters.furnishing;
+      
+      const response = await propertyAPI.getProperties(cleanFilters);
       const available = (response.data || []).filter(p => p.is_available !== false);
       setProperties(available);
     } catch (error) {
+      console.error('Error loading properties:', error);
       toast.error('Failed to load properties');
     } finally {
       setLoading(false);

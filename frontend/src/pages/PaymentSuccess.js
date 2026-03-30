@@ -10,7 +10,6 @@ const PaymentSuccess = () => {
   const [status, setStatus] = useState('checking');
   const [transaction, setTransaction] = useState(null);
   
-  // Support both Cashfree (order_id) and legacy (session_id)
   const orderId = searchParams.get('order_id') || searchParams.get('session_id');
   const paymentType = searchParams.get('type');
 
@@ -23,7 +22,7 @@ const PaymentSuccess = () => {
   }, [orderId]);
 
   const pollPaymentStatus = async (attempts = 0) => {
-    const maxAttempts = 15;  // Increased attempts
+    const maxAttempts = 15;
 
     if (attempts >= maxAttempts) {
       setStatus('timeout');
@@ -41,7 +40,6 @@ const PaymentSuccess = () => {
       } else if (paymentStatus === 'failed' || paymentStatus === 'cancelled' || paymentStatus === 'expired') {
         setStatus('error');
       } else {
-        // Still pending, check again
         setTimeout(() => pollPaymentStatus(attempts + 1), 2000);
       }
     } catch (error) {
@@ -73,7 +71,6 @@ const PaymentSuccess = () => {
       };
     }
     
-    // Default: visit packages
     if (packageType === 'single_visit') {
       return {
         title: 'Payment Successful!',
@@ -124,27 +121,30 @@ const PaymentSuccess = () => {
   const SuccessIcon = successInfo.icon;
 
   return (
-    <div className="min-h-screen bg-[#FAF9F6] flex items-center justify-center p-4">
+    <div className="min-h-screen bg-[#FDFCFB] flex items-center justify-center p-6">
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="max-w-md w-full"
       >
         {status === 'checking' && (
-          <div className="neo-card p-8 text-center">
-            <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-[#FFD166] border-2 border-[#111111] flex items-center justify-center">
-              <Loader className="w-10 h-10 animate-spin" />
+          <div className="bg-white border border-[#E5E1DB] p-8 text-center">
+            <div className="w-20 h-20 mx-auto mb-6 bg-[#C6A87C]/20 flex items-center justify-center">
+              <Loader className="w-10 h-10 text-[#C6A87C] animate-spin" strokeWidth={1.5} />
             </div>
-            <h2 className="text-2xl font-black mb-3" style={{ fontFamily: 'Outfit' }}>
+            <h2 className="text-2xl mb-3" style={{ fontFamily: 'Playfair Display, serif' }}>
               Processing Payment
             </h2>
-            <p className="text-[#52525B]">Please wait while we verify your payment...</p>
-            <div className="mt-6 flex justify-center">
-              <div className="kinetic-loader">
-                <span></span>
-                <span></span>
-                <span></span>
-              </div>
+            <p className="text-[#4A4D53]">Please wait while we verify your payment...</p>
+            <div className="mt-6 flex justify-center gap-1">
+              {[0, 1, 2].map(i => (
+                <motion.span
+                  key={i}
+                  className="w-2 h-2 bg-[#04473C] rounded-full"
+                  animate={{ y: [0, -8, 0] }}
+                  transition={{ repeat: Infinity, duration: 0.6, delay: i * 0.1 }}
+                />
+              ))}
             </div>
           </div>
         )}
@@ -153,29 +153,30 @@ const PaymentSuccess = () => {
           <motion.div 
             initial={{ scale: 0.9 }}
             animate={{ scale: 1 }}
-            className="neo-card p-8 text-center bg-gradient-to-br from-[#C1F5C3]/30 to-white"
+            className="bg-white border border-[#E5E1DB] p-8 text-center"
           >
             <motion.div 
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ type: "spring", delay: 0.2 }}
-              className="w-20 h-20 mx-auto mb-6 rounded-full bg-[#4ECDC4] border-2 border-[#111111] shadow-[4px_4px_0px_#111111] flex items-center justify-center"
+              className="w-20 h-20 mx-auto mb-6 bg-[#04473C] flex items-center justify-center"
             >
-              <CheckCircle className="w-10 h-10 text-white" />
+              <CheckCircle className="w-10 h-10 text-white" strokeWidth={1.5} />
             </motion.div>
-            <h2 className="text-3xl font-black mb-3" style={{ fontFamily: 'Outfit' }}>
+            <h2 className="text-3xl mb-3" style={{ fontFamily: 'Playfair Display, serif' }}>
               {successInfo.title}
             </h2>
-            <p className="text-[#52525B] mb-6">
+            <p className="text-[#4A4D53] mb-6">
               {successInfo.message}
             </p>
             
             {transaction && (
-              <div className="bg-[#F3F4F6] rounded-xl p-4 mb-6 border-2 border-[#111111]/10">
+              <div className="bg-[#F5F3F0] p-4 mb-6 border border-[#E5E1DB]">
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-[#52525B]">Amount Paid</span>
-                  <span className="text-xl font-black text-[#111111]" style={{ fontFamily: 'Outfit' }}>
-                    ₹{transaction.amount?.toLocaleString()}
+                  <span className="text-sm text-[#4A4D53] uppercase tracking-wide">Amount Paid</span>
+                  <span className="price-display text-xl">
+                    <span className="price-currency text-base">₹</span>
+                    {transaction.amount?.toLocaleString()}
                   </span>
                 </div>
               </div>
@@ -187,20 +188,20 @@ const PaymentSuccess = () => {
               data-testid="continue-button"
             >
               {successInfo.buttonText}
-              <ArrowRight className="w-5 h-5" />
+              <ArrowRight className="w-5 h-5" strokeWidth={1.5} />
             </button>
           </motion.div>
         )}
 
         {status === 'timeout' && (
-          <div className="neo-card p-8 text-center">
-            <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-[#FFD166] border-2 border-[#111111] shadow-[4px_4px_0px_#111111] flex items-center justify-center">
-              <Loader className="w-10 h-10" />
+          <div className="bg-white border border-[#E5E1DB] p-8 text-center">
+            <div className="w-20 h-20 mx-auto mb-6 bg-[#C6A87C]/20 flex items-center justify-center">
+              <Loader className="w-10 h-10 text-[#C6A87C]" strokeWidth={1.5} />
             </div>
-            <h2 className="text-2xl font-black mb-3" style={{ fontFamily: 'Outfit' }}>
+            <h2 className="text-2xl mb-3" style={{ fontFamily: 'Playfair Display, serif' }}>
               Still Processing
             </h2>
-            <p className="text-[#52525B] mb-6">
+            <p className="text-[#4A4D53] mb-6">
               Your payment is being processed. Please check your bookings in a few minutes.
             </p>
             <button 
@@ -213,14 +214,14 @@ const PaymentSuccess = () => {
         )}
 
         {status === 'error' && (
-          <div className="neo-card p-8 text-center">
-            <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-[#FF5A5F] border-2 border-[#111111] shadow-[4px_4px_0px_#111111] flex items-center justify-center">
-              <XCircle className="w-10 h-10 text-white" />
+          <div className="bg-white border border-[#E5E1DB] p-8 text-center">
+            <div className="w-20 h-20 mx-auto mb-6 bg-[#8F2727]/10 flex items-center justify-center">
+              <XCircle className="w-10 h-10 text-[#8F2727]" strokeWidth={1.5} />
             </div>
-            <h2 className="text-2xl font-black mb-3" style={{ fontFamily: 'Outfit' }}>
+            <h2 className="text-2xl mb-3" style={{ fontFamily: 'Playfair Display, serif' }}>
               Payment Failed
             </h2>
-            <p className="text-[#52525B] mb-6">
+            <p className="text-[#4A4D53] mb-6">
               Something went wrong with your payment. Please try again.
             </p>
             <button 

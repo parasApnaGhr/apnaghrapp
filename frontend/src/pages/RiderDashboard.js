@@ -757,15 +757,15 @@ const RiderDashboard = () => {
             )}
 
             {!isOnline ? (
-              <div className="neo-card p-12 text-center">
-                <Power className="w-12 h-12 text-[#9CA3AF] mx-auto mb-3" />
-                <p className="text-[#52525B]">Go online to see available tasks</p>
+              <div className="bg-white border border-[#E5E1DB] p-12 text-center">
+                <Power className="w-12 h-12 text-[#D0C9C0] mx-auto mb-3" strokeWidth={1} />
+                <p className="text-[#4A4D53]">Go online to see available tasks</p>
               </div>
             ) : availableTasks.length === 0 ? (
-              <div className="neo-card p-12 text-center">
-                <ClipboardList className="w-12 h-12 text-[#9CA3AF] mx-auto mb-3" />
-                <p className="text-[#52525B]">No ToLet tasks available</p>
-                <p className="text-sm text-[#9CA3AF] mt-2">Check back later</p>
+              <div className="bg-white border border-[#E5E1DB] p-12 text-center">
+                <ClipboardList className="w-12 h-12 text-[#D0C9C0] mx-auto mb-3" strokeWidth={1} />
+                <p className="text-[#4A4D53]">No ToLet tasks available</p>
+                <p className="text-sm text-[#4A4D53] mt-2">Check back later</p>
               </div>
             ) : (
               <div className="space-y-4">
@@ -774,24 +774,25 @@ const RiderDashboard = () => {
                     key={task.id}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="neo-card p-6"
+                    className="bg-white border border-[#E5E1DB] p-6 hover:shadow-lg transition-shadow"
                     data-testid={`task-${task.id}`}
                   >
                     <div className="flex items-start justify-between mb-3">
                       <div>
-                        <h4 className="font-bold">{task.title}</h4>
-                        <p className="text-sm text-[#52525B] flex items-center gap-1">
-                          <MapPin className="w-3 h-3" />
+                        <h4 className="font-medium text-[#1A1C20]">{task.title}</h4>
+                        <p className="text-sm text-[#4A4D53] flex items-center gap-1">
+                          <MapPin className="w-3 h-3" strokeWidth={1.5} />
                           {task.location}
                         </p>
                       </div>
-                      <span className="badge badge-info">{task.status}</span>
+                      <span className="px-3 py-1 bg-[#E6F0EE] text-[#04473C] text-xs font-medium">{task.status}</span>
                     </div>
-                    <p className="text-sm text-[#52525B] mb-4">{task.description}</p>
-                    <div className="flex items-center justify-between py-3 border-y mb-4">
-                      <span className="text-sm">Est. Boards: {task.estimated_boards}</span>
-                      <span className="font-bold text-[#4ECDC4]">
-                        ₹{(task.rate_per_board * task.estimated_boards).toFixed(0)} total
+                    <p className="text-sm text-[#4A4D53] mb-4">{task.description}</p>
+                    <div className="flex items-center justify-between py-3 border-y border-[#E5E1DB] mb-4">
+                      <span className="text-sm text-[#4A4D53]">Est. Boards: {task.estimated_boards}</span>
+                      <span className="price-display">
+                        <span className="price-currency text-sm">₹</span>
+                        {(task.rate_per_board * task.estimated_boards).toFixed(0)}
                       </span>
                     </div>
                     <button
@@ -799,7 +800,7 @@ const RiderDashboard = () => {
                       className="btn-secondary w-full flex items-center justify-center gap-2"
                       data-testid={`accept-task-${task.id}`}
                     >
-                      <CheckCircle className="w-5 h-5" />
+                      <CheckCircle className="w-5 h-5" strokeWidth={1.5} />
                       Accept Task
                     </button>
                   </motion.div>
@@ -813,40 +814,41 @@ const RiderDashboard = () => {
         {activeTab === 'wallet' && (
           <div>
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-bold">My Wallet</h3>
-              <button onClick={loadWallet} className="p-2 hover:bg-gray-100 rounded-full">
-                <RefreshCw className="w-4 h-4" />
+              <h3 className="text-lg font-medium text-[#1A1C20]" style={{ fontFamily: 'Playfair Display, serif' }}>My Wallet</h3>
+              <button onClick={loadWallet} className="p-2 hover:bg-[#F5F3F0] transition-colors">
+                <RefreshCw className="w-4 h-4 text-[#4A4D53]" strokeWidth={1.5} />
               </button>
             </div>
 
             {/* Wallet Summary */}
-            <div className="neo-card p-6 mb-6 bg-gradient-to-r from-[#FFD166]/20 to-white">
+            <div className="bg-white border border-[#E5E1DB] p-6 mb-6">
               <div className="text-center mb-6">
-                <p className="text-sm text-[#52525B] mb-1">Total Earnings</p>
-                <p className="text-4xl font-black" style={{ fontFamily: 'Outfit' }}>
-                  ₹{wallet?.total_earnings?.toLocaleString() || 0}
+                <p className="text-sm text-[#4A4D53] uppercase tracking-wide mb-1">Total Earnings</p>
+                <p className="price-display text-4xl">
+                  <span className="price-currency text-xl">₹</span>
+                  {wallet?.total_earnings?.toLocaleString() || 0}
                 </p>
               </div>
 
               <div className="grid grid-cols-3 gap-4">
-                <div className="text-center p-3 bg-[#FFD166]/30 rounded-xl">
-                  <p className="text-xs text-[#52525B]">Pending</p>
-                  <p className="text-lg font-bold">₹{wallet?.pending_earnings || 0}</p>
+                <div className="text-center p-3 bg-[#C6A87C]/10 border border-[#C6A87C]/30">
+                  <p className="text-xs text-[#4A4D53] uppercase">Pending</p>
+                  <p className="text-lg font-medium text-[#1A1C20]">₹{wallet?.pending_earnings || 0}</p>
                 </div>
-                <div className="text-center p-3 bg-[#4ECDC4]/30 rounded-xl">
-                  <p className="text-xs text-[#52525B]">Approved</p>
-                  <p className="text-lg font-bold text-[#4ECDC4]">₹{wallet?.approved_earnings || 0}</p>
+                <div className="text-center p-3 bg-[#E6F0EE] border border-[#04473C]/20">
+                  <p className="text-xs text-[#4A4D53] uppercase">Approved</p>
+                  <p className="text-lg font-medium text-[#04473C]">₹{wallet?.approved_earnings || 0}</p>
                 </div>
-                <div className="text-center p-3 bg-[#C1F5C3] rounded-xl">
-                  <p className="text-xs text-[#52525B]">Paid Out</p>
-                  <p className="text-lg font-bold text-green-700">₹{wallet?.paid_earnings || 0}</p>
+                <div className="text-center p-3 bg-[#04473C] border border-[#04473C]">
+                  <p className="text-xs text-white/80 uppercase">Paid Out</p>
+                  <p className="text-lg font-medium text-white">₹{wallet?.paid_earnings || 0}</p>
                 </div>
               </div>
 
               {wallet?.next_payout_date && (
-                <div className="mt-4 pt-4 border-t text-center">
-                  <p className="text-sm text-[#52525B]">
-                    Next payout: <span className="font-bold">{wallet.next_payout_date}</span>
+                <div className="mt-4 pt-4 border-t border-[#E5E1DB] text-center">
+                  <p className="text-sm text-[#4A4D53]">
+                    Next payout: <span className="font-medium text-[#1A1C20]">{wallet.next_payout_date}</span>
                   </p>
                 </div>
               )}

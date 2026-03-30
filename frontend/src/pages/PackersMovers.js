@@ -107,34 +107,30 @@ const PackersMovers = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="kinetic-loader">
-          <span></span>
-          <span></span>
-          <span></span>
-        </div>
+      <div className="min-h-screen flex items-center justify-center bg-[#FDFCFB]">
+        <div className="w-8 h-8 border-2 border-[#04473C] border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen pb-8">
-      {/* Header */}
-      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-xl border-b-2 border-[#111111]">
-        <div className="max-w-6xl mx-auto px-4 py-4">
+    <div className="min-h-screen bg-[#FDFCFB] pb-8">
+      {/* Premium Header */}
+      <header className="glass-header sticky top-0 z-50">
+        <div className="max-w-6xl mx-auto px-6 py-4">
           <div className="flex items-center gap-4">
             <button
               onClick={() => navigate(-1)}
-              className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+              className="p-2 hover:bg-[#F5F3F0] transition-colors"
               data-testid="back-button"
             >
-              <ArrowLeft className="w-6 h-6" />
+              <ArrowLeft className="w-6 h-6 text-[#1A1C20]" strokeWidth={1.5} />
             </button>
             <div>
-              <h1 className="text-2xl font-black tracking-tight" style={{ fontFamily: 'Outfit' }}>
+              <h1 className="text-xl font-medium" style={{ fontFamily: 'Playfair Display, serif' }}>
                 ApnaGhr Packers
               </h1>
-              <p className="text-sm text-[#52525B]">Stress-free relocation</p>
+              <p className="text-sm text-[#4A4D53]">Stress-free relocation</p>
             </div>
           </div>
         </div>
@@ -142,30 +138,30 @@ const PackersMovers = () => {
 
       {/* Hero Section */}
       <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-[#4ECDC4]/20 to-[#FFD166]/20"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-[#04473C]/10 to-[#C6A87C]/10"></div>
         <img 
           src="https://images.pexels.com/photos/7464510/pexels-photo-7464510.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940"
           alt="Movers"
           className="w-full h-64 object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#FAF9F6] via-transparent to-transparent"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-[#FDFCFB] via-transparent to-transparent"></div>
         <div className="absolute bottom-4 left-4 right-4">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="neo-card p-6"
+            className="bg-white border border-[#E5E1DB] p-6"
           >
-            <h2 className="text-3xl font-black tracking-tight mb-2" style={{ fontFamily: 'Outfit' }}>
+            <h2 className="text-2xl mb-2" style={{ fontFamily: 'Playfair Display, serif' }}>
               Moving Made Easy
             </h2>
-            <p className="text-[#52525B]">
+            <p className="text-[#4A4D53]">
               Professional packers & movers at your service. Choose a package that fits your needs.
             </p>
           </motion.div>
         </div>
       </section>
 
-      <div className="max-w-6xl mx-auto px-4 py-8">
+      <div className="max-w-6xl mx-auto px-6 py-8">
         {/* Booking Form */}
         {showBookingForm && selectedPackage && (
           <motion.div
@@ -173,27 +169,27 @@ const PackersMovers = () => {
             animate={{ opacity: 1, y: 0 }}
             className="mb-8"
           >
-            <div className={`neo-card p-6 ${packageColors[selectedPackage.tier]}`}>
+            <div className="bg-white border border-[#E5E1DB] p-6">
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl font-bold" style={{ fontFamily: 'Outfit' }}>
+                <h3 className="text-xl" style={{ fontFamily: 'Playfair Display, serif' }}>
                   Book {selectedPackage.name}
                 </h3>
                 <button 
                   onClick={() => setShowBookingForm(false)}
-                  className="text-sm font-bold underline"
+                  className="text-sm font-medium text-[#04473C] hover:underline"
                 >
                   Change Package
                 </button>
               </div>
 
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form onSubmit={handleSubmit} className="space-y-5">
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-bold mb-2">From City</label>
+                    <label className="premium-label">From City</label>
                     <input
                       type="text"
                       required
-                      className="input-field"
+                      className="premium-input"
                       placeholder="e.g., Mumbai"
                       value={formData.from_city}
                       onChange={(e) => setFormData({ ...formData, from_city: e.target.value })}
@@ -201,11 +197,11 @@ const PackersMovers = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-bold mb-2">To City</label>
+                    <label className="premium-label">To City</label>
                     <input
                       type="text"
                       required
-                      className="input-field"
+                      className="premium-input"
                       placeholder="e.g., Pune"
                       value={formData.to_city}
                       onChange={(e) => setFormData({ ...formData, to_city: e.target.value })}
@@ -215,11 +211,11 @@ const PackersMovers = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-bold mb-2">Pickup Address</label>
+                  <label className="premium-label">Pickup Address</label>
                   <textarea
                     required
                     rows={2}
-                    className="input-field resize-none"
+                    className="premium-input resize-none"
                     placeholder="Full pickup address with landmarks"
                     value={formData.from_address}
                     onChange={(e) => setFormData({ ...formData, from_address: e.target.value })}
@@ -228,11 +224,11 @@ const PackersMovers = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-bold mb-2">Delivery Address</label>
+                  <label className="premium-label">Delivery Address</label>
                   <textarea
                     required
                     rows={2}
-                    className="input-field resize-none"
+                    className="premium-input resize-none"
                     placeholder="Full delivery address with landmarks"
                     value={formData.to_address}
                     onChange={(e) => setFormData({ ...formData, to_address: e.target.value })}
@@ -242,28 +238,28 @@ const PackersMovers = () => {
 
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-bold mb-2">
-                      <Calendar className="w-4 h-4 inline mr-1" />
+                    <label className="premium-label flex items-center gap-2">
+                      <Calendar className="w-4 h-4" strokeWidth={1.5} />
                       Preferred Date
                     </label>
                     <input
                       type="date"
                       required
-                      className="input-field"
+                      className="premium-input"
                       value={formData.scheduled_date}
                       onChange={(e) => setFormData({ ...formData, scheduled_date: e.target.value })}
                       data-testid="date-input"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-bold mb-2">
-                      <Phone className="w-4 h-4 inline mr-1" />
+                    <label className="premium-label flex items-center gap-2">
+                      <Phone className="w-4 h-4" strokeWidth={1.5} />
                       Contact Number
                     </label>
                     <input
                       type="tel"
                       required
-                      className="input-field"
+                      className="premium-input"
                       placeholder="Your phone number"
                       value={formData.contact_phone}
                       onChange={(e) => setFormData({ ...formData, contact_phone: e.target.value })}
@@ -273,10 +269,10 @@ const PackersMovers = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-bold mb-2">Items Description (Optional)</label>
+                  <label className="premium-label">Items Description (Optional)</label>
                   <textarea
                     rows={2}
-                    className="input-field resize-none"
+                    className="premium-input resize-none"
                     placeholder="Describe major items: beds, sofa, AC, fridge..."
                     value={formData.items_description}
                     onChange={(e) => setFormData({ ...formData, items_description: e.target.value })}
@@ -286,17 +282,17 @@ const PackersMovers = () => {
 
                 {/* Add-ons */}
                 <div>
-                  <label className="block text-sm font-bold mb-3">Add Extra Services</label>
-                  <div className="flex flex-wrap gap-2">
+                  <label className="premium-label">Add Extra Services</label>
+                  <div className="flex flex-wrap gap-2 mt-2">
                     {addOns.map((addon) => (
                       <button
                         key={addon.id}
                         type="button"
                         onClick={() => toggleAddOn(addon.id)}
-                        className={`px-4 py-2 rounded-full border-2 border-[#111111] font-medium text-sm transition-all ${
+                        className={`px-4 py-2 border font-medium text-sm transition-all ${
                           formData.add_ons.includes(addon.id)
-                            ? 'bg-[#4ECDC4] shadow-[2px_2px_0px_#111111]'
-                            : 'bg-white hover:bg-gray-50'
+                            ? 'bg-[#04473C] text-white border-[#04473C]'
+                            : 'bg-white border-[#E5E1DB] hover:border-[#D0C9C0]'
                         }`}
                         data-testid={`addon-${addon.id}`}
                       >
