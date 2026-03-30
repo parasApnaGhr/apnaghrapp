@@ -15,8 +15,8 @@
       "email": "aman@example.com",
       "password": "$2b$12$W.TRRWTMllvGQW2hHfLRIefzNIiVvnzsGrDNIN58aw9xZrJr2zAwW",
       "role": "rider",
-      "is_online": true,
-      "last_location_update": "2026-03-28T04:44:56.119286+00:00",
+      "is_online": false,
+      "last_location_update": "2026-03-28T13:08:45.924809+00:00",
       "current_lat": 30.7046,
       "current_lng": 76.7179
     },
@@ -258,7 +258,7 @@
       "name": "Naitik Sharma",
       "phone": "8196884631",
       "email": "naitikchess0000@gmail.com",
-      "password": "$2b$12$pfdXA9X9RGefSrJa0LylVuNdTBFDhiqrtuMCl7xLN9ogBOwImwXZm",
+      "password": "$2b$12$JRmfwzXVsxPXsrHM4Tvva.iOg6Xfc7lCXwdu7bv6y4Aen386gJyVG",
       "role": "customer",
       "is_online": false,
       "current_lat": null,
@@ -841,7 +841,7 @@
       "package_type": "premium",
       "status": "active",
       "impressions": 1250,
-      "clicks": 45,
+      "clicks": 46,
       "start_date": "2026-03-28T07:17:08.064536+00:00",
       "end_date": "2026-04-27T07:17:08.064544+00:00",
       "created_at": "2026-03-28T07:17:08.064558+00:00",
@@ -3520,6 +3520,34 @@
       "preferences": {},
       "created_at": "2026-03-28 11:11:00.526000",
       "updated_at": "2026-03-28 11:11:04.228000"
+    },
+    {
+      "id": "4b21106a-dbf8-4837-a923-a6d0a46b5ffb",
+      "user_id": "f67b713b-4bbc-44db-be07-8e5d516a314e",
+      "messages": [],
+      "preferences": {},
+      "created_at": "2026-03-28 13:10:09.099000",
+      "updated_at": "2026-03-28 13:10:09.099000"
+    },
+    {
+      "id": "94a4256e-8260-4a94-a386-11f734df796d",
+      "user_id": "f67b713b-4bbc-44db-be07-8e5d516a314e",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Furnished flat near metro",
+          "timestamp": "2026-03-28 13:10:52.778000"
+        },
+        {
+          "role": "assistant",
+          "content": "Kya aapko specific budget ya BHK type bata sakte hain? Toh main aapke liye furnished flat search kar sakun jo metro ke paas ho.",
+          "timestamp": "2026-03-28 13:10:52.778000",
+          "properties": []
+        }
+      ],
+      "preferences": {},
+      "created_at": "2026-03-28 13:10:44.552000",
+      "updated_at": "2026-03-28 13:10:52.778000"
     }
   ],
   "chat_messages": []

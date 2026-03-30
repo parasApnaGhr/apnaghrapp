@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { 
   Users, Package, Bike, LogOut, Home, DollarSign, TrendingUp, 
-  Settings, MapPin, CheckSquare, CreditCard, Bell, BarChart3
+  Settings, MapPin, CheckSquare, CreditCard, Bell, BarChart3, Image
 } from 'lucide-react';
 import CustomerSupportPanel from '../components/CustomerSupportPanel';
 import InventoryPanel from '../components/InventoryPanel';
@@ -14,10 +14,12 @@ import PayoutsPanel from '../components/PayoutsPanel';
 import LiveTrackingPanel from '../components/LiveTrackingPanel';
 import PropertyAnalyticsPanel from '../components/PropertyAnalyticsPanel';
 import NotificationsDropdown from '../components/NotificationsDropdown';
+import ImageMigrationTool from '../components/ImageMigrationTool';
 
 const AdminDashboard = () => {
   const { user, logout } = useAuth();
   const [activePanel, setActivePanel] = useState('overview');
+  const [showImageTool, setShowImageTool] = useState(false);
 
   return (
     <div className="min-h-screen bg-[#FAF9F6]">
@@ -247,6 +249,14 @@ const AdminDashboard = () => {
                     <CreditCard className="w-4 h-4" />
                     Process Payouts
                   </button>
+                  <button
+                    onClick={() => setShowImageTool(true)}
+                    className="w-full text-left px-4 py-3 bg-amber-100 border border-amber-400 rounded-lg hover:bg-amber-200 transition flex items-center gap-2"
+                    data-testid="image-migration-btn"
+                  >
+                    <Image className="w-4 h-4 text-amber-600" />
+                    <span className="text-amber-800 font-medium">Fix Broken Images</span>
+                  </button>
                 </div>
               </div>
 
@@ -290,6 +300,11 @@ const AdminDashboard = () => {
         {activePanel === 'inventory' && <InventoryPanel />}
         {activePanel === 'settings' && <AppSettingsPanel />}
       </main>
+      
+      {/* Image Migration Tool Modal */}
+      {showImageTool && (
+        <ImageMigrationTool onClose={() => setShowImageTool(false)} />
+      )}
     </div>
   );
 };
