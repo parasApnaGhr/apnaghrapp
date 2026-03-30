@@ -156,6 +156,9 @@ export const visitAPI = {
 };
 
 export const riderAPI = {
+  // Admin: Get all riders
+  getRiders: () => api.get('/admin/riders'),
+  
   // Shift management
   updateShift: (data) => api.post('/rider/shift', data),
   getShift: () => api.get('/rider/shift'),

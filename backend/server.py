@@ -1446,6 +1446,28 @@ async def get_active_visit(current_user: dict = Depends(get_current_user)):
         "customer": customer
     }
 
+# Admin: Get all riders
+@api_router.get("/admin/riders")
+async def get_all_riders(current_user: dict = Depends(get_current_user)):
+    if current_user['role'] not in ['admin', 'rider_admin']:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    riders = await db.users.find(
+        {"role": "rider"}, 
+        {"_id": 0, "password": 0}
+    ).to_list(100)
+    
+    # Add rider-specific info for each rider
+    for rider in riders:
+        rider['on_duty'] = rider.get('is_online', False)
+        rider['user_id'] = rider.get('id')
+        rider['user'] = {
+            'name': rider.get('name', 'Rider'),
+            'phone': rider.get('phone', ''),
+        }
+    
+    return riders
+
 # Admin: Get online riders
 @api_router.get("/admin/riders/online")
 async def get_online_riders(current_user: dict = Depends(get_current_user)):

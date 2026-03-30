@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Bike, Star, Ban, DollarSign, MapPin, X, Award, TrendingUp } from 'lucide-react';
 import { riderAPI } from '../utils/api';
-import axios from 'axios';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import { toast } from 'sonner';
 import 'leaflet/dist/leaflet.css';
@@ -22,7 +21,6 @@ const RiderManagementPanel = () => {
   const [showBonusModal, setShowBonusModal] = useState(null);
   const [bonusAmount, setBonusAmount] = useState('');
   const [bonusReason, setBonusReason] = useState('');
-  const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
   useEffect(() => {
     loadRiders();
@@ -33,25 +31,11 @@ const RiderManagementPanel = () => {
   const loadRiders = async () => {
     try {
       const response = await riderAPI.getRiders();
-      // Get user details for each rider
-      const ridersWithUsers = await Promise.all(
-        response.data.map(async (rider) => {
-          try {
-            const token = localStorage.getItem('token');
-            const userResponse = await axios.get(
-              `${BACKEND_URL}/api/users`,
-              { headers: { Authorization: `Bearer ${token}` } }
-            );
-            const user = userResponse.data.find(u => u.id === rider.user_id);
-            return { ...rider, user };
-          } catch (error) {
-            return rider;
-          }
-        })
-      );
-      setRiders(ridersWithUsers);
+      // Riders now come with user info included from the backend
+      setRiders(response.data || []);
     } catch (error) {
-      console.error('Failed to load riders');
+      console.error('Failed to load riders:', error);
+      toast.error('Failed to load riders');
     } finally {
       setLoading(false);
     }
