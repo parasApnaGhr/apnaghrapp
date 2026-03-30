@@ -20,7 +20,7 @@
 
 ## Alternative Rider
 - **Phone:** 8888888888
-- **Password:** (check DB)
+- **Password:** (password not set - check MongoDB)
 - **Name:** Aman Singh
 - **Role:** rider
 
