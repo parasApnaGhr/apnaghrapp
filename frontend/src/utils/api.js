@@ -51,6 +51,12 @@ export const getMediaUrl = (url, type = 'default') => {
     return BACKEND_URL ? `${BACKEND_URL}${cleanPath}` : cleanPath;
   }
   
+  // If it's a MongoDB image path (/api/images/)
+  if (url.startsWith('/api/images/') || url.startsWith('api/images/')) {
+    const cleanPath = url.startsWith('/') ? url : `/${url}`;
+    return BACKEND_URL ? `${BACKEND_URL}${cleanPath}` : cleanPath;
+  }
+  
   // For any other path, prefix with BACKEND_URL if available
   const cleanPath = url.startsWith('/') ? url : `/${url}`;
   return BACKEND_URL ? `${BACKEND_URL}${cleanPath}` : cleanPath;
