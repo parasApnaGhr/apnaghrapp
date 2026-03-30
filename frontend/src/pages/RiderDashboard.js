@@ -328,9 +328,12 @@ const RiderDashboard = () => {
         <div className="max-w-2xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-xl font-medium" style={{ fontFamily: 'Playfair Display, serif' }}>
-                Rider Dashboard
-              </h1>
+              <div className="flex items-center gap-2">
+                <h1 className="text-xl font-medium" style={{ fontFamily: 'Playfair Display, serif' }}>
+                  Apna<span className="text-[#04473C]">Ghr</span>
+                </h1>
+                <span className="text-[10px] bg-[#04473C] text-white px-2 py-0.5">RIDER</span>
+              </div>
               <p className="text-sm text-[#4A4D53]">Welcome, {user?.name}</p>
             </div>
             <button 
@@ -345,6 +348,24 @@ const RiderDashboard = () => {
       </header>
 
       <main className="max-w-2xl mx-auto px-6 py-6">
+        {/* Earnings Banner */}
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-gradient-to-r from-[#04473C] to-[#065446] text-white p-4 mb-4"
+        >
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-xs text-white/70">Your Earnings Potential</p>
+              <p className="text-lg font-medium">₹150/visit • Daily Payouts</p>
+            </div>
+            <div className="text-right">
+              <p className="text-xs text-[#C6A87C]">10 visits = ₹1500 + ₹500 bonus</p>
+              <p className="text-[10px] text-white/60">Powered by ApnaGhr</p>
+            </div>
+          </div>
+        </motion.div>
+
         {/* Online/Offline Toggle */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
@@ -361,7 +382,7 @@ const RiderDashboard = () => {
               <div>
                 <p className="font-medium text-lg text-[#1A1C20]">{isOnline ? 'You are Online' : 'You are Offline'}</p>
                 <p className="text-sm text-[#4A4D53]">
-                  {isOnline ? 'Accepting new requests' : 'Go online to receive requests'}
+                  {isOnline ? 'Accepting new requests' : 'Go online to start earning ₹150/visit'}
                 </p>
               </div>
             </div>

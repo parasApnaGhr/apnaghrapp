@@ -189,8 +189,8 @@ const Login = () => {
 
   const roleOptions = [
     { value: 'customer', label: 'Find a Home', desc: 'Browse & book visits', icon: Home },
-    { value: 'seller', label: 'Join as Seller', desc: 'Earn commissions', icon: Briefcase },
-    { value: 'rider', label: 'Join as Rider', desc: 'Earn with visits', icon: User },
+    { value: 'seller', label: 'Join as Seller', desc: 'Earn ₹500-₹10,000 per deal', icon: Briefcase },
+    { value: 'rider', label: 'Join as Rider', desc: 'Earn ₹150/visit + ₹500 bonus', icon: User },
     { value: 'advertiser', label: 'Advertise', desc: 'Promote your business', icon: Mail },
     { value: 'builder', label: 'List Properties', desc: 'Builder/Owner account', icon: Home }
   ];
@@ -209,26 +209,54 @@ const Login = () => {
         animate={{ opacity: 1, y: 0 }}
         className="w-full max-w-md relative z-10"
       >
-        {/* Logo */}
+        {/* Logo & Branding */}
         <motion.div 
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="text-center mb-10"
+          className="text-center mb-8"
         >
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-[#04473C] mb-6">
-            <Home className="w-8 h-8 text-white" strokeWidth={1.5} />
-          </div>
           <h1 className="text-4xl tracking-tight mb-2" style={{ fontFamily: 'Playfair Display, serif' }}>
             Apna<span className="text-[#04473C]">Ghr</span>
           </h1>
-          <p className="text-[#4A4D53] text-sm tracking-wide">
-            {isForgotPassword 
-              ? 'Reset your password' 
-              : isRegister 
-                ? 'Create your account' 
-                : 'Premium Property Visits'}
-          </p>
+          {isForgotPassword ? (
+            <p className="text-[#4A4D53] text-sm tracking-wide">Reset your password</p>
+          ) : isRegister ? (
+            <>
+              {formData.role === 'rider' ? (
+                <div className="space-y-2">
+                  <p className="text-[#04473C] font-medium text-sm">India's #1 Field Rider Network</p>
+                  <p className="text-[#4A4D53] text-xs">Earn by visiting properties</p>
+                  <div className="flex items-center justify-center gap-4 mt-3">
+                    <div className="text-center">
+                      <p className="text-xl font-bold text-[#04473C]">₹150</p>
+                      <p className="text-[10px] text-[#4A4D53]">per visit</p>
+                    </div>
+                    <div className="w-px h-8 bg-[#E5E1DB]" />
+                    <div className="text-center">
+                      <p className="text-xl font-bold text-[#04473C]">Daily</p>
+                      <p className="text-[10px] text-[#4A4D53]">payouts</p>
+                    </div>
+                    <div className="w-px h-8 bg-[#E5E1DB]" />
+                    <div className="text-center">
+                      <p className="text-xl font-bold text-[#C6A87C]">+₹500</p>
+                      <p className="text-[10px] text-[#4A4D53]">bonus/10 visits</p>
+                    </div>
+                  </div>
+                </div>
+              ) : formData.role === 'seller' ? (
+                <div className="space-y-1">
+                  <p className="text-[#04473C] font-medium text-sm">Join Our Sales Network</p>
+                  <p className="text-[#4A4D53] text-xs">Earn up to ₹10,000 per deal</p>
+                </div>
+              ) : (
+                <p className="text-[#4A4D53] text-sm">Create your account</p>
+              )}
+            </>
+          ) : (
+            <p className="text-[#4A4D53] text-sm tracking-wide">Premium Property Visits</p>
+          )}
+          <p className="text-[10px] text-[#C6A87C] mt-2 font-medium">Powered by ApnaGhr</p>
         </motion.div>
 
         {/* Forgot Password Flow */}
@@ -430,20 +458,32 @@ const Login = () => {
 
                 <div>
                   <label className="premium-label">Phone Number</label>
-                  <div className="relative">
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#4A4D53] text-sm font-medium">+91</span>
+                  <div className="relative flex items-center">
+                    <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center gap-1 text-[#4A4D53] text-sm font-medium pointer-events-none">
+                      <span className="text-xs">🇮🇳</span>
+                      <span>+91</span>
+                    </div>
                     <input
                       type="tel"
+                      inputMode="numeric"
+                      pattern="[0-9]*"
                       data-testid="login-phone-input"
                       value={formData.phone}
                       onChange={(e) => {
-                        const value = e.target.value.replace(/\D/g, '').slice(0, 10);
+                        // Remove any non-digits and +91 prefix if accidentally pasted
+                        let value = e.target.value.replace(/\D/g, '');
+                        // Remove 91 prefix if user pasted full number
+                        if (value.startsWith('91') && value.length > 10) {
+                          value = value.substring(2);
+                        }
+                        value = value.slice(0, 10);
                         setFormData({ ...formData, phone: value });
                       }}
-                      placeholder="Enter mobile number"
-                      className="premium-input pl-14"
+                      placeholder="10 digit mobile number"
+                      className="premium-input pl-[4.5rem]"
                       maxLength={10}
                       required
+                      autoComplete="tel-national"
                     />
                   </div>
                   {formData.phone && !validatePhone(formData.phone) && (

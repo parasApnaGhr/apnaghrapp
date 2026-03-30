@@ -127,7 +127,7 @@ const CustomerHome = () => {
               <h1 className="text-2xl tracking-tight" style={{ fontFamily: 'Playfair Display, serif' }}>
                 Apna<span className="text-[#04473C]">Ghr</span>
               </h1>
-              <p className="text-xs tracking-[0.15em] uppercase text-[#4A4D53] font-medium">Premium Rentals</p>
+              <p className="text-[10px] tracking-[0.1em] uppercase text-[#C6A87C] font-medium">Powered by ApnaGhr</p>
             </motion.div>
             
             <div className="flex items-center gap-4">
@@ -433,6 +433,76 @@ const CustomerHome = () => {
               <p className="text-[#4A4D53]">Try adjusting your search filters</p>
             </div>
           )}
+        </section>
+
+        {/* Testimonials & Trust Section */}
+        <section className="mt-12 mb-8">
+          <div className="text-center mb-6">
+            <h2 className="text-xl mb-2" style={{ fontFamily: 'Playfair Display, serif' }}>
+              What Our Customers Say
+            </h2>
+            <p className="text-sm text-[#4A4D53]">Trusted by thousands of happy customers</p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {[
+              { name: 'Priya Sharma', city: 'Chandigarh', text: 'Found my dream home in just 2 visits! The rider was very professional.', rating: 5 },
+              { name: 'Rahul Verma', city: 'Mohali', text: 'ApnaGhr made house hunting so easy. No more dealing with fake brokers!', rating: 5 },
+              { name: 'Anita Kaur', city: 'Kharar', text: 'Transparent pricing and genuine properties. Highly recommended!', rating: 5 }
+            ].map((testimonial, idx) => (
+              <motion.div
+                key={idx}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: idx * 0.1 }}
+                className="bg-white border border-[#E5E1DB] p-5"
+              >
+                <div className="flex items-center gap-1 mb-3">
+                  {[...Array(testimonial.rating)].map((_, i) => (
+                    <Sparkles key={i} className="w-4 h-4 text-[#C6A87C]" fill="#C6A87C" />
+                  ))}
+                </div>
+                <p className="text-sm text-[#4A4D53] mb-4 italic">"{testimonial.text}"</p>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-[#04473C] text-white flex items-center justify-center font-medium">
+                    {testimonial.name[0]}
+                  </div>
+                  <div>
+                    <p className="font-medium text-sm">{testimonial.name}</p>
+                    <p className="text-xs text-[#4A4D53]">{testimonial.city}</p>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Trust Badges */}
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-6 py-6 border-y border-[#E5E1DB]">
+            <div className="text-center">
+              <p className="text-2xl font-bold text-[#04473C]">1000+</p>
+              <p className="text-xs text-[#4A4D53]">Happy Customers</p>
+            </div>
+            <div className="w-px h-10 bg-[#E5E1DB]" />
+            <div className="text-center">
+              <p className="text-2xl font-bold text-[#04473C]">500+</p>
+              <p className="text-xs text-[#4A4D53]">Verified Properties</p>
+            </div>
+            <div className="w-px h-10 bg-[#E5E1DB]" />
+            <div className="text-center">
+              <p className="text-2xl font-bold text-[#04473C]">50+</p>
+              <p className="text-xs text-[#4A4D53]">Field Riders</p>
+            </div>
+            <div className="w-px h-10 bg-[#E5E1DB]" />
+            <div className="text-center">
+              <p className="text-2xl font-bold text-[#C6A87C]">4.8★</p>
+              <p className="text-xs text-[#4A4D53]">Average Rating</p>
+            </div>
+          </div>
+          
+          <p className="text-center text-xs text-[#C6A87C] mt-4 font-medium">
+            Powered by ApnaGhr • India's Trusted Property Visit Platform
+          </p>
         </section>
       </main>
 
