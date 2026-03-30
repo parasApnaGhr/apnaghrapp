@@ -606,6 +606,84 @@ async def api_health_check():
     except Exception as e:
         return {"status": "unhealthy", "error": str(e)}
 
+# Manual seed endpoint for production database
+@api_router.post("/admin/seed-database")
+async def seed_production_database(secret_key: str = None):
+    """
+    Manually seed the production database with initial data.
+    This endpoint can be called once to populate an empty production database.
+    Requires a secret key for security.
+    """
+    # Simple security check - use environment variable or hardcoded key
+    expected_key = os.environ.get('SEED_SECRET', 'apnaghr-seed-2026')
+    if secret_key != expected_key:
+        raise HTTPException(status_code=403, detail="Invalid seed key")
+    
+    try:
+        # Check if database already has data
+        user_count = await db.users.count_documents({})
+        property_count = await db.properties.count_documents({})
+        
+        if user_count > 0 and property_count > 0:
+            return {
+                "status": "skipped",
+                "message": "Database already has data",
+                "counts": {"users": user_count, "properties": property_count}
+            }
+        
+        # Load seed data
+        seed_file = ROOT_DIR / "seed_data.json"
+        if not seed_file.exists():
+            raise HTTPException(status_code=500, detail="Seed data file not found")
+        
+        with open(seed_file) as f:
+            seed_data = json.load(f)
+        
+        results = {}
+        
+        # Seed users (with password hashing)
+        if 'users' in seed_data and await db.users.count_documents({}) == 0:
+            users = seed_data['users']
+            for user in users:
+                # Hash password if not already hashed
+                if not user.get('password', '').startswith('$2'):
+                    user['password'] = bcrypt.hashpw(user['password'].encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+                user['created_at'] = datetime.now(timezone.utc)
+            await db.users.insert_many(users)
+            results['users'] = len(users)
+        
+        # Seed properties
+        if 'properties' in seed_data and await db.properties.count_documents({}) == 0:
+            properties = seed_data['properties']
+            for prop in properties:
+                prop['created_at'] = datetime.now(timezone.utc)
+            await db.properties.insert_many(properties)
+            results['properties'] = len(properties)
+        
+        # Seed advertisements
+        if 'advertisements' in seed_data and await db.advertisements.count_documents({}) == 0:
+            ads = seed_data['advertisements']
+            for ad in ads:
+                ad['created_at'] = datetime.now(timezone.utc)
+            await db.advertisements.insert_many(ads)
+            results['advertisements'] = len(ads)
+        
+        # Seed app_settings
+        if 'app_settings' in seed_data and await db.app_settings.count_documents({}) == 0:
+            settings = seed_data['app_settings']
+            await db.app_settings.insert_many(settings)
+            results['app_settings'] = len(settings)
+        
+        return {
+            "status": "success",
+            "message": "Database seeded successfully",
+            "inserted": results
+        }
+        
+    except Exception as e:
+        logger.error(f"Seed error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Seed failed: {str(e)}")
+
 # Data integrity check endpoint for admin
 @api_router.get("/admin/data-status")
 async def get_data_status(current_user: dict = Depends(get_current_user)):
