@@ -165,6 +165,10 @@ const PropertyDetail = () => {
                 src={getMediaUrl(property.images[selectedImage])}
                 alt={property.title}
                 className="w-full h-full object-cover"
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80';
+                }}
               />
             ) : (
               <div className="flex items-center justify-center h-full">
@@ -189,7 +193,15 @@ const PropertyDetail = () => {
                     selectedImage === idx ? 'border-[#E07A5F]' : 'border-transparent'
                   }`}
                 >
-                  <img src={getMediaUrl(img)} alt="" className="w-full h-full object-cover" />
+                  <img 
+                    src={getMediaUrl(img)} 
+                    alt="" 
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80';
+                    }}
+                  />
                 </button>
               ))}
             </div>

@@ -469,7 +469,15 @@ const InventoryPanel = () => {
                 <div className="flex items-center gap-4">
                   <div className="w-20 h-20 bg-[#F3F4F6] rounded-lg border-2 border-[#111111] overflow-hidden flex-shrink-0">
                     {property.images?.[0] ? (
-                      <img src={getMediaUrl(property.images[0])} alt="" className="w-full h-full object-cover" />
+                      <img 
+                        src={getMediaUrl(property.images[0])} 
+                        alt="" 
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.src = 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80';
+                        }}
+                      />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
                         <Home className="w-8 h-8 text-[#9CA3AF]" />

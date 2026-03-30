@@ -668,7 +668,15 @@ const RiderDashboard = () => {
                     <div className="grid grid-cols-3 gap-2 mb-3">
                       {taskCompletion.proofImages.map((url, index) => (
                         <div key={index} className="relative aspect-square rounded-lg overflow-hidden border-2 border-[#E5E3D8]">
-                          <img src={url} alt={`Board ${index + 1}`} className="w-full h-full object-cover" />
+                          <img 
+                            src={url} 
+                            alt={`Board ${index + 1}`} 
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              e.target.onerror = null;
+                              e.target.src = 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80';
+                            }}
+                          />
                           <button
                             onClick={() => removeTaskPhoto(index)}
                             className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full"

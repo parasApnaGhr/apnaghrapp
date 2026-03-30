@@ -337,7 +337,10 @@ const CustomerHome = () => {
                       src={ad.image_url} 
                       alt={ad.company_name}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      onError={(e) => e.target.style.display = 'none'}
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800&q=80';
+                      }}
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                     <div className="absolute bottom-0 left-0 right-0 p-3">
@@ -424,6 +427,10 @@ const CustomerHome = () => {
                       src={getMediaUrl(property.images[0])}
                       alt={property.title}
                       className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80';
+                      }}
                     />
                   ) : (
                     <div className="flex items-center justify-center h-full bg-gradient-to-br from-[#E5E7EB] to-[#D1D5DB]">

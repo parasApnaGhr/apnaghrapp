@@ -257,6 +257,10 @@ const AIChatbot = () => {
                             src={getMediaUrl(property.images[0])}
                             alt={property.title}
                             className="w-20 h-20 object-cover border-r-2 border-black"
+                            onError={(e) => {
+                              e.target.onerror = null;
+                              e.target.src = 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80';
+                            }}
                           />
                         )}
                         <div className="flex-1 p-3">

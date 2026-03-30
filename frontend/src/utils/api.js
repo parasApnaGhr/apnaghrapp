@@ -4,6 +4,14 @@ import axios from 'axios';
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || '';
 const API = BACKEND_URL ? `${BACKEND_URL}/api` : '/api';
 
+// Placeholder images for when uploads are missing
+const PLACEHOLDER_IMAGES = {
+  property: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80',
+  avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&q=80',
+  ad: 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800&q=80',
+  default: 'https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=800&q=80'
+};
+
 // Debug log for troubleshooting (only in development)
 if (process.env.NODE_ENV === 'development' && !BACKEND_URL) {
   console.warn('REACT_APP_BACKEND_URL is not set, using relative URLs');
@@ -11,8 +19,8 @@ if (process.env.NODE_ENV === 'development' && !BACKEND_URL) {
 
 // Helper to fix image/video URLs - ensures full URL for uploaded files
 // This handles all cases: external URLs, uploaded files, and relative paths
-export const getMediaUrl = (url) => {
-  if (!url) return null;
+export const getMediaUrl = (url, type = 'default') => {
+  if (!url) return PLACEHOLDER_IMAGES[type] || PLACEHOLDER_IMAGES.default;
   
   // If it's a data URL (base64), return as-is
   if (url.startsWith('data:')) {
