@@ -24,6 +24,14 @@
 - **Name:** Aman Singh
 - **Role:** rider
 
+## Seller Account (NEW)
+- **Phone:** 9898989898
+- **Password:** seller123
+- **Name:** Test Seller Raj
+- **Role:** seller
+- **Referral Code:** EXYE1OZD
+- **City:** Mohali
+
 ## Advertiser Account
 - **Phone:** 9999999999
 - **Name:** Rahul Kumar

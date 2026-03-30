@@ -20,6 +20,7 @@ import json
 from routes.packers import router as packers_router
 from routes.advertising import router as advertising_router
 from routes.chatbot import setup_chatbot_routes
+from routes.seller import setup_seller_routes
 from services.cashfree_service import get_cashfree_service, CashfreePaymentService
 
 ROOT_DIR = Path(__file__).parent
@@ -183,6 +184,11 @@ class VisitBooking(BaseModel):
     visit_end_time: Optional[datetime] = None
     customer_feedback: Optional[str] = None
     rating: Optional[int] = None
+    # Seller referral tracking
+    referred_by: Optional[str] = None  # Seller ID who referred this client
+    deal_closed: bool = False
+    brokerage_amount: Optional[float] = None
+    seller_commission: Optional[float] = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class VisitBookingCreate(BaseModel):
@@ -193,6 +199,7 @@ class VisitBookingCreate(BaseModel):
     pickup_location: str
     pickup_lat: Optional[float] = None
     pickup_lng: Optional[float] = None
+    referral_code: Optional[str] = None  # Optional seller referral code
 
 class RiderShiftUpdate(BaseModel):
     is_online: bool
@@ -1070,6 +1077,18 @@ async def book_visit(booking_data: VisitBookingCreate, current_user: dict = Depe
     mins = estimated_minutes % 60
     estimated_duration = f"{hours}h {mins}m" if hours > 0 else f"{mins}m"
     
+    # Check for seller referral (either from user's referred_by or from booking data)
+    referred_by = current_user.get('referred_by')
+    if booking_data.referral_code and not referred_by:
+        # Look up seller by referral code
+        seller = await db.users.find_one({
+            "referral_code": booking_data.referral_code,
+            "role": "seller",
+            "approval_status": "approved"
+        })
+        if seller:
+            referred_by = seller['id']
+    
     booking = VisitBooking(
         customer_id=current_user['id'],
         property_ids=booking_data.property_ids,
@@ -1085,12 +1104,28 @@ async def book_visit(booking_data: VisitBookingCreate, current_user: dict = Depe
         pickup_location=booking_data.pickup_location,
         pickup_lat=booking_data.pickup_lat,
         pickup_lng=booking_data.pickup_lng,
-        total_earnings=num_properties * 100  # ₹100 per property for rider
+        total_earnings=num_properties * 100,  # ₹100 per property for rider
+        referred_by=referred_by  # Track seller who referred this client
     )
     
     doc = booking.model_dump()
     doc['created_at'] = doc['created_at'].isoformat()
     await db.visit_bookings.insert_one(doc)
+    
+    # Update seller referral status if applicable
+    if referred_by:
+        # Update referral record to 'booked'
+        await db.seller_referrals.update_one(
+            {
+                "seller_id": referred_by,
+                "client_id": current_user['id'],
+                "status": {"$in": ["shared", "registered"]}
+            },
+            {"$set": {
+                "status": "booked",
+                "visit_id": doc['id']
+            }}
+        )
     
     # Increment package usage for each property
     visits_to_deduct = num_properties
@@ -2822,6 +2857,9 @@ async def get_property_popularity(property_id: str):
 
 # Setup AI Chatbot routes (must be before including router)
 setup_chatbot_routes(api_router, db, get_current_user)
+
+# Setup Seller routes
+setup_seller_routes(api_router, db, get_current_user, bcrypt)
 
 app.include_router(api_router)
 

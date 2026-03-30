@@ -3,11 +3,12 @@ import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import { 
   Users, Package, Bike, LogOut, Home, DollarSign, 
-  Settings, MapPin, CheckSquare, CreditCard, BarChart3, Image, Upload
+  Settings, MapPin, CheckSquare, CreditCard, BarChart3, Image, Upload, UserPlus
 } from 'lucide-react';
 import CustomerSupportPanel from '../components/CustomerSupportPanel';
 import InventoryPanel from '../components/InventoryPanel';
 import RiderManagementPanel from '../components/RiderManagementPanel';
+import SellerManagementPanel from '../components/SellerManagementPanel';
 import AppSettingsPanel from '../components/AppSettingsPanel';
 import ToLetTasksPanel from '../components/ToLetTasksPanel';
 import VisitApprovalPanel from '../components/VisitApprovalPanel';
@@ -32,6 +33,7 @@ const AdminDashboard = () => {
     { id: 'payouts', label: 'Payouts', icon: CreditCard },
     { id: 'analytics', label: 'Property Analytics', icon: BarChart3 },
     { id: 'riders', label: 'Riders', icon: Bike },
+    { id: 'sellers', label: 'Sellers', icon: UserPlus },
     { id: 'support', label: 'Support', icon: Users },
     { id: 'inventory', label: 'Inventory', icon: Package },
     { id: 'settings', label: 'Settings', icon: Settings }
@@ -204,6 +206,7 @@ const AdminDashboard = () => {
         {activePanel === 'payouts' && <PayoutsPanel />}
         {activePanel === 'analytics' && <PropertyAnalyticsPanel />}
         {activePanel === 'riders' && <RiderManagementPanel />}
+        {activePanel === 'sellers' && <SellerManagementPanel />}
         {activePanel === 'support' && <CustomerSupportPanel />}
         {activePanel === 'inventory' && <InventoryPanel />}
         {activePanel === 'settings' && <AppSettingsPanel />}

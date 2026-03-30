@@ -10,6 +10,7 @@ import VisitCart from './pages/VisitCart';
 import PaymentSuccess from './pages/PaymentSuccess';
 import RiderDashboard from './pages/RiderDashboard';
 import AdminDashboard from './pages/AdminDashboard';
+import SellerDashboard from './pages/SellerDashboard';
 import PackersMovers from './pages/PackersMovers';
 import AdvertiseWithUs from './pages/AdvertiseWithUs';
 import CustomerProfile from './pages/CustomerProfile';
@@ -45,6 +46,8 @@ const AppRoutes = () => {
       return '/customer';
     } else if (role === 'rider') {
       return '/rider';
+    } else if (role === 'seller') {
+      return '/seller';
     } else if (['admin', 'support_admin', 'inventory_admin', 'rider_admin'].includes(role)) {
       return '/admin';
     }
@@ -137,6 +140,15 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={['rider']}>
             <RiderDashboard />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/seller"
+        element={
+          <ProtectedRoute allowedRoles={['seller']}>
+            <SellerDashboard />
           </ProtectedRoute>
         }
       />

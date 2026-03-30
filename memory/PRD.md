@@ -5,7 +5,8 @@ ApnaGhr Visit Platform is a production-ready multi-role rental property platform
 - Cashfree payment gateway (PRODUCTION)
 - Packers & Movers service
 - Advertising module with AI Ad Generation
-- Multi-role authentication (Customer, Rider, Advertiser, Builder, Admin)
+- **Seller (Calling Agent) Module** - Commission-based referral system (NEW)
+- Multi-role authentication (Customer, Rider, Seller, Advertiser, Builder, Admin)
 - **Premium Luxury UI design** (Updated March 2026)
 - AI Chatbot for property assistance
 - SMS/Email OTP system (ready for Twilio/Resend integration)
@@ -22,6 +23,41 @@ ApnaGhr Visit Platform is a production-ready multi-role rental property platform
 
 ## Latest Updates (March 30, 2026)
 
+### ✅ NEW: Seller (Calling Agent) Module Complete
+Complete calling team/sales agent management system:
+
+**Features:**
+1. **Seller Registration** - Self-registration with admin approval OR admin-created accounts
+2. **Property Sharing** - WhatsApp share with referral tracking
+3. **Referral Tracking** - Track client journey: shared → registered → booked → visited → deal_closed
+4. **Commission System** - Tiered commission structure based on brokerage amount:
+   - ₹10k-15k brokerage → ₹500 commission
+   - ₹15k-20k → ₹780
+   - ₹20k-25k → ₹1,000
+   - ₹25k-30k → ₹1,300
+   - ₹31k-35k → ₹2,000
+   - ₹35k-40k → ₹2,200
+   - ₹41k-45k → ₹2,500
+   - ₹46k-49k → ₹2,700
+   - ₹50k-70k → ₹5,000
+   - ₹71k-1L → ₹8,000
+   - ₹1.05L-1.5L → ₹10,000
+5. **Client Visit Tracking** - See which rider is handling their client's visit
+6. **In-App Chat** - Chat with rider (text only, no phone number exposed)
+7. **Earnings Wallet** - Track pending, approved, and paid commissions
+
+**Admin Features:**
+- Create sellers directly (pre-approved)
+- Approve/reject seller registrations
+- View seller stats and referrals
+- Close deals and credit commissions
+- Process seller payouts
+
+**New Files:**
+- `/app/backend/routes/seller.py` - All seller API endpoints
+- `/app/frontend/src/pages/SellerDashboard.js` - Seller dashboard
+- `/app/frontend/src/components/SellerManagementPanel.js` - Admin seller management
+
 ### ✅ Premium UI Redesign Complete
 Complete visual overhaul from Neo-Brutalist to Premium Luxury aesthetic:
 
@@ -30,11 +66,12 @@ Complete visual overhaul from Neo-Brutalist to Premium Luxury aesthetic:
 2. **CustomerHome.js** - Glass header, elegant property cards, premium search
 3. **PropertyDetail.js** - Luxury image gallery, premium booking options
 4. **VisitCart.js** - Clean cart items, premium package selection
-5. **AdminDashboard.js** - Professional stat cards, navigation tabs
+5. **AdminDashboard.js** - Professional stat cards, navigation tabs + Sellers tab
 6. **RiderDashboard.js** - Premium toggle, wallet, tasks styling
-7. **AIChatbot.js** - Teal header, gold accents, clean bubbles
-8. **PaymentSuccess.js** - Premium success/error states
-9. **PackersMovers.js** - Premium forms and package selection
+7. **SellerDashboard.js** - NEW - Seller portal with 5 tabs
+8. **AIChatbot.js** - Teal header, gold accents, clean bubbles
+9. **PaymentSuccess.js** - Premium success/error states
+10. **PackersMovers.js** - Premium forms and package selection
 
 **Design System:**
 - Primary: #04473C (Deep Teal)
@@ -45,8 +82,9 @@ Complete visual overhaul from Neo-Brutalist to Premium Luxury aesthetic:
 - Borders: Subtle #E5E1DB
 
 ### ✅ Bug Fixes This Session
-1. Fixed `propertyAPI.getAll()` → `propertyAPI.getProperties()` call
-2. Fixed empty filter params causing 422 errors on properties endpoint
+1. Fixed Admin Panel Rider Status - Added missing `/api/admin/riders` endpoint and `getRiders()` API function
+2. Fixed `propertyAPI.getAll()` → `propertyAPI.getProperties()` call
+3. Fixed empty filter params causing 422 errors on properties endpoint
 
 ## Payment Gateway: Cashfree ✅
 - Environment: PRODUCTION
@@ -58,22 +96,24 @@ Complete visual overhaul from Neo-Brutalist to Premium Luxury aesthetic:
 See `/app/memory/test_credentials.md`
 
 ## Database Status
-- **Users:** 24 accounts
+- **Users:** 25+ accounts (including sellers)
 - **Properties:** 14 listings (9 available)
-- **Riders:** 1 active
+- **Riders:** 5 registered
+- **Sellers:** 1+ active
 - **Notifications:** 37
-- **Chat Sessions:** 31
+- **Chat Sessions:** 32
 
 ## Verified Working Features
-1. ✅ User authentication (login/register)
+1. ✅ User authentication (login/register) - All roles
 2. ✅ Property listing and search
 3. ✅ Property images loading (external URLs)
 4. ✅ Cashfree payment checkout generation
 5. ✅ AI Chatbot sessions
 6. ✅ Customer wallet
-7. ✅ Admin dashboard
+7. ✅ Admin dashboard with Seller Management
 8. ✅ Rider dashboard
-9. ✅ Premium UI across all pages
+9. ✅ **Seller dashboard with commission tracking**
+10. ✅ Premium UI across all pages
 
 ## Pending Features
 
@@ -90,14 +130,14 @@ See `/app/memory/test_credentials.md`
 ```
 /app/
 ├── backend/
-│   ├── server.py          # Main API server (~2800 lines)
-│   ├── routes/            # Auth, packers, advertising, chatbot
+│   ├── server.py          # Main API server (~2900 lines)
+│   ├── routes/            # Auth, packers, advertising, chatbot, seller (NEW)
 │   ├── services/          # Cashfree, notifications, image storage
 │   └── seed_production.py # Production data migration
 ├── frontend/
 │   ├── src/
-│   │   ├── pages/         # All pages (Premium styled)
-│   │   ├── components/    # Reusable components
+│   │   ├── pages/         # All pages (Premium styled) + SellerDashboard
+│   │   ├── components/    # Reusable components + SellerManagementPanel
 │   │   ├── index.css      # Premium design system
 │   │   └── utils/api.js   # API utilities
 └── memory/

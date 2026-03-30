@@ -72,6 +72,8 @@ const Login = () => {
           navigate('/customer');
         } else if (user.role === 'rider') {
           navigate('/rider');
+        } else if (user.role === 'seller') {
+          navigate('/seller');
         } else if (['admin', 'support_admin', 'inventory_admin', 'rider_admin'].includes(user.role)) {
           navigate('/admin');
         } else {

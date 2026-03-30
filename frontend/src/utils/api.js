@@ -203,5 +203,43 @@ export const chatbotAPI = {
   deleteSession: (sessionId) => api.delete(`/chatbot/session/${sessionId}`),
 };
 
+// Seller (Calling Agent) API
+export const sellerAPI = {
+  // Registration
+  register: (data) => api.post('/seller/register', data),
+  
+  // Dashboard
+  getDashboard: () => api.get('/seller/dashboard'),
+  
+  // Properties
+  getProperties: (filters) => api.get('/seller/properties', { params: filters }),
+  shareProperty: (data) => api.post('/seller/share-property', data),
+  
+  // Referrals
+  getReferrals: (status) => api.get('/seller/referrals', { params: { status } }),
+  
+  // Visits
+  getVisits: () => api.get('/seller/visits'),
+  trackVisit: (visitId) => api.get(`/seller/visit/${visitId}/track`),
+  
+  // Chat with Rider
+  sendChatMessage: (visitId, message) => api.post('/seller/chat/send', { visit_id: visitId, message }),
+  getChatMessages: (visitId) => api.get(`/seller/chat/${visitId}`),
+  
+  // Wallet & Commissions
+  getWallet: () => api.get('/seller/wallet'),
+  getCommissions: () => api.get('/seller/commissions'),
+};
+
+// Admin Seller Management API
+export const adminSellerAPI = {
+  getAllSellers: (status) => api.get('/admin/sellers', { params: { status } }),
+  getPendingSellers: () => api.get('/admin/sellers/pending'),
+  approveSeller: (sellerId, approved, reason) => api.post(`/admin/sellers/${sellerId}/approve`, { approved, rejection_reason: reason }),
+  createSeller: (data) => api.post('/admin/sellers/create', data),
+  closeDeal: (visitId, brokerageAmount, notes) => api.post(`/admin/deals/${visitId}/close`, { visit_id: visitId, brokerage_amount: brokerageAmount, notes }),
+  processSellerPayout: (sellerId, amount) => api.post(`/admin/sellers/${sellerId}/payout`, null, { params: { amount } }),
+};
+
 
 export default api;
