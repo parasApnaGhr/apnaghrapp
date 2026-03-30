@@ -458,9 +458,9 @@ const Login = () => {
 
                 <div>
                   <label className="premium-label">Phone Number</label>
-                  <div className="relative flex items-center">
-                    <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center gap-1 text-[#4A4D53] text-sm font-medium pointer-events-none">
-                      <span className="text-xs">🇮🇳</span>
+                  <div className="relative flex items-center border border-[#E5E1DB] bg-white">
+                    <div className="flex items-center gap-1 px-4 py-4 text-[#4A4D53] text-sm font-medium border-r border-[#E5E1DB] bg-[#FDFCFB] shrink-0">
+                      <span>🇮🇳</span>
                       <span>+91</span>
                     </div>
                     <input
@@ -479,8 +479,8 @@ const Login = () => {
                         value = value.slice(0, 10);
                         setFormData({ ...formData, phone: value });
                       }}
-                      placeholder="10 digit mobile number"
-                      className="premium-input pl-[4.5rem]"
+                      placeholder="Enter mobile number"
+                      className="w-full px-4 py-4 text-[#1A1C20] placeholder:text-[#A8A29E] focus:outline-none border-0"
                       maxLength={10}
                       required
                       autoComplete="tel-national"
