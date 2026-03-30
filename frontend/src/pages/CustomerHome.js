@@ -330,7 +330,7 @@ const CustomerHome = () => {
                   key={property.id}
                   variants={itemVariants}
                   className="property-card group cursor-pointer"
-                  onClick={() => navigate(`/property/${property.id}`)}
+                  onClick={() => navigate(`/customer/property/${property.id}`)}
                   data-testid={`property-card-${property.id}`}
                 >
                   {/* Image */}
@@ -382,12 +382,13 @@ const CustomerHome = () => {
                       </h3>
                     </div>
 
-                    {property.location && (
-                      <div className="flex items-center gap-2 text-[#4A4D53] text-sm mb-4">
-                        <MapPin className="w-4 h-4" strokeWidth={1.5} />
-                        <span className="truncate">{property.location}</span>
-                      </div>
-                    )}
+                    {/* Location - Show city and area */}
+                    <div className="flex items-center gap-2 text-[#4A4D53] text-sm mb-4">
+                      <MapPin className="w-4 h-4" strokeWidth={1.5} />
+                      <span className="truncate">
+                        {property.area_name}{property.city ? `, ${property.city}` : ''}
+                      </span>
+                    </div>
 
                     {/* Property Features */}
                     {property.amenities && property.amenities.length > 0 && (

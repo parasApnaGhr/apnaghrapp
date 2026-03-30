@@ -12,6 +12,7 @@ import RiderDashboard from './pages/RiderDashboard';
 import AdminDashboard from './pages/AdminDashboard';
 import PackersMovers from './pages/PackersMovers';
 import AdvertiseWithUs from './pages/AdvertiseWithUs';
+import CustomerProfile from './pages/CustomerProfile';
 import '@/App.css';
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
@@ -118,6 +119,15 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={['customer', 'advertiser', 'builder']}>
             <AdvertiseWithUs />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/customer/profile"
+        element={
+          <ProtectedRoute allowedRoles={['customer', 'advertiser', 'builder']}>
+            <CustomerProfile />
           </ProtectedRoute>
         }
       />
