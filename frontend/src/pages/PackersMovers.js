@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { ArrowLeft, Truck, Package, Shield, Crown, MapPin, Check, Plus, Phone, Calendar, ChevronRight } from 'lucide-react';
 import { toast } from 'sonner';
 import api from '../utils/api';
+import { initiateCashfreePayment } from '../utils/cashfree';
 
 const PackersMovers = () => {
   const { user } = useAuth();
@@ -94,7 +95,19 @@ const PackersMovers = () => {
       });
       
       // Redirect to Cashfree checkout
-      if (paymentResponse.data.checkout_url) {
+      const paymentSessionId = paymentResponse.data.payment_session_id;
+      const returnUrl = `${window.location.origin}/payment-success?order_id=${paymentResponse.data.order_id}`;
+      
+      if (paymentSessionId) {
+        try {
+          await initiateCashfreePayment(paymentSessionId, returnUrl);
+        } catch (sdkError) {
+          console.warn('Cashfree SDK error, falling back to redirect:', sdkError);
+          if (paymentResponse.data.checkout_url) {
+            window.location.href = paymentResponse.data.checkout_url;
+          }
+        }
+      } else if (paymentResponse.data.checkout_url) {
         window.location.href = paymentResponse.data.checkout_url;
       } else {
         toast.success('Booking created! Redirecting to payment...');

@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { paymentAPI, getMediaUrl } from '../utils/api';
+import { initiateCashfreePayment } from '../utils/cashfree';
 import { 
   ArrowLeft, Trash2, MapPin, Home, Calendar, Clock, 
   ShoppingCart, CreditCard, Check, ChevronRight
@@ -93,9 +94,32 @@ const VisitCart = () => {
     try {
       const originUrl = window.location.origin;
       const response = await paymentAPI.createCheckout(selectedPackage, originUrl, null);
-      window.location.href = response.data.checkout_url;
+      
+      // Use Cashfree SDK for payment
+      const paymentSessionId = response.data.payment_session_id;
+      const returnUrl = `${originUrl}/payment-success?order_id=${response.data.order_id}`;
+      
+      if (paymentSessionId) {
+        // Try Cashfree SDK first
+        try {
+          await initiateCashfreePayment(paymentSessionId, returnUrl);
+        } catch (sdkError) {
+          console.warn('Cashfree SDK error, falling back to redirect:', sdkError);
+          // Fallback to direct redirect if SDK fails
+          if (response.data.checkout_url) {
+            window.location.href = response.data.checkout_url;
+          } else {
+            throw new Error('Payment initialization failed');
+          }
+        }
+      } else if (response.data.checkout_url) {
+        // Fallback to checkout URL
+        window.location.href = response.data.checkout_url;
+      } else {
+        throw new Error('No payment session received');
+      }
     } catch (error) {
-      toast.error(error.response?.data?.detail || 'Failed to create payment');
+      toast.error(error.response?.data?.detail || error.message || 'Failed to create payment');
       setLoading(false);
     }
   };

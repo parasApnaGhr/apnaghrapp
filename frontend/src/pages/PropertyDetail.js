@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import { propertyAPI, paymentAPI, getMediaUrl } from '../utils/api';
+import { initiateCashfreePayment } from '../utils/cashfree';
 import api from '../utils/api';
 import { ArrowLeft, MapPin, Bed, Sofa, Home, Lock, Video, ShoppingCart, Plus, Check, Play, X, ChevronLeft, ChevronRight, ZoomIn } from 'lucide-react';
 import { toast } from 'sonner';
@@ -83,7 +84,24 @@ const PropertyDetail = () => {
     try {
       const originUrl = window.location.origin;
       const response = await paymentAPI.createCheckout(packageId, originUrl, id);
-      window.location.href = response.data.checkout_url;
+      
+      const paymentSessionId = response.data.payment_session_id;
+      const returnUrl = `${originUrl}/payment-success?order_id=${response.data.order_id}`;
+      
+      if (paymentSessionId) {
+        try {
+          await initiateCashfreePayment(paymentSessionId, returnUrl);
+        } catch (sdkError) {
+          console.warn('Cashfree SDK error, falling back to redirect:', sdkError);
+          if (response.data.checkout_url) {
+            window.location.href = response.data.checkout_url;
+          } else {
+            throw new Error('Payment initialization failed');
+          }
+        }
+      } else if (response.data.checkout_url) {
+        window.location.href = response.data.checkout_url;
+      }
     } catch (error) {
       toast.error(error.response?.data?.detail || 'Failed to create payment');
       setProcessingPayment(false);
@@ -95,7 +113,24 @@ const PropertyDetail = () => {
     try {
       const originUrl = window.location.origin;
       const response = await paymentAPI.createCheckout('property_lock', originUrl, id);
-      window.location.href = response.data.checkout_url;
+      
+      const paymentSessionId = response.data.payment_session_id;
+      const returnUrl = `${originUrl}/payment-success?order_id=${response.data.order_id}`;
+      
+      if (paymentSessionId) {
+        try {
+          await initiateCashfreePayment(paymentSessionId, returnUrl);
+        } catch (sdkError) {
+          console.warn('Cashfree SDK error, falling back to redirect:', sdkError);
+          if (response.data.checkout_url) {
+            window.location.href = response.data.checkout_url;
+          } else {
+            throw new Error('Payment initialization failed');
+          }
+        }
+      } else if (response.data.checkout_url) {
+        window.location.href = response.data.checkout_url;
+      }
     } catch (error) {
       toast.error(error.response?.data?.detail || 'Failed to create payment');
       setProcessingPayment(false);
