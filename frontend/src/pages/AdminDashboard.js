@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import { 
   Users, Package, Bike, LogOut, Home, DollarSign, 
-  Settings, MapPin, CheckSquare, CreditCard, BarChart3, Image, Upload, UserPlus, Gift
+  Settings, MapPin, CheckSquare, CreditCard, BarChart3, Image, Upload, UserPlus, Gift, QrCode
 } from 'lucide-react';
 import CustomerSupportPanel from '../components/CustomerSupportPanel';
 import InventoryPanel from '../components/InventoryPanel';
@@ -11,6 +11,7 @@ import RiderManagementPanel from '../components/RiderManagementPanel';
 import SellerManagementPanel from '../components/SellerManagementPanel';
 import AppSettingsPanel from '../components/AppSettingsPanel';
 import PromotionsPanel from '../components/PromotionsPanel';
+import ManualVisitPanel from '../components/ManualVisitPanel';
 import ToLetTasksPanel from '../components/ToLetTasksPanel';
 import VisitApprovalPanel from '../components/VisitApprovalPanel';
 import PayoutsPanel from '../components/PayoutsPanel';
@@ -30,6 +31,7 @@ const AdminDashboard = () => {
     { id: 'overview', label: 'Overview', icon: null },
     { id: 'tracking', label: 'Live Tracking', icon: MapPin },
     { id: 'approvals', label: 'Visit Approvals', icon: CheckSquare },
+    { id: 'manual-visit', label: 'Create Visit', icon: QrCode },
     { id: 'tolet', label: 'ToLet Tasks', icon: Home },
     { id: 'payouts', label: 'Payouts', icon: CreditCard },
     { id: 'promotions', label: 'Promotions', icon: Gift },
@@ -250,6 +252,7 @@ const AdminDashboard = () => {
 
         {activePanel === 'tracking' && <LiveTrackingPanel />}
         {activePanel === 'approvals' && <VisitApprovalPanel />}
+        {activePanel === 'manual-visit' && <ManualVisitPanel />}
         {activePanel === 'tolet' && <ToLetTasksPanel />}
         {activePanel === 'payouts' && <PayoutsPanel />}
         {activePanel === 'promotions' && <PromotionsPanel />}

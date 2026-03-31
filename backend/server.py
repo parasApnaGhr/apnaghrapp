@@ -1963,6 +1963,174 @@ async def get_active_promotions():
         "promo_codes": active_offers
     }
 
+# ============ ADMIN: MANUAL VISIT CREATION ============
+
+class ManualVisitCreate(BaseModel):
+    customer_phone: str
+    customer_name: str
+    customer_id: Optional[str] = None
+    property_ids: List[str]
+    preferred_date: str
+    preferred_time: str = "10:00"
+    payment_method: str = "qr_code"
+    payment_amount: float
+    payment_reference: Optional[str] = None
+    assigned_rider_id: Optional[str] = None
+    notes: Optional[str] = None
+    property_count: int = 1
+
+@api_router.get("/admin/search-customer")
+async def search_customer(phone: str, current_user: dict = Depends(get_current_user)):
+    """Search customer by phone number"""
+    if current_user['role'] not in ['admin', 'support_admin', 'inventory_admin']:
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    customers = await db.users.find(
+        {"phone": {"$regex": phone}, "role": "customer"},
+        {"_id": 0, "password": 0}
+    ).limit(5).to_list(None)
+    
+    return customers
+
+@api_router.post("/admin/create-manual-visit")
+async def create_manual_visit(data: ManualVisitCreate, current_user: dict = Depends(get_current_user)):
+    """Create a visit booking for QR code/cash payments"""
+    if current_user['role'] not in ['admin', 'support_admin', 'inventory_admin']:
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    # Check if customer exists, create if not
+    customer = await db.users.find_one({"phone": data.customer_phone})
+    if not customer:
+        # Create new customer account
+        customer_id = str(uuid.uuid4())
+        temp_password = bcrypt.hashpw("apnaghr123".encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+        new_customer = {
+            "id": customer_id,
+            "name": data.customer_name,
+            "phone": data.customer_phone,
+            "password": temp_password,
+            "role": "customer",
+            "created_at": datetime.now(timezone.utc),
+            "created_by_admin": True
+        }
+        await db.users.insert_one(new_customer)
+        customer = new_customer
+    else:
+        customer_id = customer.get('id')
+    
+    # Get property details
+    properties = await db.properties.find(
+        {"id": {"$in": data.property_ids}},
+        {"_id": 0, "id": 1, "title": 1, "area_name": 1, "city": 1, "rent": 1}
+    ).to_list(None)
+    
+    # Create visit package
+    package_id = str(uuid.uuid4())
+    visit_package = {
+        "id": package_id,
+        "user_id": customer_id,
+        "customer_name": data.customer_name,
+        "customer_phone": data.customer_phone,
+        "property_ids": data.property_ids,
+        "properties": properties,
+        "property_count": len(data.property_ids),
+        "preferred_date": data.preferred_date,
+        "preferred_time": data.preferred_time,
+        "status": "confirmed",
+        "payment_status": "completed",
+        "payment_method": data.payment_method,
+        "payment_amount": data.payment_amount,
+        "payment_reference": data.payment_reference,
+        "created_by": "admin_manual",
+        "admin_notes": data.notes,
+        "created_at": datetime.now(timezone.utc)
+    }
+    
+    await db.visit_packages.insert_one(visit_package)
+    
+    # Create visit bookings for each property
+    visit_ids = []
+    for prop in properties:
+        visit_id = str(uuid.uuid4())
+        visit_booking = {
+            "id": visit_id,
+            "package_id": package_id,
+            "user_id": customer_id,
+            "customer_name": data.customer_name,
+            "customer_phone": data.customer_phone,
+            "property_id": prop["id"],
+            "property_title": prop.get("title", ""),
+            "property_location": f"{prop.get('area_name', '')}, {prop.get('city', '')}",
+            "preferred_date": data.preferred_date,
+            "preferred_time": data.preferred_time,
+            "status": "pending",
+            "assigned_rider_id": data.assigned_rider_id,
+            "payment_status": "completed",
+            "payment_method": data.payment_method,
+            "amount_paid": data.payment_amount / len(data.property_ids),
+            "created_by": "admin_manual",
+            "created_at": datetime.now(timezone.utc)
+        }
+        await db.visit_bookings.insert_one(visit_booking)
+        visit_ids.append(visit_id)
+    
+    # If rider is assigned, update their assignments
+    if data.assigned_rider_id:
+        for visit_id in visit_ids:
+            await db.visit_bookings.update_one(
+                {"id": visit_id},
+                {"$set": {"status": "assigned", "assigned_rider_id": data.assigned_rider_id}}
+            )
+    
+    # Create payment transaction record
+    transaction = {
+        "id": str(uuid.uuid4()),
+        "user_id": customer_id,
+        "package_id": package_id,
+        "amount": data.payment_amount,
+        "payment_method": data.payment_method,
+        "payment_reference": data.payment_reference,
+        "status": "completed",
+        "created_by": "admin_manual",
+        "admin_id": current_user.get('id'),
+        "created_at": datetime.now(timezone.utc)
+    }
+    await db.payment_transactions.insert_one(transaction)
+    
+    # Create notification for customer
+    notification = {
+        "id": str(uuid.uuid4()),
+        "user_id": customer_id,
+        "type": "visit_confirmed",
+        "title": "Visit Confirmed!",
+        "message": f"Your visit for {len(properties)} properties on {data.preferred_date} has been confirmed. Track your rider in the app!",
+        "read": False,
+        "created_at": datetime.now(timezone.utc)
+    }
+    await db.notifications.insert_one(notification)
+    
+    return {
+        "success": True,
+        "message": "Manual visit created successfully",
+        "package_id": package_id,
+        "visit_ids": visit_ids,
+        "customer_id": customer_id,
+        "customer_created": customer.get('created_by_admin', False)
+    }
+
+@api_router.get("/admin/manual-visits")
+async def get_manual_visits(current_user: dict = Depends(get_current_user)):
+    """Get recent manual visits"""
+    if current_user['role'] not in ['admin', 'support_admin', 'inventory_admin']:
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    visits = await db.visit_packages.find(
+        {"created_by": "admin_manual"},
+        {"_id": 0}
+    ).sort("created_at", -1).limit(20).to_list(None)
+    
+    return visits
+
 @api_router.post("/visits/{visit_id}/upload-proof")
 async def upload_visit_proof(
     visit_id: str,
