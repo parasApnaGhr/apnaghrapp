@@ -25,6 +25,30 @@ ApnaGhr Visit Platform is a production-ready multi-role rental property platform
 
 ## Latest Updates (March 31, 2026)
 
+### 🆕 Legal Policy & Terms Acceptance System (VERIFIED ✅)
+
+**Strict Anti-Circumvention Compliance:**
+- ✅ **Terms Acceptance Modal at Login** - Customers and Riders must accept before accessing platform
+- ✅ **Terms Acceptance at Visit Cart Checkout** - Must accept before payment
+- ✅ **TermsAcceptanceModal Component** - Reusable modal with:
+  - Customer Agreement (all deals through ApnaGhr)
+  - Anti-Circumvention Policy (prominently displayed)
+  - Penalty clause: Minimum ₹50,000 or 2X deal value
+  - Three mandatory checkboxes (Terms, Privacy, Anti-Circumvention)
+- ✅ **Legal Agreement Section in VisitCart.js**:
+  - "Action Required" warning before payment
+  - "View & Accept Terms" button
+  - Shows "Terms & Conditions Accepted" with green checkmark after acceptance
+  - Pay & Book button disabled until terms accepted
+- ✅ **LocalStorage persistence** - Remembers acceptance for 30 days
+- ✅ **Legal Policies Page** (`/legal`) - Full policy documentation
+
+**Files Updated:**
+- `/app/frontend/src/components/TermsAcceptanceModal.js` - Modal component
+- `/app/frontend/src/pages/VisitCart.js` - Checkout integration
+- `/app/frontend/src/pages/Login.js` - Login/Registration integration
+- `/app/frontend/src/pages/LegalPolicies.js` - Full policy page
+
 ### 🆕 Real-Time Agent Tracking System (Production-Ready)
 
 **Performance Specifications:**
@@ -255,6 +279,9 @@ See `/app/memory/test_credentials.md`
 8. ✅ Rider dashboard
 9. ✅ **Seller dashboard with commission tracking**
 10. ✅ Premium UI across all pages
+11. ✅ **Legal Policy Terms Acceptance at Login & Checkout** (NEW)
+12. ✅ **Real-time Agent Tracking with WebSockets** (NEW)
+13. ✅ **Multi-Visit Route Optimization** (NEW)
 
 ## Pending Features
 

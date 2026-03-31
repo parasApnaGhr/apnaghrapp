@@ -6,9 +6,10 @@ import { paymentAPI, getMediaUrl } from '../utils/api';
 import { initiateCashfreePayment } from '../utils/cashfree';
 import { 
   ArrowLeft, Trash2, MapPin, Home, Calendar, Clock, 
-  ShoppingCart, CreditCard, Check, ChevronRight, AlertTriangle, FileText
+  ShoppingCart, CreditCard, Check, ChevronRight, AlertTriangle, FileText, Shield
 } from 'lucide-react';
 import { toast } from 'sonner';
+import TermsAcceptanceModal from '../components/TermsAcceptanceModal';
 
 const VisitCart = () => {
   const navigate = useNavigate();
@@ -28,6 +29,7 @@ const VisitCart = () => {
   const [loading, setLoading] = useState(false);
   const [selectedPackage, setSelectedPackage] = useState(null);
   const [termsAccepted, setTermsAccepted] = useState(false);
+  const [showTermsModal, setShowTermsModal] = useState(false);
 
   useEffect(() => {
     localStorage.setItem('visitCart', JSON.stringify(cart));
@@ -87,9 +89,11 @@ const VisitCart = () => {
     }
 
     if (!termsAccepted) {
-      toast.error('Please accept the terms and conditions to proceed');
+      setShowTermsModal(true);
       return;
     }
+
+    // Store booking data and proceed to payment
 
     localStorage.setItem('pendingVisitBooking', JSON.stringify({
       property_ids: cart.map(p => p.id),
@@ -388,6 +392,49 @@ const VisitCart = () => {
               </div>
             </div>
 
+            {/* Terms Acceptance Section */}
+            <div className="bg-white border border-[#E5E1DB] p-6 mb-8">
+              <h3 className="text-lg mb-4 flex items-center gap-2" style={{ fontFamily: 'Playfair Display, serif' }}>
+                <Shield className="w-5 h-5 text-[#04473C]" strokeWidth={1.5} />
+                Legal Agreement
+              </h3>
+              
+              {termsAccepted ? (
+                <div className="flex items-center gap-3 p-4 bg-[#E6F0EE] border border-[#04473C]/20 rounded-lg">
+                  <div className="w-8 h-8 bg-[#04473C] rounded-full flex items-center justify-center">
+                    <Check className="w-4 h-4 text-white" strokeWidth={2} />
+                  </div>
+                  <div>
+                    <p className="font-medium text-[#04473C]">Terms & Conditions Accepted</p>
+                    <p className="text-sm text-[#4A4D53]">You agreed to anti-circumvention and privacy policies</p>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg">
+                    <div className="flex items-start gap-3">
+                      <AlertTriangle className="w-5 h-5 text-amber-600 mt-0.5" />
+                      <div>
+                        <p className="font-medium text-amber-800">Action Required</p>
+                        <p className="text-sm text-amber-700 mt-1">
+                          You must accept our Terms & Conditions including the <strong>Anti-Circumvention Policy</strong> before proceeding with payment.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <button
+                    onClick={() => setShowTermsModal(true)}
+                    className="w-full p-4 border-2 border-dashed border-[#04473C] bg-[#E6F0EE]/50 text-[#04473C] font-medium flex items-center justify-center gap-2 hover:bg-[#E6F0EE] transition-colors"
+                    data-testid="view-terms-button"
+                  >
+                    <FileText className="w-5 h-5" strokeWidth={1.5} />
+                    View & Accept Terms
+                  </button>
+                </div>
+              )}
+            </div>
+
             {/* Pay & Book Button - Fixed Bottom */}
             <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-[#E5E1DB] p-4 z-40">
               <div className="max-w-4xl mx-auto flex items-center justify-between">
@@ -400,7 +447,7 @@ const VisitCart = () => {
                 </div>
                 <button
                   onClick={handlePayAndBook}
-                  disabled={loading || !selectedPackage || cart.length === 0}
+                  disabled={loading || !selectedPackage || cart.length === 0 || !termsAccepted}
                   className="btn-primary flex items-center gap-2 disabled:opacity-50"
                   data-testid="pay-and-book-button"
                 >
@@ -418,6 +465,22 @@ const VisitCart = () => {
           </>
         )}
       </main>
+
+      {/* Terms Acceptance Modal */}
+      <TermsAcceptanceModal
+        isOpen={showTermsModal}
+        onAccept={() => {
+          setTermsAccepted(true);
+          setShowTermsModal(false);
+          toast.success('Terms accepted! You can now proceed with payment.');
+        }}
+        onDecline={() => {
+          setShowTermsModal(false);
+          toast.error('You must accept terms to book visits');
+        }}
+        userType="customer"
+        context="booking"
+      />
     </div>
   );
 };
