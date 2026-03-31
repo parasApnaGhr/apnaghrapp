@@ -997,8 +997,18 @@ async def get_payment_status(order_id: str, current_user: dict = Depends(get_cur
         cf_status = order_status.get('order_status', '').upper()
         logging.info(f"Cashfree order {order_id} status check: {cf_status}")
         
+        # Also check payment details for this order
+        payments = await cashfree_service.get_payments_for_order(order_id)
+        payment_successful = any(
+            p.get('payment_status', '').upper() == 'SUCCESS' 
+            for p in payments
+        )
+        
+        logging.info(f"Cashfree order {order_id} payments: {payments}, payment_successful: {payment_successful}")
+        
         # Handle PAID/SUCCESS status - Cashfree may return either
-        if cf_status in ["PAID", "SUCCESS", "ACTIVE"] and transaction['payment_status'] != "paid":
+        # Also check if any payment was successful
+        if (cf_status in ["PAID", "SUCCESS"] or payment_successful) and transaction['payment_status'] != "paid":
             logging.info(f"Processing successful payment for {order_id}")
             
             await db.payment_transactions.update_one(
@@ -1071,15 +1081,7 @@ async def get_payment_status(order_id: str, current_user: dict = Depends(get_cur
                 )
             
             transaction['payment_status'] = "paid"
-        elif cf_status in ["EXPIRED", "CANCELLED", "FAILED", "TERMINATED"]:
-            await db.payment_transactions.update_one(
-                {"session_id": order_id},
-                {"$set": {"payment_status": "failed"}}
-            )
-            transaction['payment_status'] = "failed"
-        
-        # Handle FAILED/EXPIRED/CANCELLED status
-        elif cf_status in ["EXPIRED", "CANCELLED", "FAILED", "VOID"]:
+        elif cf_status in ["EXPIRED", "CANCELLED", "FAILED", "TERMINATED", "VOID"]:
             await db.payment_transactions.update_one(
                 {"session_id": order_id},
                 {"$set": {"payment_status": "failed"}}
