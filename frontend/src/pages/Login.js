@@ -1,16 +1,20 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { toast } from 'sonner';
-import { Home, User, Phone, Mail, Lock, ChevronRight, Eye, EyeOff, KeyRound, ArrowLeft, Briefcase } from 'lucide-react';
+import { Home, User, Phone, Mail, Lock, ChevronRight, Eye, EyeOff, KeyRound, ArrowLeft, Briefcase, FileText } from 'lucide-react';
 import api, { sellerAPI } from '../utils/api';
+import TermsAcceptanceModal from '../components/TermsAcceptanceModal';
 
 const Login = () => {
   const [isRegister, setIsRegister] = useState(false);
   const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [forgotStep, setForgotStep] = useState(1);
   const [showPassword, setShowPassword] = useState(false);
+  const [showTermsModal, setShowTermsModal] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [pendingAction, setPendingAction] = useState(null); // 'login' or 'register'
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -39,28 +43,50 @@ const Login = () => {
     return password.length >= 6;
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  // Check if terms need to be shown
+  const checkTermsAndProceed = (action) => {
+    // Check localStorage if user already accepted terms
+    const acceptedTerms = localStorage.getItem('apnaghr_terms_accepted');
+    const acceptedDate = localStorage.getItem('apnaghr_terms_date');
     
-    if (!validatePhone(formData.phone)) {
-      toast.error('Please enter a valid 10-digit Indian mobile number');
-      return;
-    }
+    // Re-require acceptance every 30 days or if never accepted
+    const thirtyDaysAgo = Date.now() - (30 * 24 * 60 * 60 * 1000);
+    const needsAcceptance = !acceptedTerms || !acceptedDate || parseInt(acceptedDate) < thirtyDaysAgo;
     
-    if (!validatePassword(formData.password)) {
-      toast.error('Password must be at least 6 characters');
-      return;
+    if (needsAcceptance && (formData.role === 'customer' || formData.role === 'rider')) {
+      setPendingAction(action);
+      setShowTermsModal(true);
+      return false;
     }
-    
-    if (isRegister && !formData.name.trim()) {
-      toast.error('Please enter your full name');
-      return;
-    }
+    return true;
+  };
 
+  const handleTermsAccepted = () => {
+    // Store acceptance
+    localStorage.setItem('apnaghr_terms_accepted', 'true');
+    localStorage.setItem('apnaghr_terms_date', Date.now().toString());
+    localStorage.setItem('apnaghr_terms_role', formData.role);
+    
+    setTermsAccepted(true);
+    setShowTermsModal(false);
+    
+    // Proceed with pending action
+    if (pendingAction) {
+      processAuthAction(pendingAction);
+    }
+  };
+
+  const handleTermsDeclined = () => {
+    setShowTermsModal(false);
+    setPendingAction(null);
+    toast.error('You must accept the terms to continue');
+  };
+
+  const processAuthAction = async (action) => {
     setLoading(true);
 
     try {
-      if (isRegister) {
+      if (action === 'register') {
         // Special handling for seller registration (requires admin approval)
         if (formData.role === 'seller') {
           const response = await sellerAPI.register({
@@ -97,11 +123,46 @@ const Login = () => {
         }
       }
     } catch (error) {
-      const errorMsg = error.response?.data?.detail || 'Something went wrong. Please try again.';
-      toast.error(errorMsg);
+      if (error.response?.data?.detail?.includes('pending approval')) {
+        toast.info('Your account is pending admin approval. Please wait.');
+      } else if (error.response?.data?.detail?.includes('suspended')) {
+        toast.error('Your account has been suspended. Contact support.');
+      } else {
+        toast.error(error.response?.data?.detail || 'Something went wrong');
+      }
     } finally {
       setLoading(false);
+      setPendingAction(null);
     }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    if (!validatePhone(formData.phone)) {
+      toast.error('Please enter a valid 10-digit Indian mobile number');
+      return;
+    }
+    
+    if (!validatePassword(formData.password)) {
+      toast.error('Password must be at least 6 characters');
+      return;
+    }
+    
+    if (isRegister && !formData.name.trim()) {
+      toast.error('Please enter your full name');
+      return;
+    }
+
+    const action = isRegister ? 'register' : 'login';
+    
+    // Check if terms acceptance is needed
+    if (!checkTermsAndProceed(action)) {
+      return; // Terms modal will be shown
+    }
+    
+    // Proceed directly if terms already accepted
+    processAuthAction(action);
   };
 
   const handleForgotPassword = async () => {
@@ -637,11 +698,20 @@ const Login = () => {
         {/* Terms & Privacy */}
         <p className="text-center text-xs text-[#4A4D53] mt-8">
           By continuing, you agree to our{' '}
-          <span className="text-[#04473C] cursor-pointer hover:underline">Terms of Service</span>
+          <Link to="/legal" className="text-[#04473C] hover:underline">Terms of Service</Link>
           {' '}and{' '}
-          <span className="text-[#04473C] cursor-pointer hover:underline">Privacy Policy</span>
+          <Link to="/legal" className="text-[#04473C] hover:underline">Privacy Policy</Link>
         </p>
       </motion.div>
+
+      {/* Terms Acceptance Modal */}
+      <TermsAcceptanceModal
+        isOpen={showTermsModal}
+        onAccept={handleTermsAccepted}
+        onDecline={handleTermsDeclined}
+        userType={formData.role}
+        context={isRegister ? 'registration' : 'login'}
+      />
     </div>
   );
 };

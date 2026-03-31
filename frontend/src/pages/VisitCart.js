@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { paymentAPI, getMediaUrl } from '../utils/api';
 import { initiateCashfreePayment } from '../utils/cashfree';
 import { 
   ArrowLeft, Trash2, MapPin, Home, Calendar, Clock, 
-  ShoppingCart, CreditCard, Check, ChevronRight
+  ShoppingCart, CreditCard, Check, ChevronRight, AlertTriangle, FileText
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -27,6 +27,7 @@ const VisitCart = () => {
   
   const [loading, setLoading] = useState(false);
   const [selectedPackage, setSelectedPackage] = useState(null);
+  const [termsAccepted, setTermsAccepted] = useState(false);
 
   useEffect(() => {
     localStorage.setItem('visitCart', JSON.stringify(cart));
@@ -82,6 +83,11 @@ const VisitCart = () => {
 
     if (!bookingData.scheduled_date || !bookingData.scheduled_time || !bookingData.pickup_location) {
       toast.error('Please fill in all booking details');
+      return;
+    }
+
+    if (!termsAccepted) {
+      toast.error('Please accept the terms and conditions to proceed');
       return;
     }
 

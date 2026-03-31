@@ -15,6 +15,7 @@ import SellerDashboard from './pages/SellerDashboard';
 import PackersMovers from './pages/PackersMovers';
 import AdvertiseWithUs from './pages/AdvertiseWithUs';
 import CustomerProfile from './pages/CustomerProfile';
+import LegalPolicies from './pages/LegalPolicies';
 import '@/App.css';
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
@@ -59,8 +60,9 @@ const AppRoutes = () => {
     <Routes>
       <Route path="/" element={user ? <Navigate to={getRedirectPath(user.role)} replace /> : <Login />} />
 
-      {/* PUBLIC ROUTE - Property view without auth (for shared links) */}
+      {/* PUBLIC ROUTES */}
       <Route path="/property/:id" element={<PublicPropertyDetail />} />
+      <Route path="/legal" element={<LegalPolicies />} />
 
       <Route
         path="/customer"
