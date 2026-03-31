@@ -15,6 +15,28 @@ import bcrypt
 import jwt
 import aiofiles
 import json
+import math
+
+# Haversine formula to calculate distance between two coordinates
+def calculate_distance_km(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
+    """Calculate distance between two points in kilometers using Haversine formula"""
+    if not all([lat1, lon1, lat2, lon2]):
+        return float('inf')  # If any coordinate is missing, return infinity
+    
+    R = 6371  # Earth's radius in kilometers
+    
+    lat1_rad = math.radians(lat1)
+    lat2_rad = math.radians(lat2)
+    delta_lat = math.radians(lat2 - lat1)
+    delta_lon = math.radians(lon2 - lon1)
+    
+    a = math.sin(delta_lat/2)**2 + math.cos(lat1_rad) * math.cos(lat2_rad) * math.sin(delta_lon/2)**2
+    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
+    
+    return R * c
+
+# Maximum radius for riders to see available visits (in km)
+RIDER_MAX_RADIUS_KM = 50
 
 # Import new modular routes
 from routes.packers import router as packers_router
@@ -1314,6 +1336,10 @@ async def get_available_visits(current_user: dict = Depends(get_current_user)):
     if not rider.get('is_online', False):
         return []  # Offline riders don't see visits
     
+    # Get rider's current location
+    rider_lat = rider.get('latitude')
+    rider_lng = rider.get('longitude')
+    
     # Find pending visits with no rider assigned (check both rider_id and assigned_rider_id)
     visits = await db.visit_bookings.find(
         {
@@ -1326,28 +1352,75 @@ async def get_available_visits(current_user: dict = Depends(get_current_user)):
             ]
         }, 
         {"_id": 0}
-    ).limit(20).to_list(None)
+    ).limit(50).to_list(None)
     
     # Batch fetch all property IDs to avoid N+1 queries
     all_prop_ids = []
     for visit in visits:
         all_prop_ids.extend(visit.get('property_ids', []))
+        if visit.get('property_id'):
+            all_prop_ids.append(visit.get('property_id'))
     
-    # Single query to get all properties
+    # Single query to get all properties WITH coordinates
     if all_prop_ids:
         properties_list = await db.properties.find(
             {"id": {"$in": all_prop_ids}}, 
-            {"_id": 0, "exact_address": 0}
+            {"_id": 0}  # Include lat/lng for distance calculation
         ).to_list(None)
         prop_map = {p['id']: p for p in properties_list}
     else:
         prop_map = {}
     
-    # Enrich visits with properties from cache
+    # Filter visits by 50 km radius if rider has location
+    filtered_visits = []
     for visit in visits:
-        visit['properties'] = [prop_map.get(pid) for pid in visit.get('property_ids', []) if prop_map.get(pid)]
+        # Get property location
+        prop_ids = visit.get('property_ids', [])
+        if not prop_ids and visit.get('property_id'):
+            prop_ids = [visit.get('property_id')]
+        
+        # Get the first property's coordinates for distance check
+        property_lat = None
+        property_lng = None
+        for pid in prop_ids:
+            prop = prop_map.get(pid)
+            if prop:
+                property_lat = prop.get('latitude')
+                property_lng = prop.get('longitude')
+                if property_lat and property_lng:
+                    break
+        
+        # Calculate distance if both locations are available
+        if rider_lat and rider_lng and property_lat and property_lng:
+            distance = calculate_distance_km(rider_lat, rider_lng, property_lat, property_lng)
+            visit['distance_km'] = round(distance, 1)
+            
+            # Only include visits within 50 km radius
+            if distance <= RIDER_MAX_RADIUS_KM:
+                visit['properties'] = [prop_map.get(pid) for pid in prop_ids if prop_map.get(pid)]
+                # Remove sensitive location data from response
+                for prop in visit.get('properties', []):
+                    if prop:
+                        prop.pop('latitude', None)
+                        prop.pop('longitude', None)
+                        prop.pop('exact_address', None)
+                filtered_visits.append(visit)
+        else:
+            # If location not available, show all visits (backward compatibility)
+            # But mark them as unknown distance
+            visit['distance_km'] = None
+            visit['properties'] = [prop_map.get(pid) for pid in prop_ids if prop_map.get(pid)]
+            for prop in visit.get('properties', []):
+                if prop:
+                    prop.pop('latitude', None)
+                    prop.pop('longitude', None)
+                    prop.pop('exact_address', None)
+            filtered_visits.append(visit)
     
-    return visits
+    # Sort by distance (closest first), unknown distances at the end
+    filtered_visits.sort(key=lambda x: x.get('distance_km') if x.get('distance_km') is not None else 9999)
+    
+    return filtered_visits[:20]  # Return max 20 visits
 
 @api_router.post("/visits/{visit_id}/accept")
 async def accept_visit(visit_id: str, current_user: dict = Depends(get_current_user)):
@@ -1358,6 +1431,35 @@ async def accept_visit(visit_id: str, current_user: dict = Depends(get_current_u
     rider = await db.users.find_one({"id": current_user['id']}, {"_id": 0})
     if not rider.get('is_online', False):
         raise HTTPException(status_code=400, detail="You must be online to accept visits")
+    
+    # Get rider's location
+    rider_lat = rider.get('latitude')
+    rider_lng = rider.get('longitude')
+    
+    # Get the visit to check distance
+    visit = await db.visit_bookings.find_one({"id": visit_id, "status": "pending"}, {"_id": 0})
+    if not visit:
+        raise HTTPException(status_code=400, detail="Visit not available")
+    
+    # Get property coordinates to verify distance
+    prop_ids = visit.get('property_ids', [])
+    if not prop_ids and visit.get('property_id'):
+        prop_ids = [visit.get('property_id')]
+    
+    if prop_ids and rider_lat and rider_lng:
+        # Get first property's coordinates
+        prop = await db.properties.find_one({"id": prop_ids[0]}, {"_id": 0, "latitude": 1, "longitude": 1})
+        if prop:
+            property_lat = prop.get('latitude')
+            property_lng = prop.get('longitude')
+            
+            if property_lat and property_lng:
+                distance = calculate_distance_km(rider_lat, rider_lng, property_lat, property_lng)
+                if distance > RIDER_MAX_RADIUS_KM:
+                    raise HTTPException(
+                        status_code=400, 
+                        detail=f"This property is {distance:.1f} km away. You can only accept visits within {RIDER_MAX_RADIUS_KM} km radius."
+                    )
     
     result = await db.visit_bookings.update_one(
         {"id": visit_id, "status": "pending"},

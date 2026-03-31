@@ -614,7 +614,14 @@ const RiderDashboard = () => {
                               {visit.property_ids?.length || 1} properties · {visit.estimated_duration || '~1hr'}
                             </p>
                           </div>
-                          <span className="badge badge-warning">Pending</span>
+                          <div className="flex flex-col items-end gap-1">
+                            <span className="badge badge-warning">Pending</span>
+                            {visit.distance_km !== null && visit.distance_km !== undefined && (
+                              <span className="text-xs font-medium text-[#04473C] bg-[#E6F0EE] px-2 py-1">
+                                {visit.distance_km} km away
+                              </span>
+                            )}
+                          </div>
                         </div>
 
                         <div className="space-y-2 mb-4">
