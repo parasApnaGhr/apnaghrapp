@@ -225,10 +225,10 @@ const CustomerHome = () => {
                       className="premium-input py-3 text-sm"
                     >
                       <option value="">All Types</option>
-                      <option value="1BHK">1 BHK</option>
-                      <option value="2BHK">2 BHK</option>
-                      <option value="3BHK">3 BHK</option>
-                      <option value="4BHK">4+ BHK</option>
+                      <option value="1">1 BHK</option>
+                      <option value="2">2 BHK</option>
+                      <option value="3">3 BHK</option>
+                      <option value="4">4+ BHK</option>
                     </select>
                   </div>
                   <div className="flex items-end">

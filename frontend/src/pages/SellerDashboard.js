@@ -495,9 +495,10 @@ const SellerDashboard = () => {
                   className="premium-input py-2 text-sm"
                 >
                   <option value="">All BHK</option>
-                  <option value="1BHK">1 BHK</option>
-                  <option value="2BHK">2 BHK</option>
-                  <option value="3BHK">3 BHK</option>
+                  <option value="1">1 BHK</option>
+                  <option value="2">2 BHK</option>
+                  <option value="3">3 BHK</option>
+                  <option value="4">4+ BHK</option>
                 </select>
                 <button onClick={loadProperties} className="btn-primary py-2 text-sm">
                   <Search className="w-4 h-4 mr-1" /> Search
