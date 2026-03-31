@@ -32,9 +32,16 @@ ApnaGhr Visit Platform is a production-ready multi-role rental property platform
 - `/api/tracking/customer/{id}` - Customer tracking WebSocket endpoint
 - `/api/tracking/admin` - Admin monitoring WebSocket endpoint
 - `/api/tracking/calculate-eta` - Dynamic ETA using OSRM (free routing)
-- `/api/tracking/optimize-route` - Multi-visit route optimization (nearest neighbor + 2-opt)
+- `/api/tracking/optimize-route` - **Multi-visit route optimization (nearest neighbor + 2-opt)**
 - `/api/tracking/check-reached` - Auto-detect when rider reaches destination (50m radius)
 - `/api/tracking/online-riders` - Get all online riders
+
+**Multi-Visit Route Optimization:**
+- When customer books 5 properties → ONE rider gets assigned to ALL
+- Route is automatically optimized for shortest path
+- Shows: Visit 1 → Visit 2 → Visit 3 → Visit 4 → Visit 5
+- Total distance and estimated time calculated
+- Progress tracking for each property in the batch
 
 **Frontend Components:**
 - `useTrackingWebSocket.js` - React hook for WebSocket connections
@@ -42,12 +49,14 @@ ApnaGhr Visit Platform is a production-ready multi-role rental property platform
 - `RiderLocationTracker.js` - GPS tracking with background support
 - `CustomerVisitTracker.js` - Customer view with ETA countdown
 - `AdminLiveTracking.js` - Admin dashboard with all riders
+- `MultiVisitRoute.js` - **Optimized route display with visit order**
 
 **Features:**
 - ✅ GPS tracking every 5 seconds
 - ✅ Smooth marker animation on map
 - ✅ Smart ETA using OSRM (OpenStreetMap routing)
-- ✅ Multi-visit route optimization
+- ✅ **Multi-visit route optimization (assign 3-5 properties to one rider)**
+- ✅ **Visit order: Visit 1 → Visit 2 → Visit 3 → Visit 4**
 - ✅ Visit statuses: Assigned → Accepted → On the Way → Reached → Completed
 - ✅ Auto "Reached" detection (50m radius)
 - ✅ Customer notifications ("Agent arriving in 5 mins")

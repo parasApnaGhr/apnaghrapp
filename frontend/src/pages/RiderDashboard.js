@@ -4,10 +4,11 @@ import { useAuth } from '../context/AuthContext';
 import { visitAPI, riderAPI, getMediaUrl } from '../utils/api';
 import api from '../utils/api';
 import VisitProofUpload from '../components/VisitProofUpload';
+import MultiVisitRoute from '../components/MultiVisitRoute';
 import { 
   MapPin, Clock, CheckCircle, Phone, Camera, Navigation, 
   Home, User, ArrowRight, IndianRupee, Power, Wallet, 
-  ClipboardList, FileText, LogOut, RefreshCw, Upload, X, Image, Trash2
+  ClipboardList, FileText, LogOut, RefreshCw, Upload, X, Image, Trash2, Route
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -40,6 +41,9 @@ const RiderDashboard = () => {
   // Proof upload modal
   const [showProofUpload, setShowProofUpload] = useState(false);
   const [currentProofPropertyId, setCurrentProofPropertyId] = useState(null);
+  
+  // Multi-visit route map
+  const [showRouteMap, setShowRouteMap] = useState(false);
 
   useEffect(() => {
     if (isOnline) {
@@ -131,7 +135,19 @@ const RiderDashboard = () => {
       const response = await visitAPI.acceptVisit(visitId);
       setActiveVisit(response.data);
       setAvailableVisits([]);
-      toast.success('Visit accepted! Navigate to customer pickup location');
+      
+      // Show route info if multiple properties
+      const numProperties = response.data.properties?.length || 1;
+      const optimizedRoute = response.data.optimized_route;
+      
+      if (numProperties > 1 && optimizedRoute) {
+        toast.success(
+          `Visit accepted! ${numProperties} properties, ${optimizedRoute.total_distance_km} km total. Route optimized!`,
+          { duration: 5000 }
+        );
+      } else {
+        toast.success('Visit accepted! Navigate to customer pickup location');
+      }
     } catch (error) {
       toast.error(error.response?.data?.detail || 'Failed to accept visit');
     }
@@ -572,6 +588,32 @@ const RiderDashboard = () => {
                       ))}
                     </div>
                   </div>
+
+                  {/* Multi-Property Route View */}
+                  {activeVisit.properties?.length > 1 && (
+                    <div className="pt-4 border-t border-[#E5E1DB]">
+                      <button
+                        onClick={() => setShowRouteMap(true)}
+                        className="w-full p-3 bg-[#04473C]/10 border border-[#04473C] rounded-lg flex items-center justify-center gap-2 text-[#04473C] hover:bg-[#04473C]/20 transition-colors"
+                      >
+                        <Route className="w-5 h-5" />
+                        <span className="font-medium">View Optimized Route ({activeVisit.properties.length} Properties)</span>
+                      </button>
+                      
+                      {activeVisit.optimized_route && (
+                        <div className="mt-3 grid grid-cols-2 gap-3 text-center">
+                          <div className="bg-[#F5F3F0] p-3 rounded-lg">
+                            <p className="text-2xl font-bold text-[#04473C]">{activeVisit.optimized_route.total_distance_km}</p>
+                            <p className="text-xs text-[#4A4D53]">Total km</p>
+                          </div>
+                          <div className="bg-[#F5F3F0] p-3 rounded-lg">
+                            <p className="text-2xl font-bold text-[#04473C]">{Math.round(activeVisit.optimized_route.estimated_time_minutes)} min</p>
+                            <p className="text-xs text-[#4A4D53]">Est. Time</p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               </motion.div>
             )}
@@ -981,6 +1023,62 @@ const RiderDashboard = () => {
           </div>
         </div>
       )}
+
+      {/* Route Map Modal */}
+      <AnimatePresence>
+        {showRouteMap && activeVisit && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4"
+            onClick={() => setShowRouteMap(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+              onClick={e => e.stopPropagation()}
+            >
+              <div className="p-4 border-b border-[#E5E1DB] flex items-center justify-between">
+                <h3 className="text-xl font-bold text-[#04473C]" style={{ fontFamily: 'Playfair Display, serif' }}>
+                  Optimized Visit Route
+                </h3>
+                <button
+                  onClick={() => setShowRouteMap(false)}
+                  className="p-2 hover:bg-[#F5F3F0] rounded-full"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              <div className="p-4">
+                <MultiVisitRoute
+                  visit={activeVisit.visit}
+                  properties={activeVisit.properties}
+                  optimizedRoute={activeVisit.optimized_route}
+                  customer={activeVisit.customer}
+                  currentStep={activeVisit.visit?.current_step}
+                  onStartVisit={() => handleUpdateStep('start_visit')}
+                  onCompleteProperty={(propId, index) => {
+                    // Handle completing individual property
+                    console.log('Complete property:', propId, index);
+                  }}
+                  onViewMap={() => {
+                    // Open external map with route
+                    if (activeVisit.optimized_route?.visits) {
+                      const firstVisit = activeVisit.optimized_route.visits[0];
+                      if (firstVisit) {
+                        window.open(`https://www.google.com/maps/dir/?api=1&destination=${firstVisit.lat},${firstVisit.lng}`, '_blank');
+                      }
+                    }
+                  }}
+                />
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

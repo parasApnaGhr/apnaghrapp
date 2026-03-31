@@ -1489,10 +1489,49 @@ async def accept_visit(visit_id: str, current_user: dict = Depends(get_current_u
         if prop:
             properties.append(prop)
     
+    # Optimize route if multiple properties and rider has location
+    optimized_route = None
+    if len(properties) > 1 and rider_lat and rider_lng:
+        from services.tracking_service import optimize_visit_route, haversine_distance
+        
+        visits_for_optimization = [
+            {
+                "id": p['id'],
+                "lat": p.get('latitude', 0),
+                "lng": p.get('longitude', 0),
+                "title": p.get('title', ''),
+                "address": p.get('address', '')
+            }
+            for p in properties if p.get('latitude') and p.get('longitude')
+        ]
+        
+        if visits_for_optimization:
+            optimized = optimize_visit_route(visits_for_optimization, (rider_lat, rider_lng))
+            
+            # Calculate total distance
+            total_distance = 0
+            current_loc = (rider_lat, rider_lng)
+            for v in optimized:
+                total_distance += haversine_distance(current_loc[0], current_loc[1], v['lat'], v['lng'])
+                current_loc = (v['lat'], v['lng'])
+            
+            optimized_route = {
+                "visits": optimized,
+                "total_distance_km": round(total_distance, 2),
+                "estimated_time_minutes": round((total_distance / 25) * 60 + len(optimized) * 15, 0)
+            }
+            
+            # Save optimized order to the visit
+            await db.visit_bookings.update_one(
+                {"id": visit_id},
+                {"$set": {"optimized_route": optimized_route}}
+            )
+    
     return {
         "visit": visit, 
         "properties": properties,
-        "customer": customer
+        "customer": customer,
+        "optimized_route": optimized_route
     }
 
 @api_router.post("/visits/{visit_id}/update-step")
@@ -1726,7 +1765,7 @@ async def update_rider_location(lat: float, lng: float, current_user: dict = Dep
 
 @api_router.get("/rider/active-visit")
 async def get_active_visit(current_user: dict = Depends(get_current_user)):
-    """Get rider's currently active visit"""
+    """Get rider's currently active visit with optimized route"""
     if current_user['role'] != 'rider':
         raise HTTPException(status_code=403, detail="Riders only")
     
@@ -1748,10 +1787,53 @@ async def get_active_visit(current_user: dict = Depends(get_current_user)):
         if prop:
             properties.append(prop)
     
+    # Get rider's current location for route optimization
+    rider = await db.users.find_one({"id": current_user['id']}, {"_id": 0})
+    rider_lat = rider.get('latitude')
+    rider_lng = rider.get('longitude')
+    
+    # Calculate optimized route if not already saved
+    optimized_route = visit.get('optimized_route')
+    if not optimized_route and len(properties) > 1 and rider_lat and rider_lng:
+        from services.tracking_service import optimize_visit_route, haversine_distance
+        
+        visits_for_optimization = [
+            {
+                "id": p['id'],
+                "lat": p.get('latitude', 0),
+                "lng": p.get('longitude', 0),
+                "title": p.get('title', ''),
+                "address": p.get('address', '')
+            }
+            for p in properties if p.get('latitude') and p.get('longitude')
+        ]
+        
+        if visits_for_optimization:
+            optimized = optimize_visit_route(visits_for_optimization, (rider_lat, rider_lng))
+            
+            total_distance = 0
+            current_loc = (rider_lat, rider_lng)
+            for v in optimized:
+                total_distance += haversine_distance(current_loc[0], current_loc[1], v['lat'], v['lng'])
+                current_loc = (v['lat'], v['lng'])
+            
+            optimized_route = {
+                "visits": optimized,
+                "total_distance_km": round(total_distance, 2),
+                "estimated_time_minutes": round((total_distance / 25) * 60 + len(optimized) * 15, 0)
+            }
+            
+            # Save for future
+            await db.visit_bookings.update_one(
+                {"id": visit['id']},
+                {"$set": {"optimized_route": optimized_route}}
+            )
+    
     return {
         "visit": visit,
         "properties": properties,
-        "customer": customer
+        "customer": customer,
+        "optimized_route": optimized_route
     }
 
 # Admin: Get all riders
