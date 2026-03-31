@@ -1297,7 +1297,11 @@ async def book_visit(booking_data: VisitBookingCreate, current_user: dict = Depe
 
 @api_router.get("/visits/my-bookings")
 async def get_my_bookings(current_user: dict = Depends(get_current_user)):
-    bookings = await db.visit_bookings.find({"customer_id": current_user['id']}, {"_id": 0}).to_list(50)
+    # Search by both customer_id and user_id to support both old and manual bookings
+    bookings = await db.visit_bookings.find(
+        {"$or": [{"customer_id": current_user['id']}, {"user_id": current_user['id']}]}, 
+        {"_id": 0}
+    ).sort("created_at", -1).to_list(50)
     return bookings
 
 @api_router.get("/visits/available")
@@ -1310,7 +1314,19 @@ async def get_available_visits(current_user: dict = Depends(get_current_user)):
     if not rider.get('is_online', False):
         return []  # Offline riders don't see visits
     
-    visits = await db.visit_bookings.find({"status": "pending", "rider_id": None}, {"_id": 0}).limit(20).to_list(None)
+    # Find pending visits with no rider assigned (check both rider_id and assigned_rider_id)
+    visits = await db.visit_bookings.find(
+        {
+            "status": "pending", 
+            "$or": [
+                {"rider_id": None},
+                {"rider_id": {"$exists": False}},
+                {"assigned_rider_id": None},
+                {"assigned_rider_id": {"$exists": False}}
+            ]
+        }, 
+        {"_id": 0}
+    ).limit(20).to_list(None)
     
     # Batch fetch all property IDs to avoid N+1 queries
     all_prop_ids = []
@@ -2056,14 +2072,17 @@ async def create_manual_visit(data: ManualVisitCreate, current_user: dict = Depe
             "id": visit_id,
             "package_id": package_id,
             "user_id": customer_id,
+            "customer_id": customer_id,  # Required for my-bookings endpoint
             "customer_name": data.customer_name,
             "customer_phone": data.customer_phone,
             "property_id": prop["id"],
+            "property_ids": [prop["id"]],  # Required for available visits
             "property_title": prop.get("title", ""),
             "property_location": f"{prop.get('area_name', '')}, {prop.get('city', '')}",
             "preferred_date": data.preferred_date,
             "preferred_time": data.preferred_time,
             "status": "pending",
+            "rider_id": None,  # Required for available visits endpoint
             "assigned_rider_id": data.assigned_rider_id,
             "payment_status": "completed",
             "payment_method": data.payment_method,
@@ -2079,7 +2098,7 @@ async def create_manual_visit(data: ManualVisitCreate, current_user: dict = Depe
         for visit_id in visit_ids:
             await db.visit_bookings.update_one(
                 {"id": visit_id},
-                {"$set": {"status": "assigned", "assigned_rider_id": data.assigned_rider_id}}
+                {"$set": {"status": "assigned", "rider_id": data.assigned_rider_id, "assigned_rider_id": data.assigned_rider_id}}
             )
     
     # Create payment transaction record
