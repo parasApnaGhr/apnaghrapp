@@ -5,10 +5,12 @@ import { visitAPI, riderAPI, getMediaUrl } from '../utils/api';
 import api from '../utils/api';
 import VisitProofUpload from '../components/VisitProofUpload';
 import MultiVisitRoute from '../components/MultiVisitRoute';
+import RiderLocationTracker from '../components/RiderLocationTracker';
 import { 
   MapPin, Clock, CheckCircle, Phone, Camera, Navigation, 
   Home, User, ArrowRight, IndianRupee, Power, Wallet, 
-  ClipboardList, FileText, LogOut, RefreshCw, Upload, X, Image, Trash2, Route
+  ClipboardList, FileText, LogOut, RefreshCw, Upload, X, Image, Trash2, Route,
+  Locate
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -468,6 +470,7 @@ const RiderDashboard = () => {
         <div className="flex gap-2 mb-6 overflow-x-auto pb-2 hide-scrollbar">
           {[
             { id: 'visits', label: 'Visits', icon: Navigation },
+            { id: 'tracking', label: 'GPS Track', icon: Locate },
             { id: 'tasks', label: 'ToLet Tasks', icon: ClipboardList },
             { id: 'wallet', label: 'Wallet', icon: Wallet }
           ].map((tab) => (
@@ -715,6 +718,54 @@ const RiderDashboard = () => {
               </div>
             )}
           </>
+        )}
+
+        {/* GPS Tracking Tab */}
+        {activeTab === 'tracking' && (
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-medium text-[#1A1C20]" style={{ fontFamily: 'Playfair Display, serif' }}>
+                Live GPS Tracking
+              </h3>
+            </div>
+
+            {!isOnline ? (
+              <div className="bg-white border border-[#E5E1DB] p-12 text-center">
+                <Power className="w-12 h-12 text-[#D0C9C0] mx-auto mb-3" strokeWidth={1} />
+                <p className="text-[#4A4D53]">Go online to enable GPS tracking</p>
+                <p className="text-sm text-[#4A4D53] mt-2">Your location will be shared with customers</p>
+              </div>
+            ) : (
+              <RiderLocationTracker
+                riderId={user?.id}
+                riderName={user?.name}
+                assignedVisits={activeVisit ? [{
+                  id: activeVisit.visit?.id,
+                  properties: activeVisit.properties,
+                  ...activeVisit.visit
+                }] : []}
+                onVisitStatusChange={(visitId, status) => {
+                  console.log('Visit status changed:', visitId, status);
+                  if (status === 'completed') {
+                    loadAvailableVisits();
+                    loadWallet();
+                  }
+                }}
+              />
+            )}
+
+            {/* Instructions */}
+            <div className="mt-6 p-4 bg-[#E6F0EE] border border-[#04473C]/20 rounded-lg">
+              <h4 className="font-medium text-[#04473C] mb-2">How GPS Tracking Works</h4>
+              <ul className="text-sm text-[#4A4D53] space-y-2">
+                <li>• Click "Start" to begin sharing your location</li>
+                <li>• Customers will see your live position on the map</li>
+                <li>• ETA is automatically calculated using real road distances</li>
+                <li>• System detects when you reach within 100m of property</li>
+                <li>• Keep this tab open while on duty for best tracking</li>
+              </ul>
+            </div>
+          </div>
         )}
 
         {/* ToLet Tasks Tab */}
