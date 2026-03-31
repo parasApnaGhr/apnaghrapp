@@ -43,6 +43,7 @@ from routes.packers import router as packers_router
 from routes.advertising import router as advertising_router
 from routes.chatbot import setup_chatbot_routes
 from routes.seller import setup_seller_routes
+from routes.tracking import router as tracking_router
 from services.cashfree_service import get_cashfree_service, CashfreePaymentService
 
 ROOT_DIR = Path(__file__).parent
@@ -3384,6 +3385,7 @@ app.include_router(api_router)
 # Include new modular routes
 app.include_router(packers_router, prefix="/api")
 app.include_router(advertising_router, prefix="/api")
+app.include_router(tracking_router, prefix="/api")
 
 # Mount uploads directory for serving files
 # Using /api/uploads to ensure proper routing through Kubernetes ingress

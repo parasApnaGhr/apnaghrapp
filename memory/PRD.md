@@ -5,12 +5,13 @@ ApnaGhr Visit Platform is a production-ready multi-role rental property platform
 - Cashfree payment gateway (PRODUCTION)
 - Packers & Movers service
 - Advertising module with AI Ad Generation
-- **Seller (Calling Agent) Module** - Commission-based referral system (NEW)
+- **Seller (Calling Agent) Module** - Commission-based referral system
 - Multi-role authentication (Customer, Rider, Seller, Advertiser, Builder, Admin)
 - **Premium Luxury UI design** (Updated March 2026)
 - AI Chatbot for property assistance
 - SMS/Email OTP system (ready for Twilio/Resend integration)
-- **Public Property Links** - Share properties without requiring login (NEW)
+- **Public Property Links** - Share properties without requiring login
+- **🆕 Real-Time Agent Tracking System** - Live GPS tracking with WebSockets
 
 ## Deployment Status: ✅ READY
 
@@ -24,11 +25,43 @@ ApnaGhr Visit Platform is a production-ready multi-role rental property platform
 
 ## Latest Updates (March 31, 2026)
 
+### 🆕 Real-Time Agent Tracking System (Phase 1-5 Complete)
+**Backend:**
+- WebSocket infrastructure for real-time location broadcasting
+- `/api/tracking/rider/{id}` - Rider location WebSocket endpoint
+- `/api/tracking/customer/{id}` - Customer tracking WebSocket endpoint
+- `/api/tracking/admin` - Admin monitoring WebSocket endpoint
+- `/api/tracking/calculate-eta` - Dynamic ETA using OSRM (free routing)
+- `/api/tracking/optimize-route` - Multi-visit route optimization (nearest neighbor + 2-opt)
+- `/api/tracking/check-reached` - Auto-detect when rider reaches destination (50m radius)
+- `/api/tracking/online-riders` - Get all online riders
+
+**Frontend Components:**
+- `useTrackingWebSocket.js` - React hook for WebSocket connections
+- `LiveTrackingMap.js` - Leaflet + OpenStreetMap real-time map
+- `RiderLocationTracker.js` - GPS tracking with background support
+- `CustomerVisitTracker.js` - Customer view with ETA countdown
+- `AdminLiveTracking.js` - Admin dashboard with all riders
+
+**Features:**
+- ✅ GPS tracking every 5 seconds
+- ✅ Smooth marker animation on map
+- ✅ Smart ETA using OSRM (OpenStreetMap routing)
+- ✅ Multi-visit route optimization
+- ✅ Visit statuses: Assigned → Accepted → On the Way → Reached → Completed
+- ✅ Auto "Reached" detection (50m radius)
+- ✅ Customer notifications ("Agent arriving in 5 mins")
+
 ### ✅ Custom Domain CORS Fix
 - Added `https://apnaghrapp.in` to CORS allowed origins
 - Added `https://field-rider-ops.emergent.host` (production backend)
 - Backend `.env` now includes all necessary origins
 - **REQUIRES REDEPLOYMENT** for production to work
+
+### ✅ Cashfree Payment Integration Updated
+- Added Cashfree JavaScript SDK to frontend
+- Polling-based payment verification (no webhook dependency)
+- Payment status checked on return URL
 
 ## Previous Updates (March 30, 2026)
 
