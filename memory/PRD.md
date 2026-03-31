@@ -22,7 +22,15 @@ ApnaGhr Visit Platform is a production-ready multi-role rental property platform
 - ✅ MongoDB GridFS for permanent image storage
 - ✅ Production seed migration script
 
-## Latest Updates (March 30, 2026)
+## Latest Updates (March 31, 2026)
+
+### ✅ Custom Domain CORS Fix
+- Added `https://apnaghrapp.in` to CORS allowed origins
+- Added `https://field-rider-ops.emergent.host` (production backend)
+- Backend `.env` now includes all necessary origins
+- **REQUIRES REDEPLOYMENT** for production to work
+
+## Previous Updates (March 30, 2026)
 
 ### ✅ Public Property Links (NEW)
 - Added `/property/:id` public route for shared property links
