@@ -11,7 +11,67 @@ ApnaGhr Visit Platform is a production-ready multi-role rental property platform
 - AI Chatbot for property assistance
 - SMS/Email OTP system (ready for Twilio/Resend integration)
 - **Public Property Links** - Share properties without requiring login
-- **🆕 Real-Time Agent Tracking System** - Live GPS tracking with WebSockets
+- **Real-Time Agent Tracking System** - Live GPS tracking with WebSockets
+- **🆕 Complete Customer Profile System** - Stats, Payment History, Notifications, Help, Privacy
+- **🆕 Rider Bank Account Management** - Bank details for payouts
+- **🆕 GPS Location Capture** - Use Current Location for pickup and address
+
+## Latest Updates (April 1, 2026)
+
+### 🆕 Customer Profile System (Complete)
+
+**Features Implemented:**
+- ✅ Profile stats: Visits count, Total spent, Properties viewed
+- ✅ Address management with GPS location capture
+- ✅ Payment History page (`/customer/payments`)
+- ✅ Notifications page with unread count (`/customer/notifications`)
+- ✅ Help & Support page with FAQ and contact options (`/customer/support`)
+- ✅ Privacy & Security page with password change (`/customer/privacy`)
+
+**API Endpoints:**
+- `PUT /api/customer/profile` - Update profile with address/location
+- `GET /api/customer/wallet` - Get stats (visits, spent, viewed)
+- `GET /api/customer/payments` - Get payment history
+
+### 🆕 Rider Profile & Bank Account System
+
+**Features Implemented:**
+- ✅ Profile editing (name, email, vehicle type/number, address)
+- ✅ Bank account management (add/update)
+- ✅ Account number masking for security
+- ✅ UPI ID support
+- ✅ Profile completion warning
+
+**API Endpoints:**
+- `GET /api/rider/profile` - Get profile with bank details
+- `PUT /api/rider/profile` - Update profile
+- `POST /api/rider/bank-account` - Add/update bank account
+- `GET /api/rider/bank-account` - Get bank account (masked)
+
+**Bank Account Fields:**
+- Account Holder Name
+- Account Number (stored securely, displayed masked)
+- IFSC Code
+- Bank Name
+- UPI ID (optional)
+
+### 🆕 GPS Location Capture
+
+**Features Implemented:**
+- ✅ "Use Current Location" button in Visit Cart for pickup
+- ✅ Location capture in Customer Profile for address
+- ✅ Reverse geocoding via OpenStreetMap Nominatim
+- ✅ GPS coordinates stored (lat/lng) for route optimization
+
+### 🆕 Customer Visit Modification
+
+**Features Implemented:**
+- ✅ Customers can modify admin-created visits
+- ✅ Update date, time, and pickup location
+- ✅ Confirmation tracking for modified visits
+
+**API Endpoint:**
+- `PUT /api/customer/visits/{visit_id}/modify`
 
 ## Deployment Status: ✅ READY
 
