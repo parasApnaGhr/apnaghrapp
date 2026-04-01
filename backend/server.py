@@ -1378,9 +1378,16 @@ async def book_visit(booking_data: VisitBookingCreate, current_user: dict = Depe
 
 @api_router.get("/visits/my-bookings")
 async def get_my_bookings(current_user: dict = Depends(get_current_user)):
-    # Search by both customer_id and user_id to support both old and manual bookings
+    # Search by customer_id, user_id, OR customer_phone to support all booking types
+    # - customer_id: Standard bookings
+    # - user_id: Legacy bookings
+    # - customer_phone: Admin manual bookings where customer account was created later
     bookings = await db.visit_bookings.find(
-        {"$or": [{"customer_id": current_user['id']}, {"user_id": current_user['id']}]}, 
+        {"$or": [
+            {"customer_id": current_user['id']}, 
+            {"user_id": current_user['id']},
+            {"customer_phone": current_user.get('phone')}
+        ]}, 
         {"_id": 0}
     ).sort("created_at", -1).to_list(50)
     return bookings
@@ -1399,17 +1406,31 @@ async def get_available_visits(current_user: dict = Depends(get_current_user)):
     rider_lat = rider.get('current_lat') or rider.get('latitude')
     rider_lng = rider.get('current_lng') or rider.get('longitude')
     
-    # Find pending/confirmed visits with no rider assigned (check both rider_id and assigned_rider_id)
+    # Find pending/confirmed/assigned visits that are either:
+    # 1. Unassigned (no rider) - available for any rider to accept
+    # 2. Assigned to THIS specific rider - show in their active visits
+    
+    # Query for unassigned visits (available to all riders)
+    unassigned_query = {
+        "status": {"$in": ["pending", "confirmed"]},
+        "$and": [
+            {"$or": [{"rider_id": None}, {"rider_id": {"$exists": False}}]},
+            {"$or": [{"assigned_rider_id": None}, {"assigned_rider_id": {"$exists": False}}]}
+        ]
+    }
+    
+    # Query for visits assigned to this rider but not yet started
+    assigned_to_me_query = {
+        "status": {"$in": ["pending", "confirmed", "assigned"]},
+        "$or": [
+            {"rider_id": current_user['id']},
+            {"assigned_rider_id": current_user['id']}
+        ]
+    }
+    
+    # Combine both queries
     visits = await db.visit_bookings.find(
-        {
-            "status": {"$in": ["pending", "confirmed"]}, 
-            "$or": [
-                {"rider_id": None},
-                {"rider_id": {"$exists": False}},
-                {"assigned_rider_id": None},
-                {"assigned_rider_id": {"$exists": False}}
-            ]
-        }, 
+        {"$or": [unassigned_query, assigned_to_me_query]}, 
         {"_id": 0}
     ).limit(50).to_list(None)
     
@@ -1479,9 +1500,12 @@ async def get_available_visits(current_user: dict = Depends(get_current_user)):
     # Sort by distance (closest first), unknown distances at the end
     filtered_visits.sort(key=lambda x: x.get('distance_km') if x.get('distance_km') is not None else 9999)
     
-    # Also check for any assigned/active visit for this rider
+    # Also check for any assigned/active visit for this rider (check both rider_id and assigned_rider_id)
     active_visit = await db.visit_bookings.find_one({
-        "rider_id": current_user['id'],
+        "$or": [
+            {"rider_id": current_user['id']},
+            {"assigned_rider_id": current_user['id']}
+        ],
         "status": {"$in": ["assigned", "rider_assigned", "pickup_started", "at_customer", "navigating", "at_property", "in_progress"]}
     }, {"_id": 0})
     

@@ -392,25 +392,57 @@ See `/app/memory/test_credentials.md`
 
 ## Latest Bug Fixes (April 1, 2026)
 
-### P0 - Rider Available Visits Fix ✅
-**Issue**: Admin-created visits (status: "confirmed" or with assigned_rider_id) were not appearing in the Rider's Available Visits panel.
+### P0 - Rider Available Visits Fix ✅ (PROPERLY FIXED)
+**Issue**: Admin-created visits (with or without assigned rider) were not appearing correctly for riders.
 
-**Root Cause**: The `/api/visits/available` endpoint only queried for `status: "pending"` visits.
+**Root Cause**: 
+1. The MongoDB `$or` logic was incorrect - it checked if ANY field was null, not if BOTH were null
+2. Visits assigned to a specific rider weren't included in that rider's available visits
 
 **Fix Applied**:
-1. Updated MongoDB query to include both `"pending"` and `"confirmed"` statuses
-2. Enhanced API response to return structured data: `{available: [...], active: {...}}`
-3. Active visits (with status: assigned, rider_assigned, in_progress) now automatically populate the rider's active visit panel
+1. Changed query logic to use `$and` to ensure BOTH `rider_id` AND `assigned_rider_id` are null for unassigned visits
+2. Added a second query to include visits specifically assigned to the current rider
+3. Updated active visit query to check BOTH `rider_id` and `assigned_rider_id`
 
-**Files Modified**:
-- `/app/backend/server.py` (Line ~1405 and ~1479-1500)
+**Code Changes** (`/app/backend/server.py`):
+```python
+# Query for unassigned visits (available to all riders)
+unassigned_query = {
+    "status": {"$in": ["pending", "confirmed"]},
+    "$and": [
+        {"$or": [{"rider_id": None}, {"rider_id": {"$exists": False}}]},
+        {"$or": [{"assigned_rider_id": None}, {"assigned_rider_id": {"$exists": False}}]}
+    ]
+}
 
-### P1 - Customer Visibility for Admin-Booked Visits ✅
+# Query for visits assigned to this rider but not yet started
+assigned_to_me_query = {
+    "status": {"$in": ["pending", "confirmed", "assigned"]},
+    "$or": [
+        {"rider_id": current_user['id']},
+        {"assigned_rider_id": current_user['id']}
+    ]
+}
+```
+
+### P1 - Customer Visibility for Admin-Booked Visits ✅ (PROPERLY FIXED)
 **Issue**: Customers couldn't see visits booked on their behalf by Admin.
 
-**Verification**: The `/api/visits/my-bookings` endpoint correctly returns visits where `customer_id` or `user_id` matches the logged-in customer. The `CustomerBookings.js` page displays these visits with proper status indicators.
+**Root Cause**: The my-bookings query only checked `customer_id` and `user_id`, but admin might create visits with just phone number.
 
-**Status**: Working as expected - no code changes needed. The admin's `create-manual-visit` endpoint correctly sets `customer_id` on bookings.
+**Fix Applied**: Added `customer_phone` to the query to match by phone number as fallback.
+
+**Code Changes** (`/app/backend/server.py`):
+```python
+bookings = await db.visit_bookings.find(
+    {"$or": [
+        {"customer_id": current_user['id']}, 
+        {"user_id": current_user['id']},
+        {"customer_phone": current_user.get('phone')}
+    ]}, 
+    {"_id": 0}
+).sort("created_at", -1).to_list(50)
+```
 
 ## Known Environment Note
 ⚠️ **Preview vs Production Database**: The preview environment (`field-rider-ops.preview.emergentagent.com`) uses a separate MongoDB database from production (`apnaghrapp.in`). Test users created on production won't appear in preview. Always test with preview-specific data or recreate test scenarios on preview.
