@@ -1399,10 +1399,10 @@ async def get_available_visits(current_user: dict = Depends(get_current_user)):
     rider_lat = rider.get('current_lat') or rider.get('latitude')
     rider_lng = rider.get('current_lng') or rider.get('longitude')
     
-    # Find pending visits with no rider assigned (check both rider_id and assigned_rider_id)
+    # Find pending/confirmed visits with no rider assigned (check both rider_id and assigned_rider_id)
     visits = await db.visit_bookings.find(
         {
-            "status": "pending", 
+            "status": {"$in": ["pending", "confirmed"]}, 
             "$or": [
                 {"rider_id": None},
                 {"rider_id": {"$exists": False}},
