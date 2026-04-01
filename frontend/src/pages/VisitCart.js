@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { paymentAPI, getMediaUrl } from '../utils/api';
+import { paymentAPI, getMediaUrl, authAPI } from '../utils/api';
 import { initiateCashfreePayment } from '../utils/cashfree';
 import { 
   ArrowLeft, Trash2, MapPin, Home, Calendar, Clock, 
@@ -30,6 +30,36 @@ const VisitCart = () => {
   const [selectedPackage, setSelectedPackage] = useState(null);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [showTermsModal, setShowTermsModal] = useState(false);
+  const [checkingTerms, setCheckingTerms] = useState(true);
+
+  // Check terms status from database on mount
+  useEffect(() => {
+    const checkTermsStatus = async () => {
+      try {
+        // Check from user object first (comes from login response)
+        if (user?.terms_accepted) {
+          setTermsAccepted(true);
+          setCheckingTerms(false);
+          return;
+        }
+        
+        // Otherwise check via API
+        const response = await authAPI.getTermsStatus();
+        setTermsAccepted(response.data.terms_accepted || false);
+      } catch (error) {
+        console.error('Error checking terms status:', error);
+        setTermsAccepted(false);
+      } finally {
+        setCheckingTerms(false);
+      }
+    };
+    
+    if (user) {
+      checkTermsStatus();
+    } else {
+      setCheckingTerms(false);
+    }
+  }, [user]);
 
   useEffect(() => {
     localStorage.setItem('visitCart', JSON.stringify(cart));
@@ -469,10 +499,21 @@ const VisitCart = () => {
       {/* Terms Acceptance Modal */}
       <TermsAcceptanceModal
         isOpen={showTermsModal}
-        onAccept={() => {
-          setTermsAccepted(true);
-          setShowTermsModal(false);
-          toast.success('Terms accepted! You can now proceed with payment.');
+        onAccept={async () => {
+          try {
+            // Save to database permanently
+            await authAPI.acceptTerms({
+              accepted_terms: true,
+              accepted_privacy: true,
+              accepted_anti_circumvention: true
+            });
+            setTermsAccepted(true);
+            setShowTermsModal(false);
+            toast.success('Terms accepted! You can now proceed with payment.');
+          } catch (error) {
+            toast.error('Failed to save terms acceptance. Please try again.');
+            console.error('Terms acceptance error:', error);
+          }
         }}
         onDecline={() => {
           setShowTermsModal(false);

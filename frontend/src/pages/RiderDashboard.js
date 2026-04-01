@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
-import { visitAPI, riderAPI, getMediaUrl } from '../utils/api';
+import { visitAPI, riderAPI, getMediaUrl, authAPI } from '../utils/api';
 import api from '../utils/api';
 import VisitProofUpload from '../components/VisitProofUpload';
 import MultiVisitRoute from '../components/MultiVisitRoute';
 import RiderLocationTracker from '../components/RiderLocationTracker';
+import TermsAcceptanceModal from '../components/TermsAcceptanceModal';
 import { 
   MapPin, Clock, CheckCircle, Phone, Camera, Navigation, 
   Home, User, ArrowRight, IndianRupee, Power, Wallet, 
@@ -20,6 +21,10 @@ const RiderDashboard = () => {
   const [isOnline, setIsOnline] = useState(user?.is_online || false);
   const [shiftLoading, setShiftLoading] = useState(false);
   const [loading, setLoading] = useState(false);
+  
+  // Terms state
+  const [showTermsModal, setShowTermsModal] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(user?.terms_accepted || false);
   
   // Visits state
   const [availableVisits, setAvailableVisits] = useState([]);
@@ -46,6 +51,28 @@ const RiderDashboard = () => {
   
   // Multi-visit route map
   const [showRouteMap, setShowRouteMap] = useState(false);
+
+  // Check terms acceptance on mount
+  useEffect(() => {
+    const checkTerms = async () => {
+      if (!user?.terms_accepted) {
+        try {
+          const response = await authAPI.getTermsStatus();
+          if (!response.data.terms_accepted) {
+            setShowTermsModal(true);
+          } else {
+            setTermsAccepted(true);
+          }
+        } catch (error) {
+          console.error('Error checking terms:', error);
+          setShowTermsModal(true);
+        }
+      } else {
+        setTermsAccepted(true);
+      }
+    };
+    checkTerms();
+  }, [user]);
 
   useEffect(() => {
     if (isOnline) {
@@ -1130,6 +1157,31 @@ const RiderDashboard = () => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Terms Acceptance Modal - Blocks dashboard until accepted */}
+      <TermsAcceptanceModal
+        isOpen={showTermsModal}
+        onAccept={async () => {
+          try {
+            await authAPI.acceptTerms({
+              accepted_terms: true,
+              accepted_privacy: true,
+              accepted_anti_circumvention: true
+            });
+            setTermsAccepted(true);
+            setShowTermsModal(false);
+            toast.success('Terms accepted! You can now use the platform.');
+          } catch (error) {
+            toast.error('Failed to save terms. Please try again.');
+          }
+        }}
+        onDecline={() => {
+          toast.error('You must accept terms to continue. Logging out...');
+          logout();
+        }}
+        userType="rider"
+        context="dashboard"
+      />
     </div>
   );
 };

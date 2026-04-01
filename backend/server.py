@@ -434,7 +434,60 @@ async def login(login_data: LoginRequest):
     
     token = create_jwt_token(user['id'], user['role'])
     user.pop('password', None)
+    
+    # Include terms acceptance status in response
+    user['terms_accepted'] = user.get('terms_accepted', False)
+    user['terms_accepted_date'] = user.get('terms_accepted_date', None)
+    
     return {"token": token, "user": user}
+
+
+# ============ TERMS & CONDITIONS ACCEPTANCE ============
+
+class TermsAcceptanceRequest(BaseModel):
+    accepted_terms: bool = True
+    accepted_privacy: bool = True
+    accepted_anti_circumvention: bool = True
+
+@api_router.post("/auth/accept-terms")
+async def accept_terms(request: TermsAcceptanceRequest, current_user: dict = Depends(get_current_user)):
+    """Accept terms and conditions - stored permanently in database"""
+    if not all([request.accepted_terms, request.accepted_privacy, request.accepted_anti_circumvention]):
+        raise HTTPException(status_code=400, detail="All terms must be accepted")
+    
+    # Update user record with terms acceptance
+    result = await db.users.update_one(
+        {"id": current_user['id']},
+        {"$set": {
+            "terms_accepted": True,
+            "terms_accepted_date": datetime.now(timezone.utc).isoformat(),
+            "terms_version": "1.0",
+            "accepted_terms": True,
+            "accepted_privacy": True,
+            "accepted_anti_circumvention": True
+        }}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    return {
+        "status": "success",
+        "message": "Terms and conditions accepted successfully",
+        "terms_accepted": True,
+        "terms_accepted_date": datetime.now(timezone.utc).isoformat()
+    }
+
+@api_router.get("/auth/terms-status")
+async def get_terms_status(current_user: dict = Depends(get_current_user)):
+    """Check if user has accepted terms"""
+    user = await db.users.find_one({"id": current_user['id']}, {"_id": 0, "terms_accepted": 1, "terms_accepted_date": 1, "terms_version": 1})
+    
+    return {
+        "terms_accepted": user.get('terms_accepted', False) if user else False,
+        "terms_accepted_date": user.get('terms_accepted_date', None) if user else None,
+        "terms_version": user.get('terms_version', None) if user else None
+    }
 
 
 # ============ FORGOT PASSWORD ============

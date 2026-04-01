@@ -25,23 +25,36 @@ ApnaGhr Visit Platform is a production-ready multi-role rental property platform
 
 ## Latest Updates (March 31, 2026)
 
-### 🆕 Legal Policy & Terms Acceptance System (VERIFIED ✅)
+### 🆕 Legal Policy & Terms Acceptance System (PERMANENT - DATABASE STORED ✅)
 
-**Strict Anti-Circumvention Compliance:**
-- ✅ **Terms Acceptance Modal at Login** - Customers and Riders must accept before accessing platform
-- ✅ **Terms Acceptance at Visit Cart Checkout** - Must accept before payment
-- ✅ **TermsAcceptanceModal Component** - Reusable modal with:
-  - Customer Agreement (all deals through ApnaGhr)
-  - Anti-Circumvention Policy (prominently displayed)
-  - Penalty clause: Minimum ₹50,000 or 2X deal value
-  - Three mandatory checkboxes (Terms, Privacy, Anti-Circumvention)
-- ✅ **Legal Agreement Section in VisitCart.js**:
-  - "Action Required" warning before payment
-  - "View & Accept Terms" button
-  - Shows "Terms & Conditions Accepted" with green checkmark after acceptance
-  - Pay & Book button disabled until terms accepted
-- ✅ **LocalStorage persistence** - Remembers acceptance for 30 days
-- ✅ **Legal Policies Page** (`/legal`) - Full policy documentation
+**Storage: MongoDB Database (Survives All Deployments)**
+- ✅ `terms_accepted`: Boolean flag on user document
+- ✅ `terms_accepted_date`: ISO timestamp when accepted
+- ✅ `terms_version`: Version tracking for future policy updates
+
+**API Endpoints:**
+- `POST /api/auth/accept-terms` - Save acceptance to database
+- `GET /api/auth/terms-status` - Check acceptance status
+- Login response includes `terms_accepted` field
+
+**Frontend Integration:**
+- ✅ **Login.js** - Checks terms after login, shows modal if not accepted
+- ✅ **CustomerHome.js** - Shows modal on dashboard if terms not accepted
+- ✅ **RiderDashboard.js** - Shows modal on dashboard if terms not accepted
+- ✅ **VisitCart.js** - Requires terms before payment (checks from DB)
+
+**User Flow:**
+1. User logs in → Backend returns `terms_accepted: false`
+2. Dashboard shows Terms Modal (blocks UI)
+3. User accepts all checkboxes + clicks "I Accept All Terms"
+4. Frontend calls `POST /api/auth/accept-terms`
+5. Database updated with `terms_accepted: true`
+6. Modal closes, user can continue
+7. Next login → `terms_accepted: true` → No modal shown
+
+**Anti-Circumvention Policy Displayed:**
+- Customer: ₹50,000 or 2X deal value penalty
+- Rider: ₹1,00,000 fine + termination
 
 **Files Updated:**
 - `/app/frontend/src/components/TermsAcceptanceModal.js` - Modal component

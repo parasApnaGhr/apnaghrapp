@@ -95,6 +95,8 @@ export const authAPI = {
   login: (phone, password) => api.post('/auth/login', { phone, password }),
   register: (data) => api.post('/auth/register', data),
   getMe: () => api.get('/auth/me'),
+  acceptTerms: (data) => api.post('/auth/accept-terms', data),
+  getTermsStatus: () => api.get('/auth/terms-status'),
 };
 
 export const propertyAPI = {

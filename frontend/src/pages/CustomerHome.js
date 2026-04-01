@@ -1,18 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
-import { propertyAPI, getMediaUrl } from '../utils/api';
+import { propertyAPI, getMediaUrl, authAPI } from '../utils/api';
 import { useNavigate } from 'react-router-dom';
 import { Search, SlidersHorizontal, Home, User, Heart, Calendar, LogOut, Truck, Megaphone, ShoppingCart, X, MapPin, Bath, BedDouble, Square, ChevronRight, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
 import api from '../utils/api';
 import AIChatbot from '../components/AIChatbot';
+import TermsAcceptanceModal from '../components/TermsAcceptanceModal';
 
 const CustomerHome = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showTermsModal, setShowTermsModal] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(user?.terms_accepted || false);
   const [filters, setFilters] = useState({
     city: '',
     min_rent: '',
@@ -32,7 +35,28 @@ const CustomerHome = () => {
     loadActiveAds();
     const cart = JSON.parse(localStorage.getItem('visitCart') || '[]');
     setCartCount(cart.length);
-  }, []);
+    
+    // Check terms acceptance from database
+    const checkTerms = async () => {
+      if (!user?.terms_accepted) {
+        try {
+          const response = await authAPI.getTermsStatus();
+          if (!response.data.terms_accepted) {
+            setShowTermsModal(true);
+          } else {
+            setTermsAccepted(true);
+          }
+        } catch (error) {
+          console.error('Error checking terms:', error);
+          // If error, assume not accepted for customers
+          setShowTermsModal(true);
+        }
+      } else {
+        setTermsAccepted(true);
+      }
+    };
+    if (user) checkTerms();
+  }, [user]);
 
   const loadAppSettings = async () => {
     try {
@@ -596,6 +620,31 @@ const CustomerHome = () => {
       
       {/* AI Chatbot */}
       <AIChatbot />
+
+      {/* Terms Acceptance Modal */}
+      <TermsAcceptanceModal
+        isOpen={showTermsModal}
+        onAccept={async () => {
+          try {
+            await authAPI.acceptTerms({
+              accepted_terms: true,
+              accepted_privacy: true,
+              accepted_anti_circumvention: true
+            });
+            setTermsAccepted(true);
+            setShowTermsModal(false);
+            toast.success('Terms accepted! Welcome to ApnaGhr.');
+          } catch (error) {
+            toast.error('Failed to save terms. Please try again.');
+          }
+        }}
+        onDecline={() => {
+          toast.error('You must accept terms to continue. Logging out...');
+          logout();
+        }}
+        userType="customer"
+        context="dashboard"
+      />
     </div>
   );
 };

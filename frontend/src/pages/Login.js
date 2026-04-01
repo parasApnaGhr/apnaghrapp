@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Home, User, Phone, Mail, Lock, ChevronRight, Eye, EyeOff, KeyRound, ArrowLeft, Briefcase, FileText } from 'lucide-react';
-import api, { sellerAPI } from '../utils/api';
+import api, { sellerAPI, authAPI } from '../utils/api';
 import TermsAcceptanceModal from '../components/TermsAcceptanceModal';
 
 const Login = () => {
@@ -31,6 +31,7 @@ const Login = () => {
     method: 'sms'
   });
   const [loading, setLoading] = useState(false);
+  const [pendingUser, setPendingUser] = useState(null); // Store logged in user pending terms
   const { login, register } = useAuth();
   const navigate = useNavigate();
 
@@ -43,36 +44,50 @@ const Login = () => {
     return password.length >= 6;
   };
 
-  // Check if terms need to be shown
-  const checkTermsAndProceed = (action) => {
-    // Check localStorage if user already accepted terms
-    const acceptedTerms = localStorage.getItem('apnaghr_terms_accepted');
-    const acceptedDate = localStorage.getItem('apnaghr_terms_date');
-    
-    // Re-require acceptance every 30 days or if never accepted
-    const thirtyDaysAgo = Date.now() - (30 * 24 * 60 * 60 * 1000);
-    const needsAcceptance = !acceptedTerms || !acceptedDate || parseInt(acceptedDate) < thirtyDaysAgo;
-    
-    if (needsAcceptance && (formData.role === 'customer' || formData.role === 'rider')) {
-      setPendingAction(action);
-      setShowTermsModal(true);
-      return false;
+  // Navigate user after login based on role
+  const navigateAfterLogin = (user) => {
+    if (user.role === 'customer' || user.role === 'advertiser' || user.role === 'builder') {
+      navigate('/customer');
+    } else if (user.role === 'rider') {
+      navigate('/rider');
+    } else if (user.role === 'seller') {
+      navigate('/seller');
+    } else if (['admin', 'support_admin', 'inventory_admin', 'rider_admin'].includes(user.role)) {
+      navigate('/admin');
+    } else {
+      navigate('/customer');
     }
-    return true;
   };
 
-  const handleTermsAccepted = () => {
-    // Store acceptance
-    localStorage.setItem('apnaghr_terms_accepted', 'true');
-    localStorage.setItem('apnaghr_terms_date', Date.now().toString());
-    localStorage.setItem('apnaghr_terms_role', formData.role);
-    
-    setTermsAccepted(true);
-    setShowTermsModal(false);
-    
-    // Proceed with pending action
-    if (pendingAction) {
-      processAuthAction(pendingAction);
+  // Handle terms acceptance - save to DATABASE (permanent)
+  const handleTermsAccepted = async () => {
+    try {
+      // Save to database via API
+      await authAPI.acceptTerms({
+        accepted_terms: true,
+        accepted_privacy: true,
+        accepted_anti_circumvention: true
+      });
+      
+      setTermsAccepted(true);
+      setShowTermsModal(false);
+      toast.success('Terms accepted successfully!');
+      
+      // If we have a pending user (from login), navigate them
+      if (pendingUser) {
+        navigateAfterLogin(pendingUser);
+        setPendingUser(null);
+      }
+      
+      // If we had a pending action, complete it
+      if (pendingAction === 'register') {
+        toast.success('Account created! Please login.');
+        setIsRegister(false);
+      }
+      setPendingAction(null);
+    } catch (error) {
+      toast.error('Failed to save terms acceptance. Please try again.');
+      console.error('Terms acceptance error:', error);
     }
   };
 
@@ -102,24 +117,31 @@ const Login = () => {
           setFormData({ ...formData, name: '', password: '', city: '' });
         } else {
           await register(formData);
-          toast.success('Account created successfully! Please login.');
+          // After registration, show terms modal before login
+          if (formData.role === 'customer' || formData.role === 'rider') {
+            toast.success('Account created! Please login and accept terms.');
+          } else {
+            toast.success('Account created successfully! Please login.');
+          }
           setIsRegister(false);
           setFormData({ ...formData, name: '', password: '' });
         }
       } else {
+        // LOGIN - Check terms from database
         const user = await login(formData.phone, formData.password);
         toast.success(`Welcome back, ${user.name || 'User'}!`);
-
-        if (user.role === 'customer' || user.role === 'advertiser' || user.role === 'builder') {
-          navigate('/customer');
-        } else if (user.role === 'rider') {
-          navigate('/rider');
-        } else if (user.role === 'seller') {
-          navigate('/seller');
-        } else if (['admin', 'support_admin', 'inventory_admin', 'rider_admin'].includes(user.role)) {
-          navigate('/admin');
+        
+        // Check if user needs to accept terms (from database)
+        const needsTerms = (user.role === 'customer' || user.role === 'rider') && !user.terms_accepted;
+        
+        if (needsTerms) {
+          // Store user and show terms modal
+          setPendingUser(user);
+          setShowTermsModal(true);
+          toast.info('Please accept our terms and conditions to continue.');
         } else {
-          navigate('/customer');
+          // Terms already accepted or not required, navigate directly
+          navigateAfterLogin(user);
         }
       }
     } catch (error) {
@@ -132,7 +154,6 @@ const Login = () => {
       }
     } finally {
       setLoading(false);
-      setPendingAction(null);
     }
   };
 
@@ -156,12 +177,7 @@ const Login = () => {
 
     const action = isRegister ? 'register' : 'login';
     
-    // Check if terms acceptance is needed
-    if (!checkTermsAndProceed(action)) {
-      return; // Terms modal will be shown
-    }
-    
-    // Proceed directly if terms already accepted
+    // Proceed with auth - terms will be checked from database after login
     processAuthAction(action);
   };
 
