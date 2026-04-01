@@ -5,7 +5,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   MapPin, Clock, Phone, User, Navigation, 
-  Bell, X, CheckCircle, Loader, ArrowRight
+  Bell, X, CheckCircle, Loader, ArrowRight, AlertCircle
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useTrackingWebSocket } from '../hooks/useTrackingWebSocket';
@@ -23,6 +23,7 @@ const CustomerVisitTracker = ({
   const [visitStatus, setVisitStatus] = useState(visitDetails?.status || 'pending');
   const [showFullMap, setShowFullMap] = useState(false);
   const [notifications, setNotifications] = useState([]);
+  const [hasError, setHasError] = useState(false);
 
   const {
     isConnected,
@@ -34,15 +35,38 @@ const CustomerVisitTracker = ({
 
   // Start tracking when component mounts
   useEffect(() => {
-    if (isConnected && visitId) {
-      trackVisit(visitId);
+    try {
+      if (isConnected && visitId) {
+        trackVisit(visitId);
+      }
+    } catch (error) {
+      console.error('Tracking error:', error);
+      setHasError(true);
     }
     return () => {
-      if (visitId) {
-        stopTrackingVisit(visitId);
+      try {
+        if (visitId) {
+          stopTrackingVisit(visitId);
+        }
+      } catch (error) {
+        console.error('Stop tracking error:', error);
       }
     };
   }, [isConnected, visitId, trackVisit, stopTrackingVisit]);
+
+  // Error fallback
+  if (hasError) {
+    return (
+      <div className="bg-white rounded-lg border border-[#E5E1DB] p-6 text-center">
+        <AlertCircle className="w-12 h-12 mx-auto mb-4 text-amber-500" />
+        <h3 className="font-medium text-[#1A1C20] mb-2">Tracking Temporarily Unavailable</h3>
+        <p className="text-sm text-[#4A4D53] mb-4">We're having trouble connecting to the tracking service. Your visit is still confirmed.</p>
+        <button onClick={() => window.location.reload()} className="btn-primary">
+          Refresh Page
+        </button>
+      </div>
+    );
+  }
 
   // Get rider location for this visit
   const riderLocation = Object.values(riderLocations)[0]; // First rider tracking this visit

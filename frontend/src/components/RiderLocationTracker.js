@@ -267,12 +267,22 @@ const RiderLocationTracker = ({
     }
   }, [currentLocation, isTracking, currentVisit, calculateETA, checkReached]);
 
-  // Cleanup on unmount
+  // Cleanup on unmount ONLY - don't stop tracking on re-renders
   useEffect(() => {
+    // Only cleanup refs when component is truly unmounting
     return () => {
-      stopTracking();
+      // Clear intervals but don't call stopTracking API
+      // This prevents tracking from stopping when component re-renders
+      if (watchIdRef.current) {
+        navigator.geolocation.clearWatch(watchIdRef.current);
+        watchIdRef.current = null;
+      }
+      if (updateIntervalRef.current) {
+        clearInterval(updateIntervalRef.current);
+        updateIntervalRef.current = null;
+      }
     };
-  }, [stopTracking]);
+  }, []); // Empty deps - only on unmount
 
   const getStatusColor = (status) => {
     switch (status) {

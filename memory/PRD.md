@@ -75,6 +75,24 @@ ApnaGhr Visit Platform is a production-ready multi-role rental property platform
 
 ## Deployment Status: ✅ READY
 
+## Critical Bug Fixes (April 1, 2026 - Production)
+
+### 1. Payment → Auto-Book Visit Fix
+**Issue**: After payment, customer had to manually book visit - visits weren't created automatically.
+**Fix**: PaymentSuccess.js now auto-creates visit booking from localStorage `pendingVisitBooking` after payment succeeds.
+**Files**: `/app/frontend/src/pages/PaymentSuccess.js`
+
+### 2. Rider GPS Tracking Stops Issue  
+**Issue**: GPS tracking stopped after 1-2 seconds.
+**Root Cause**: Component cleanup was calling `stopTracking()` on every re-render.
+**Fix**: Changed cleanup to only clear intervals/watchers, not call API to stop tracking.
+**Files**: `/app/frontend/src/components/RiderLocationTracker.js`
+
+### 3. Customer Tracking Blank Page
+**Issue**: Tracking page showed blank/black.
+**Fix**: Added error boundary with user-friendly fallback UI.
+**Files**: `/app/frontend/src/components/CustomerVisitTracker.js`
+
 ### Pre-deployment Optimizations Completed
 - ✅ Fixed N+1 database queries (3 locations optimized with batch queries)
 - ✅ Added .gitignore for sensitive files

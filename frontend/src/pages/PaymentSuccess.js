@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { paymentAPI } from '../utils/api';
-import { CheckCircle, Loader, XCircle, Home, Package, Megaphone, ArrowRight } from 'lucide-react';
+import { paymentAPI, visitAPI } from '../utils/api';
+import { CheckCircle, Loader, XCircle, Home, Package, Megaphone, ArrowRight, Calendar } from 'lucide-react';
+import { toast } from 'sonner';
 
 const PaymentSuccess = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [status, setStatus] = useState('checking');
   const [transaction, setTransaction] = useState(null);
+  const [visitBooked, setVisitBooked] = useState(false);
+  const [bookingDetails, setBookingDetails] = useState(null);
   
   const orderId = searchParams.get('order_id') || searchParams.get('session_id');
   const paymentType = searchParams.get('type');
@@ -21,8 +24,41 @@ const PaymentSuccess = () => {
     }
   }, [orderId]);
 
+  // Auto-book visit after payment success
+  const autoBookVisit = async () => {
+    const pendingBookingStr = localStorage.getItem('pendingVisitBooking');
+    if (!pendingBookingStr) return;
+
+    try {
+      const pendingBooking = JSON.parse(pendingBookingStr);
+      
+      // Create the visit booking
+      const response = await visitAPI.bookVisit({
+        property_ids: pendingBooking.property_ids,
+        scheduled_date: pendingBooking.scheduled_date,
+        scheduled_time: pendingBooking.scheduled_time,
+        pickup_location: pendingBooking.pickup_location,
+        pickup_lat: pendingBooking.pickup_lat,
+        pickup_lng: pendingBooking.pickup_lng
+      });
+
+      setVisitBooked(true);
+      setBookingDetails(response.data);
+      
+      // Clear pending booking and cart
+      localStorage.removeItem('pendingVisitBooking');
+      localStorage.removeItem('visitCart');
+      
+      toast.success('Visit booked successfully!');
+    } catch (error) {
+      console.error('Auto-book visit error:', error);
+      // Don't fail the payment success page, just show message
+      toast.error('Payment successful! Please book your visit from the home page.');
+    }
+  };
+
   const pollPaymentStatus = async (attempts = 0) => {
-    const maxAttempts = 20; // Increased from 15 to 20 attempts (40 seconds total)
+    const maxAttempts = 20;
 
     if (attempts >= maxAttempts) {
       setStatus('timeout');
@@ -38,6 +74,8 @@ const PaymentSuccess = () => {
 
       if (paymentStatus === 'paid' || paymentStatus === 'success') {
         setStatus('success');
+        // Auto-book visit if pending
+        await autoBookVisit();
       } else if (paymentStatus === 'failed' || paymentStatus === 'cancelled' || paymentStatus === 'expired') {
         setStatus('error');
       } else {
@@ -76,6 +114,15 @@ const PaymentSuccess = () => {
     }
     
     if (packageType === 'single_visit') {
+      if (visitBooked && bookingDetails) {
+        return {
+          title: 'Visit Scheduled!',
+          message: `Your property visit is confirmed for ${bookingDetails.scheduled_date} at ${bookingDetails.scheduled_time}. A rider will pick you up.`,
+          icon: Calendar,
+          buttonText: 'View My Bookings',
+          redirectTo: '/customer/bookings'
+        };
+      }
       return {
         title: 'Payment Successful!',
         message: 'You can now book 1 property visit.',
@@ -85,6 +132,15 @@ const PaymentSuccess = () => {
       };
     }
     if (packageType === 'three_visits') {
+      if (visitBooked && bookingDetails) {
+        return {
+          title: 'Visit Scheduled!',
+          message: `Your property visit is confirmed for ${bookingDetails.scheduled_date} at ${bookingDetails.scheduled_time}. You have ${2} more visits remaining.`,
+          icon: Calendar,
+          buttonText: 'View My Bookings',
+          redirectTo: '/customer/bookings'
+        };
+      }
       return {
         title: 'Payment Successful!',
         message: 'Your 3-visit package is now active. Valid for 7 days.',
@@ -94,6 +150,15 @@ const PaymentSuccess = () => {
       };
     }
     if (packageType === 'five_visits') {
+      if (visitBooked && bookingDetails) {
+        return {
+          title: 'Visit Scheduled!',
+          message: `Your property visit is confirmed for ${bookingDetails.scheduled_date} at ${bookingDetails.scheduled_time}. You have ${4} more visits remaining.`,
+          icon: Calendar,
+          buttonText: 'View My Bookings',
+          redirectTo: '/customer/bookings'
+        };
+      }
       return {
         title: 'Payment Successful!',
         message: 'Your 5-visit package is now active. Valid for 10 days.',
