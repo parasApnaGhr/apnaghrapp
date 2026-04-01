@@ -1,12 +1,12 @@
 // Rider Location Tracker Component
-// Handles GPS tracking and sends updates via WebSocket
+// Handles GPS tracking and sends updates via WebSocket + Database
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Navigation, MapPin, Clock, Battery, Signal, 
   Play, Pause, CheckCircle, AlertCircle, Loader,
-  Phone, ChevronRight
+  Phone, ChevronRight, Database
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useTrackingWebSocket } from '../hooks/useTrackingWebSocket';
@@ -30,6 +30,8 @@ const RiderLocationTracker = ({
   const [showMap, setShowMap] = useState(false);
   const [eta, setEta] = useState(null);
   const [optimizedRoute, setOptimizedRoute] = useState([]);
+  const [trackingSessionId, setTrackingSessionId] = useState(null);
+  const [dbSyncStatus, setDbSyncStatus] = useState('idle'); // idle, syncing, synced, error
   
   const watchIdRef = useRef(null);
   const updateIntervalRef = useRef(null);
@@ -41,8 +43,8 @@ const RiderLocationTracker = ({
     updateVisitStatus 
   } = useTrackingWebSocket('rider', riderId, riderName);
 
-  // Start GPS tracking
-  const startTracking = useCallback(() => {
+  // Start GPS tracking with database session
+  const startTracking = useCallback(async () => {
     if (!navigator.geolocation) {
       setLocationError('Geolocation is not supported by your browser');
       return;
@@ -51,15 +53,30 @@ const RiderLocationTracker = ({
     setIsTracking(true);
     setLocationError(null);
 
+    // Start database tracking session
+    try {
+      const sessionResponse = await api.post(`/tracking/session/start?rider_id=${riderId}`, {
+        visit_id: currentVisit?.id || null
+      });
+      setTrackingSessionId(sessionResponse.data.session_id);
+      setDbSyncStatus('synced');
+      toast.success('Tracking session started (saved to database)');
+    } catch (error) {
+      console.error('Failed to start DB session:', error);
+      setDbSyncStatus('error');
+      // Continue with WebSocket-only tracking
+    }
+
     // High accuracy watch position
     watchIdRef.current = navigator.geolocation.watchPosition(
       (position) => {
-        const { latitude, longitude, speed, heading } = position.coords;
+        const { latitude, longitude, speed, heading, accuracy } = position.coords;
         const newLocation = {
           lat: latitude,
           lng: longitude,
           speed: speed ? speed * 3.6 : null, // Convert m/s to km/h
           heading: heading,
+          accuracy: accuracy,
           timestamp: new Date().toISOString()
         };
         setCurrentLocation(newLocation);
@@ -76,24 +93,41 @@ const RiderLocationTracker = ({
       }
     );
 
-    // Send location updates at interval
-    updateIntervalRef.current = setInterval(() => {
+    // Send location updates at interval (both WebSocket and Database)
+    updateIntervalRef.current = setInterval(async () => {
       if (currentLocation) {
+        // Send via WebSocket (real-time)
         sendLocation(
           currentLocation.lat,
           currentLocation.lng,
           currentLocation.speed,
           currentLocation.heading
         );
+        
+        // Also save to database (persistent)
+        if (trackingSessionId) {
+          try {
+            await api.post(`/tracking/session/${trackingSessionId}/location?rider_id=${riderId}`, {
+              lat: currentLocation.lat,
+              lng: currentLocation.lng,
+              speed: currentLocation.speed,
+              heading: currentLocation.heading,
+              accuracy: currentLocation.accuracy
+            });
+            setDbSyncStatus('synced');
+          } catch (error) {
+            console.error('DB sync error:', error);
+            setDbSyncStatus('error');
+          }
+        }
       }
     }, LOCATION_UPDATE_INTERVAL);
 
     updateStatus('on_duty');
-    toast.success('Location tracking started');
-  }, [currentLocation, sendLocation, updateStatus]);
+  }, [currentLocation, sendLocation, updateStatus, riderId, currentVisit, trackingSessionId]);
 
-  // Stop GPS tracking
-  const stopTracking = useCallback(() => {
+  // Stop GPS tracking and save session
+  const stopTracking = useCallback(async () => {
     if (watchIdRef.current) {
       navigator.geolocation.clearWatch(watchIdRef.current);
       watchIdRef.current = null;
@@ -102,10 +136,22 @@ const RiderLocationTracker = ({
       clearInterval(updateIntervalRef.current);
       updateIntervalRef.current = null;
     }
+    
+    // Stop database session
+    if (trackingSessionId) {
+      try {
+        const result = await api.post(`/tracking/session/${trackingSessionId}/stop?rider_id=${riderId}`);
+        toast.success(`Tracking stopped. Distance: ${result.data.total_distance_km} km, Duration: ${Math.round(result.data.duration_minutes)} min`);
+        setTrackingSessionId(null);
+      } catch (error) {
+        console.error('Failed to stop DB session:', error);
+      }
+    }
+    
     setIsTracking(false);
+    setDbSyncStatus('idle');
     updateStatus('online');
-    toast.info('Location tracking stopped');
-  }, [updateStatus]);
+  }, [updateStatus, trackingSessionId, riderId]);
 
   // Optimize route when visits are assigned
   const optimizeRoute = useCallback(async () => {
@@ -230,9 +276,29 @@ const RiderLocationTracker = ({
             {isConnected ? 'Connected to server' : 'Disconnected'}
           </span>
         </div>
-        <div className="flex items-center gap-2 text-sm text-[#4A4D53]">
-          <Signal className="w-4 h-4" />
-          <span>GPS {currentLocation ? 'Active' : 'Inactive'}</span>
+        <div className="flex items-center gap-4">
+          {/* Database Sync Status */}
+          {isTracking && (
+            <div className="flex items-center gap-2 text-sm">
+              <Database className={`w-4 h-4 ${
+                dbSyncStatus === 'synced' ? 'text-green-500' : 
+                dbSyncStatus === 'syncing' ? 'text-yellow-500 animate-pulse' : 
+                dbSyncStatus === 'error' ? 'text-red-500' : 'text-gray-400'
+              }`} />
+              <span className={`${
+                dbSyncStatus === 'synced' ? 'text-green-600' : 
+                dbSyncStatus === 'error' ? 'text-red-600' : 'text-[#4A4D53]'
+              }`}>
+                {dbSyncStatus === 'synced' ? 'DB Synced' : 
+                 dbSyncStatus === 'syncing' ? 'Syncing...' : 
+                 dbSyncStatus === 'error' ? 'Sync Error' : ''}
+              </span>
+            </div>
+          )}
+          <div className="flex items-center gap-2 text-sm text-[#4A4D53]">
+            <Signal className="w-4 h-4" />
+            <span>GPS {currentLocation ? 'Active' : 'Inactive'}</span>
+          </div>
         </div>
       </div>
 
@@ -242,7 +308,14 @@ const RiderLocationTracker = ({
           <div>
             <h3 className="font-medium text-[#04473C]">Location Tracking</h3>
             <p className="text-sm text-[#4A4D53]">
-              {isTracking ? 'Sharing your location' : 'Not tracking'}
+              {isTracking ? (
+                <>
+                  Sharing your location
+                  {trackingSessionId && (
+                    <span className="ml-2 text-xs text-green-600">(Session: {trackingSessionId.slice(-8)})</span>
+                  )}
+                </>
+              ) : 'Not tracking'}
             </p>
           </div>
           <button
@@ -252,6 +325,7 @@ const RiderLocationTracker = ({
                 ? 'bg-red-500 text-white hover:bg-red-600' 
                 : 'bg-[#04473C] text-white hover:bg-[#033830]'
             }`}
+            data-testid="tracking-toggle-button"
           >
             {isTracking ? (
               <>

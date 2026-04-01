@@ -62,19 +62,69 @@ ApnaGhr Visit Platform is a production-ready multi-role rental property platform
 - `/app/frontend/src/pages/Login.js` - Login/Registration integration
 - `/app/frontend/src/pages/LegalPolicies.js` - Full policy page
 
-### 🆕 Real-Time Agent Tracking System (INTEGRATED ✅)
+### 🆕 Real-Time Agent Tracking System (DATABASE-BACKED ✅)
 
 **Performance Specifications:**
 - ✅ **Real-time delay < 2 seconds** (batched broadcasts every 500ms)
 - ✅ **Smooth marker movement** (cubic ease-out interpolation with velocity prediction)
 - ✅ **Scales to 5000+ agents** (marker clustering, batched WebSocket updates)
 
-**Frontend Integration (NEWLY ADDED):**
-- ✅ **GPS Track Tab** in RiderDashboard.js - Riders can start/stop GPS sharing
-- ✅ **RiderLocationTracker Component** - Handles GPS permissions and WebSocket updates
-- ✅ **LiveTrackingMap Component** - Leaflet map with real-time markers
-- ✅ **CustomerVisitTracker Component** - Customers can track assigned rider
-- ✅ **useTrackingWebSocket Hook** - High-performance WebSocket with interpolation
+**DATABASE STORAGE (Permanent - Survives Deployments):**
+
+1. **Tracking Sessions Collection** (`tracking_sessions`):
+   ```javascript
+   {
+     id: "track_xxx",
+     rider_id: "uuid",
+     visit_id: "visit_xxx",
+     status: "active" | "completed",
+     started_at: ISODate,
+     ended_at: ISODate,
+     locations: [{lat, lng, speed, heading, accuracy, timestamp}],
+     total_distance_km: 7.5,
+     duration_minutes: 45,
+     total_locations: 150
+   }
+   ```
+
+2. **User Location Updates** (`users` collection):
+   ```javascript
+   {
+     current_lat: 30.7046,
+     current_lng: 76.7179,
+     current_speed: 35.0,
+     current_heading: 180,
+     last_location_update: ISODate,
+     tracking_active: true,
+     current_tracking_session: "track_xxx"
+   }
+   ```
+
+3. **Visit Optimized Routes** (`visit_bookings` collection):
+   ```javascript
+   {
+     optimized_route: {
+       visits: [{id, lat, lng, order: 1}, ...],
+       total_distance_km: 15.5,
+       estimated_time_minutes: 90
+     }
+   }
+   ```
+
+**API Endpoints (Database-Backed):**
+- `POST /api/tracking/session/start` - Start tracking session (saved to DB)
+- `POST /api/tracking/session/{id}/location` - Update GPS location (saved to DB)
+- `POST /api/tracking/session/{id}/stop` - Stop session (calculates totals)
+- `GET /api/tracking/session/{id}` - Get session with all locations
+- `GET /api/tracking/rider/{id}/sessions` - Get rider's session history
+- `GET /api/tracking/rider/{id}/current-location` - Get from database
+- `GET /api/tracking/visit/{id}/tracking` - Get visit tracking with rider location
+
+**Frontend Integration:**
+- ✅ **GPS Track Tab** in RiderDashboard.js - With database sync indicator
+- ✅ **RiderLocationTracker Component** - Saves to both WebSocket AND database
+- ✅ **"DB Synced" indicator** - Shows green when locations are saved to DB
+- ✅ **Session ID display** - Shows active tracking session
 
 **Backend Architecture:**
 - High-performance WebSocket manager with connection pooling

@@ -43,7 +43,7 @@ from routes.packers import router as packers_router
 from routes.advertising import router as advertising_router
 from routes.chatbot import setup_chatbot_routes
 from routes.seller import setup_seller_routes
-from routes.tracking import router as tracking_router
+from routes.tracking import router as tracking_router, set_database as set_tracking_db
 from services.cashfree_service import get_cashfree_service, CashfreePaymentService
 
 ROOT_DIR = Path(__file__).parent
@@ -52,6 +52,9 @@ load_dotenv(ROOT_DIR / '.env')
 mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
+
+# Set database for tracking routes
+set_tracking_db(db)
 
 app = FastAPI(title="ApnaGhr Visit Platform", version="2.0")
 api_router = APIRouter(prefix="/api")
@@ -3521,6 +3524,59 @@ app.include_router(api_router)
 app.include_router(packers_router, prefix="/api")
 app.include_router(advertising_router, prefix="/api")
 app.include_router(tracking_router, prefix="/api")
+
+# ============ TEST/DEMO ENDPOINT FOR MULTI-VISIT ============
+@app.post("/api/demo/create-multi-visit")
+async def create_demo_multi_visit():
+    """Create a demo multi-property visit for testing route optimization"""
+    import uuid
+    
+    # Get 3 random properties with coordinates
+    properties = await db.properties.find(
+        {"latitude": {"$exists": True, "$ne": None}},
+        {"_id": 0}
+    ).limit(3).to_list(length=3)
+    
+    if len(properties) < 3:
+        # Create demo properties with Chandigarh coordinates
+        demo_properties = [
+            {"id": f"demo_{uuid.uuid4().hex[:8]}", "title": "3BHK in Sector 17", 
+             "latitude": 30.7046, "longitude": 76.7179, "rent": 25000, "bhk": 3,
+             "address": "Sector 17, Chandigarh", "city": "Chandigarh"},
+            {"id": f"demo_{uuid.uuid4().hex[:8]}", "title": "2BHK in Sector 22", 
+             "latitude": 30.7333, "longitude": 76.7794, "rent": 18000, "bhk": 2,
+             "address": "Sector 22, Chandigarh", "city": "Chandigarh"},
+            {"id": f"demo_{uuid.uuid4().hex[:8]}", "title": "1BHK in Sector 35", 
+             "latitude": 30.7000, "longitude": 76.7500, "rent": 12000, "bhk": 1,
+             "address": "Sector 35, Chandigarh", "city": "Chandigarh"},
+        ]
+        for prop in demo_properties:
+            await db.properties.update_one({"id": prop["id"]}, {"$set": prop}, upsert=True)
+        properties = demo_properties
+    
+    # Create a multi-property visit booking
+    visit_id = f"visit_{uuid.uuid4().hex[:12]}"
+    visit = {
+        "id": visit_id,
+        "customer_id": "demo_customer",
+        "property_ids": [p["id"] for p in properties],
+        "status": "pending",
+        "scheduled_date": datetime.now(timezone.utc).isoformat(),
+        "scheduled_time": "10:00 AM",
+        "pickup_location": "Sector 17 Bus Stand, Chandigarh",
+        "package_type": "three_visits",
+        "amount_paid": 350,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.visit_bookings.insert_one(visit)
+    
+    return {
+        "visit_id": visit_id,
+        "properties": [{"id": p["id"], "title": p["title"], "lat": p.get("latitude"), "lng": p.get("longitude")} for p in properties],
+        "message": "Demo multi-property visit created. Rider can now accept this visit to see route optimization.",
+        "status": "pending"
+    }
 
 # Mount uploads directory for serving files
 # Using /api/uploads to ensure proper routing through Kubernetes ingress
