@@ -1479,7 +1479,33 @@ async def get_available_visits(current_user: dict = Depends(get_current_user)):
     # Sort by distance (closest first), unknown distances at the end
     filtered_visits.sort(key=lambda x: x.get('distance_km') if x.get('distance_km') is not None else 9999)
     
-    return filtered_visits[:20]  # Return max 20 visits
+    # Also check for any assigned/active visit for this rider
+    active_visit = await db.visit_bookings.find_one({
+        "rider_id": current_user['id'],
+        "status": {"$in": ["assigned", "rider_assigned", "pickup_started", "at_customer", "navigating", "at_property", "in_progress"]}
+    }, {"_id": 0})
+    
+    # If there's an active visit, enrich it with customer and property details
+    active_response = None
+    if active_visit:
+        customer = await db.users.find_one({"id": active_visit.get('customer_id')}, {"_id": 0, "password": 0})
+        properties = []
+        for prop_id in active_visit.get('property_ids', []):
+            prop = await db.properties.find_one({"id": prop_id}, {"_id": 0})
+            if prop:
+                properties.append(prop)
+        
+        active_response = {
+            "visit": active_visit,
+            "customer": customer,
+            "properties": properties,
+            "optimized_route": active_visit.get('optimized_route')
+        }
+    
+    return {
+        "available": filtered_visits[:20],
+        "active": active_response
+    }
 
 @api_router.post("/visits/{visit_id}/accept")
 async def accept_visit(visit_id: str, current_user: dict = Depends(get_current_user)):

@@ -389,3 +389,28 @@ See `/app/memory/test_credentials.md`
 - **Emergent LLM** - AI Chatbot
 - **MongoDB GridFS** - File storage
 - **Unsplash/Pexels** - Property images
+
+## Latest Bug Fixes (April 1, 2026)
+
+### P0 - Rider Available Visits Fix ✅
+**Issue**: Admin-created visits (status: "confirmed" or with assigned_rider_id) were not appearing in the Rider's Available Visits panel.
+
+**Root Cause**: The `/api/visits/available` endpoint only queried for `status: "pending"` visits.
+
+**Fix Applied**:
+1. Updated MongoDB query to include both `"pending"` and `"confirmed"` statuses
+2. Enhanced API response to return structured data: `{available: [...], active: {...}}`
+3. Active visits (with status: assigned, rider_assigned, in_progress) now automatically populate the rider's active visit panel
+
+**Files Modified**:
+- `/app/backend/server.py` (Line ~1405 and ~1479-1500)
+
+### P1 - Customer Visibility for Admin-Booked Visits ✅
+**Issue**: Customers couldn't see visits booked on their behalf by Admin.
+
+**Verification**: The `/api/visits/my-bookings` endpoint correctly returns visits where `customer_id` or `user_id` matches the logged-in customer. The `CustomerBookings.js` page displays these visits with proper status indicators.
+
+**Status**: Working as expected - no code changes needed. The admin's `create-manual-visit` endpoint correctly sets `customer_id` on bookings.
+
+## Known Environment Note
+⚠️ **Preview vs Production Database**: The preview environment (`field-rider-ops.preview.emergentagent.com`) uses a separate MongoDB database from production (`apnaghrapp.in`). Test users created on production won't appear in preview. Always test with preview-specific data or recreate test scenarios on preview.
