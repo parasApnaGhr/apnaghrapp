@@ -6,7 +6,7 @@ import api from '../utils/api';
 import { 
   User, Phone, Mail, MapPin, Edit2, Save, LogOut, 
   ChevronRight, ArrowLeft, Shield, Bell, HelpCircle,
-  CreditCard, Calendar, Home, Truck
+  CreditCard, Calendar, Home, Truck, Locate, Check
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -15,6 +15,7 @@ const CustomerProfile = () => {
   const { user, logout } = useAuth();
   const [editing, setEditing] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [gettingLocation, setGettingLocation] = useState(false);
   const [stats, setStats] = useState({
     total_visits: 0,
     total_spent: 0,
@@ -24,7 +25,9 @@ const CustomerProfile = () => {
   const [formData, setFormData] = useState({
     name: user?.name || '',
     email: user?.email || '',
-    address: user?.address || ''
+    address: user?.address || '',
+    address_lat: null,
+    address_lng: null
   });
 
   useEffect(() => {
@@ -55,6 +58,47 @@ const CustomerProfile = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const getCurrentLocation = () => {
+    if (!navigator.geolocation) {
+      toast.error('Geolocation not supported');
+      return;
+    }
+
+    setGettingLocation(true);
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+        try {
+          const response = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
+          );
+          const data = await response.json();
+          const address = data.display_name || `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
+          setFormData(prev => ({
+            ...prev,
+            address: address,
+            address_lat: latitude,
+            address_lng: longitude
+          }));
+          toast.success('Location captured!');
+        } catch (error) {
+          setFormData(prev => ({
+            ...prev,
+            address: `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`,
+            address_lat: latitude,
+            address_lng: longitude
+          }));
+        }
+        setGettingLocation(false);
+      },
+      (error) => {
+        setGettingLocation(false);
+        toast.error('Unable to get location');
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
   };
 
   const handleLogout = () => {
@@ -171,15 +215,35 @@ const CustomerProfile = () => {
               <div className="flex-1">
                 <p className="text-xs text-[#4A4D53] uppercase tracking-wide">Address</p>
                 {editing ? (
-                  <input
-                    type="text"
-                    value={formData.address}
-                    onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                    className="premium-input py-1"
-                    placeholder="Your address"
-                  />
+                  <div className="flex gap-2 items-center mt-1">
+                    <input
+                      type="text"
+                      value={formData.address}
+                      onChange={(e) => setFormData({ ...formData, address: e.target.value, address_lat: null, address_lng: null })}
+                      className="premium-input py-1 flex-1"
+                      placeholder="Your address"
+                    />
+                    <button
+                      type="button"
+                      onClick={getCurrentLocation}
+                      disabled={gettingLocation}
+                      className="p-2 bg-[#04473C] text-white hover:bg-[#033530] transition-colors disabled:opacity-50"
+                      title="Use current location"
+                    >
+                      {gettingLocation ? (
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      ) : (
+                        <Locate className="w-4 h-4" />
+                      )}
+                    </button>
+                  </div>
                 ) : (
                   <p className="font-medium text-[#1A1C20]">{user?.address || 'Not set'}</p>
+                )}
+                {editing && formData.address_lat && (
+                  <p className="text-xs text-green-600 mt-1 flex items-center gap-1">
+                    <Check className="w-3 h-3" /> GPS location captured
+                  </p>
                 )}
               </div>
             </div>
@@ -217,7 +281,7 @@ const CustomerProfile = () => {
           {menuItems.map((item, idx) => (
             <button
               key={item.label}
-              onClick={() => toast.info('Coming soon!')}
+              onClick={() => navigate(item.path)}
               className={`w-full flex items-center justify-between p-4 hover:bg-[#F5F3F0] transition-colors ${
                 idx !== menuItems.length - 1 ? 'border-b border-[#E5E1DB]' : ''
               }`}

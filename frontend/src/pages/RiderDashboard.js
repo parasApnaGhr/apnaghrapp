@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { visitAPI, riderAPI, getMediaUrl, authAPI } from '../utils/api';
 import api from '../utils/api';
@@ -16,6 +17,7 @@ import {
 import { toast } from 'sonner';
 
 const RiderDashboard = () => {
+  const navigate = useNavigate();
   const { user, logout } = useAuth();
   const [activeTab, setActiveTab] = useState('visits');
   const [isOnline, setIsOnline] = useState(user?.is_online || false);
@@ -515,13 +517,23 @@ const RiderDashboard = () => {
                 <p className="text-sm text-[#4A4D53]">Welcome, <span className="font-medium text-[#04473C]">{user?.name}</span></p>
               </div>
             </div>
-            <button 
-              onClick={logout}
-              className="p-2 hover:bg-[#F5F3F0] transition-colors rounded-full"
-              data-testid="logout-button"
-            >
-              <LogOut className="w-5 h-5 text-[#4A4D53]" strokeWidth={1.5} />
-            </button>
+            <div className="flex items-center gap-2">
+              <button 
+                onClick={() => navigate('/rider/profile')}
+                className="p-2 hover:bg-[#F5F3F0] transition-colors rounded-full"
+                data-testid="profile-button"
+                title="Profile & Bank Account"
+              >
+                <User className="w-5 h-5 text-[#04473C]" strokeWidth={1.5} />
+              </button>
+              <button 
+                onClick={logout}
+                className="p-2 hover:bg-[#F5F3F0] transition-colors rounded-full"
+                data-testid="logout-button"
+              >
+                <LogOut className="w-5 h-5 text-[#4A4D53]" strokeWidth={1.5} />
+              </button>
+            </div>
           </div>
         </div>
       </header>

@@ -15,6 +15,11 @@ import SellerDashboard from './pages/SellerDashboard';
 import PackersMovers from './pages/PackersMovers';
 import AdvertiseWithUs from './pages/AdvertiseWithUs';
 import CustomerProfile from './pages/CustomerProfile';
+import CustomerPayments from './pages/CustomerPayments';
+import CustomerNotifications from './pages/CustomerNotifications';
+import CustomerSupport from './pages/CustomerSupport';
+import CustomerPrivacy from './pages/CustomerPrivacy';
+import RiderProfile from './pages/RiderProfile';
 import LegalPolicies from './pages/LegalPolicies';
 import '@/App.css';
 
@@ -142,10 +147,55 @@ const AppRoutes = () => {
       />
 
       <Route
+        path="/customer/payments"
+        element={
+          <ProtectedRoute allowedRoles={['customer', 'advertiser', 'builder']}>
+            <CustomerPayments />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/customer/notifications"
+        element={
+          <ProtectedRoute allowedRoles={['customer', 'advertiser', 'builder']}>
+            <CustomerNotifications />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/customer/support"
+        element={
+          <ProtectedRoute allowedRoles={['customer', 'advertiser', 'builder']}>
+            <CustomerSupport />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/customer/privacy"
+        element={
+          <ProtectedRoute allowedRoles={['customer', 'advertiser', 'builder']}>
+            <CustomerPrivacy />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
         path="/rider"
         element={
           <ProtectedRoute allowedRoles={['rider']}>
             <RiderDashboard />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/rider/profile"
+        element={
+          <ProtectedRoute allowedRoles={['rider']}>
+            <RiderProfile />
           </ProtectedRoute>
         }
       />

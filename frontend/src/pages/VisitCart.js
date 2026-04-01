@@ -23,7 +23,9 @@ const VisitCart = () => {
   const [bookingData, setBookingData] = useState({
     scheduled_date: '',
     scheduled_time: '',
-    pickup_location: ''
+    pickup_location: '',
+    pickup_lat: null,
+    pickup_lng: null
   });
   
   const [loading, setLoading] = useState(false);
@@ -31,6 +33,7 @@ const VisitCart = () => {
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [showTermsModal, setShowTermsModal] = useState(false);
   const [checkingTerms, setCheckingTerms] = useState(true);
+  const [gettingLocation, setGettingLocation] = useState(false);
 
   // Check terms status from database on mount
   useEffect(() => {
@@ -94,6 +97,65 @@ const VisitCart = () => {
     setCart([]);
     localStorage.removeItem('visitCart');
     toast.success('Cart cleared');
+  };
+
+  // Get current location for pickup
+  const getCurrentLocation = () => {
+    if (!navigator.geolocation) {
+      toast.error('Geolocation is not supported by your browser');
+      return;
+    }
+
+    setGettingLocation(true);
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+        
+        // Reverse geocode to get address
+        try {
+          const response = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
+          );
+          const data = await response.json();
+          const address = data.display_name || `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
+          
+          setBookingData(prev => ({
+            ...prev,
+            pickup_location: address,
+            pickup_lat: latitude,
+            pickup_lng: longitude
+          }));
+          toast.success('Location captured successfully!');
+        } catch (error) {
+          // If reverse geocoding fails, use coordinates
+          setBookingData(prev => ({
+            ...prev,
+            pickup_location: `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`,
+            pickup_lat: latitude,
+            pickup_lng: longitude
+          }));
+          toast.success('Location coordinates captured');
+        }
+        setGettingLocation(false);
+      },
+      (error) => {
+        setGettingLocation(false);
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            toast.error('Please allow location access to use this feature');
+            break;
+          case error.POSITION_UNAVAILABLE:
+            toast.error('Location information unavailable');
+            break;
+          case error.TIMEOUT:
+            toast.error('Location request timed out');
+            break;
+          default:
+            toast.error('Unable to get your location');
+        }
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+    );
   };
 
   const packages = [
@@ -410,14 +472,40 @@ const VisitCart = () => {
                     <MapPin className="w-4 h-4" strokeWidth={1.5} />
                     Pickup Location
                   </label>
-                  <input
-                    type="text"
-                    value={bookingData.pickup_location}
-                    onChange={(e) => setBookingData(prev => ({ ...prev, pickup_location: e.target.value }))}
-                    placeholder="Where should we pick you up?"
-                    className="premium-input"
-                    data-testid="pickup-location-input"
-                  />
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={bookingData.pickup_location}
+                      onChange={(e) => setBookingData(prev => ({ ...prev, pickup_location: e.target.value, pickup_lat: null, pickup_lng: null }))}
+                      placeholder="Where should we pick you up?"
+                      className="premium-input flex-1"
+                      data-testid="pickup-location-input"
+                    />
+                    <button
+                      type="button"
+                      onClick={getCurrentLocation}
+                      disabled={gettingLocation}
+                      className="px-4 py-2 bg-[#04473C] text-white text-sm font-medium hover:bg-[#033530] transition-colors flex items-center gap-2 whitespace-nowrap disabled:opacity-50"
+                      data-testid="use-location-button"
+                    >
+                      {gettingLocation ? (
+                        <>
+                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                          Getting...
+                        </>
+                      ) : (
+                        <>
+                          <MapPin className="w-4 h-4" />
+                          Use Current
+                        </>
+                      )}
+                    </button>
+                  </div>
+                  {bookingData.pickup_lat && bookingData.pickup_lng && (
+                    <p className="text-xs text-green-600 mt-1 flex items-center gap-1">
+                      <Check className="w-3 h-3" /> GPS coordinates captured
+                    </p>
+                  )}
                 </div>
               </div>
             </div>

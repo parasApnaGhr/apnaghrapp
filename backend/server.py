@@ -651,6 +651,33 @@ async def reset_password(request: ResetPasswordRequest):
     
     return {"message": "Password reset successfully. You can now login with your new password."}
 
+class ChangePasswordRequest(BaseModel):
+    current_password: str
+    new_password: str
+
+@api_router.post("/auth/change-password")
+async def change_password(request: ChangePasswordRequest, current_user: dict = Depends(get_current_user)):
+    """Change password for logged-in user"""
+    # Get user with password
+    user = await db.users.find_one({"id": current_user['id']})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Verify current password
+    if not bcrypt.checkpw(request.current_password.encode('utf-8'), user['password'].encode('utf-8')):
+        raise HTTPException(status_code=400, detail="Current password is incorrect")
+    
+    # Hash new password
+    new_hashed = bcrypt.hashpw(request.new_password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+    
+    # Update password
+    await db.users.update_one(
+        {"id": current_user['id']},
+        {"$set": {"password": new_hashed}}
+    )
+    
+    return {"success": True, "message": "Password changed successfully"}
+
 @api_router.get("/auth/me")
 async def get_me(current_user: dict = Depends(get_current_user)):
     current_user.pop('password', None)
@@ -3448,6 +3475,245 @@ async def mark_notifications_read(notification_ids: List[str] = None, current_us
         )
     
     return {"success": True}
+
+
+# ============ CUSTOMER PROFILE & WALLET ============
+
+class CustomerProfileUpdate(BaseModel):
+    name: Optional[str] = None
+    email: Optional[str] = None
+    address: Optional[str] = None
+    address_lat: Optional[float] = None
+    address_lng: Optional[float] = None
+
+@api_router.put("/customer/profile")
+async def update_customer_profile(data: CustomerProfileUpdate, current_user: dict = Depends(get_current_user)):
+    """Update customer profile"""
+    update_data = {}
+    if data.name:
+        update_data['name'] = data.name
+    if data.email:
+        update_data['email'] = data.email
+    if data.address:
+        update_data['address'] = data.address
+    if data.address_lat:
+        update_data['address_lat'] = data.address_lat
+    if data.address_lng:
+        update_data['address_lng'] = data.address_lng
+    
+    if update_data:
+        await db.users.update_one({"id": current_user['id']}, {"$set": update_data})
+    
+    updated_user = await db.users.find_one({"id": current_user['id']}, {"_id": 0, "password": 0})
+    return {"success": True, "user": updated_user}
+
+@api_router.get("/customer/wallet")
+async def get_customer_wallet(current_user: dict = Depends(get_current_user)):
+    """Get customer wallet with stats"""
+    # Count completed visits
+    total_visits = await db.visit_bookings.count_documents({
+        "$or": [{"customer_id": current_user['id']}, {"user_id": current_user['id']}],
+        "status": "completed"
+    })
+    
+    # Sum total spent
+    pipeline = [
+        {"$match": {"$or": [{"customer_id": current_user['id']}, {"user_id": current_user['id']}]}},
+        {"$group": {"_id": None, "total": {"$sum": "$amount_paid"}}}
+    ]
+    spent_result = await db.visit_bookings.aggregate(pipeline).to_list(1)
+    total_spent = spent_result[0]['total'] if spent_result else 0
+    
+    # Count properties viewed (from cart history or visits)
+    properties_viewed = await db.visit_bookings.count_documents({
+        "$or": [{"customer_id": current_user['id']}, {"user_id": current_user['id']}]
+    })
+    
+    # Get visit packages/credits
+    packages = await db.visit_packages.find(
+        {"user_id": current_user['id']},
+        {"_id": 0}
+    ).to_list(10)
+    
+    visits_available = sum(p.get('total_visits', 0) - p.get('visits_used', 0) for p in packages)
+    
+    return {
+        "total_visits": total_visits,
+        "total_spent": total_spent,
+        "properties_viewed": properties_viewed,
+        "visits_available": visits_available,
+        "packages": packages
+    }
+
+@api_router.get("/customer/payments")
+async def get_customer_payment_history(current_user: dict = Depends(get_current_user)):
+    """Get customer payment history"""
+    payments = await db.payment_transactions.find(
+        {"user_id": current_user['id']},
+        {"_id": 0}
+    ).sort("created_at", -1).limit(50).to_list(None)
+    
+    return payments
+
+
+# ============ RIDER PROFILE & BANK ACCOUNT ============
+
+class RiderBankAccount(BaseModel):
+    account_holder_name: str
+    account_number: str
+    ifsc_code: str
+    bank_name: str
+    upi_id: Optional[str] = None
+
+class RiderProfileUpdate(BaseModel):
+    name: Optional[str] = None
+    email: Optional[str] = None
+    address: Optional[str] = None
+    vehicle_type: Optional[str] = None
+    vehicle_number: Optional[str] = None
+    profile_complete: Optional[bool] = None
+
+@api_router.put("/rider/profile")
+async def update_rider_profile(data: RiderProfileUpdate, current_user: dict = Depends(get_current_user)):
+    """Update rider profile"""
+    if current_user['role'] != 'rider':
+        raise HTTPException(status_code=403, detail="Riders only")
+    
+    update_data = {}
+    if data.name:
+        update_data['name'] = data.name
+    if data.email:
+        update_data['email'] = data.email
+    if data.address:
+        update_data['address'] = data.address
+    if data.vehicle_type:
+        update_data['vehicle_type'] = data.vehicle_type
+    if data.vehicle_number:
+        update_data['vehicle_number'] = data.vehicle_number
+    if data.profile_complete is not None:
+        update_data['profile_complete'] = data.profile_complete
+    
+    if update_data:
+        await db.users.update_one({"id": current_user['id']}, {"$set": update_data})
+    
+    updated_user = await db.users.find_one({"id": current_user['id']}, {"_id": 0, "password": 0})
+    return {"success": True, "user": updated_user}
+
+@api_router.get("/rider/profile")
+async def get_rider_profile(current_user: dict = Depends(get_current_user)):
+    """Get rider profile with bank details"""
+    if current_user['role'] != 'rider':
+        raise HTTPException(status_code=403, detail="Riders only")
+    
+    rider = await db.users.find_one({"id": current_user['id']}, {"_id": 0, "password": 0})
+    bank_account = await db.rider_bank_accounts.find_one({"rider_id": current_user['id']}, {"_id": 0})
+    
+    return {
+        "profile": rider,
+        "bank_account": bank_account,
+        "profile_complete": rider.get('profile_complete', False)
+    }
+
+@api_router.post("/rider/bank-account")
+async def add_rider_bank_account(data: RiderBankAccount, current_user: dict = Depends(get_current_user)):
+    """Add or update rider bank account for payouts"""
+    if current_user['role'] != 'rider':
+        raise HTTPException(status_code=403, detail="Riders only")
+    
+    bank_doc = {
+        "rider_id": current_user['id'],
+        "account_holder_name": data.account_holder_name,
+        "account_number": data.account_number,
+        "ifsc_code": data.ifsc_code.upper(),
+        "bank_name": data.bank_name,
+        "upi_id": data.upi_id,
+        "verified": False,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "updated_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    # Upsert bank account
+    await db.rider_bank_accounts.update_one(
+        {"rider_id": current_user['id']},
+        {"$set": bank_doc},
+        upsert=True
+    )
+    
+    # Mark profile as complete if bank added
+    await db.users.update_one(
+        {"id": current_user['id']},
+        {"$set": {"bank_account_added": True}}
+    )
+    
+    return {"success": True, "message": "Bank account added successfully"}
+
+@api_router.get("/rider/bank-account")
+async def get_rider_bank_account(current_user: dict = Depends(get_current_user)):
+    """Get rider bank account details"""
+    if current_user['role'] != 'rider':
+        raise HTTPException(status_code=403, detail="Riders only")
+    
+    bank_account = await db.rider_bank_accounts.find_one({"rider_id": current_user['id']}, {"_id": 0})
+    
+    if bank_account:
+        # Mask account number for security
+        acc_num = bank_account.get('account_number', '')
+        bank_account['account_number_masked'] = f"XXXX{acc_num[-4:]}" if len(acc_num) >= 4 else acc_num
+    
+    return bank_account
+
+
+# ============ CUSTOMER VISIT MODIFICATION (For Admin-Created Visits) ============
+
+class VisitModification(BaseModel):
+    scheduled_date: Optional[str] = None
+    scheduled_time: Optional[str] = None
+    pickup_location: Optional[str] = None
+    pickup_lat: Optional[float] = None
+    pickup_lng: Optional[float] = None
+
+@api_router.put("/customer/visits/{visit_id}/modify")
+async def modify_customer_visit(visit_id: str, data: VisitModification, current_user: dict = Depends(get_current_user)):
+    """Allow customer to modify time/date/location for admin-created visits"""
+    # Find the visit
+    visit = await db.visit_bookings.find_one({
+        "id": visit_id,
+        "$or": [
+            {"customer_id": current_user['id']},
+            {"user_id": current_user['id']},
+            {"customer_phone": current_user.get('phone')}
+        ]
+    })
+    
+    if not visit:
+        raise HTTPException(status_code=404, detail="Visit not found")
+    
+    # Only allow modification for pending/assigned visits (not in-progress)
+    if visit.get('status') not in ['pending', 'confirmed', 'assigned']:
+        raise HTTPException(status_code=400, detail="Cannot modify visit that is already in progress")
+    
+    update_data = {}
+    if data.scheduled_date:
+        update_data['scheduled_date'] = data.scheduled_date
+        update_data['preferred_date'] = data.scheduled_date
+    if data.scheduled_time:
+        update_data['scheduled_time'] = data.scheduled_time
+        update_data['preferred_time'] = data.scheduled_time
+    if data.pickup_location:
+        update_data['pickup_location'] = data.pickup_location
+    if data.pickup_lat:
+        update_data['pickup_lat'] = data.pickup_lat
+    if data.pickup_lng:
+        update_data['pickup_lng'] = data.pickup_lng
+    
+    update_data['customer_confirmed'] = True
+    update_data['customer_confirmed_at'] = datetime.now(timezone.utc).isoformat()
+    
+    if update_data:
+        await db.visit_bookings.update_one({"id": visit_id}, {"$set": update_data})
+    
+    updated_visit = await db.visit_bookings.find_one({"id": visit_id}, {"_id": 0})
+    return {"success": True, "visit": updated_visit}
 
 
 # ============ LIVE TRACKING ============
