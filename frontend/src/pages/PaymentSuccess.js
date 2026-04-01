@@ -27,10 +27,17 @@ const PaymentSuccess = () => {
   // Auto-book visit after payment success
   const autoBookVisit = async () => {
     const pendingBookingStr = localStorage.getItem('pendingVisitBooking');
-    if (!pendingBookingStr) return;
+    if (!pendingBookingStr) {
+      console.log('No pending booking found in localStorage');
+      return;
+    }
 
     try {
       const pendingBooking = JSON.parse(pendingBookingStr);
+      console.log('Attempting to auto-book visit:', pendingBooking);
+      
+      // Small delay to ensure package is created
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
       // Create the visit booking
       const response = await visitAPI.bookVisit({
@@ -42,6 +49,7 @@ const PaymentSuccess = () => {
         pickup_lng: pendingBooking.pickup_lng
       });
 
+      console.log('Visit booked successfully:', response.data);
       setVisitBooked(true);
       setBookingDetails(response.data);
       
@@ -49,11 +57,18 @@ const PaymentSuccess = () => {
       localStorage.removeItem('pendingVisitBooking');
       localStorage.removeItem('visitCart');
       
-      toast.success('Visit booked successfully!');
+      toast.success('Visit scheduled successfully!');
     } catch (error) {
       console.error('Auto-book visit error:', error);
-      // Don't fail the payment success page, just show message
-      toast.error('Payment successful! Please book your visit from the home page.');
+      const errorMsg = error.response?.data?.detail || error.message;
+      
+      // If no credits, it's still a success - just need to book separately
+      if (errorMsg?.includes('No available visit credits')) {
+        toast.info('Payment successful! Visit package added. You can now book your visit.');
+        localStorage.removeItem('visitCart');
+      } else {
+        toast.error('Payment successful! Please book your visit from My Bookings.');
+      }
     }
   };
 
