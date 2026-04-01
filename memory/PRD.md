@@ -349,9 +349,10 @@ See `/app/memory/test_credentials.md`
 8. ✅ Rider dashboard
 9. ✅ **Seller dashboard with commission tracking**
 10. ✅ Premium UI across all pages
-11. ✅ **Legal Policy Terms Acceptance at Login & Checkout** (NEW)
-12. ✅ **Real-time Agent Tracking with WebSockets** (NEW)
-13. ✅ **Multi-Visit Route Optimization** (NEW)
+11. ✅ **Legal Policy Terms Acceptance at Login & Checkout** (Database-stored)
+12. ✅ **Real-time Agent Tracking with WebSockets** (Database-stored)
+13. ✅ **Multi-Visit Route Optimization** (Database-stored)
+14. ✅ **Seller Client Follow-up System** (NEW - Database-stored)
 
 ## Pending Features
 

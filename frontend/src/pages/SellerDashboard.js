@@ -2,13 +2,29 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import { sellerAPI, getMediaUrl } from '../utils/api';
+import api from '../utils/api';
 import { 
   Users, Home, DollarSign, LogOut, Share2, MessageCircle, 
   MapPin, Phone, Clock, TrendingUp, Wallet, Search, 
   Filter, Send, X, ExternalLink, CheckCircle, AlertCircle,
-  Navigation, RefreshCw, Copy, Eye
+  Navigation, RefreshCw, Copy, Eye, ClipboardList, Plus, Calendar,
+  PhoneCall, UserCheck, XCircle, ArrowRight
 } from 'lucide-react';
 import { toast } from 'sonner';
+
+const FOLLOWUP_STATUSES = [
+  { value: 'new_lead', label: 'New Lead', color: 'bg-blue-100 text-blue-800' },
+  { value: 'contacted', label: 'Contacted', color: 'bg-purple-100 text-purple-800' },
+  { value: 'interested', label: 'Interested', color: 'bg-green-100 text-green-800' },
+  { value: 'not_interested', label: 'Not Interested', color: 'bg-red-100 text-red-800' },
+  { value: 'callback', label: 'Callback', color: 'bg-yellow-100 text-yellow-800' },
+  { value: 'negotiating', label: 'Negotiating', color: 'bg-orange-100 text-orange-800' },
+  { value: 'site_visit_scheduled', label: 'Visit Scheduled', color: 'bg-indigo-100 text-indigo-800' },
+  { value: 'site_visit_done', label: 'Visit Done', color: 'bg-teal-100 text-teal-800' },
+  { value: 'deal_in_progress', label: 'Deal in Progress', color: 'bg-cyan-100 text-cyan-800' },
+  { value: 'closed_won', label: 'Closed Won', color: 'bg-emerald-100 text-emerald-800' },
+  { value: 'closed_lost', label: 'Closed Lost', color: 'bg-gray-100 text-gray-800' },
+];
 
 const SellerDashboard = () => {
   const { user, logout } = useAuth();
@@ -44,6 +60,36 @@ const SellerDashboard = () => {
   const [shareProperty, setShareProperty] = useState(null);
   const [shareData, setShareData] = useState(null);
   
+  // Follow-ups
+  const [followups, setFollowups] = useState([]);
+  const [followupStats, setFollowupStats] = useState(null);
+  const [showAddFollowup, setShowAddFollowup] = useState(false);
+  const [showUpdateFollowup, setShowUpdateFollowup] = useState(false);
+  const [showCloseModal, setShowCloseModal] = useState(false);
+  const [selectedFollowup, setSelectedFollowup] = useState(null);
+  const [newFollowup, setNewFollowup] = useState({
+    client_name: '',
+    client_phone: '',
+    status: 'new_lead',
+    notes: '',
+    next_followup_date: '',
+    call_duration_mins: '',
+    client_budget: '',
+    client_requirements: ''
+  });
+  const [updateData, setUpdateData] = useState({
+    status: '',
+    notes: '',
+    next_followup_date: '',
+    call_duration_mins: ''
+  });
+  const [closeData, setCloseData] = useState({
+    outcome: '',
+    final_notes: '',
+    brokerage_amount: '',
+    loss_reason: ''
+  });
+  
   useEffect(() => {
     if (user?.approval_status === 'approved') {
       loadDashboard();
@@ -55,6 +101,7 @@ const SellerDashboard = () => {
     if (activeTab === 'referrals') loadReferrals();
     if (activeTab === 'visits') loadVisits();
     if (activeTab === 'earnings') loadCommissions();
+    if (activeTab === 'followups') loadFollowups();
   }, [activeTab]);
 
   const loadDashboard = async () => {
@@ -112,6 +159,114 @@ const SellerDashboard = () => {
     } catch (error) {
       toast.error('Failed to load commissions');
     }
+  };
+
+  // Follow-up functions
+  const loadFollowups = async () => {
+    try {
+      const response = await api.get('/seller/followups');
+      setFollowups(response.data.followups || []);
+      setFollowupStats(response.data.stats);
+    } catch (error) {
+      toast.error('Failed to load follow-ups');
+    }
+  };
+
+  const handleCreateFollowup = async () => {
+    if (!newFollowup.client_name || !newFollowup.client_phone || !newFollowup.notes) {
+      toast.error('Please fill in client name, phone and notes');
+      return;
+    }
+    if (newFollowup.notes.length < 10) {
+      toast.error('Notes must be at least 10 characters');
+      return;
+    }
+
+    try {
+      await api.post('/seller/followups', {
+        ...newFollowup,
+        client_budget: newFollowup.client_budget ? parseFloat(newFollowup.client_budget) : null,
+        call_duration_mins: newFollowup.call_duration_mins ? parseInt(newFollowup.call_duration_mins) : null
+      });
+      toast.success('Follow-up created successfully');
+      setShowAddFollowup(false);
+      setNewFollowup({
+        client_name: '',
+        client_phone: '',
+        status: 'new_lead',
+        notes: '',
+        next_followup_date: '',
+        call_duration_mins: '',
+        client_budget: '',
+        client_requirements: ''
+      });
+      loadFollowups();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Failed to create follow-up');
+    }
+  };
+
+  const handleUpdateFollowup = async () => {
+    if (!updateData.notes || updateData.notes.length < 10) {
+      toast.error('Notes must be at least 10 characters');
+      return;
+    }
+
+    try {
+      await api.put(`/seller/followups/${selectedFollowup.id}`, {
+        ...updateData,
+        call_duration_mins: updateData.call_duration_mins ? parseInt(updateData.call_duration_mins) : null
+      });
+      toast.success('Follow-up updated successfully');
+      setShowUpdateFollowup(false);
+      setSelectedFollowup(null);
+      loadFollowups();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Failed to update follow-up');
+    }
+  };
+
+  const handleCloseLead = async () => {
+    if (!closeData.final_notes || closeData.final_notes.length < 20) {
+      toast.error('Final notes must be at least 20 characters');
+      return;
+    }
+    if (closeData.outcome === 'closed_won' && !closeData.brokerage_amount) {
+      toast.error('Brokerage amount is required for won deals');
+      return;
+    }
+    if (closeData.outcome === 'closed_lost' && (!closeData.loss_reason || closeData.loss_reason.length < 10)) {
+      toast.error('Loss reason (min 10 chars) is required for lost deals');
+      return;
+    }
+
+    try {
+      const response = await api.post(`/seller/followups/${selectedFollowup.id}/close`, {
+        followup_id: selectedFollowup.id,
+        outcome: closeData.outcome,
+        final_notes: closeData.final_notes,
+        brokerage_amount: closeData.outcome === 'closed_won' ? parseFloat(closeData.brokerage_amount) : null,
+        loss_reason: closeData.outcome === 'closed_lost' ? closeData.loss_reason : null
+      });
+      
+      if (closeData.outcome === 'closed_won') {
+        toast.success(`Deal closed! Commission: ₹${response.data.commission_amount}`);
+      } else {
+        toast.info('Lead marked as lost');
+      }
+      
+      setShowCloseModal(false);
+      setSelectedFollowup(null);
+      setCloseData({ outcome: '', final_notes: '', brokerage_amount: '', loss_reason: '' });
+      loadFollowups();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Failed to close lead');
+    }
+  };
+
+  const getStatusBadge = (status) => {
+    const statusObj = FOLLOWUP_STATUSES.find(s => s.value === status);
+    return statusObj || { label: status, color: 'bg-gray-100 text-gray-800' };
   };
 
   const handleShareProperty = async (property) => {
@@ -324,6 +479,7 @@ const SellerDashboard = () => {
           <div className="flex gap-1 overflow-x-auto">
             {[
               { id: 'dashboard', label: 'Overview', icon: TrendingUp },
+              { id: 'followups', label: 'Follow-ups', icon: ClipboardList },
               { id: 'properties', label: 'Properties', icon: Home },
               { id: 'referrals', label: 'My Referrals', icon: Users },
               { id: 'visits', label: 'Client Visits', icon: MapPin },
@@ -459,6 +615,156 @@ const SellerDashboard = () => {
                 </div>
               </>
             ) : null}
+          </motion.div>
+        )}
+
+        {/* Follow-ups Tab */}
+        {activeTab === 'followups' && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+            {/* Stats Cards */}
+            {followupStats && (
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                <div className="bg-white border border-[#E5E1DB] p-4">
+                  <p className="text-xs text-[#4A4D53] uppercase tracking-wide">Total Leads</p>
+                  <p className="text-2xl font-bold text-[#1A1C20]">{followupStats.total}</p>
+                </div>
+                <div className="bg-white border border-[#E5E1DB] p-4">
+                  <p className="text-xs text-[#4A4D53] uppercase tracking-wide">Active</p>
+                  <p className="text-2xl font-bold text-blue-600">{followupStats.active}</p>
+                </div>
+                <div className="bg-white border border-[#E5E1DB] p-4">
+                  <p className="text-xs text-[#4A4D53] uppercase tracking-wide">Won</p>
+                  <p className="text-2xl font-bold text-green-600">{followupStats.closed_won}</p>
+                </div>
+                <div className="bg-white border border-[#E5E1DB] p-4">
+                  <p className="text-xs text-[#4A4D53] uppercase tracking-wide">Conversion</p>
+                  <p className="text-2xl font-bold text-[#04473C]">{followupStats.conversion_rate}%</p>
+                </div>
+              </div>
+            )}
+
+            {/* Add New Follow-up Button */}
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-lg font-semibold text-[#1A1C20]">Client Follow-ups</h2>
+              <button
+                onClick={() => setShowAddFollowup(true)}
+                className="btn-primary flex items-center gap-2"
+                data-testid="add-followup-btn"
+              >
+                <Plus className="w-4 h-4" />
+                Add New Lead
+              </button>
+            </div>
+
+            {/* Follow-ups List */}
+            <div className="space-y-4">
+              {followups.length > 0 ? (
+                followups.map((fu) => {
+                  const statusBadge = getStatusBadge(fu.status);
+                  return (
+                    <div key={fu.id} className="bg-white border border-[#E5E1DB] p-4">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3 mb-2">
+                            <h3 className="font-semibold text-[#1A1C20]">{fu.client_name}</h3>
+                            <span className={`px-2 py-0.5 text-xs font-medium rounded ${statusBadge.color}`}>
+                              {statusBadge.label}
+                            </span>
+                            {fu.is_closed && (
+                              <span className="px-2 py-0.5 text-xs font-medium bg-gray-200 text-gray-700 rounded">
+                                CLOSED
+                              </span>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-4 text-sm text-[#4A4D53]">
+                            <span className="flex items-center gap-1">
+                              <Phone className="w-3.5 h-3.5" />
+                              {fu.client_phone}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <PhoneCall className="w-3.5 h-3.5" />
+                              {fu.total_followups} calls
+                            </span>
+                            {fu.next_followup_date && (
+                              <span className="flex items-center gap-1 text-orange-600">
+                                <Calendar className="w-3.5 h-3.5" />
+                                Next: {new Date(fu.next_followup_date).toLocaleDateString()}
+                              </span>
+                            )}
+                          </div>
+                          {fu.client_budget && (
+                            <p className="text-sm text-[#04473C] mt-1">Budget: ₹{fu.client_budget.toLocaleString()}</p>
+                          )}
+                        </div>
+                        
+                        {/* Actions */}
+                        {!fu.is_closed && (
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => {
+                                setSelectedFollowup(fu);
+                                setUpdateData({
+                                  status: fu.status,
+                                  notes: '',
+                                  next_followup_date: fu.next_followup_date || '',
+                                  call_duration_mins: ''
+                                });
+                                setShowUpdateFollowup(true);
+                              }}
+                              className="px-3 py-1.5 text-sm bg-[#04473C] text-white hover:bg-[#033830] transition-colors"
+                              data-testid={`update-followup-${fu.id}`}
+                            >
+                              Add Update
+                            </button>
+                            <button
+                              onClick={() => {
+                                setSelectedFollowup(fu);
+                                setCloseData({ outcome: '', final_notes: '', brokerage_amount: '', loss_reason: '' });
+                                setShowCloseModal(true);
+                              }}
+                              className="px-3 py-1.5 text-sm border border-[#04473C] text-[#04473C] hover:bg-[#04473C] hover:text-white transition-colors"
+                              data-testid={`close-lead-${fu.id}`}
+                            >
+                              Close Lead
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                      
+                      {/* Recent History */}
+                      {fu.history && fu.history.length > 0 && (
+                        <div className="mt-4 pt-4 border-t border-[#E5E1DB]">
+                          <p className="text-xs font-medium text-[#4A4D53] mb-2">RECENT ACTIVITY</p>
+                          <div className="space-y-2">
+                            {fu.history.slice(-3).reverse().map((entry, idx) => (
+                              <div key={idx} className="text-sm flex items-start gap-2">
+                                <div className={`w-2 h-2 mt-1.5 rounded-full ${
+                                  entry.status === 'closed_won' ? 'bg-green-500' :
+                                  entry.status === 'closed_lost' ? 'bg-red-500' :
+                                  'bg-blue-500'
+                                }`} />
+                                <div>
+                                  <span className="font-medium">{getStatusBadge(entry.status).label}</span>
+                                  <span className="text-[#4A4D53]"> - {entry.notes?.slice(0, 100)}{entry.notes?.length > 100 ? '...' : ''}</span>
+                                  <span className="text-xs text-[#9CA3AF] ml-2">
+                                    {new Date(entry.timestamp).toLocaleDateString()}
+                                  </span>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })
+              ) : (
+                <div className="bg-white border border-[#E5E1DB] p-12 text-center">
+                  <ClipboardList className="w-12 h-12 text-[#D0C9C0] mx-auto mb-3" />
+                  <p className="text-[#4A4D53]">No follow-ups yet. Add your first lead!</p>
+                </div>
+              )}
+            </div>
           </motion.div>
         )}
 
@@ -958,6 +1264,364 @@ const SellerDashboard = () => {
                 />
                 <button onClick={sendMessage} className="btn-primary px-4">
                   <Send className="w-4 h-4" />
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Add New Follow-up Modal */}
+      <AnimatePresence>
+        {showAddFollowup && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="bg-white w-full max-w-lg max-h-[90vh] overflow-y-auto"
+            >
+              <div className="p-4 border-b border-[#E5E1DB] flex items-center justify-between">
+                <h3 className="font-semibold text-lg">Add New Lead</h3>
+                <button onClick={() => setShowAddFollowup(false)} className="p-2 hover:bg-[#F5F3F0]">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              
+              <div className="p-4 space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-[#4A4D53] mb-1">Client Name *</label>
+                    <input
+                      type="text"
+                      value={newFollowup.client_name}
+                      onChange={(e) => setNewFollowup({...newFollowup, client_name: e.target.value})}
+                      className="premium-input w-full"
+                      placeholder="Enter name"
+                      data-testid="followup-client-name"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-[#4A4D53] mb-1">Phone Number *</label>
+                    <input
+                      type="tel"
+                      value={newFollowup.client_phone}
+                      onChange={(e) => setNewFollowup({...newFollowup, client_phone: e.target.value})}
+                      className="premium-input w-full"
+                      placeholder="10-digit number"
+                      data-testid="followup-client-phone"
+                    />
+                  </div>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-[#4A4D53] mb-1">Status</label>
+                  <select
+                    value={newFollowup.status}
+                    onChange={(e) => setNewFollowup({...newFollowup, status: e.target.value})}
+                    className="premium-input w-full"
+                  >
+                    {FOLLOWUP_STATUSES.filter(s => !s.value.startsWith('closed')).map(s => (
+                      <option key={s.value} value={s.value}>{s.label}</option>
+                    ))}
+                  </select>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-[#4A4D53] mb-1">Budget (₹)</label>
+                    <input
+                      type="number"
+                      value={newFollowup.client_budget}
+                      onChange={(e) => setNewFollowup({...newFollowup, client_budget: e.target.value})}
+                      className="premium-input w-full"
+                      placeholder="e.g. 25000"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-[#4A4D53] mb-1">Call Duration (mins)</label>
+                    <input
+                      type="number"
+                      value={newFollowup.call_duration_mins}
+                      onChange={(e) => setNewFollowup({...newFollowup, call_duration_mins: e.target.value})}
+                      className="premium-input w-full"
+                      placeholder="e.g. 15"
+                    />
+                  </div>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-[#4A4D53] mb-1">Requirements</label>
+                  <input
+                    type="text"
+                    value={newFollowup.client_requirements}
+                    onChange={(e) => setNewFollowup({...newFollowup, client_requirements: e.target.value})}
+                    className="premium-input w-full"
+                    placeholder="e.g. 2BHK near metro, furnished"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-[#4A4D53] mb-1">Next Follow-up Date</label>
+                  <input
+                    type="datetime-local"
+                    value={newFollowup.next_followup_date}
+                    onChange={(e) => setNewFollowup({...newFollowup, next_followup_date: e.target.value})}
+                    className="premium-input w-full"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-[#4A4D53] mb-1">Notes * (min 10 chars)</label>
+                  <textarea
+                    value={newFollowup.notes}
+                    onChange={(e) => setNewFollowup({...newFollowup, notes: e.target.value})}
+                    className="premium-input w-full h-24 resize-none"
+                    placeholder="Enter call notes, client requirements, discussion summary..."
+                    data-testid="followup-notes"
+                  />
+                  <p className="text-xs text-[#9CA3AF] mt-1">{newFollowup.notes.length}/10 characters</p>
+                </div>
+              </div>
+              
+              <div className="p-4 border-t border-[#E5E1DB] flex gap-3">
+                <button
+                  onClick={() => setShowAddFollowup(false)}
+                  className="flex-1 py-2 border border-[#E5E1DB] text-[#4A4D53] hover:bg-[#F5F3F0] transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleCreateFollowup}
+                  className="flex-1 btn-primary py-2"
+                  data-testid="save-followup-btn"
+                >
+                  Save Lead
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Update Follow-up Modal */}
+      <AnimatePresence>
+        {showUpdateFollowup && selectedFollowup && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="bg-white w-full max-w-lg"
+            >
+              <div className="p-4 border-b border-[#E5E1DB] flex items-center justify-between">
+                <div>
+                  <h3 className="font-semibold text-lg">Add Follow-up Update</h3>
+                  <p className="text-sm text-[#4A4D53]">{selectedFollowup.client_name} - {selectedFollowup.client_phone}</p>
+                </div>
+                <button onClick={() => setShowUpdateFollowup(false)} className="p-2 hover:bg-[#F5F3F0]">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              
+              <div className="p-4 space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-[#4A4D53] mb-1">New Status</label>
+                  <select
+                    value={updateData.status}
+                    onChange={(e) => setUpdateData({...updateData, status: e.target.value})}
+                    className="premium-input w-full"
+                  >
+                    {FOLLOWUP_STATUSES.filter(s => !s.value.startsWith('closed')).map(s => (
+                      <option key={s.value} value={s.value}>{s.label}</option>
+                    ))}
+                  </select>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-[#4A4D53] mb-1">Call Duration (mins)</label>
+                    <input
+                      type="number"
+                      value={updateData.call_duration_mins}
+                      onChange={(e) => setUpdateData({...updateData, call_duration_mins: e.target.value})}
+                      className="premium-input w-full"
+                      placeholder="e.g. 10"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-[#4A4D53] mb-1">Next Follow-up</label>
+                    <input
+                      type="datetime-local"
+                      value={updateData.next_followup_date}
+                      onChange={(e) => setUpdateData({...updateData, next_followup_date: e.target.value})}
+                      className="premium-input w-full"
+                    />
+                  </div>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-[#4A4D53] mb-1">Notes * (min 10 chars)</label>
+                  <textarea
+                    value={updateData.notes}
+                    onChange={(e) => setUpdateData({...updateData, notes: e.target.value})}
+                    className="premium-input w-full h-24 resize-none"
+                    placeholder="What was discussed? Any updates from client?"
+                  />
+                  <p className="text-xs text-[#9CA3AF] mt-1">{updateData.notes.length}/10 characters</p>
+                </div>
+              </div>
+              
+              <div className="p-4 border-t border-[#E5E1DB] flex gap-3">
+                <button
+                  onClick={() => setShowUpdateFollowup(false)}
+                  className="flex-1 py-2 border border-[#E5E1DB] text-[#4A4D53] hover:bg-[#F5F3F0] transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleUpdateFollowup}
+                  className="flex-1 btn-primary py-2"
+                >
+                  Save Update
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Close Lead Modal */}
+      <AnimatePresence>
+        {showCloseModal && selectedFollowup && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="bg-white w-full max-w-lg"
+            >
+              <div className="p-4 border-b border-[#E5E1DB]">
+                <h3 className="font-semibold text-lg">Close Lead</h3>
+                <p className="text-sm text-[#4A4D53]">{selectedFollowup.client_name}</p>
+                {selectedFollowup.total_followups < 2 && (
+                  <p className="text-sm text-red-600 mt-2 flex items-center gap-1">
+                    <AlertCircle className="w-4 h-4" />
+                    You need at least 2 follow-ups to close this lead
+                  </p>
+                )}
+              </div>
+              
+              <div className="p-4 space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-[#4A4D53] mb-2">Outcome *</label>
+                  <div className="grid grid-cols-2 gap-3">
+                    <button
+                      onClick={() => setCloseData({...closeData, outcome: 'closed_won'})}
+                      className={`p-4 border-2 flex flex-col items-center gap-2 transition-colors ${
+                        closeData.outcome === 'closed_won' 
+                          ? 'border-green-500 bg-green-50' 
+                          : 'border-[#E5E1DB] hover:border-green-300'
+                      }`}
+                    >
+                      <UserCheck className={`w-8 h-8 ${closeData.outcome === 'closed_won' ? 'text-green-600' : 'text-[#4A4D53]'}`} />
+                      <span className={`font-medium ${closeData.outcome === 'closed_won' ? 'text-green-700' : 'text-[#1A1C20]'}`}>
+                        Deal Won
+                      </span>
+                    </button>
+                    <button
+                      onClick={() => setCloseData({...closeData, outcome: 'closed_lost'})}
+                      className={`p-4 border-2 flex flex-col items-center gap-2 transition-colors ${
+                        closeData.outcome === 'closed_lost' 
+                          ? 'border-red-500 bg-red-50' 
+                          : 'border-[#E5E1DB] hover:border-red-300'
+                      }`}
+                    >
+                      <XCircle className={`w-8 h-8 ${closeData.outcome === 'closed_lost' ? 'text-red-600' : 'text-[#4A4D53]'}`} />
+                      <span className={`font-medium ${closeData.outcome === 'closed_lost' ? 'text-red-700' : 'text-[#1A1C20]'}`}>
+                        Deal Lost
+                      </span>
+                    </button>
+                  </div>
+                </div>
+                
+                {closeData.outcome === 'closed_won' && (
+                  <div>
+                    <label className="block text-sm font-medium text-[#4A4D53] mb-1">Brokerage Amount (₹) *</label>
+                    <input
+                      type="number"
+                      value={closeData.brokerage_amount}
+                      onChange={(e) => setCloseData({...closeData, brokerage_amount: e.target.value})}
+                      className="premium-input w-full"
+                      placeholder="e.g. 25000"
+                    />
+                    <p className="text-xs text-[#04473C] mt-1">Your commission will be calculated based on this amount</p>
+                  </div>
+                )}
+                
+                {closeData.outcome === 'closed_lost' && (
+                  <div>
+                    <label className="block text-sm font-medium text-[#4A4D53] mb-1">Loss Reason * (min 10 chars)</label>
+                    <input
+                      type="text"
+                      value={closeData.loss_reason}
+                      onChange={(e) => setCloseData({...closeData, loss_reason: e.target.value})}
+                      className="premium-input w-full"
+                      placeholder="e.g. Client found another property, Budget issues"
+                    />
+                  </div>
+                )}
+                
+                <div>
+                  <label className="block text-sm font-medium text-[#4A4D53] mb-1">Final Notes * (min 20 chars)</label>
+                  <textarea
+                    value={closeData.final_notes}
+                    onChange={(e) => setCloseData({...closeData, final_notes: e.target.value})}
+                    className="premium-input w-full h-24 resize-none"
+                    placeholder="Provide detailed closing notes about this deal..."
+                  />
+                  <p className="text-xs text-[#9CA3AF] mt-1">{closeData.final_notes.length}/20 characters</p>
+                </div>
+              </div>
+              
+              <div className="p-4 border-t border-[#E5E1DB] flex gap-3">
+                <button
+                  onClick={() => {
+                    setShowCloseModal(false);
+                    setSelectedFollowup(null);
+                  }}
+                  className="flex-1 py-2 border border-[#E5E1DB] text-[#4A4D53] hover:bg-[#F5F3F0] transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleCloseLead}
+                  disabled={!closeData.outcome || selectedFollowup.total_followups < 2}
+                  className={`flex-1 py-2 font-medium transition-colors ${
+                    closeData.outcome === 'closed_won' 
+                      ? 'bg-green-600 hover:bg-green-700 text-white' 
+                      : closeData.outcome === 'closed_lost'
+                      ? 'bg-red-600 hover:bg-red-700 text-white'
+                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  }`}
+                >
+                  {closeData.outcome === 'closed_won' ? 'Mark as Won' : 
+                   closeData.outcome === 'closed_lost' ? 'Mark as Lost' : 'Select Outcome'}
                 </button>
               </div>
             </motion.div>

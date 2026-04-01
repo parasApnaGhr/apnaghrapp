@@ -113,6 +113,47 @@ class SellerCommission(BaseModel):
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 
+# Follow-up Models for Client Tracking
+class FollowUpCreate(BaseModel):
+    client_phone: str
+    client_name: str
+    property_id: Optional[str] = None
+    visit_id: Optional[str] = None
+    status: str  # interested, not_interested, callback, negotiating, site_visit_done, deal_in_progress, closed_won, closed_lost
+    notes: str = Field(..., min_length=10, description="Minimum 10 characters required")
+    next_followup_date: Optional[str] = None
+    call_duration_mins: Optional[int] = None
+    client_budget: Optional[float] = None
+    client_requirements: Optional[str] = None
+
+class FollowUpUpdate(BaseModel):
+    status: str
+    notes: str = Field(..., min_length=10, description="Minimum 10 characters required")
+    next_followup_date: Optional[str] = None
+    call_duration_mins: Optional[int] = None
+
+class LeadCloseRequest(BaseModel):
+    followup_id: str
+    outcome: str  # closed_won, closed_lost
+    final_notes: str = Field(..., min_length=20, description="Minimum 20 characters required for closing")
+    brokerage_amount: Optional[float] = None  # Required if closed_won
+    loss_reason: Optional[str] = None  # Required if closed_lost
+
+FOLLOWUP_STATUSES = [
+    "new_lead",
+    "contacted", 
+    "interested",
+    "not_interested",
+    "callback",
+    "negotiating",
+    "site_visit_scheduled",
+    "site_visit_done",
+    "deal_in_progress",
+    "closed_won",
+    "closed_lost"
+]
+
+
 def setup_seller_routes(api_router, db, get_current_user, bcrypt_module):
     """Setup all seller routes with database dependency"""
     
@@ -896,6 +937,326 @@ Shared by: {current_user['name']} (ApnaGhr Partner)"""
                 "phone": user["phone"],
                 "role": user["role"]
             }
+        }
+    
+    # ============ CLIENT FOLLOW-UP MANAGEMENT ============
+    
+    @api_router.post("/seller/followups")
+    async def create_followup(data: FollowUpCreate, current_user: dict = Depends(get_current_user)):
+        """Create a new follow-up entry for a client"""
+        if current_user['role'] != 'seller':
+            raise HTTPException(status_code=403, detail="Seller access required")
+        
+        if data.status not in FOLLOWUP_STATUSES:
+            raise HTTPException(status_code=400, detail=f"Invalid status. Must be one of: {FOLLOWUP_STATUSES}")
+        
+        followup = {
+            "id": str(uuid.uuid4()),
+            "seller_id": current_user['id'],
+            "client_phone": data.client_phone,
+            "client_name": data.client_name,
+            "property_id": data.property_id,
+            "visit_id": data.visit_id,
+            "status": data.status,
+            "is_closed": False,
+            "history": [{
+                "status": data.status,
+                "notes": data.notes,
+                "next_followup_date": data.next_followup_date,
+                "call_duration_mins": data.call_duration_mins,
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+                "updated_by": current_user['id']
+            }],
+            "client_budget": data.client_budget,
+            "client_requirements": data.client_requirements,
+            "total_followups": 1,
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "updated_at": datetime.now(timezone.utc).isoformat(),
+            "next_followup_date": data.next_followup_date
+        }
+        
+        await db.seller_followups.insert_one(followup)
+        
+        return {
+            "id": followup["id"],
+            "message": "Follow-up created successfully",
+            "status": data.status
+        }
+    
+    @api_router.get("/seller/followups")
+    async def get_seller_followups(
+        current_user: dict = Depends(get_current_user),
+        status: Optional[str] = None,
+        is_closed: Optional[bool] = None,
+        limit: int = 50
+    ):
+        """Get all follow-ups for the seller"""
+        if current_user['role'] != 'seller':
+            raise HTTPException(status_code=403, detail="Seller access required")
+        
+        query = {"seller_id": current_user['id']}
+        if status:
+            query["status"] = status
+        if is_closed is not None:
+            query["is_closed"] = is_closed
+        
+        followups = await db.seller_followups.find(
+            query, 
+            {"_id": 0}
+        ).sort("updated_at", -1).limit(limit).to_list(length=limit)
+        
+        # Get statistics
+        total = await db.seller_followups.count_documents({"seller_id": current_user['id']})
+        active = await db.seller_followups.count_documents({"seller_id": current_user['id'], "is_closed": False})
+        won = await db.seller_followups.count_documents({"seller_id": current_user['id'], "status": "closed_won"})
+        lost = await db.seller_followups.count_documents({"seller_id": current_user['id'], "status": "closed_lost"})
+        
+        return {
+            "followups": followups,
+            "stats": {
+                "total": total,
+                "active": active,
+                "closed_won": won,
+                "closed_lost": lost,
+                "conversion_rate": round((won / total * 100), 1) if total > 0 else 0
+            }
+        }
+    
+    @api_router.get("/seller/followups/{followup_id}")
+    async def get_followup_details(followup_id: str, current_user: dict = Depends(get_current_user)):
+        """Get detailed follow-up history"""
+        if current_user['role'] != 'seller':
+            raise HTTPException(status_code=403, detail="Seller access required")
+        
+        followup = await db.seller_followups.find_one(
+            {"id": followup_id, "seller_id": current_user['id']},
+            {"_id": 0}
+        )
+        
+        if not followup:
+            raise HTTPException(status_code=404, detail="Follow-up not found")
+        
+        return followup
+    
+    @api_router.put("/seller/followups/{followup_id}")
+    async def update_followup(followup_id: str, data: FollowUpUpdate, current_user: dict = Depends(get_current_user)):
+        """Add a new follow-up entry to existing lead"""
+        if current_user['role'] != 'seller':
+            raise HTTPException(status_code=403, detail="Seller access required")
+        
+        if data.status not in FOLLOWUP_STATUSES:
+            raise HTTPException(status_code=400, detail=f"Invalid status. Must be one of: {FOLLOWUP_STATUSES}")
+        
+        followup = await db.seller_followups.find_one(
+            {"id": followup_id, "seller_id": current_user['id']},
+            {"_id": 0}
+        )
+        
+        if not followup:
+            raise HTTPException(status_code=404, detail="Follow-up not found")
+        
+        if followup.get("is_closed"):
+            raise HTTPException(status_code=400, detail="Cannot update a closed lead")
+        
+        # Add new history entry
+        new_entry = {
+            "status": data.status,
+            "notes": data.notes,
+            "next_followup_date": data.next_followup_date,
+            "call_duration_mins": data.call_duration_mins,
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "updated_by": current_user['id']
+        }
+        
+        await db.seller_followups.update_one(
+            {"id": followup_id},
+            {
+                "$push": {"history": new_entry},
+                "$set": {
+                    "status": data.status,
+                    "next_followup_date": data.next_followup_date,
+                    "updated_at": datetime.now(timezone.utc).isoformat()
+                },
+                "$inc": {"total_followups": 1}
+            }
+        )
+        
+        return {"message": "Follow-up updated successfully", "status": data.status}
+    
+    @api_router.post("/seller/followups/{followup_id}/close")
+    async def close_lead(followup_id: str, data: LeadCloseRequest, current_user: dict = Depends(get_current_user)):
+        """Close a lead - requires valid follow-up history and reason"""
+        if current_user['role'] != 'seller':
+            raise HTTPException(status_code=403, detail="Seller access required")
+        
+        if data.outcome not in ["closed_won", "closed_lost"]:
+            raise HTTPException(status_code=400, detail="Outcome must be 'closed_won' or 'closed_lost'")
+        
+        followup = await db.seller_followups.find_one(
+            {"id": followup_id, "seller_id": current_user['id']},
+            {"_id": 0}
+        )
+        
+        if not followup:
+            raise HTTPException(status_code=404, detail="Follow-up not found")
+        
+        if followup.get("is_closed"):
+            raise HTTPException(status_code=400, detail="Lead is already closed")
+        
+        # Validation: Must have at least 2 follow-up entries before closing
+        if followup.get("total_followups", 0) < 2:
+            raise HTTPException(
+                status_code=400, 
+                detail="Cannot close lead without at least 2 follow-up entries. Please add more follow-ups before closing."
+            )
+        
+        # Validation for closed_won
+        if data.outcome == "closed_won":
+            if not data.brokerage_amount or data.brokerage_amount <= 0:
+                raise HTTPException(status_code=400, detail="Brokerage amount is required for won deals")
+        
+        # Validation for closed_lost
+        if data.outcome == "closed_lost":
+            if not data.loss_reason or len(data.loss_reason) < 10:
+                raise HTTPException(status_code=400, detail="Loss reason (min 10 chars) is required for lost deals")
+        
+        # Calculate commission if won
+        commission_amount = 0
+        if data.outcome == "closed_won" and data.brokerage_amount:
+            commission_amount = calculate_commission(data.brokerage_amount)
+        
+        # Add closing entry to history
+        closing_entry = {
+            "status": data.outcome,
+            "notes": data.final_notes,
+            "brokerage_amount": data.brokerage_amount,
+            "commission_amount": commission_amount,
+            "loss_reason": data.loss_reason,
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "updated_by": current_user['id'],
+            "is_closing_entry": True
+        }
+        
+        await db.seller_followups.update_one(
+            {"id": followup_id},
+            {
+                "$push": {"history": closing_entry},
+                "$set": {
+                    "status": data.outcome,
+                    "is_closed": True,
+                    "closed_at": datetime.now(timezone.utc).isoformat(),
+                    "brokerage_amount": data.brokerage_amount,
+                    "commission_amount": commission_amount,
+                    "loss_reason": data.loss_reason,
+                    "updated_at": datetime.now(timezone.utc).isoformat()
+                },
+                "$inc": {"total_followups": 1}
+            }
+        )
+        
+        # If won, create commission record
+        if data.outcome == "closed_won" and commission_amount > 0:
+            commission_record = {
+                "id": str(uuid.uuid4()),
+                "seller_id": current_user['id'],
+                "followup_id": followup_id,
+                "client_phone": followup.get("client_phone"),
+                "client_name": followup.get("client_name"),
+                "property_id": followup.get("property_id"),
+                "brokerage_amount": data.brokerage_amount,
+                "commission_amount": commission_amount,
+                "status": "pending",  # pending admin approval
+                "created_at": datetime.now(timezone.utc).isoformat()
+            }
+            await db.seller_commissions.insert_one(commission_record)
+            
+            # Update seller wallet
+            await db.seller_wallets.update_one(
+                {"seller_id": current_user['id']},
+                {"$inc": {"pending_earnings": commission_amount}},
+                upsert=True
+            )
+        
+        return {
+            "message": f"Lead closed as {data.outcome}",
+            "commission_amount": commission_amount if data.outcome == "closed_won" else 0,
+            "status": data.outcome
+        }
+    
+    @api_router.get("/seller/followups/pending-today")
+    async def get_todays_followups(current_user: dict = Depends(get_current_user)):
+        """Get follow-ups scheduled for today"""
+        if current_user['role'] != 'seller':
+            raise HTTPException(status_code=403, detail="Seller access required")
+        
+        today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+        
+        followups = await db.seller_followups.find(
+            {
+                "seller_id": current_user['id'],
+                "is_closed": False,
+                "next_followup_date": {"$regex": f"^{today}"}
+            },
+            {"_id": 0, "history": 0}
+        ).to_list(length=100)
+        
+        return {"followups": followups, "count": len(followups), "date": today}
+    
+    @api_router.get("/seller/clients")
+    async def get_seller_clients(current_user: dict = Depends(get_current_user)):
+        """Get all clients with visit history for this seller"""
+        if current_user['role'] != 'seller':
+            raise HTTPException(status_code=403, detail="Seller access required")
+        
+        # Get all referrals with visits
+        referrals = await db.seller_referrals.find(
+            {"seller_id": current_user['id']},
+            {"_id": 0}
+        ).sort("created_at", -1).to_list(length=100)
+        
+        # Get follow-ups
+        followups = await db.seller_followups.find(
+            {"seller_id": current_user['id']},
+            {"_id": 0, "history": 0}
+        ).to_list(length=100)
+        
+        # Merge clients from both sources
+        clients = {}
+        
+        for ref in referrals:
+            phone = ref.get("client_phone")
+            if phone:
+                if phone not in clients:
+                    clients[phone] = {
+                        "phone": phone,
+                        "name": ref.get("client_name", "Unknown"),
+                        "referrals": [],
+                        "followups": [],
+                        "total_visits": 0,
+                        "status": ref.get("status", "shared")
+                    }
+                clients[phone]["referrals"].append(ref)
+                if ref.get("visit_id"):
+                    clients[phone]["total_visits"] += 1
+        
+        for fu in followups:
+            phone = fu.get("client_phone")
+            if phone:
+                if phone not in clients:
+                    clients[phone] = {
+                        "phone": phone,
+                        "name": fu.get("client_name", "Unknown"),
+                        "referrals": [],
+                        "followups": [],
+                        "total_visits": 0,
+                        "status": fu.get("status", "new_lead")
+                    }
+                clients[phone]["followups"].append(fu)
+                clients[phone]["status"] = fu.get("status")
+        
+        return {
+            "clients": list(clients.values()),
+            "total": len(clients)
         }
     
     return router
