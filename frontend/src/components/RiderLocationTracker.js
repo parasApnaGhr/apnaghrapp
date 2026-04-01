@@ -43,6 +43,19 @@ const RiderLocationTracker = ({
     updateVisitStatus 
   } = useTrackingWebSocket('rider', riderId, riderName);
 
+  // Use ref to store current location for interval callback
+  const currentLocationRef = useRef(null);
+  const trackingSessionIdRef = useRef(null);
+
+  // Update ref when location changes
+  useEffect(() => {
+    currentLocationRef.current = currentLocation;
+  }, [currentLocation]);
+
+  useEffect(() => {
+    trackingSessionIdRef.current = trackingSessionId;
+  }, [trackingSessionId]);
+
   // Start GPS tracking with database session
   const startTracking = useCallback(async () => {
     if (!navigator.geolocation) {
@@ -54,17 +67,19 @@ const RiderLocationTracker = ({
     setLocationError(null);
 
     // Start database tracking session
+    let sessionId = null;
     try {
       const sessionResponse = await api.post(`/tracking/session/start?rider_id=${riderId}`, {
         visit_id: currentVisit?.id || null
       });
-      setTrackingSessionId(sessionResponse.data.session_id);
+      sessionId = sessionResponse.data.session_id;
+      setTrackingSessionId(sessionId);
+      trackingSessionIdRef.current = sessionId;
       setDbSyncStatus('synced');
-      toast.success('Tracking session started (saved to database)');
+      toast.success('GPS tracking started');
     } catch (error) {
       console.error('Failed to start DB session:', error);
       setDbSyncStatus('error');
-      // Continue with WebSocket-only tracking
     }
 
     // High accuracy watch position
@@ -74,45 +89,48 @@ const RiderLocationTracker = ({
         const newLocation = {
           lat: latitude,
           lng: longitude,
-          speed: speed ? speed * 3.6 : null, // Convert m/s to km/h
+          speed: speed ? speed * 3.6 : null,
           heading: heading,
           accuracy: accuracy,
           timestamp: new Date().toISOString()
         };
         setCurrentLocation(newLocation);
+        currentLocationRef.current = newLocation;
         setLocationError(null);
       },
       (error) => {
         console.error('Geolocation error:', error);
         setLocationError(error.message);
+        // Don't stop tracking on timeout, just log the error
+        if (error.code !== error.TIMEOUT) {
+          toast.error(`GPS Error: ${error.message}`);
+        }
       },
       {
         enableHighAccuracy: true,
-        maximumAge: 0,
-        timeout: 10000
+        maximumAge: 5000,
+        timeout: 30000
       }
     );
 
-    // Send location updates at interval (both WebSocket and Database)
+    // Send location updates at interval (using refs to avoid stale closures)
     updateIntervalRef.current = setInterval(async () => {
-      if (currentLocation) {
+      const loc = currentLocationRef.current;
+      const sessId = trackingSessionIdRef.current;
+      
+      if (loc) {
         // Send via WebSocket (real-time)
-        sendLocation(
-          currentLocation.lat,
-          currentLocation.lng,
-          currentLocation.speed,
-          currentLocation.heading
-        );
+        sendLocation(loc.lat, loc.lng, loc.speed, loc.heading);
         
         // Also save to database (persistent)
-        if (trackingSessionId) {
+        if (sessId) {
           try {
-            await api.post(`/tracking/session/${trackingSessionId}/location?rider_id=${riderId}`, {
-              lat: currentLocation.lat,
-              lng: currentLocation.lng,
-              speed: currentLocation.speed,
-              heading: currentLocation.heading,
-              accuracy: currentLocation.accuracy
+            await api.post(`/tracking/session/${sessId}/location?rider_id=${riderId}`, {
+              lat: loc.lat,
+              lng: loc.lng,
+              speed: loc.speed,
+              heading: loc.heading,
+              accuracy: loc.accuracy
             });
             setDbSyncStatus('synced');
           } catch (error) {
@@ -124,7 +142,7 @@ const RiderLocationTracker = ({
     }, LOCATION_UPDATE_INTERVAL);
 
     updateStatus('on_duty');
-  }, [currentLocation, sendLocation, updateStatus, riderId, currentVisit, trackingSessionId]);
+  }, [sendLocation, updateStatus, riderId, currentVisit]);
 
   // Stop GPS tracking and save session
   const stopTracking = useCallback(async () => {

@@ -11,7 +11,7 @@ import {
   MapPin, Clock, CheckCircle, Phone, Camera, Navigation, 
   Home, User, ArrowRight, IndianRupee, Power, Wallet, 
   ClipboardList, FileText, LogOut, RefreshCw, Upload, X, Image, Trash2, Route,
-  Locate
+  Locate, AlertTriangle, Shield, XCircle
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -51,6 +51,19 @@ const RiderDashboard = () => {
   
   // Multi-visit route map
   const [showRouteMap, setShowRouteMap] = useState(false);
+
+  // Compliance check state (after each property visit)
+  const [showComplianceModal, setShowComplianceModal] = useState(false);
+  const [complianceAnswers, setComplianceAnswers] = useState({
+    with_client_all_time: null,
+    client_shared_contact: null,
+    helped_negotiations: null
+  });
+  const [pendingAction, setPendingAction] = useState(null);
+  const [complianceViolation, setComplianceViolation] = useState(false);
+
+  // Auto-show map when accepting visit
+  const [showVisitMap, setShowVisitMap] = useState(false);
 
   // Check terms acceptance on mount
   useEffect(() => {
@@ -197,6 +210,17 @@ const RiderDashboard = () => {
   const handleUpdateStep = async (action) => {
     if (!activeVisit) return;
     
+    // If completing a property, show compliance questions first
+    if (action === 'complete_property' || action === 'complete_visit') {
+      setPendingAction(action);
+      setShowComplianceModal(true);
+      return;
+    }
+    
+    await executeStepUpdate(action);
+  };
+
+  const executeStepUpdate = async (action) => {
     try {
       const response = await visitAPI.updateVisitStep(activeVisit.visit.id, action);
       setActiveVisit(prev => ({ ...prev, visit: response.data }));
@@ -212,13 +236,94 @@ const RiderDashboard = () => {
       
       toast.success(messages[action] || 'Progress updated');
       
+      // After accepting visit, show map automatically
+      if (action === 'start_pickup') {
+        setShowVisitMap(true);
+      }
+      
       if (action === 'complete_visit' || response.data.status === 'completed') {
         setActiveVisit(null);
+        setShowVisitMap(false);
         loadAvailableVisits();
-        loadWallet(); // Refresh wallet after completing visit
+        loadWallet();
       }
     } catch (error) {
       toast.error('Failed to update progress');
+    }
+  };
+
+  const handleComplianceSubmit = async () => {
+    // Check for violations
+    const { with_client_all_time, client_shared_contact, helped_negotiations } = complianceAnswers;
+    
+    if (with_client_all_time === null || client_shared_contact === null || helped_negotiations === null) {
+      toast.error('Please answer all compliance questions');
+      return;
+    }
+    
+    // If client shared contact or rider helped in negotiations - VIOLATION
+    if (client_shared_contact === true || helped_negotiations === true) {
+      setComplianceViolation(true);
+      
+      // Report violation to backend
+      try {
+        await api.post(`/visits/${activeVisit.visit.id}/report-violation`, {
+          violation_type: client_shared_contact ? 'contact_shared' : 'negotiation_help',
+          rider_report: true,
+          details: {
+            with_client_all_time,
+            client_shared_contact,
+            helped_negotiations
+          }
+        });
+      } catch (error) {
+        console.error('Failed to report violation:', error);
+      }
+      
+      toast.error('Terms violation detected! This visit is being flagged.');
+      
+      // End the visit as terminated
+      try {
+        await api.post(`/visits/${activeVisit.visit.id}/terminate`, {
+          reason: 'terms_violation',
+          violation_details: complianceAnswers
+        });
+        setActiveVisit(null);
+        setShowComplianceModal(false);
+        setShowVisitMap(false);
+        loadAvailableVisits();
+      } catch (error) {
+        console.error('Failed to terminate visit:', error);
+      }
+      
+      return;
+    }
+    
+    // No violation - proceed with completing the property/visit
+    setShowComplianceModal(false);
+    setComplianceViolation(false);
+    
+    // Save compliance record
+    try {
+      await api.post(`/visits/${activeVisit.visit.id}/compliance-check`, {
+        property_id: activeVisit.properties?.[activeVisit.visit?.current_property_index]?.id,
+        answers: complianceAnswers
+      });
+    } catch (error) {
+      console.error('Failed to save compliance:', error);
+    }
+    
+    // Reset answers for next property
+    setComplianceAnswers({
+      with_client_all_time: null,
+      client_shared_contact: null,
+      helped_negotiations: null
+    });
+    
+    // Execute the pending action
+    if (pendingAction) {
+      await executeStepUpdate(pendingAction);
+      setPendingAction(null);
     }
   };
 
@@ -1182,6 +1287,187 @@ const RiderDashboard = () => {
         userType="rider"
         context="dashboard"
       />
+
+      {/* Compliance Check Modal - After Each Property Visit */}
+      <AnimatePresence>
+        {showComplianceModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4"
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white w-full max-w-lg rounded-lg overflow-hidden"
+            >
+              <div className="p-4 bg-[#04473C] text-white">
+                <div className="flex items-center gap-3">
+                  <Shield className="w-6 h-6" />
+                  <div>
+                    <h3 className="font-semibold text-lg">Compliance Check</h3>
+                    <p className="text-sm text-white/80">Answer honestly - violations will be penalized</p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="p-6 space-y-6">
+                {/* Question 1 */}
+                <div className="space-y-3">
+                  <p className="font-medium text-[#1A1C20]">
+                    1. Were you with the client the entire time during this property visit?
+                  </p>
+                  <div className="flex gap-3">
+                    <button
+                      onClick={() => setComplianceAnswers(prev => ({ ...prev, with_client_all_time: true }))}
+                      className={`flex-1 py-3 border-2 font-medium transition-colors ${
+                        complianceAnswers.with_client_all_time === true
+                          ? 'border-green-500 bg-green-50 text-green-700'
+                          : 'border-[#E5E1DB] hover:border-green-300'
+                      }`}
+                    >
+                      <CheckCircle className={`w-5 h-5 mx-auto mb-1 ${complianceAnswers.with_client_all_time === true ? 'text-green-600' : 'text-[#9CA3AF]'}`} />
+                      Yes
+                    </button>
+                    <button
+                      onClick={() => setComplianceAnswers(prev => ({ ...prev, with_client_all_time: false }))}
+                      className={`flex-1 py-3 border-2 font-medium transition-colors ${
+                        complianceAnswers.with_client_all_time === false
+                          ? 'border-red-500 bg-red-50 text-red-700'
+                          : 'border-[#E5E1DB] hover:border-red-300'
+                      }`}
+                    >
+                      <XCircle className={`w-5 h-5 mx-auto mb-1 ${complianceAnswers.with_client_all_time === false ? 'text-red-600' : 'text-[#9CA3AF]'}`} />
+                      No
+                    </button>
+                  </div>
+                </div>
+
+                {/* Question 2 - CRITICAL */}
+                <div className="space-y-3">
+                  <div className="flex items-start gap-2">
+                    <AlertTriangle className="w-5 h-5 text-red-500 mt-0.5" />
+                    <p className="font-medium text-[#1A1C20]">
+                      2. Did the client share their contact number with the property owner?
+                    </p>
+                  </div>
+                  <div className="flex gap-3">
+                    <button
+                      onClick={() => setComplianceAnswers(prev => ({ ...prev, client_shared_contact: true }))}
+                      className={`flex-1 py-3 border-2 font-medium transition-colors ${
+                        complianceAnswers.client_shared_contact === true
+                          ? 'border-red-500 bg-red-50 text-red-700'
+                          : 'border-[#E5E1DB] hover:border-red-300'
+                      }`}
+                    >
+                      <AlertTriangle className={`w-5 h-5 mx-auto mb-1 ${complianceAnswers.client_shared_contact === true ? 'text-red-600' : 'text-[#9CA3AF]'}`} />
+                      Yes (Violation!)
+                    </button>
+                    <button
+                      onClick={() => setComplianceAnswers(prev => ({ ...prev, client_shared_contact: false }))}
+                      className={`flex-1 py-3 border-2 font-medium transition-colors ${
+                        complianceAnswers.client_shared_contact === false
+                          ? 'border-green-500 bg-green-50 text-green-700'
+                          : 'border-[#E5E1DB] hover:border-green-300'
+                      }`}
+                    >
+                      <CheckCircle className={`w-5 h-5 mx-auto mb-1 ${complianceAnswers.client_shared_contact === false ? 'text-green-600' : 'text-[#9CA3AF]'}`} />
+                      No
+                    </button>
+                  </div>
+                </div>
+
+                {/* Question 3 - CRITICAL */}
+                <div className="space-y-3">
+                  <div className="flex items-start gap-2">
+                    <AlertTriangle className="w-5 h-5 text-red-500 mt-0.5" />
+                    <p className="font-medium text-[#1A1C20]">
+                      3. Did you help the client in direct negotiations with the owner?
+                    </p>
+                  </div>
+                  <div className="flex gap-3">
+                    <button
+                      onClick={() => setComplianceAnswers(prev => ({ ...prev, helped_negotiations: true }))}
+                      className={`flex-1 py-3 border-2 font-medium transition-colors ${
+                        complianceAnswers.helped_negotiations === true
+                          ? 'border-red-500 bg-red-50 text-red-700'
+                          : 'border-[#E5E1DB] hover:border-red-300'
+                      }`}
+                    >
+                      <AlertTriangle className={`w-5 h-5 mx-auto mb-1 ${complianceAnswers.helped_negotiations === true ? 'text-red-600' : 'text-[#9CA3AF]'}`} />
+                      Yes (Violation!)
+                    </button>
+                    <button
+                      onClick={() => setComplianceAnswers(prev => ({ ...prev, helped_negotiations: false }))}
+                      className={`flex-1 py-3 border-2 font-medium transition-colors ${
+                        complianceAnswers.helped_negotiations === false
+                          ? 'border-green-500 bg-green-50 text-green-700'
+                          : 'border-[#E5E1DB] hover:border-green-300'
+                      }`}
+                    >
+                      <CheckCircle className={`w-5 h-5 mx-auto mb-1 ${complianceAnswers.helped_negotiations === false ? 'text-green-600' : 'text-[#9CA3AF]'}`} />
+                      No
+                    </button>
+                  </div>
+                </div>
+
+                {/* Warning */}
+                {(complianceAnswers.client_shared_contact === true || complianceAnswers.helped_negotiations === true) && (
+                  <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+                    <div className="flex items-start gap-3">
+                      <AlertTriangle className="w-6 h-6 text-red-600 mt-0.5" />
+                      <div>
+                        <p className="font-semibold text-red-800">Terms Violation Detected!</p>
+                        <p className="text-sm text-red-700 mt-1">
+                          This visit will be terminated and flagged for review. 
+                          Penalties may include fines up to ₹1,00,000 and account termination.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="p-4 border-t border-[#E5E1DB] flex gap-3">
+                <button
+                  onClick={() => {
+                    setShowComplianceModal(false);
+                    setPendingAction(null);
+                    setComplianceAnswers({
+                      with_client_all_time: null,
+                      client_shared_contact: null,
+                      helped_negotiations: null
+                    });
+                  }}
+                  className="flex-1 py-3 border border-[#E5E1DB] text-[#4A4D53] hover:bg-[#F5F3F0] transition-colors font-medium"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleComplianceSubmit}
+                  disabled={
+                    complianceAnswers.with_client_all_time === null ||
+                    complianceAnswers.client_shared_contact === null ||
+                    complianceAnswers.helped_negotiations === null
+                  }
+                  className={`flex-1 py-3 font-medium transition-colors ${
+                    complianceAnswers.client_shared_contact === true || complianceAnswers.helped_negotiations === true
+                      ? 'bg-red-600 hover:bg-red-700 text-white'
+                      : 'bg-[#04473C] hover:bg-[#033830] text-white'
+                  } disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed`}
+                  data-testid="compliance-submit-btn"
+                >
+                  {complianceAnswers.client_shared_contact === true || complianceAnswers.helped_negotiations === true
+                    ? 'Report Violation & End Visit'
+                    : 'Submit & Complete Property'}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

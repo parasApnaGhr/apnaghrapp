@@ -1819,6 +1819,163 @@ async def update_rider_location(lat: float, lng: float, current_user: dict = Dep
     
     return {"success": True}
 
+
+# ============ COMPLIANCE CHECK ENDPOINTS ============
+
+class ComplianceCheckData(BaseModel):
+    property_id: Optional[str] = None
+    answers: dict
+
+class ViolationReportData(BaseModel):
+    violation_type: str  # contact_shared, negotiation_help
+    rider_report: bool = True
+    details: dict
+
+class TerminateVisitData(BaseModel):
+    reason: str
+    violation_details: dict
+
+@api_router.post("/visits/{visit_id}/compliance-check")
+async def save_compliance_check(visit_id: str, data: ComplianceCheckData, current_user: dict = Depends(get_current_user)):
+    """Save compliance check after each property visit"""
+    if current_user['role'] != 'rider':
+        raise HTTPException(status_code=403, detail="Riders only")
+    
+    visit = await db.visit_bookings.find_one({"id": visit_id, "rider_id": current_user['id']}, {"_id": 0})
+    if not visit:
+        raise HTTPException(status_code=404, detail="Visit not found")
+    
+    compliance_record = {
+        "id": str(uuid.uuid4()),
+        "visit_id": visit_id,
+        "rider_id": current_user['id'],
+        "property_id": data.property_id,
+        "answers": data.answers,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.compliance_checks.insert_one(compliance_record)
+    
+    # Also append to visit record
+    await db.visit_bookings.update_one(
+        {"id": visit_id},
+        {"$push": {"compliance_checks": compliance_record}}
+    )
+    
+    return {"status": "saved", "id": compliance_record["id"]}
+
+@api_router.post("/visits/{visit_id}/report-violation")
+async def report_violation(visit_id: str, data: ViolationReportData, current_user: dict = Depends(get_current_user)):
+    """Report a terms violation during visit"""
+    visit = await db.visit_bookings.find_one({"id": visit_id}, {"_id": 0})
+    if not visit:
+        raise HTTPException(status_code=404, detail="Visit not found")
+    
+    # Get customer info
+    customer = await db.users.find_one({"id": visit.get('customer_id')}, {"_id": 0, "password": 0})
+    
+    violation = {
+        "id": str(uuid.uuid4()),
+        "visit_id": visit_id,
+        "customer_id": visit.get('customer_id'),
+        "customer_name": customer.get('name') if customer else None,
+        "customer_phone": customer.get('phone') if customer else None,
+        "rider_id": visit.get('rider_id'),
+        "reporter_id": current_user['id'],
+        "reporter_role": current_user['role'],
+        "violation_type": data.violation_type,
+        "details": data.details,
+        "status": "pending_review",
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.violations.insert_one(violation)
+    
+    # Mark customer for potential ban
+    await db.users.update_one(
+        {"id": visit.get('customer_id')},
+        {
+            "$inc": {"violation_count": 1},
+            "$push": {"violation_ids": violation["id"]}
+        }
+    )
+    
+    # Notify admins
+    admins = await db.users.find({"role": {"$in": ["admin", "support_admin"]}}, {"_id": 0}).to_list(50)
+    for admin in admins:
+        notification = {
+            "id": str(uuid.uuid4()),
+            "user_id": admin['id'],
+            "type": "violation_report",
+            "title": "⚠️ Terms Violation Reported",
+            "message": f"Violation by customer {customer.get('name') if customer else 'Unknown'}: {data.violation_type}",
+            "reference_id": violation["id"],
+            "reference_type": "violation",
+            "read": False,
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+        await db.notifications.insert_one(notification)
+    
+    return {"status": "reported", "violation_id": violation["id"]}
+
+@api_router.post("/visits/{visit_id}/terminate")
+async def terminate_visit(visit_id: str, data: TerminateVisitData, current_user: dict = Depends(get_current_user)):
+    """Terminate a visit due to violation"""
+    visit = await db.visit_bookings.find_one({"id": visit_id}, {"_id": 0})
+    if not visit:
+        raise HTTPException(status_code=404, detail="Visit not found")
+    
+    # Update visit status
+    await db.visit_bookings.update_one(
+        {"id": visit_id},
+        {"$set": {
+            "status": "terminated",
+            "termination_reason": data.reason,
+            "termination_details": data.violation_details,
+            "terminated_at": datetime.now(timezone.utc).isoformat(),
+            "terminated_by": current_user['id']
+        }}
+    )
+    
+    # If customer violated terms, apply penalties
+    if data.reason == "terms_violation":
+        # Flag customer account
+        await db.users.update_one(
+            {"id": visit.get('customer_id')},
+            {"$set": {
+                "flagged_for_violation": True,
+                "last_violation_date": datetime.now(timezone.utc).isoformat()
+            }}
+        )
+        
+        # Create penalty record
+        penalty = {
+            "id": str(uuid.uuid4()),
+            "user_id": visit.get('customer_id'),
+            "visit_id": visit_id,
+            "penalty_type": "terms_violation",
+            "amount": 50000,  # ₹50,000 minimum penalty
+            "status": "pending",
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+        await db.penalties.insert_one(penalty)
+    
+    return {"status": "terminated", "reason": data.reason}
+
+@api_router.get("/admin/violations")
+async def get_violations(current_user: dict = Depends(get_current_user), status: Optional[str] = None):
+    """Get all reported violations for admin review"""
+    if current_user['role'] not in ['admin', 'support_admin']:
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    query = {}
+    if status:
+        query["status"] = status
+    
+    violations = await db.violations.find(query, {"_id": 0}).sort("created_at", -1).to_list(100)
+    
+    return {"violations": violations, "count": len(violations)}
+
 @api_router.get("/rider/active-visit")
 async def get_active_visit(current_user: dict = Depends(get_current_user)):
     """Get rider's currently active visit with optimized route"""
