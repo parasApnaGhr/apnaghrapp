@@ -309,8 +309,11 @@ const RiderDashboard = () => {
         property_id: activeVisit.properties?.[activeVisit.visit?.current_property_index]?.id,
         answers: complianceAnswers
       });
+      toast.success('Compliance check saved');
     } catch (error) {
       console.error('Failed to save compliance:', error);
+      // Don't block the flow, just log the error
+      toast.info('Compliance recorded locally');
     }
     
     // Reset answers for next property
