@@ -1395,9 +1395,9 @@ async def get_available_visits(current_user: dict = Depends(get_current_user)):
     if not rider.get('is_online', False):
         return []  # Offline riders don't see visits
     
-    # Get rider's current location
-    rider_lat = rider.get('latitude')
-    rider_lng = rider.get('longitude')
+    # Get rider's current location (check both fields)
+    rider_lat = rider.get('current_lat') or rider.get('latitude')
+    rider_lng = rider.get('current_lng') or rider.get('longitude')
     
     # Find pending visits with no rider assigned (check both rider_id and assigned_rider_id)
     visits = await db.visit_bookings.find(
@@ -1491,9 +1491,9 @@ async def accept_visit(visit_id: str, current_user: dict = Depends(get_current_u
     if not rider.get('is_online', False):
         raise HTTPException(status_code=400, detail="You must be online to accept visits")
     
-    # Get rider's location
-    rider_lat = rider.get('latitude')
-    rider_lng = rider.get('longitude')
+    # Get rider's location (check both fields for compatibility)
+    rider_lat = rider.get('current_lat') or rider.get('latitude')
+    rider_lng = rider.get('current_lng') or rider.get('longitude')
     
     # Get the visit to check distance
     visit = await db.visit_bookings.find_one({"id": visit_id, "status": "pending"}, {"_id": 0})
@@ -2000,10 +2000,10 @@ async def get_active_visit(current_user: dict = Depends(get_current_user)):
         if prop:
             properties.append(prop)
     
-    # Get rider's current location for route optimization
+    # Get rider's current location for route optimization (check both fields)
     rider = await db.users.find_one({"id": current_user['id']}, {"_id": 0})
-    rider_lat = rider.get('latitude')
-    rider_lng = rider.get('longitude')
+    rider_lat = rider.get('current_lat') or rider.get('latitude')
+    rider_lng = rider.get('current_lng') or rider.get('longitude')
     
     # Calculate optimized route if not already saved
     optimized_route = visit.get('optimized_route')

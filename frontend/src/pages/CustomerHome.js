@@ -271,6 +271,30 @@ const CustomerHome = () => {
         </div>
       </header>
 
+      {/* Hero Banner with ApnaGhr Image */}
+      <div className="relative h-48 overflow-hidden">
+        <img 
+          src="https://customer-assets.emergentagent.com/job_field-rider-ops/artifacts/gnxc4pz6_IMG_7402.jpeg"
+          alt="ApnaGhr - Find Your Home"
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#04473C]/80 to-transparent flex items-center">
+          <div className="max-w-7xl mx-auto px-6 w-full">
+            <motion.div
+              initial={{ opacity: 0, x: -30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.2 }}
+            >
+              <p className="text-white/80 text-sm uppercase tracking-wider">Welcome to</p>
+              <h2 className="text-3xl font-bold text-white" style={{ fontFamily: 'Playfair Display, serif' }}>
+                Apna<span className="text-[#C6A87C]">Ghr</span>
+              </h2>
+              <p className="text-white/70 text-sm mt-2">Find your perfect rental home with guided visits</p>
+            </motion.div>
+          </div>
+        </div>
+      </div>
+
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-6 py-8">
         {/* Featured Sponsors - Premium Style */}

@@ -303,17 +303,15 @@ const RiderDashboard = () => {
     setShowComplianceModal(false);
     setComplianceViolation(false);
     
-    // Save compliance record
+    // Save compliance record (silent - no toast)
     try {
       await api.post(`/visits/${activeVisit.visit.id}/compliance-check`, {
         property_id: activeVisit.properties?.[activeVisit.visit?.current_property_index]?.id,
         answers: complianceAnswers
       });
-      toast.success('Compliance check saved');
     } catch (error) {
       console.error('Failed to save compliance:', error);
-      // Don't block the flow, just log the error
-      toast.info('Compliance recorded locally');
+      // Continue anyway - don't block the flow
     }
     
     // Reset answers for next property
@@ -323,9 +321,13 @@ const RiderDashboard = () => {
       helped_negotiations: null
     });
     
-    // Execute the pending action
+    // Execute the pending action and wait for it to complete
     if (pendingAction) {
-      await executeStepUpdate(pendingAction);
+      try {
+        await executeStepUpdate(pendingAction);
+      } catch (error) {
+        console.error('Step update error:', error);
+      }
       setPendingAction(null);
     }
   };
@@ -525,18 +527,19 @@ const RiderDashboard = () => {
       </header>
 
       <main className="max-w-2xl mx-auto px-6 py-6">
-        {/* Animated Earnings Banner */}
+        {/* ApnaGhr Promotional Banner with Image */}
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="earnings-banner text-white p-5 mb-4 relative overflow-hidden"
+          className="relative overflow-hidden mb-4 rounded-lg"
         >
-          {/* Decorative Elements */}
-          <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
-          <div className="absolute bottom-0 left-0 w-20 h-20 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2" />
-          
-          <div className="flex items-center justify-between relative z-10">
-            <div>
+          <img 
+            src="https://customer-assets.emergentagent.com/job_field-rider-ops/artifacts/0c2eghg4_IMG_7401.jpeg"
+            alt="ApnaGhr Rider"
+            className="w-full h-40 object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#04473C]/90 to-[#04473C]/60 flex items-center justify-between p-5">
+            <div className="text-white">
               <p className="text-xs text-white/70 tracking-wider uppercase">Your Earnings Potential</p>
               <motion.p 
                 className="text-xl font-semibold mt-1"
@@ -547,7 +550,7 @@ const RiderDashboard = () => {
                 ₹150<span className="text-sm font-normal">/visit</span> • Daily Payouts
               </motion.p>
             </div>
-            <div className="text-right">
+            <div className="text-right text-white">
               <motion.div
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}

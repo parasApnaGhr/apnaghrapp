@@ -504,15 +504,19 @@ const SellerDashboard = () => {
       </div>
 
       <main className="max-w-7xl mx-auto px-6 py-8">
-        {/* Seller Earnings Potential Banner */}
+        {/* Seller Earnings Potential Banner with Image */}
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-gradient-to-r from-[#C6A87C] to-[#D4BC98] text-[#1A1C20] p-5 mb-6 relative overflow-hidden"
+          className="relative overflow-hidden mb-6 rounded-lg h-40"
         >
-          <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2" />
-          <div className="flex items-center justify-between relative z-10">
-            <div>
+          <img 
+            src="https://customer-assets.emergentagent.com/job_field-rider-ops/artifacts/ckuq2u78_IMG_7403.jpeg"
+            alt="ApnaGhr Seller"
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#C6A87C]/90 to-[#C6A87C]/60 flex items-center justify-between p-6">
+            <div className="text-[#1A1C20]">
               <p className="text-xs font-medium uppercase tracking-wider opacity-70">Your Earning Potential</p>
               <p className="text-2xl font-bold mt-1">₹500 - ₹10,000 <span className="text-sm font-normal">per deal</span></p>
             </div>
@@ -520,7 +524,7 @@ const SellerDashboard = () => {
               <div className="bg-[#04473C] text-white px-3 py-1.5 text-xs font-bold tracking-wide mb-1">
                 UNLIMITED EARNINGS
               </div>
-              <p className="text-[10px] opacity-70">Share properties • Earn commissions</p>
+              <p className="text-[10px] text-[#1A1C20]/70">Share properties • Earn commissions</p>
             </div>
           </div>
         </motion.div>
