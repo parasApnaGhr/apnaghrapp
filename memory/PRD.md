@@ -16,24 +16,40 @@ ApnaGhr Visit Platform is a production-ready multi-role rental property platform
 - **🆕 Rider Bank Account Management** - Bank details for payouts
 - **🆕 GPS Location Capture** - Use Current Location for pickup and address
 - **🆕 Property GPS Coordinates** - For rider navigation to properties
+- **🆕 Uber-like Customer Tracking** - Track Rider Live button with ETA display
 
 ## Latest Updates (April 2, 2026)
 
 ### 🔴 P0 Bug Fixes - Critical Production Issues RESOLVED
 
-#### P0 Issue 1: Riders Cannot See Admin-Created Manual Visits - FIXED ✅
+#### P0 Issue 1: Customer UI Missing "Track Rider" Button & ETA - FIXED ✅
+**Root Cause**: CustomerBookings.js was missing the Track Rider Live button and tracking modal components.
+**Fix Applied**: 
+- Added "Track Rider Live" button in rider info section when rider is assigned
+- Added full-featured tracking modal with:
+  - Rider info (name, phone, online status)
+  - GPS coordinates display
+  - "View on Google Maps" button
+  - ETA display (when available)
+  - "Refresh Location" button
+**Files Changed**: `/app/frontend/src/pages/CustomerBookings.js`, `/app/frontend/src/utils/api.js`
+**Verification**: Customers can now click "Track Rider Live" and see rider location in modal. ✅ VERIFIED
+
+#### P0 Issue 2: Rider Unable to Complete Visits (500 Error) - FIXED ✅
+**Root Cause**: MongoDB `insert_one()` mutates the input dictionary by adding `_id` field (ObjectId). When that same dictionary was pushed into the visit's `compliance_checks` array, it contained an ObjectId which is not JSON serializable.
+**Fix Applied**: 
+- Changed `await db.compliance_checks.insert_one(compliance_record)` to `await db.compliance_checks.insert_one(compliance_record.copy())` to prevent mutation
+- Cleaned up existing corrupted documents in the database
+**Files Changed**: `/app/backend/server.py` line 2165
+**Verification**: Riders can now complete visits without "Failed to update progress" error. ✅ VERIFIED
+
+#### P0 Issue 3: Riders Cannot See Admin-Created Manual Visits - FIXED ✅
 **Root Cause**: MongoDB `$in` operator with `[None]` does not match documents where the field is null. Also production data had `assigned_rider_id: ''` (empty string) instead of `None`.
 **Fix Applied**: 
 - Changed query from `{rider_id: {$in: [None]}}` to simple equality `{rider_id: None}`
 - Added support for empty string `''` in addition to `None`
 **Files Changed**: `/app/backend/server.py` - `get_available_visits` endpoint
-**Verification**: Riders now see 16+ pending manual visits in their available visits list. ✅ VERIFIED IN PRODUCTION
-
-#### P0 Issue 2: Customers' Paid Packages Not Converting to Booked Visits - FIXED ✅
-**Root Cause**: `accept_visit` endpoint was accessing `visit['customer_id']` directly, but manual visits created by admin use `user_id` field instead, causing KeyError.
-**Fix Applied**: Added fallback: `customer_id = visit.get('customer_id') or visit.get('user_id')` to handle both field names.
-**Files Changed**: `/app/backend/server.py` - `accept_visit`, `book_visit` endpoints
-**Verification**: Riders can accept manual visits without errors. Customers can book visits using their credits.
+**Verification**: Riders now see 16+ pending manual visits in their available visits list. ✅ VERIFIED
 
 ### 🟡 GPS Navigation Issue - DATA PROBLEM IDENTIFIED
 
