@@ -1,9 +1,11 @@
 from fastapi import FastAPI, APIRouter, HTTPException, Depends, status, Request, UploadFile, File
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.staticfiles import StaticFiles
+from fastapi.responses import JSONResponse
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
+from bson import ObjectId
 import os
 import logging
 from pathlib import Path
@@ -16,6 +18,39 @@ import jwt
 import aiofiles
 import json
 import math
+
+# Custom JSON encoder that handles MongoDB ObjectId and other non-serializable types
+class MongoJSONEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, ObjectId):
+            return str(obj)
+        if isinstance(obj, datetime):
+            return obj.isoformat()
+        return super().default(obj)
+
+def sanitize_mongo_doc(doc):
+    """Remove or convert non-serializable fields from MongoDB documents"""
+    if doc is None:
+        return None
+    if isinstance(doc, list):
+        return [sanitize_mongo_doc(d) for d in doc]
+    if isinstance(doc, dict):
+        result = {}
+        for key, value in doc.items():
+            if key == '_id':
+                continue  # Skip _id completely
+            if isinstance(value, ObjectId):
+                result[key] = str(value)
+            elif isinstance(value, dict):
+                result[key] = sanitize_mongo_doc(value)
+            elif isinstance(value, list):
+                result[key] = sanitize_mongo_doc(value)
+            else:
+                result[key] = value
+        return result
+    if isinstance(doc, ObjectId):
+        return str(doc)
+    return doc
 
 # Haversine formula to calculate distance between two coordinates
 def calculate_distance_km(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
@@ -1409,15 +1444,23 @@ async def get_my_bookings(current_user: dict = Depends(get_current_user)):
     # - customer_id: Standard bookings
     # - user_id: Legacy bookings
     # - customer_phone: Admin manual bookings where customer account was created later
-    bookings = await db.visit_bookings.find(
-        {"$or": [
-            {"customer_id": current_user['id']}, 
-            {"user_id": current_user['id']},
-            {"customer_phone": current_user.get('phone')}
-        ]}, 
-        {"_id": 0}
-    ).sort("created_at", -1).to_list(50)
-    return bookings
+    try:
+        bookings = await db.visit_bookings.find(
+            {"$or": [
+                {"customer_id": current_user['id']}, 
+                {"user_id": current_user['id']},
+                {"customer_phone": current_user.get('phone')}
+            ]}, 
+            {"_id": 0}
+        ).sort("created_at", -1).to_list(50)
+        
+        # Sanitize all documents to handle any ObjectId references
+        return sanitize_mongo_doc(bookings)
+    except Exception as e:
+        import traceback
+        print(f"ERROR in get_my_bookings: {e}")
+        print(traceback.format_exc())
+        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 @api_router.get("/visits/available")
 async def get_available_visits(current_user: dict = Depends(get_current_user)):
@@ -3042,25 +3085,33 @@ async def get_all_visits(current_user: dict = Depends(get_current_user)):
     if current_user['role'] not in ['admin', 'support_admin', 'rider_admin']:
         raise HTTPException(status_code=403, detail="Admin access required")
     
-    visits = await db.visit_bookings.find({}, {"_id": 0}).sort("created_at", -1).to_list(100)
-    
-    # Batch fetch all users to avoid N+1 queries
-    user_ids = set()
-    for visit in visits:
-        user_ids.add(visit.get('customer_id'))
-        if visit.get('rider_id'):
-            user_ids.add(visit['rider_id'])
-    
-    users = await db.users.find({"id": {"$in": list(user_ids)}}, {"_id": 0, "password": 0}).to_list(None)
-    user_map = {u['id']: u for u in users}
-    
-    # Enrich with customer and rider info using batch data
-    for visit in visits:
-        visit['customer'] = user_map.get(visit.get('customer_id'))
-        if visit.get('rider_id'):
-            visit['rider'] = user_map.get(visit['rider_id'])
-    
-    return visits
+    try:
+        visits = await db.visit_bookings.find({}, {"_id": 0}).sort("created_at", -1).to_list(100)
+        
+        # Batch fetch all users to avoid N+1 queries
+        user_ids = set()
+        for visit in visits:
+            if visit.get('customer_id'):
+                user_ids.add(visit.get('customer_id'))
+            if visit.get('rider_id'):
+                user_ids.add(visit['rider_id'])
+        
+        users = await db.users.find({"id": {"$in": list(user_ids)}}, {"_id": 0, "password": 0}).to_list(None)
+        user_map = {u['id']: u for u in users}
+        
+        # Enrich with customer and rider info using batch data
+        for visit in visits:
+            visit['customer'] = user_map.get(visit.get('customer_id'))
+            if visit.get('rider_id'):
+                visit['rider'] = user_map.get(visit['rider_id'])
+        
+        # Sanitize all documents to handle any ObjectId references
+        return sanitize_mongo_doc(visits)
+    except Exception as e:
+        import traceback
+        print(f"ERROR in get_all_visits: {e}")
+        print(traceback.format_exc())
+        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 @api_router.get("/admin/visits/pending-approval")
 async def get_visits_pending_approval(current_user: dict = Depends(get_current_user)):
@@ -3537,13 +3588,13 @@ async def get_customer_wallet(current_user: dict = Depends(get_current_user)):
     
     visits_available = sum(p.get('total_visits', 0) - p.get('visits_used', 0) for p in packages)
     
-    return {
+    return sanitize_mongo_doc({
         "total_visits": total_visits,
-        "total_spent": total_spent,
+        "total_spent": total_spent or 0,
         "properties_viewed": properties_viewed,
         "visits_available": visits_available,
         "packages": packages
-    }
+    })
 
 @api_router.get("/customer/payments")
 async def get_customer_payment_history(current_user: dict = Depends(get_current_user)):
@@ -3553,7 +3604,7 @@ async def get_customer_payment_history(current_user: dict = Depends(get_current_
         {"_id": 0}
     ).sort("created_at", -1).limit(50).to_list(None)
     
-    return payments
+    return sanitize_mongo_doc(payments)
 
 
 # ============ RIDER PROFILE & BANK ACCOUNT ============
