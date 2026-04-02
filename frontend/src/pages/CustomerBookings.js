@@ -148,6 +148,71 @@ const CustomerBookings = () => {
 
                   {/* Content */}
                   <div className="p-4">
+                    {/* RIDER INFO - Uber Style */}
+                    {booking.rider_id && (
+                      <div className="bg-gradient-to-r from-[#04473C] to-[#065f4e] rounded-xl p-4 mb-4 text-white">
+                        <div className="flex items-center gap-4">
+                          <div className="w-14 h-14 bg-white/20 rounded-full flex items-center justify-center">
+                            <User className="w-7 h-7" />
+                          </div>
+                          <div className="flex-1">
+                            <p className="text-xs text-white/70 uppercase tracking-wider">Your Rider</p>
+                            <p className="font-bold text-lg">{booking.rider_name || 'Assigned Rider'}</p>
+                            {booking.rider_is_online && (
+                              <span className="inline-flex items-center gap-1 text-xs bg-green-500 px-2 py-0.5 rounded-full mt-1">
+                                <span className="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></span>
+                                Online
+                              </span>
+                            )}
+                          </div>
+                          {booking.rider_phone && (
+                            <a
+                              href={`tel:${booking.rider_phone}`}
+                              className="w-12 h-12 bg-white rounded-full flex items-center justify-center"
+                              data-testid="call-rider-btn"
+                            >
+                              <Phone className="w-5 h-5 text-[#04473C]" />
+                            </a>
+                          )}
+                        </div>
+                        
+                        {/* ETA Section - if rider is on the way */}
+                        {['pickup_started', 'navigating'].includes(booking.status) && booking.rider_lat && booking.rider_lng && (
+                          <div className="mt-4 pt-4 border-t border-white/20">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <Navigation className="w-4 h-4" />
+                                <span className="text-sm">Rider is on the way</span>
+                              </div>
+                              <button
+                                onClick={() => {
+                                  window.open(`https://www.google.com/maps?q=${booking.rider_lat},${booking.rider_lng}`, '_blank');
+                                }}
+                                className="text-xs bg-white/20 px-3 py-1 rounded-full hover:bg-white/30 transition-colors"
+                              >
+                                View on Map
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* No Rider Yet */}
+                    {!booking.rider_id && booking.status === 'pending' && (
+                      <div className="bg-amber-50 rounded-xl p-4 mb-4 border border-amber-200">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center">
+                            <Clock className="w-5 h-5 text-amber-600" />
+                          </div>
+                          <div>
+                            <p className="font-medium text-amber-800">Finding a Rider</p>
+                            <p className="text-sm text-amber-600">We'll notify you when a rider accepts</p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
                     {/* Pickup Location */}
                     {booking.pickup_location && (
                       <div className="flex items-start gap-3 mb-4 pb-4 border-b border-[#E5E3D8]">

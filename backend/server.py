@@ -1458,13 +1458,128 @@ async def get_my_bookings(current_user: dict = Depends(get_current_user)):
             {"_id": 0}
         ).sort("created_at", -1).to_list(50)
         
+        # Enrich bookings with rider information
+        enriched_bookings = []
+        for booking in bookings:
+            booking_copy = dict(booking)
+            
+            # Get rider details if rider is assigned
+            rider_id = booking.get('rider_id') or booking.get('assigned_rider_id')
+            if rider_id:
+                rider = await db.users.find_one(
+                    {"id": rider_id}, 
+                    {"_id": 0, "password": 0}
+                )
+                if rider:
+                    booking_copy['rider_name'] = rider.get('name', 'Assigned Rider')
+                    booking_copy['rider_phone'] = rider.get('phone')
+                    booking_copy['rider_photo'] = rider.get('photo')
+                    # Include rider's current location for tracking
+                    booking_copy['rider_lat'] = rider.get('current_lat')
+                    booking_copy['rider_lng'] = rider.get('current_lng')
+                    booking_copy['rider_is_online'] = rider.get('is_online', False)
+            
+            # Get first property info for display
+            prop_ids = booking.get('property_ids', [])
+            if not prop_ids and booking.get('property_id'):
+                prop_ids = [booking.get('property_id')]
+            if prop_ids:
+                first_prop = await db.properties.find_one({"id": prop_ids[0]}, {"_id": 0})
+                if first_prop:
+                    booking_copy['property_title'] = first_prop.get('title')
+                    booking_copy['property_area'] = first_prop.get('area_name')
+                    booking_copy['property_city'] = first_prop.get('city')
+            
+            enriched_bookings.append(booking_copy)
+        
         # Sanitize all documents to handle any ObjectId references
-        return sanitize_mongo_doc(bookings)
+        return sanitize_mongo_doc(enriched_bookings)
     except Exception as e:
         import traceback
         print(f"ERROR in get_my_bookings: {e}")
         print(traceback.format_exc())
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+
+@api_router.get("/visits/{visit_id}/track")
+async def track_visit(visit_id: str, current_user: dict = Depends(get_current_user)):
+    """Get real-time tracking info for a visit (like Uber tracking)"""
+    # Get the visit
+    visit = await db.visit_bookings.find_one({"id": visit_id}, {"_id": 0})
+    if not visit:
+        raise HTTPException(status_code=404, detail="Visit not found")
+    
+    # Verify customer owns this visit
+    customer_id = visit.get('customer_id') or visit.get('user_id')
+    customer_phone = visit.get('customer_phone')
+    if customer_id != current_user['id'] and customer_phone != current_user.get('phone'):
+        raise HTTPException(status_code=403, detail="Not your visit")
+    
+    # Get rider info if assigned
+    rider_id = visit.get('rider_id') or visit.get('assigned_rider_id')
+    rider_info = None
+    eta_minutes = None
+    distance_km = None
+    
+    if rider_id:
+        rider = await db.users.find_one({"id": rider_id}, {"_id": 0, "password": 0})
+        if rider:
+            rider_info = {
+                "id": rider.get('id'),
+                "name": rider.get('name', 'Assigned Rider'),
+                "phone": rider.get('phone'),
+                "photo": rider.get('photo'),
+                "is_online": rider.get('is_online', False),
+                "current_lat": rider.get('current_lat'),
+                "current_lng": rider.get('current_lng'),
+                "last_location_update": rider.get('last_location_update')
+            }
+            
+            # Calculate ETA if rider has location and visit has pickup location
+            rider_lat = rider.get('current_lat')
+            rider_lng = rider.get('current_lng')
+            pickup_lat = visit.get('pickup_lat')
+            pickup_lng = visit.get('pickup_lng')
+            
+            if rider_lat and rider_lng and pickup_lat and pickup_lng:
+                from services.tracking_service import haversine_distance
+                distance_km = haversine_distance(rider_lat, rider_lng, pickup_lat, pickup_lng)
+                # Assume average speed of 25 km/h in city
+                eta_minutes = round((distance_km / 25) * 60)
+    
+    # Get property info
+    properties = []
+    prop_ids = visit.get('property_ids', [])
+    if not prop_ids and visit.get('property_id'):
+        prop_ids = [visit.get('property_id')]
+    for prop_id in prop_ids:
+        prop = await db.properties.find_one({"id": prop_id}, {"_id": 0})
+        if prop:
+            properties.append({
+                "id": prop.get('id'),
+                "title": prop.get('title'),
+                "area_name": prop.get('area_name'),
+                "city": prop.get('city'),
+                "latitude": prop.get('latitude'),
+                "longitude": prop.get('longitude')
+            })
+    
+    return {
+        "visit": {
+            "id": visit.get('id'),
+            "status": visit.get('status'),
+            "current_step": visit.get('current_step'),
+            "pickup_location": visit.get('pickup_location'),
+            "pickup_lat": visit.get('pickup_lat'),
+            "pickup_lng": visit.get('pickup_lng'),
+            "scheduled_date": visit.get('scheduled_date') or visit.get('preferred_date'),
+            "scheduled_time": visit.get('scheduled_time') or visit.get('preferred_time'),
+            "otp": visit.get('otp')
+        },
+        "rider": rider_info,
+        "eta_minutes": eta_minutes,
+        "distance_km": round(distance_km, 2) if distance_km else None,
+        "properties": properties
+    }
 
 @api_router.get("/visits/available")
 async def get_available_visits(current_user: dict = Depends(get_current_user)):
@@ -1781,7 +1896,14 @@ async def update_visit_step(visit_id: str, step_data: VisitStepUpdate, current_u
     if current_user['role'] != 'rider':
         raise HTTPException(status_code=403, detail="Riders only")
     
-    visit = await db.visit_bookings.find_one({"id": visit_id, "rider_id": current_user['id']}, {"_id": 0})
+    # Check both rider_id and assigned_rider_id for compatibility
+    visit = await db.visit_bookings.find_one({
+        "id": visit_id, 
+        "$or": [
+            {"rider_id": current_user['id']},
+            {"assigned_rider_id": current_user['id']}
+        ]
+    }, {"_id": 0})
     if not visit:
         raise HTTPException(status_code=404, detail="Visit not found or not assigned to you")
     
