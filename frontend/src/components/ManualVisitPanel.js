@@ -28,7 +28,10 @@ const ManualVisitPanel = () => {
     payment_amount: '',
     payment_reference: '',
     assigned_rider_id: '',
-    notes: ''
+    notes: '',
+    pickup_location: '',
+    pickup_lat: null,
+    pickup_lng: null
   });
 
   useEffect(() => {
@@ -287,6 +290,48 @@ const ManualVisitPanel = () => {
                       />
                     </div>
                   </div>
+                </div>
+
+                {/* Pickup Location */}
+                <div className="bg-[#E6F0EE] p-4 space-y-4 border border-[#04473C]/20">
+                  <h4 className="font-medium flex items-center gap-2">
+                    <MapPin className="w-4 h-4 text-[#04473C]" />
+                    Pickup Location (for GPS Navigation)
+                  </h4>
+                  <div>
+                    <input
+                      type="text"
+                      value={formData.pickup_location}
+                      onChange={(e) => setFormData({ ...formData, pickup_location: e.target.value })}
+                      className="premium-input"
+                      placeholder="Enter customer pickup address (e.g., Sector 17, Chandigarh)"
+                    />
+                    <p className="text-xs text-[#4A4D53] mt-1">
+                      If left empty, rider will navigate to the first property address
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (navigator.geolocation) {
+                        navigator.geolocation.getCurrentPosition(
+                          (position) => {
+                            setFormData({
+                              ...formData,
+                              pickup_lat: position.coords.latitude,
+                              pickup_lng: position.coords.longitude,
+                              pickup_location: formData.pickup_location || 'Current Location (GPS)'
+                            });
+                            toast.success('GPS location captured!');
+                          },
+                          (error) => toast.error('Could not get location: ' + error.message)
+                        );
+                      }
+                    }}
+                    className="text-sm text-[#04473C] hover:underline flex items-center gap-1"
+                  >
+                    <MapPin className="w-3 h-3" /> Use Current Location
+                  </button>
                 </div>
 
                 {/* Property Selection */}

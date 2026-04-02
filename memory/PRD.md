@@ -15,16 +15,19 @@ ApnaGhr Visit Platform is a production-ready multi-role rental property platform
 - **🆕 Complete Customer Profile System** - Stats, Payment History, Notifications, Help, Privacy
 - **🆕 Rider Bank Account Management** - Bank details for payouts
 - **🆕 GPS Location Capture** - Use Current Location for pickup and address
+- **🆕 Property GPS Coordinates** - For rider navigation to properties
 
 ## Latest Updates (April 2, 2026)
 
 ### 🔴 P0 Bug Fixes - Critical Production Issues RESOLVED
 
 #### P0 Issue 1: Riders Cannot See Admin-Created Manual Visits - FIXED ✅
-**Root Cause**: MongoDB `$in` operator with `[None]` does not match documents where the field is null. This is a known MongoDB quirk.
-**Fix Applied**: Changed query from `{rider_id: {$in: [None]}}` to simple equality `{rider_id: None}` which MongoDB handles correctly for null matching.
+**Root Cause**: MongoDB `$in` operator with `[None]` does not match documents where the field is null. Also production data had `assigned_rider_id: ''` (empty string) instead of `None`.
+**Fix Applied**: 
+- Changed query from `{rider_id: {$in: [None]}}` to simple equality `{rider_id: None}`
+- Added support for empty string `''` in addition to `None`
 **Files Changed**: `/app/backend/server.py` - `get_available_visits` endpoint
-**Verification**: Riders now see pending manual visits in their available visits list.
+**Verification**: Riders now see 16+ pending manual visits in their available visits list. ✅ VERIFIED IN PRODUCTION
 
 #### P0 Issue 2: Customers' Paid Packages Not Converting to Booked Visits - FIXED ✅
 **Root Cause**: `accept_visit` endpoint was accessing `visit['customer_id']` directly, but manual visits created by admin use `user_id` field instead, causing KeyError.
@@ -32,11 +35,29 @@ ApnaGhr Visit Platform is a production-ready multi-role rental property platform
 **Files Changed**: `/app/backend/server.py` - `accept_visit`, `book_visit` endpoints
 **Verification**: Riders can accept manual visits without errors. Customers can book visits using their credits.
 
-#### Additional Fixes in This Session:
+### 🟡 GPS Navigation Issue - DATA PROBLEM IDENTIFIED
+
+**Issue**: Rider cannot use GPS navigation to customer/properties
+**Root Cause** (Not a code bug - DATA issue):
+1. ALL manual visits have `pickup_location: None` (no pickup address)
+2. ALL 158 properties have `latitude: None, longitude: None` (no GPS coordinates)
+
+**Fixes Applied** (Ready for deployment):
+1. Added **Pickup Location** field to Admin Manual Visit creation form
+2. Added **GPS Coordinates** (lat/lng) fields to Property creation/edit form
+3. Added "Use Current Location" button to capture GPS from device
+4. Added backend fallback: If no pickup location, use first property's address
+
+**Action Required**:
+1. Deploy to production
+2. Edit existing properties to add GPS coordinates
+3. Add pickup location when creating new manual visits
+
+### Additional Fixes in This Session:
 - Fixed `accept_visit` to accept both "pending" and "confirmed" status visits
 - Updated `book_visit` to check both `customer_id` and `user_id` for package lookup
 - Enhanced `create_manual_visit` to include all required fields: `scheduled_date/time`, `otp`, `current_step`, `total_properties`, etc.
-- Migrated existing pending manual visits to add missing fields
+- Added pickup location enrichment from first property if missing
 
 ## Previous Updates (April 1, 2026)
 

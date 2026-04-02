@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Edit, Trash2, CheckCircle, Home, X, Video, Image as ImageIcon, RefreshCw } from 'lucide-react';
+import { Plus, Edit, Trash2, CheckCircle, Home, X, Video, Image as ImageIcon, RefreshCw, MapPin } from 'lucide-react';
 import { toast } from 'sonner';
 import { propertyAPI, getMediaUrl } from '../utils/api';
 import api from '../utils/api';
@@ -21,6 +21,8 @@ const InventoryPanel = () => {
     area_name: '',
     city: '',
     exact_address: '',
+    latitude: null,
+    longitude: null,
     images: [],
     video_url: '',
     amenities: [],
@@ -79,6 +81,8 @@ const InventoryPanel = () => {
       area_name: '',
       city: '',
       exact_address: '',
+      latitude: null,
+      longitude: null,
       images: [],
       video_url: '',
       amenities: [],
@@ -129,6 +133,8 @@ const InventoryPanel = () => {
       area_name: property.area_name || '',
       city: property.city || '',
       exact_address: property.exact_address || '',
+      latitude: property.latitude || null,
+      longitude: property.longitude || null,
       images: property.images || [],
       video_url: property.video_url || '',
       amenities: property.amenities || [],
@@ -315,6 +321,63 @@ const InventoryPanel = () => {
                 required
               />
             </div>
+            
+            {/* GPS Coordinates */}
+            <div className="md:col-span-2 bg-[#E6F0EE] p-4 rounded-lg border border-[#04473C]/20">
+              <label className="block text-sm font-bold text-[#111111] mb-2">
+                <MapPin className="w-4 h-4 inline mr-1" />
+                GPS Location (for Rider Navigation)
+              </label>
+              <div className="grid grid-cols-2 gap-4 mb-3">
+                <div>
+                  <input
+                    type="number"
+                    step="0.000001"
+                    value={formData.latitude || ''}
+                    onChange={(e) => setFormData({ ...formData, latitude: e.target.value ? parseFloat(e.target.value) : null })}
+                    className="input-field"
+                    placeholder="Latitude (e.g., 30.7046)"
+                  />
+                </div>
+                <div>
+                  <input
+                    type="number"
+                    step="0.000001"
+                    value={formData.longitude || ''}
+                    onChange={(e) => setFormData({ ...formData, longitude: e.target.value ? parseFloat(e.target.value) : null })}
+                    className="input-field"
+                    placeholder="Longitude (e.g., 76.7179)"
+                  />
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                      (position) => {
+                        setFormData({
+                          ...formData,
+                          latitude: position.coords.latitude,
+                          longitude: position.coords.longitude
+                        });
+                        toast.success('GPS location captured!');
+                      },
+                      (error) => toast.error('Could not get location: ' + error.message)
+                    );
+                  } else {
+                    toast.error('Geolocation not supported');
+                  }
+                }}
+                className="text-sm text-[#04473C] hover:underline flex items-center gap-1"
+              >
+                <MapPin className="w-3 h-3" /> Use Current Location
+              </button>
+              <p className="text-xs text-[#4A4D53] mt-2">
+                GPS coordinates enable rider navigation. Stand at the property and click "Use Current Location".
+              </p>
+            </div>
+            
             <div className="md:col-span-2">
               <label className="block text-sm font-bold text-[#111111] mb-1">Description *</label>
               <textarea

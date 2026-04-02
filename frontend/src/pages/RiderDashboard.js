@@ -420,15 +420,36 @@ const RiderDashboard = () => {
     const properties = activeVisit.properties || [];
     const currentIdx = visit.current_property_index || 0;
     const currentProperty = properties[currentIdx];
+    const customer = activeVisit.customer;
     const step = visit.current_step || 'go_to_customer';
     
     if (step === 'go_to_customer') {
+      // Use pickup location if available, otherwise fall back to customer address or first property
+      let pickupLocation = visit.pickup_location;
+      let pickupLat = visit.pickup_lat;
+      let pickupLng = visit.pickup_lng;
+      
+      // Fallback 1: Customer's address
+      if (!pickupLocation && customer?.address) {
+        pickupLocation = customer.address;
+        pickupLat = customer.address_lat;
+        pickupLng = customer.address_lng;
+      }
+      
+      // Fallback 2: First property location (for manual visits without any pickup info)
+      if (!pickupLocation && currentProperty) {
+        pickupLocation = currentProperty.exact_address || currentProperty.address || 
+          `${currentProperty.area_name}, ${currentProperty.city}`;
+        pickupLat = currentProperty.latitude;
+        pickupLng = currentProperty.longitude;
+      }
+      
       return {
         title: 'Go to Customer',
-        subtitle: 'Navigate to pickup location',
-        location: visit.pickup_location,
-        lat: visit.pickup_lat,
-        lng: visit.pickup_lng,
+        subtitle: pickupLocation ? 'Navigate to pickup location' : 'Contact customer for pickup location',
+        location: pickupLocation || `Contact: ${customer?.phone || visit.customer_phone || 'Customer'}`,
+        lat: pickupLat,
+        lng: pickupLng,
         action: 'arrived_customer',
         actionText: 'Arrived at Customer',
         icon: User

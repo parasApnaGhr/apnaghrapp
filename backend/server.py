@@ -1584,15 +1584,45 @@ async def get_available_visits(current_user: dict = Depends(get_current_user)):
     # If there's an active visit, enrich it with customer and property details
     active_response = None
     if active_visit:
-        customer = await db.users.find_one({"id": active_visit.get('customer_id')}, {"_id": 0, "password": 0})
+        # Get customer - check both customer_id and user_id for compatibility
+        customer_id = active_visit.get('customer_id') or active_visit.get('user_id')
+        customer = None
+        if customer_id:
+            customer = await db.users.find_one({"id": customer_id}, {"_id": 0, "password": 0})
+        
+        # If customer not found by ID, try by phone
+        if not customer and active_visit.get('customer_phone'):
+            customer = await db.users.find_one({"phone": active_visit.get('customer_phone')}, {"_id": 0, "password": 0})
+        
+        # Get properties - check both property_ids and property_id
+        prop_ids = active_visit.get('property_ids', [])
+        if not prop_ids and active_visit.get('property_id'):
+            prop_ids = [active_visit.get('property_id')]
+            
         properties = []
-        for prop_id in active_visit.get('property_ids', []):
+        for prop_id in prop_ids:
             prop = await db.properties.find_one({"id": prop_id}, {"_id": 0})
             if prop:
                 properties.append(prop)
         
+        # Enrich visit with fallback pickup location if missing
+        enriched_visit = dict(active_visit)
+        if not enriched_visit.get('pickup_location') and not enriched_visit.get('pickup_lat'):
+            # Fallback 1: Customer's address
+            if customer and customer.get('address'):
+                enriched_visit['pickup_location'] = customer.get('address')
+                enriched_visit['pickup_lat'] = customer.get('address_lat')
+                enriched_visit['pickup_lng'] = customer.get('address_lng')
+            # Fallback 2: First property location
+            elif properties:
+                first_prop = properties[0]
+                enriched_visit['pickup_location'] = first_prop.get('exact_address') or \
+                    f"{first_prop.get('area_name', '')}, {first_prop.get('city', '')}"
+                enriched_visit['pickup_lat'] = first_prop.get('latitude')
+                enriched_visit['pickup_lng'] = first_prop.get('longitude')
+        
         active_response = {
-            "visit": active_visit,
+            "visit": enriched_visit,
             "customer": customer,
             "properties": properties,
             "optimized_route": active_visit.get('optimized_route')
@@ -1722,8 +1752,24 @@ async def accept_visit(visit_id: str, current_user: dict = Depends(get_current_u
                 {"$set": {"optimized_route": optimized_route}}
             )
     
+    # Enrich visit with fallback pickup location if missing
+    enriched_visit = dict(visit)
+    if not enriched_visit.get('pickup_location') and not enriched_visit.get('pickup_lat'):
+        # Fallback 1: Customer's address
+        if customer and customer.get('address'):
+            enriched_visit['pickup_location'] = customer.get('address')
+            enriched_visit['pickup_lat'] = customer.get('address_lat')
+            enriched_visit['pickup_lng'] = customer.get('address_lng')
+        # Fallback 2: First property location
+        elif properties:
+            first_prop = properties[0]
+            enriched_visit['pickup_location'] = first_prop.get('exact_address') or \
+                f"{first_prop.get('area_name', '')}, {first_prop.get('city', '')}"
+            enriched_visit['pickup_lat'] = first_prop.get('latitude')
+            enriched_visit['pickup_lng'] = first_prop.get('longitude')
+    
     return {
-        "visit": visit, 
+        "visit": enriched_visit, 
         "properties": properties,
         "customer": customer,
         "optimized_route": optimized_route
