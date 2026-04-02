@@ -21,6 +21,7 @@ import CustomerSupport from './pages/CustomerSupport';
 import CustomerPrivacy from './pages/CustomerPrivacy';
 import RiderProfile from './pages/RiderProfile';
 import LegalPolicies from './pages/LegalPolicies';
+import AddPropertyLocation from './pages/AddPropertyLocation';
 import '@/App.css';
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
@@ -68,6 +69,7 @@ const AppRoutes = () => {
       {/* PUBLIC ROUTES */}
       <Route path="/property/:id" element={<PublicPropertyDetail />} />
       <Route path="/legal" element={<LegalPolicies />} />
+      <Route path="/add-location/:propertyId" element={<AddPropertyLocation />} />
 
       <Route
         path="/customer"

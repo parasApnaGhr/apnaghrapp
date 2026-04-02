@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Edit, Trash2, CheckCircle, Home, X, Video, Image as ImageIcon, RefreshCw, MapPin } from 'lucide-react';
+import { Plus, Edit, Trash2, CheckCircle, Home, X, Video, Image as ImageIcon, RefreshCw, MapPin, Search } from 'lucide-react';
 import { toast } from 'sonner';
 import { propertyAPI, getMediaUrl } from '../utils/api';
 import api from '../utils/api';
@@ -317,7 +317,7 @@ const InventoryPanel = () => {
                 onChange={(e) => setFormData({ ...formData, exact_address: e.target.value })}
                 className="input-field resize-none"
                 rows="2"
-                placeholder="Full address with landmarks"
+                placeholder="Full address with landmarks (e.g., House 123, Sector 17, Chandigarh)"
                 required
               />
             </div>
@@ -328,54 +328,138 @@ const InventoryPanel = () => {
                 <MapPin className="w-4 h-4 inline mr-1" />
                 GPS Location (for Rider Navigation)
               </label>
-              <div className="grid grid-cols-2 gap-4 mb-3">
-                <div>
-                  <input
-                    type="number"
-                    step="0.000001"
-                    value={formData.latitude || ''}
-                    onChange={(e) => setFormData({ ...formData, latitude: e.target.value ? parseFloat(e.target.value) : null })}
-                    className="input-field"
-                    placeholder="Latitude (e.g., 30.7046)"
-                  />
-                </div>
-                <div>
-                  <input
-                    type="number"
-                    step="0.000001"
-                    value={formData.longitude || ''}
-                    onChange={(e) => setFormData({ ...formData, longitude: e.target.value ? parseFloat(e.target.value) : null })}
-                    className="input-field"
-                    placeholder="Longitude (e.g., 76.7179)"
-                  />
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => {
-                  if (navigator.geolocation) {
-                    navigator.geolocation.getCurrentPosition(
-                      (position) => {
+              
+              {/* Auto-Geocode from Address */}
+              <div className="mb-4 p-3 bg-white rounded border border-[#04473C]/10">
+                <p className="text-sm font-medium text-[#04473C] mb-2">Option 1: Auto-detect from Address</p>
+                <button
+                  type="button"
+                  onClick={async () => {
+                    const address = `${formData.exact_address}, ${formData.area_name}, ${formData.city}`.trim();
+                    if (!address || address === ', , ') {
+                      toast.error('Please enter address, area and city first');
+                      return;
+                    }
+                    toast.loading('Finding location from address...');
+                    try {
+                      const response = await fetch(
+                        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1`
+                      );
+                      const data = await response.json();
+                      toast.dismiss();
+                      if (data && data.length > 0) {
                         setFormData({
                           ...formData,
-                          latitude: position.coords.latitude,
-                          longitude: position.coords.longitude
+                          latitude: parseFloat(data[0].lat),
+                          longitude: parseFloat(data[0].lon)
                         });
-                        toast.success('GPS location captured!');
-                      },
-                      (error) => toast.error('Could not get location: ' + error.message)
-                    );
-                  } else {
-                    toast.error('Geolocation not supported');
-                  }
-                }}
-                className="text-sm text-[#04473C] hover:underline flex items-center gap-1"
-              >
-                <MapPin className="w-3 h-3" /> Use Current Location
-              </button>
-              <p className="text-xs text-[#4A4D53] mt-2">
-                GPS coordinates enable rider navigation. Stand at the property and click "Use Current Location".
-              </p>
+                        toast.success(`Location found: ${data[0].display_name.substring(0, 50)}...`);
+                      } else {
+                        toast.error('Could not find location. Try adding more details to address.');
+                      }
+                    } catch (error) {
+                      toast.dismiss();
+                      toast.error('Failed to geocode address');
+                    }
+                  }}
+                  className="w-full py-2 px-4 bg-[#04473C] text-white rounded hover:bg-[#033530] transition-colors flex items-center justify-center gap-2"
+                >
+                  <Search className="w-4 h-4" />
+                  Get GPS from Address
+                </button>
+                <p className="text-xs text-[#4A4D53] mt-1">
+                  Works best with complete address including city name
+                </p>
+              </div>
+              
+              {/* Owner Location Link */}
+              {editingProperty && (
+                <div className="mb-4 p-3 bg-white rounded border border-[#04473C]/10">
+                  <p className="text-sm font-medium text-[#04473C] mb-2">Option 2: Send Link to Owner</p>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      readOnly
+                      value={`${window.location.origin}/add-location/${editingProperty.id}`}
+                      className="input-field text-xs flex-1"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const link = `${window.location.origin}/add-location/${editingProperty.id}`;
+                        navigator.clipboard.writeText(link);
+                        toast.success('Link copied! Send this to property owner');
+                      }}
+                      className="px-3 py-2 bg-[#C6A87C] text-white rounded hover:bg-[#b39669] transition-colors"
+                    >
+                      Copy
+                    </button>
+                  </div>
+                  <p className="text-xs text-[#4A4D53] mt-1">
+                    Owner opens this link on their phone at the property to add GPS location
+                  </p>
+                </div>
+              )}
+              
+              {/* Manual Entry */}
+              <div className="p-3 bg-white rounded border border-[#04473C]/10">
+                <p className="text-sm font-medium text-[#04473C] mb-2">Option 3: Manual Entry</p>
+                <div className="grid grid-cols-2 gap-4 mb-2">
+                  <div>
+                    <input
+                      type="number"
+                      step="0.000001"
+                      value={formData.latitude || ''}
+                      onChange={(e) => setFormData({ ...formData, latitude: e.target.value ? parseFloat(e.target.value) : null })}
+                      className="input-field"
+                      placeholder="Latitude (e.g., 30.7046)"
+                    />
+                  </div>
+                  <div>
+                    <input
+                      type="number"
+                      step="0.000001"
+                      value={formData.longitude || ''}
+                      onChange={(e) => setFormData({ ...formData, longitude: e.target.value ? parseFloat(e.target.value) : null })}
+                      className="input-field"
+                      placeholder="Longitude (e.g., 76.7179)"
+                    />
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (navigator.geolocation) {
+                      navigator.geolocation.getCurrentPosition(
+                        (position) => {
+                          setFormData({
+                            ...formData,
+                            latitude: position.coords.latitude,
+                            longitude: position.coords.longitude
+                          });
+                          toast.success('GPS location captured!');
+                        },
+                        (error) => toast.error('Could not get location: ' + error.message)
+                      );
+                    } else {
+                      toast.error('Geolocation not supported');
+                    }
+                  }}
+                  className="text-sm text-[#04473C] hover:underline flex items-center gap-1"
+                >
+                  <MapPin className="w-3 h-3" /> Use My Current Location
+                </button>
+              </div>
+              
+              {/* Status indicator */}
+              {formData.latitude && formData.longitude && (
+                <div className="mt-3 p-2 bg-green-50 border border-green-200 rounded flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-600" />
+                  <span className="text-sm text-green-700">
+                    GPS Set: {formData.latitude.toFixed(4)}, {formData.longitude.toFixed(4)}
+                  </span>
+                </div>
+              )}
             </div>
             
             <div className="md:col-span-2">

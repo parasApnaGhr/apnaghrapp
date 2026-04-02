@@ -4122,6 +4122,48 @@ async def get_property_popularity(property_id: str):
         "total_visits": prop.get('visit_count', 0)
     }
 
+@api_router.get("/property/{property_id}/public")
+async def get_property_public(property_id: str):
+    """Get property info for owner location page (public - no auth required)"""
+    prop = await db.properties.find_one({"id": property_id}, {"_id": 0, "owner_phone": 0})
+    if not prop:
+        raise HTTPException(status_code=404, detail="Property not found")
+    
+    return {
+        "id": prop.get("id"),
+        "title": prop.get("title"),
+        "exact_address": prop.get("exact_address"),
+        "area_name": prop.get("area_name"),
+        "city": prop.get("city"),
+        "latitude": prop.get("latitude"),
+        "longitude": prop.get("longitude")
+    }
+
+@api_router.put("/property/{property_id}/location")
+async def update_property_location(property_id: str, location_data: dict):
+    """Update property GPS location (public - for owners to add location)"""
+    prop = await db.properties.find_one({"id": property_id})
+    if not prop:
+        raise HTTPException(status_code=404, detail="Property not found")
+    
+    latitude = location_data.get("latitude")
+    longitude = location_data.get("longitude")
+    
+    if not latitude or not longitude:
+        raise HTTPException(status_code=400, detail="Latitude and longitude required")
+    
+    await db.properties.update_one(
+        {"id": property_id},
+        {"$set": {
+            "latitude": latitude,
+            "longitude": longitude,
+            "location_updated_at": datetime.now(timezone.utc).isoformat(),
+            "location_updated_by": "owner"
+        }}
+    )
+    
+    return {"success": True, "message": "Location updated successfully"}
+
 
 # Setup AI Chatbot routes (must be before including router)
 setup_chatbot_routes(api_router, db, get_current_user)
