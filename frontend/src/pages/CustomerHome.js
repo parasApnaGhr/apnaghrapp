@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
-import { propertyAPI, getMediaUrl, authAPI } from '../utils/api';
+import { propertyAPI, getMediaUrl, authAPI, visitAPI } from '../utils/api';
 import { useNavigate } from 'react-router-dom';
-import { Search, SlidersHorizontal, Home, User, Heart, Calendar, LogOut, Truck, Megaphone, ShoppingCart, X, MapPin, Bath, BedDouble, Square, ChevronRight, Sparkles } from 'lucide-react';
+import { Search, SlidersHorizontal, Home, User, Heart, Calendar, LogOut, Truck, Megaphone, ShoppingCart, X, MapPin, Bath, BedDouble, Square, ChevronRight, Sparkles, Car, Clock, CheckCircle, Phone, Navigation, Star, Shield } from 'lucide-react';
 import { toast } from 'sonner';
 import api from '../utils/api';
 import AIChatbot from '../components/AIChatbot';
@@ -28,13 +28,19 @@ const CustomerHome = () => {
   const [cartCount, setCartCount] = useState(0);
   const [appSettings, setAppSettings] = useState(null);
   const [activeAds, setActiveAds] = useState([]);
+  const [myBookings, setMyBookings] = useState([]);
+  const [bookingsLoading, setBookingsLoading] = useState(true);
 
   useEffect(() => {
     loadProperties();
     loadAppSettings();
     loadActiveAds();
+    loadMyBookings();
     const cart = JSON.parse(localStorage.getItem('visitCart') || '[]');
     setCartCount(cart.length);
+    
+    // Refresh bookings every 30 seconds
+    const bookingsInterval = setInterval(loadMyBookings, 30000);
     
     // Check terms acceptance from database
     const checkTerms = async () => {
@@ -56,6 +62,8 @@ const CustomerHome = () => {
       }
     };
     if (user) checkTerms();
+    
+    return () => clearInterval(bookingsInterval);
   }, [user]);
 
   const loadAppSettings = async () => {
@@ -76,6 +84,34 @@ const CustomerHome = () => {
     } catch (error) {
       console.log('No active ads');
     }
+  };
+
+  const loadMyBookings = async () => {
+    try {
+      const response = await visitAPI.getMyBookings();
+      // Filter to show only active bookings (not completed/cancelled)
+      const activeBookings = (response.data || []).filter(
+        b => !['completed', 'cancelled'].includes(b.status)
+      );
+      setMyBookings(activeBookings.slice(0, 3)); // Show max 3 on home
+    } catch (error) {
+      console.log('Error loading bookings:', error);
+    } finally {
+      setBookingsLoading(false);
+    }
+  };
+
+  // Get status display info
+  const getStatusInfo = (status) => {
+    const statuses = {
+      pending: { color: 'amber', text: 'Finding Rider', icon: Clock },
+      rider_assigned: { color: 'blue', text: 'Rider Assigned', icon: User },
+      pickup_started: { color: 'purple', text: 'Rider On Way', icon: Car },
+      at_customer: { color: 'indigo', text: 'Rider Arrived', icon: MapPin },
+      navigating: { color: 'cyan', text: 'Tour In Progress', icon: Navigation },
+      at_property: { color: 'teal', text: 'At Property', icon: Home },
+    };
+    return statuses[status] || { color: 'gray', text: status, icon: Clock };
   };
 
   const loadProperties = async () => {
@@ -297,6 +333,173 @@ const CustomerHome = () => {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-6 py-8">
+        
+        {/* My Active Bookings - Uber Style */}
+        {myBookings.length > 0 && (
+          <motion.section 
+            className="mb-8"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <p className="overline text-[#04473C] mb-1">Your Visits</p>
+                <h2 className="text-2xl" style={{ fontFamily: 'Playfair Display, serif' }}>Active Bookings</h2>
+              </div>
+              <button 
+                onClick={() => navigate('/customer/bookings')}
+                className="text-sm text-[#04473C] font-medium flex items-center gap-1 hover:underline"
+              >
+                View All <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+            
+            <div className="space-y-4">
+              {myBookings.map((booking, index) => {
+                const statusInfo = getStatusInfo(booking.status);
+                const StatusIcon = statusInfo.icon;
+                
+                return (
+                  <motion.div
+                    key={booking.id}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                    onClick={() => navigate('/customer/bookings')}
+                    className="bg-white border border-[#E5E1DB] rounded-xl overflow-hidden cursor-pointer hover:shadow-lg transition-shadow"
+                    data-testid={`home-booking-${booking.id}`}
+                  >
+                    {/* Status Banner */}
+                    <div className={`px-4 py-3 flex items-center gap-3 ${
+                      statusInfo.color === 'amber' ? 'bg-gradient-to-r from-amber-500 to-orange-500' :
+                      statusInfo.color === 'blue' ? 'bg-gradient-to-r from-blue-500 to-blue-600' :
+                      statusInfo.color === 'purple' ? 'bg-gradient-to-r from-purple-500 to-purple-600' :
+                      statusInfo.color === 'indigo' ? 'bg-gradient-to-r from-indigo-500 to-indigo-600' :
+                      statusInfo.color === 'cyan' ? 'bg-gradient-to-r from-cyan-500 to-cyan-600' :
+                      statusInfo.color === 'teal' ? 'bg-gradient-to-r from-teal-500 to-teal-600' :
+                      'bg-gradient-to-r from-gray-500 to-gray-600'
+                    } text-white`}>
+                      <div className={`w-8 h-8 bg-white/20 rounded-full flex items-center justify-center ${
+                        booking.status === 'pending' ? 'animate-pulse' : ''
+                      }`}>
+                        <StatusIcon className="w-4 h-4" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="font-semibold">{statusInfo.text}</p>
+                        <p className="text-xs text-white/80">
+                          {booking.property_ids?.length || 1} {(booking.property_ids?.length || 1) === 1 ? 'property' : 'properties'}
+                        </p>
+                      </div>
+                      {booking.status === 'pending' && (
+                        <div className="flex gap-1">
+                          {[0, 1, 2].map((i) => (
+                            <motion.div
+                              key={i}
+                              className="w-1.5 h-1.5 bg-white rounded-full"
+                              animate={{ opacity: [0.3, 1, 0.3] }}
+                              transition={{ duration: 1, delay: i * 0.2, repeat: Infinity }}
+                            />
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Booking Content */}
+                    <div className="p-4">
+                      {/* Rider Info - if assigned */}
+                      {booking.rider_id && (
+                        <div className="flex items-center gap-3 mb-3 pb-3 border-b border-[#E5E1DB]">
+                          <div className="relative">
+                            <div className="w-12 h-12 bg-gradient-to-br from-[#04473C] to-[#2A9D8F] rounded-full flex items-center justify-center">
+                              <User className="w-6 h-6 text-white" />
+                            </div>
+                            {booking.rider_is_online && (
+                              <motion.div
+                                animate={{ scale: [1, 1.2, 1] }}
+                                transition={{ duration: 1.5, repeat: Infinity }}
+                                className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-green-500 rounded-full border-2 border-white"
+                              />
+                            )}
+                          </div>
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2">
+                              <p className="font-semibold text-[#264653]">{booking.rider_name || 'Your Rider'}</p>
+                              <div className="flex items-center gap-0.5 bg-amber-100 px-1.5 py-0.5 rounded">
+                                <Star className="w-3 h-3 text-amber-500 fill-amber-500" />
+                                <span className="text-xs font-medium text-amber-700">4.9</span>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-1 text-xs text-green-600">
+                              <Shield className="w-3 h-3" />
+                              <span>Verified Rider</span>
+                            </div>
+                          </div>
+                          {booking.rider_phone && (
+                            <a
+                              href={`tel:${booking.rider_phone}`}
+                              onClick={(e) => e.stopPropagation()}
+                              className="w-10 h-10 bg-[#04473C] rounded-full flex items-center justify-center"
+                            >
+                              <Phone className="w-4 h-4 text-white" />
+                            </a>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Finding Rider Animation */}
+                      {!booking.rider_id && booking.status === 'pending' && (
+                        <div className="flex items-center gap-4 mb-3 pb-3 border-b border-[#E5E1DB]">
+                          <div className="relative">
+                            <motion.div
+                              className="absolute inset-0 border-2 border-[#04473C] rounded-full"
+                              animate={{ scale: [1, 1.8], opacity: [0.5, 0] }}
+                              transition={{ duration: 1.5, repeat: Infinity }}
+                              style={{ width: 48, height: 48 }}
+                            />
+                            <div className="w-12 h-12 bg-[#04473C] rounded-full flex items-center justify-center relative z-10">
+                              <Car className="w-6 h-6 text-white" />
+                            </div>
+                          </div>
+                          <div>
+                            <p className="font-semibold text-[#264653]">Searching for riders...</p>
+                            <p className="text-xs text-[#4A626C]">We'll notify you when matched</p>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Date & Location */}
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2 text-sm text-[#4A626C]">
+                          <Calendar className="w-4 h-4" />
+                          <span>{booking.scheduled_date}</span>
+                        </div>
+                        {booking.pickup_location && (
+                          <div className="flex items-center gap-1 text-sm text-[#4A626C] max-w-[50%]">
+                            <MapPin className="w-4 h-4 flex-shrink-0" />
+                            <span className="truncate">{booking.pickup_location}</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </div>
+
+            {/* View All Button */}
+            <motion.button
+              whileHover={{ scale: 1.01 }}
+              whileTap={{ scale: 0.99 }}
+              onClick={() => navigate('/customer/bookings')}
+              className="w-full mt-4 py-3 bg-[#04473C] text-white rounded-xl font-medium flex items-center justify-center gap-2"
+            >
+              <Calendar className="w-5 h-5" />
+              View All My Bookings
+              <ChevronRight className="w-5 h-5" />
+            </motion.button>
+          </motion.section>
+        )}
+
         {/* Featured Sponsors - Premium Style */}
         {activeAds.length > 0 && (
           <motion.section 
