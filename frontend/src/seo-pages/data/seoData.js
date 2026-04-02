@@ -64,6 +64,33 @@ export const AREAS = {
     { slug: 'patiala-road', name: 'Patiala Road' },
     { slug: 'baltana', name: 'Baltana' },
     { slug: 'dhakoli', name: 'Dhakoli' },
+    { slug: 'lohgarh', name: 'Lohgarh' },
+    { slug: 'gazipur', name: 'Gazipur' },
+  ],
+  derabassi: [
+    { slug: 'derabassi-main', name: 'Dera Bassi Main' },
+    { slug: 'barwala', name: 'Barwala' },
+    { slug: 'palheri', name: 'Palheri' },
+  ],
+  ludhiana: [
+    { slug: 'model-town', name: 'Model Town' },
+    { slug: 'sarabha-nagar', name: 'Sarabha Nagar' },
+    { slug: 'brs-nagar', name: 'BRS Nagar' },
+    { slug: 'pakhowal-road', name: 'Pakhowal Road' },
+    { slug: 'dugri', name: 'Dugri' },
+    { slug: 'civil-lines', name: 'Civil Lines' },
+  ],
+  jalandhar: [
+    { slug: 'model-town-jalandhar', name: 'Model Town' },
+    { slug: 'urban-estate', name: 'Urban Estate' },
+    { slug: 'new-jalandhar', name: 'New Jalandhar' },
+    { slug: 'basti-bawa-khel', name: 'Basti Bawa Khel' },
+  ],
+  amritsar: [
+    { slug: 'ranjit-avenue', name: 'Ranjit Avenue' },
+    { slug: 'lawrence-road', name: 'Lawrence Road' },
+    { slug: 'white-avenue', name: 'White Avenue' },
+    { slug: 'majitha-road', name: 'Majitha Road' },
   ],
 };
 

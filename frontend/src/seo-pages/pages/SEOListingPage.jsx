@@ -76,7 +76,8 @@ const SEOListingPage = ({ listingType = 'rent' }) => {
     };
 
     fetchProperties();
-  }, [slug, listingType, parsedSlug?.city?.slug, parsedSlug?.area?.slug]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [slug, listingType]);
 
   // Pagination
   const totalPages = Math.ceil(properties.length / itemsPerPage);

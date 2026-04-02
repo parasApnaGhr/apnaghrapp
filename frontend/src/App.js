@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'sonner';
+import { HelmetProvider } from 'react-helmet-async';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Login from './pages/Login';
 import CustomerHome from './pages/CustomerHome';
@@ -22,6 +23,11 @@ import CustomerPrivacy from './pages/CustomerPrivacy';
 import RiderProfile from './pages/RiderProfile';
 import LegalPolicies from './pages/LegalPolicies';
 import AddPropertyLocation from './pages/AddPropertyLocation';
+// SEO Module - Isolated imports (read-only, no DB modifications)
+import SEOListingPage from './seo-pages/pages/SEOListingPage';
+import BlogListPage from './seo-pages/pages/BlogListPage';
+import BlogPostPage from './seo-pages/pages/BlogPostPage';
+import SitemapPage from './seo-pages/pages/SitemapPage';
 import '@/App.css';
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
@@ -220,6 +226,24 @@ const AppRoutes = () => {
         }
       />
 
+      {/* ============================================
+          SEO PAGES MODULE - Completely Isolated
+          These are PUBLIC routes for search engine indexing
+          NO authentication required, NO DB modifications
+          ============================================ */}
+      
+      {/* Blog Routes */}
+      <Route path="/blogs" element={<BlogListPage />} />
+      <Route path="/blogs/:slug" element={<BlogPostPage />} />
+      
+      {/* Sitemap */}
+      <Route path="/sitemap" element={<SitemapPage />} />
+      
+      {/* SEO Listing Pages - Dynamic slug parsing */}
+      <Route path="/rent/:slug" element={<SEOListingPage listingType="rent" />} />
+      <Route path="/buy/:slug" element={<SEOListingPage listingType="buy" />} />
+      <Route path="/pg/:slug" element={<SEOListingPage listingType="pg" />} />
+
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
@@ -227,12 +251,14 @@ const AppRoutes = () => {
 
 function App() {
   return (
-    <AuthProvider>
-      <BrowserRouter>
-        <Toaster position="top-right" richColors expand={true} />
-        <AppRoutes />
-      </BrowserRouter>
-    </AuthProvider>
+    <HelmetProvider>
+      <AuthProvider>
+        <BrowserRouter>
+          <Toaster position="top-right" richColors expand={true} />
+          <AppRoutes />
+        </BrowserRouter>
+      </AuthProvider>
+    </HelmetProvider>
   );
 }
 

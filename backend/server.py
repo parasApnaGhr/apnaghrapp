@@ -1,7 +1,7 @@
 from fastapi import FastAPI, APIRouter, HTTPException, Depends, status, Request, UploadFile, File
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, Response
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -955,6 +955,182 @@ async def get_public_property(property_id: str):
     if not property_data:
         raise HTTPException(status_code=404, detail="Property not found")
     return property_data
+
+# ============================================
+# SEO Module Endpoints - READ-ONLY, PUBLIC
+# No database modifications, only read operations
+# ============================================
+
+@api_router.get("/seo/properties")
+async def get_seo_properties(
+    city: Optional[str] = None,
+    area: Optional[str] = None,
+    bedrooms: Optional[int] = None,
+    min_price: Optional[int] = None,
+    max_price: Optional[int] = None,
+    listing_type: Optional[str] = "rent",
+    limit: int = 50
+):
+    """
+    SEO-friendly property listing endpoint - PUBLIC, read-only
+    Returns properties for SEO pages without sensitive data
+    """
+    # Match properties that are available or under verification (visible to public)
+    query = {"status": {"$in": ["available", "under_verification"]}}
+    
+    if city:
+        # Case-insensitive city search
+        query["city"] = {"$regex": f"^{city}$", "$options": "i"}
+    
+    if area:
+        # Search in both area_name and location fields
+        query["$or"] = [
+            {"area_name": {"$regex": area, "$options": "i"}},
+            {"location": {"$regex": area, "$options": "i"}}
+        ]
+    
+    if bedrooms is not None:
+        query["bedrooms"] = bedrooms
+    
+    # Price filtering based on listing type
+    if listing_type == "rent":
+        if min_price is not None or max_price is not None:
+            query["rent"] = {}
+            if min_price is not None:
+                query["rent"]["$gte"] = min_price
+            if max_price is not None:
+                query["rent"]["$lte"] = max_price
+    elif listing_type == "buy":
+        if min_price is not None or max_price is not None:
+            query["price"] = {}
+            if min_price is not None:
+                query["price"]["$gte"] = min_price
+            if max_price is not None:
+                query["price"]["$lte"] = max_price
+    
+    # Projection: exclude sensitive data
+    projection = {
+        "_id": 0,
+        "exact_address": 0,
+        "latitude": 0,
+        "longitude": 0,
+        "owner_phone": 0,
+        "owner_id": 0
+    }
+    
+    properties = await db.properties.find(query, projection).limit(limit).to_list(limit)
+    return properties
+
+@api_router.get("/seo/sitemap-data")
+async def get_sitemap_data():
+    """
+    Returns data for generating sitemap - PUBLIC, read-only
+    Returns unique cities and property counts for sitemap generation
+    """
+    # Get unique cities with property counts
+    city_pipeline = [
+        {"$match": {"status": {"$in": ["available", "under_verification"]}}},
+        {"$group": {
+            "_id": "$city",
+            "count": {"$sum": 1}
+        }},
+        {"$sort": {"count": -1}},
+        {"$limit": 50}
+    ]
+    
+    cities = await db.properties.aggregate(city_pipeline).to_list(100)
+    
+    # Get property type distribution
+    type_pipeline = [
+        {"$match": {"status": {"$in": ["available", "under_verification"]}}},
+        {"$group": {
+            "_id": "$bedrooms",
+            "count": {"$sum": 1}
+        }},
+        {"$sort": {"_id": 1}}
+    ]
+    
+    types = await db.properties.aggregate(type_pipeline).to_list(20)
+    
+    return {
+        "cities": [{"name": c["_id"], "count": c["count"]} for c in cities if c["_id"]],
+        "property_types": [{"bedrooms": t["_id"], "count": t["count"]} for t in types if t["_id"] is not None],
+        "total_properties": await db.properties.count_documents({"status": {"$in": ["available", "under_verification"]}})
+    }
+
+@api_router.get("/sitemap.xml")
+async def get_sitemap_xml():
+    """
+    Returns dynamic XML sitemap - PUBLIC endpoint
+    """
+    site_url = "https://apnaghrapp.in"
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    
+    # Static SEO data
+    cities = ["mohali", "chandigarh", "panchkula", "kharar", "zirakpur", "derabassi", "ludhiana", "jalandhar", "amritsar", "bathinda", "patiala"]
+    areas = {
+        "mohali": ["sector-70", "sector-71", "sector-79", "sector-80", "sector-82", "sector-91", "phase-5", "phase-7", "aerocity", "it-city"],
+        "chandigarh": ["sector-17", "sector-22", "sector-35", "sector-43", "sector-44", "manimajra"],
+        "panchkula": ["sector-4", "sector-9", "sector-12", "sector-20"],
+        "kharar": ["kharar-main", "sunny-enclave", "landran"],
+        "zirakpur": ["zirakpur-main", "vip-road", "patiala-road", "baltana"]
+    }
+    property_types = ["1bhk", "2bhk", "3bhk", "4bhk", "studio", "villa"]
+    listing_types = ["rent", "buy", "pg"]
+    
+    # Blog slugs (static list)
+    blog_slugs = [
+        "how-to-find-perfect-rental-home-mohali",
+        "top-10-localities-chandigarh-tricity-2025",
+        "vastu-tips-new-home-buyers",
+        "rental-agreement-checklist-india",
+        "first-time-home-buyer-guide-india"
+    ]
+    
+    urls = []
+    
+    # Static pages
+    urls.append({"loc": f"{site_url}/", "priority": "1.0", "changefreq": "daily"})
+    urls.append({"loc": f"{site_url}/blogs", "priority": "0.9", "changefreq": "daily"})
+    urls.append({"loc": f"{site_url}/sitemap", "priority": "0.5", "changefreq": "weekly"})
+    urls.append({"loc": f"{site_url}/legal", "priority": "0.3", "changefreq": "monthly"})
+    
+    # City pages
+    for city in cities:
+        for listing_type in listing_types:
+            urls.append({"loc": f"{site_url}/{listing_type}/flats-in-{city}", "priority": "0.8", "changefreq": "weekly"})
+            for prop_type in property_types:
+                urls.append({"loc": f"{site_url}/{listing_type}/{prop_type}-in-{city}", "priority": "0.7", "changefreq": "weekly"})
+        
+        # Area pages
+        city_areas = areas.get(city, [])
+        for area in city_areas:
+            for listing_type in ["rent", "buy"]:
+                urls.append({"loc": f"{site_url}/{listing_type}/flats-in-{area}-{city}", "priority": "0.7", "changefreq": "weekly"})
+    
+    # Blog pages
+    for slug in blog_slugs:
+        urls.append({"loc": f"{site_url}/blogs/{slug}", "priority": "0.7", "changefreq": "monthly"})
+    
+    # Build XML
+    xml = '<?xml version="1.0" encoding="UTF-8"?>\n'
+    xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+    
+    for url in urls:
+        xml += '  <url>\n'
+        xml += f'    <loc>{url["loc"]}</loc>\n'
+        xml += f'    <lastmod>{today}</lastmod>\n'
+        xml += f'    <changefreq>{url["changefreq"]}</changefreq>\n'
+        xml += f'    <priority>{url["priority"]}</priority>\n'
+        xml += '  </url>\n'
+    
+    xml += '</urlset>'
+    
+    return Response(content=xml, media_type="application/xml")
+
+# ============================================
+# End SEO Module Endpoints
+# ============================================
 
 @api_router.get("/properties/{property_id}")
 async def get_property(property_id: str, current_user: dict = Depends(get_current_user)):
