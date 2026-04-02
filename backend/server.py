@@ -1504,6 +1504,19 @@ async def get_available_visits(current_user: dict = Depends(get_current_user)):
         {"_id": 0}
     ).limit(50).to_list(None)
     
+    # Debug: Log query results
+    print(f"DEBUG: Rider {current_user['id']} query returned {len(visits)} visits")
+    print(f"DEBUG: Unassigned query: {unassigned_query}")
+    
+    # Also try a simpler query to see all pending/confirmed visits
+    all_pending = await db.visit_bookings.find(
+        {"status": {"$in": ["pending", "confirmed"]}},
+        {"_id": 0, "status": 1, "rider_id": 1, "assigned_rider_id": 1}
+    ).limit(20).to_list(None)
+    print(f"DEBUG: All pending/confirmed visits: {len(all_pending)}")
+    for v in all_pending[:3]:
+        print(f"DEBUG:   - status:{v.get('status')} rider_id:{v.get('rider_id')} assigned:{v.get('assigned_rider_id')}")
+    
     # Batch fetch all property IDs to avoid N+1 queries
     all_prop_ids = []
     for visit in visits:
