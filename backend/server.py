@@ -1484,12 +1484,15 @@ async def get_available_visits(current_user: dict = Depends(get_current_user)):
     # 1. Unassigned (no rider) - available for any rider to accept
     # 2. Assigned to THIS specific rider - show in their active visits
     
-    # Combine queries - need to use explicit $or since we have nested $or
+    # Combine queries - handle both None and empty string '' for assigned_rider_id
+    # Production data has assigned_rider_id: '' while new code uses None
     visits = await db.visit_bookings.find(
         {"$or": [
-            # Unassigned pending/confirmed visits
+            # Unassigned pending/confirmed visits (rider_id None, assigned_rider_id None or empty)
             {"status": "pending", "rider_id": None, "assigned_rider_id": None},
+            {"status": "pending", "rider_id": None, "assigned_rider_id": ""},
             {"status": "confirmed", "rider_id": None, "assigned_rider_id": None},
+            {"status": "confirmed", "rider_id": None, "assigned_rider_id": ""},
             # Assigned to this rider
             {"rider_id": current_user['id']},
             {"assigned_rider_id": current_user['id']}
