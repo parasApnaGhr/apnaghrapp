@@ -16,9 +16,29 @@ ApnaGhr Visit Platform is a production-ready multi-role rental property platform
 - **🆕 Rider Bank Account Management** - Bank details for payouts
 - **🆕 GPS Location Capture** - Use Current Location for pickup and address
 
-## Latest Updates (April 1, 2026)
+## Latest Updates (April 2, 2026)
 
-### 🆕 Customer Profile System (Complete)
+### 🔴 P0 Bug Fixes - Critical Production Issues RESOLVED
+
+#### P0 Issue 1: Riders Cannot See Admin-Created Manual Visits - FIXED ✅
+**Root Cause**: MongoDB `$in` operator with `[None]` does not match documents where the field is null. This is a known MongoDB quirk.
+**Fix Applied**: Changed query from `{rider_id: {$in: [None]}}` to simple equality `{rider_id: None}` which MongoDB handles correctly for null matching.
+**Files Changed**: `/app/backend/server.py` - `get_available_visits` endpoint
+**Verification**: Riders now see pending manual visits in their available visits list.
+
+#### P0 Issue 2: Customers' Paid Packages Not Converting to Booked Visits - FIXED ✅
+**Root Cause**: `accept_visit` endpoint was accessing `visit['customer_id']` directly, but manual visits created by admin use `user_id` field instead, causing KeyError.
+**Fix Applied**: Added fallback: `customer_id = visit.get('customer_id') or visit.get('user_id')` to handle both field names.
+**Files Changed**: `/app/backend/server.py` - `accept_visit`, `book_visit` endpoints
+**Verification**: Riders can accept manual visits without errors. Customers can book visits using their credits.
+
+#### Additional Fixes in This Session:
+- Fixed `accept_visit` to accept both "pending" and "confirmed" status visits
+- Updated `book_visit` to check both `customer_id` and `user_id` for package lookup
+- Enhanced `create_manual_visit` to include all required fields: `scheduled_date/time`, `otp`, `current_step`, `total_properties`, etc.
+- Migrated existing pending manual visits to add missing fields
+
+## Previous Updates (April 1, 2026)
 
 **Features Implemented:**
 - ✅ Profile stats: Visits count, Total spent, Properties viewed

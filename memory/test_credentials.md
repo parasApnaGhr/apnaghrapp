@@ -17,6 +17,13 @@
 - **Password:** paras123
 - **Name:** Paras
 - **Role:** rider
+- **Status:** Online (default)
+
+## Test Rider Account
+- **Phone:** 6111222333
+- **Password:** rider123
+- **Name:** Test Rider
+- **Role:** rider
 
 ## Alternative Rider
 - **Phone:** 8888888888
