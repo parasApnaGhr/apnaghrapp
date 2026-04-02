@@ -3580,20 +3580,29 @@ async def get_customer_wallet(current_user: dict = Depends(get_current_user)):
         "$or": [{"customer_id": current_user['id']}, {"user_id": current_user['id']}]
     })
     
-    # Get visit packages/credits
+    # Get visit packages/credits - check BOTH customer_id and user_id
     packages = await db.visit_packages.find(
-        {"user_id": current_user['id']},
+        {"$or": [{"customer_id": current_user['id']}, {"user_id": current_user['id']}]},
         {"_id": 0}
-    ).to_list(10)
+    ).to_list(20)
     
-    visits_available = sum(p.get('total_visits', 0) - p.get('visits_used', 0) for p in packages)
+    # Calculate available visits from valid packages only
+    now = datetime.now(timezone.utc).isoformat()
+    valid_packages = []
+    visits_available = 0
+    for p in packages:
+        valid_until = p.get('valid_until', '')
+        if valid_until and valid_until > now:
+            remaining = max(0, (p.get('total_visits') or 0) - (p.get('visits_used') or 0))
+            visits_available += remaining
+            valid_packages.append(p)
     
     return sanitize_mongo_doc({
         "total_visits": total_visits,
         "total_spent": total_spent or 0,
         "properties_viewed": properties_viewed,
         "visits_available": visits_available,
-        "packages": packages
+        "packages": valid_packages
     })
 
 @api_router.get("/customer/payments")
