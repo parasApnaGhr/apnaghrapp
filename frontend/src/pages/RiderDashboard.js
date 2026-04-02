@@ -54,6 +54,11 @@ const RiderDashboard = () => {
   // Multi-visit route map
   const [showRouteMap, setShowRouteMap] = useState(false);
 
+  // Exciting Accept Animation State
+  const [showAcceptAnimation, setShowAcceptAnimation] = useState(false);
+  const [acceptedVisitData, setAcceptedVisitData] = useState(null);
+  const [acceptAnimationStep, setAcceptAnimationStep] = useState(0);
+
   // Compliance check state (after each property visit)
   const [showComplianceModal, setShowComplianceModal] = useState(false);
   const [complianceAnswers, setComplianceAnswers] = useState({
@@ -176,35 +181,40 @@ const RiderDashboard = () => {
 
   const handleAcceptVisit = async (visitId) => {
     try {
+      // Show exciting acceptance animation immediately
+      setShowAcceptAnimation(true);
+      setAcceptAnimationStep(1); // "Accepting..."
+      
       const response = await visitAPI.acceptVisit(visitId);
-      setActiveVisit(response.data);
+      
+      // Store the accepted visit data
+      setAcceptedVisitData(response.data);
       setAvailableVisits([]);
       
-      // Show route info if multiple properties
-      const numProperties = response.data.properties?.length || 1;
-      const optimizedRoute = response.data.optimized_route;
+      // Progress through animation steps
+      setTimeout(() => setAcceptAnimationStep(2), 800);  // "Accepted!"
+      setTimeout(() => setAcceptAnimationStep(3), 1800); // Show earnings
+      setTimeout(() => setAcceptAnimationStep(4), 3000); // Show customer info
+      setTimeout(() => setAcceptAnimationStep(5), 4200); // "Starting navigation..."
       
-      // Get pickup location for navigation
-      const pickupLocation = response.data.visit?.pickup_location;
-      const pickupLat = response.data.visit?.pickup_lat;
-      const pickupLng = response.data.visit?.pickup_lng;
-      const customerName = response.data.visit?.customer_name || 'Customer';
-      
-      if (numProperties > 1 && optimizedRoute) {
-        toast.success(
-          `Visit accepted! ${numProperties} properties, ${optimizedRoute.total_distance_km} km total. Opening navigation...`,
-          { duration: 5000 }
-        );
-      } else {
-        toast.success('Visit accepted! Opening navigation to pickup location...', { duration: 3000 });
-      }
-      
-      // Auto-open Google Maps navigation after a short delay (Uber-like experience)
+      // After animation, set active visit and open navigation
       setTimeout(() => {
+        setActiveVisit(response.data);
+        setShowAcceptAnimation(false);
+        setAcceptAnimationStep(0);
+        
+        // Auto-open Google Maps navigation
+        const pickupLocation = response.data.visit?.pickup_location;
+        const pickupLat = response.data.visit?.pickup_lat;
+        const pickupLng = response.data.visit?.pickup_lng;
+        const customerName = response.data.visit?.customer_name || 'Customer';
+        
         openNavigationToPickup(pickupLat, pickupLng, pickupLocation, customerName);
-      }, 1500);
+      }, 5500);
       
     } catch (error) {
+      setShowAcceptAnimation(false);
+      setAcceptAnimationStep(0);
       toast.error(error.response?.data?.detail || 'Failed to accept visit');
     }
   };
@@ -1625,6 +1635,368 @@ const RiderDashboard = () => {
                 </button>
               </div>
             </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Exciting Accept Animation Modal - Uber Style */}
+      <AnimatePresence>
+        {showAcceptAnimation && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] bg-[#04473C] flex items-center justify-center overflow-hidden"
+          >
+            {/* Animated Background Circles */}
+            <div className="absolute inset-0 overflow-hidden">
+              {[...Array(6)].map((_, i) => (
+                <motion.div
+                  key={i}
+                  className="absolute rounded-full bg-white/5"
+                  initial={{ scale: 0, opacity: 0 }}
+                  animate={{ 
+                    scale: [0, 2, 2.5],
+                    opacity: [0, 0.3, 0],
+                  }}
+                  transition={{
+                    duration: 3,
+                    delay: i * 0.5,
+                    repeat: Infinity,
+                    ease: "easeOut"
+                  }}
+                  style={{
+                    width: '300px',
+                    height: '300px',
+                    left: `${20 + i * 15}%`,
+                    top: `${30 + (i % 3) * 20}%`,
+                  }}
+                />
+              ))}
+            </div>
+
+            {/* Confetti Effect */}
+            {acceptAnimationStep >= 2 && (
+              <div className="absolute inset-0 pointer-events-none">
+                {[...Array(30)].map((_, i) => (
+                  <motion.div
+                    key={i}
+                    className="absolute w-3 h-3"
+                    initial={{ 
+                      y: -20,
+                      x: Math.random() * window.innerWidth,
+                      rotate: 0,
+                      opacity: 1
+                    }}
+                    animate={{ 
+                      y: window.innerHeight + 100,
+                      rotate: 360 * (Math.random() > 0.5 ? 1 : -1),
+                      opacity: [1, 1, 0]
+                    }}
+                    transition={{
+                      duration: 3 + Math.random() * 2,
+                      delay: Math.random() * 0.5,
+                      ease: "linear"
+                    }}
+                    style={{
+                      backgroundColor: ['#FFD700', '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7'][i % 6],
+                      borderRadius: Math.random() > 0.5 ? '50%' : '2px',
+                    }}
+                  />
+                ))}
+              </div>
+            )}
+
+            {/* Main Content */}
+            <div className="relative z-10 text-center px-8 max-w-md mx-auto">
+              
+              {/* Step 1: Accepting... */}
+              <AnimatePresence mode="wait">
+                {acceptAnimationStep === 1 && (
+                  <motion.div
+                    key="step1"
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.8 }}
+                    className="text-white"
+                  >
+                    <motion.div
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                      className="w-20 h-20 border-4 border-white/30 border-t-white rounded-full mx-auto mb-6"
+                    />
+                    <p className="text-2xl font-medium">Accepting Visit...</p>
+                  </motion.div>
+                )}
+
+                {/* Step 2: Accepted! */}
+                {acceptAnimationStep === 2 && (
+                  <motion.div
+                    key="step2"
+                    initial={{ opacity: 0, scale: 0.5 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, y: -50 }}
+                    className="text-white"
+                  >
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: [0, 1.3, 1] }}
+                      transition={{ duration: 0.5, times: [0, 0.6, 1] }}
+                      className="w-24 h-24 bg-[#4ECDC4] rounded-full mx-auto mb-6 flex items-center justify-center"
+                    >
+                      <CheckCircle className="w-14 h-14 text-white" strokeWidth={2.5} />
+                    </motion.div>
+                    <motion.h2
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="text-4xl font-bold mb-2"
+                    >
+                      ACCEPTED!
+                    </motion.h2>
+                    <motion.p
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.3 }}
+                      className="text-white/80 text-lg"
+                    >
+                      You got a new ride!
+                    </motion.p>
+                  </motion.div>
+                )}
+
+                {/* Step 3: Show Earnings */}
+                {acceptAnimationStep === 3 && acceptedVisitData && (
+                  <motion.div
+                    key="step3"
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -30 }}
+                    className="text-white"
+                  >
+                    {/* Money Rain Effect */}
+                    <div className="absolute inset-0 pointer-events-none overflow-hidden">
+                      {[...Array(15)].map((_, i) => (
+                        <motion.div
+                          key={i}
+                          className="absolute text-4xl"
+                          initial={{ 
+                            y: -50,
+                            x: Math.random() * 300 + 50,
+                            rotate: 0,
+                            opacity: 1
+                          }}
+                          animate={{ 
+                            y: 800,
+                            rotate: 360,
+                            opacity: [1, 1, 0]
+                          }}
+                          transition={{
+                            duration: 3,
+                            delay: i * 0.2,
+                            ease: "linear"
+                          }}
+                        >
+                          💰
+                        </motion.div>
+                      ))}
+                    </div>
+                    
+                    <motion.div
+                      initial={{ scale: 0.8 }}
+                      animate={{ scale: [0.8, 1.1, 1] }}
+                      className="mb-6"
+                    >
+                      <motion.div
+                        animate={{ 
+                          scale: [1, 1.05, 1],
+                        }}
+                        transition={{ duration: 0.5, repeat: Infinity }}
+                        className="inline-block"
+                      >
+                        <p className="text-xl text-[#4ECDC4] uppercase tracking-wider mb-3 font-bold">💵 You'll Earn 💵</p>
+                      </motion.div>
+                      <div className="flex items-center justify-center gap-2">
+                        <motion.span
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          className="text-6xl font-bold text-[#FFD700]"
+                        >
+                          ₹
+                        </motion.span>
+                        <motion.span
+                          initial={{ opacity: 0, scale: 0 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+                          className="text-8xl font-black text-white"
+                          style={{ textShadow: '0 0 30px rgba(78, 205, 196, 0.5)' }}
+                        >
+                          {acceptedVisitData.visit?.total_earnings || (acceptedVisitData.properties?.length || 1) * 100}
+                        </motion.span>
+                      </div>
+                      <motion.p
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.5 }}
+                        className="text-[#4ECDC4] mt-2 text-lg"
+                      >
+                        Cash in your pocket! 🎉
+                      </motion.p>
+                    </motion.div>
+                    
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.4 }}
+                      className="flex items-center justify-center gap-4 text-white/80"
+                    >
+                      <div className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full">
+                        <Home className="w-5 h-5" />
+                        <span>{acceptedVisitData.properties?.length || 1} {(acceptedVisitData.properties?.length || 1) === 1 ? 'Property' : 'Properties'}</span>
+                      </div>
+                      {acceptedVisitData.optimized_route && (
+                        <div className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full">
+                          <Navigation className="w-5 h-5" />
+                          <span>{acceptedVisitData.optimized_route.total_distance_km} km</span>
+                        </div>
+                      )}
+                    </motion.div>
+                  </motion.div>
+                )}
+
+                {/* Step 4: Customer Info */}
+                {acceptAnimationStep === 4 && acceptedVisitData && (
+                  <motion.div
+                    key="step4"
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -30 }}
+                    className="text-white"
+                  >
+                    {/* Pulsing rings around avatar */}
+                    <div className="relative mx-auto w-28 h-28 mb-6">
+                      <motion.div
+                        className="absolute inset-0 rounded-full border-2 border-[#4ECDC4]"
+                        animate={{ scale: [1, 1.5, 1.5], opacity: [0.5, 0, 0] }}
+                        transition={{ duration: 2, repeat: Infinity }}
+                      />
+                      <motion.div
+                        className="absolute inset-0 rounded-full border-2 border-[#4ECDC4]"
+                        animate={{ scale: [1, 1.3, 1.3], opacity: [0.5, 0, 0] }}
+                        transition={{ duration: 2, repeat: Infinity, delay: 0.5 }}
+                      />
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        className="w-28 h-28 bg-gradient-to-br from-[#4ECDC4] to-[#44A08D] rounded-full flex items-center justify-center shadow-lg"
+                      >
+                        <User className="w-14 h-14" />
+                      </motion.div>
+                    </div>
+                    
+                    <motion.p
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="text-[#4ECDC4] uppercase tracking-wider mb-2 font-medium"
+                    >
+                      🎯 Your Customer
+                    </motion.p>
+                    
+                    <motion.h3
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.2 }}
+                      className="text-4xl font-bold mb-4"
+                    >
+                      {acceptedVisitData.customer?.name || acceptedVisitData.visit?.customer_name || 'Customer'}
+                    </motion.h3>
+                    
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: 0.4 }}
+                      className="bg-white/10 backdrop-blur-sm rounded-2xl p-5 mt-4 border border-white/20"
+                    >
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="w-10 h-10 bg-[#FF5A5F] rounded-full flex items-center justify-center">
+                          <MapPin className="w-5 h-5" />
+                        </div>
+                        <p className="text-sm text-white/70 uppercase tracking-wider">Pickup Location</p>
+                      </div>
+                      <p className="text-lg text-left">
+                        {acceptedVisitData.visit?.pickup_location || 'Location will be shown after navigation starts'}
+                      </p>
+                    </motion.div>
+                    
+                    {/* Phone Number */}
+                    {(acceptedVisitData.customer?.phone || acceptedVisitData.visit?.customer_phone) && (
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.6 }}
+                        className="mt-4 flex items-center justify-center gap-2 text-[#4ECDC4]"
+                      >
+                        <Phone className="w-5 h-5" />
+                        <span className="text-lg">{acceptedVisitData.customer?.phone || acceptedVisitData.visit?.customer_phone}</span>
+                      </motion.div>
+                    )}
+                  </motion.div>
+                )}
+
+                {/* Step 5: Starting Navigation */}
+                {acceptAnimationStep === 5 && (
+                  <motion.div
+                    key="step5"
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="text-white"
+                  >
+                    <motion.div
+                      animate={{ 
+                        scale: [1, 1.2, 1],
+                        rotate: [0, 10, -10, 0]
+                      }}
+                      transition={{ duration: 0.8, repeat: Infinity }}
+                      className="w-24 h-24 bg-[#1a73e8] rounded-full mx-auto mb-6 flex items-center justify-center"
+                    >
+                      <Navigation className="w-12 h-12" />
+                    </motion.div>
+                    
+                    <motion.h2
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="text-2xl font-bold mb-2"
+                    >
+                      Opening Google Maps...
+                    </motion.h2>
+                    
+                    <motion.p
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: [0, 1, 0] }}
+                      transition={{ duration: 1.5, repeat: Infinity }}
+                      className="text-white/80"
+                    >
+                      Get ready to drive!
+                    </motion.p>
+                    
+                    {/* Animated dots */}
+                    <div className="flex justify-center gap-2 mt-4">
+                      {[0, 1, 2].map((i) => (
+                        <motion.div
+                          key={i}
+                          className="w-3 h-3 bg-white rounded-full"
+                          animate={{ opacity: [0.3, 1, 0.3] }}
+                          transition={{
+                            duration: 1,
+                            delay: i * 0.2,
+                            repeat: Infinity,
+                          }}
+                        />
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

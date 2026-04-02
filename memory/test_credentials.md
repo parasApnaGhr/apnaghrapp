@@ -3,7 +3,7 @@
 ## Customer Account
 - **Phone:** 7696046257
 - **Password:** naveen@001
-- **Name:** Paras
+- **Name:** Naveen Sharma
 - **Role:** customer
 
 ## Admin Account
@@ -12,16 +12,17 @@
 - **Name:** Admin User
 - **Role:** admin
 
-## Test Rider Account
+## Rider Accounts
+### Primary Rider
+- **Phone:** 9877704235
+- **Password:** Guri@1234
+- **Name:** Gurpal Singh
+- **Role:** rider
+
+### Test Rider (Preview)
 - **Phone:** 6111222333
 - **Password:** rider123
 - **Name:** Test Rider
-- **Role:** rider
-
-## Alternative Rider
-- **Phone:** 9915413810
-- **Password:** paras123
-- **Name:** Paras
 - **Role:** rider
 
 ## Seller Account
@@ -29,10 +30,9 @@
 - **Password:** seller123
 - **Name:** Test Seller Raj
 - **Role:** seller
-- **Referral Code:** EXYE1OZD
-- **City:** Mohali
 
-## Advertiser Account
-- **Phone:** 9999999999
-- **Name:** Rahul Kumar
-- **Role:** advertiser
+## Production URL
+- **URL:** https://apnaghrapp.in
+
+## Preview URL  
+- **URL:** https://field-rider-ops.preview.emergentagent.com
