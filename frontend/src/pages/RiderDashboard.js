@@ -823,56 +823,113 @@ const RiderDashboard = () => {
                         className="bg-white border border-[#E5E1DB] p-6 hover:shadow-lg transition-shadow"
                         data-testid={`visit-request-${visit.id}`}
                       >
+                        {/* Header with Property Count & Earnings */}
                         <div className="flex items-start justify-between mb-4">
                           <div>
-                            <h4 className="font-medium text-lg text-[#1A1C20]">Multi-Property Visit</h4>
+                            <div className="flex items-center gap-2 mb-1">
+                              <h4 className="font-medium text-lg text-[#1A1C20]">
+                                {(visit.property_ids?.length || 1) === 1 
+                                  ? 'Single Property Visit' 
+                                  : `${visit.property_ids?.length || 1} Properties to Visit`}
+                              </h4>
+                              {(visit.property_ids?.length || 1) > 1 && (
+                                <span className="bg-[#FF5A5F] text-white text-xs px-2 py-0.5 rounded-full font-medium">
+                                  Multi-Stop
+                                </span>
+                              )}
+                            </div>
                             <p className="text-sm text-[#4A4D53]">
-                              {visit.property_ids?.length || 1} properties · {visit.estimated_duration || '~1hr'}
+                              {visit.estimated_duration || `~${(visit.property_ids?.length || 1) * 30} mins`}
                             </p>
                           </div>
                           <div className="flex flex-col items-end gap-1">
                             <span className="badge badge-warning">Pending</span>
                             {visit.distance_km !== null && visit.distance_km !== undefined && (
-                              <span className="text-xs font-medium text-[#04473C] bg-[#E6F0EE] px-2 py-1">
-                                {visit.distance_km} km away
+                              <span className="text-xs font-medium text-[#04473C] bg-[#E6F0EE] px-2 py-1 rounded">
+                                {visit.distance_km} km
                               </span>
                             )}
                           </div>
                         </div>
 
+                        {/* Earnings Banner */}
+                        <div className="bg-gradient-to-r from-[#04473C] to-[#065f4e] rounded-lg p-4 mb-4">
+                          <div className="flex items-center justify-between text-white">
+                            <div>
+                              <p className="text-xs text-white/70 uppercase tracking-wider">You'll Earn</p>
+                              <div className="flex items-center gap-1">
+                                <IndianRupee className="w-6 h-6" />
+                                <span className="text-3xl font-bold">
+                                  {visit.total_earnings || (visit.property_ids?.length || 1) * 100}
+                                </span>
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-xs text-white/70">
+                                ₹100 × {visit.property_ids?.length || 1} {(visit.property_ids?.length || 1) === 1 ? 'property' : 'properties'}
+                              </p>
+                              {(visit.property_ids?.length || 1) > 1 && (
+                                <p className="text-sm text-[#4ECDC4] font-medium mt-1">
+                                  +Bonus for multi-stop!
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* All Property Locations */}
                         <div className="space-y-2 mb-4">
-                          {visit.properties?.slice(0, 3).map((prop, idx) => (
-                            <div key={prop.id} className="flex items-center gap-3 bg-[#F3F4F6] rounded-lg p-3">
-                              <div className="w-8 h-8 bg-[#FF5A5F] text-white rounded-full flex items-center justify-center font-bold text-sm">
+                          <p className="text-xs text-[#6B7280] uppercase tracking-wider font-medium mb-2">
+                            {(visit.property_ids?.length || 1) === 1 ? 'Property Location' : 'All Locations'}
+                          </p>
+                          {visit.properties?.map((prop, idx) => (
+                            <div key={prop.id} className="flex items-center gap-3 bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg p-3">
+                              <div className="w-8 h-8 bg-[#FF5A5F] text-white rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0">
                                 {idx + 1}
                               </div>
                               <div className="flex-1 min-w-0">
-                                <p className="font-medium truncate">{prop.title}</p>
-                                <p className="text-xs text-[#52525B]">{prop.area_name}</p>
+                                <p className="font-medium text-[#1A1C20] truncate">{prop.title}</p>
+                                <p className="text-sm text-[#6B7280] truncate">{prop.location || prop.area_name}</p>
                               </div>
+                              {idx < (visit.properties?.length || 1) - 1 && (
+                                <div className="text-xs text-[#9CA3AF]">→</div>
+                              )}
                             </div>
                           ))}
+                          {/* If no properties array, show basic info */}
+                          {(!visit.properties || visit.properties.length === 0) && (
+                            <div className="flex items-center gap-3 bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg p-3">
+                              <div className="w-8 h-8 bg-[#FF5A5F] text-white rounded-full flex items-center justify-center font-bold text-sm">
+                                1
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="font-medium text-[#1A1C20] truncate">{visit.property_title || 'Property Visit'}</p>
+                                <p className="text-sm text-[#6B7280] truncate">{visit.property_location || visit.pickup_location || 'Location details available after accepting'}</p>
+                              </div>
+                            </div>
+                          )}
                         </div>
 
+                        {/* Schedule & Customer Info */}
                         <div className="flex items-center justify-between py-3 border-y border-[#E5E7EB] mb-4">
                           <div className="flex items-center gap-2 text-sm">
                             <Clock className="w-4 h-4 text-[#52525B]" />
-                            <span>{visit.scheduled_date} at {visit.scheduled_time}</span>
+                            <span>{visit.scheduled_date || 'Flexible'} {visit.scheduled_time ? `at ${visit.scheduled_time}` : ''}</span>
                           </div>
-                          <div className="flex items-center gap-1 text-[#4ECDC4] font-bold">
-                            <IndianRupee className="w-4 h-4" />
-                            <span>{visit.total_earnings || (visit.property_ids?.length || 1) * 100}</span>
+                          <div className="text-sm text-[#6B7280]">
+                            Customer: {visit.customer_name || 'Available after accept'}
                           </div>
                         </div>
 
+                        {/* Accept Button */}
                         <div className="flex gap-3">
                           <button
                             onClick={() => handleAcceptVisit(visit.id)}
-                            className="btn-primary flex-1 flex items-center justify-center gap-2"
+                            className="btn-primary flex-1 flex items-center justify-center gap-2 py-4 text-lg"
                             data-testid={`accept-visit-${visit.id}`}
                           >
-                            <CheckCircle className="w-5 h-5" />
-                            Accept
+                            <CheckCircle className="w-6 h-6" />
+                            ACCEPT & Earn ₹{visit.total_earnings || (visit.property_ids?.length || 1) * 100}
                           </button>
                         </div>
                       </motion.div>
