@@ -1336,12 +1336,16 @@ async def cashfree_webhook(request: Request):
 @api_router.post("/visits/book")
 async def book_visit(booking_data: VisitBookingCreate, current_user: dict = Depends(get_current_user)):
     # Check if user has available visits using aggregation
+    # Support both customer_id and user_id for backward compatibility
     num_properties = len(booking_data.property_ids)
     
     pipeline = [
         {
             "$match": {
-                "customer_id": current_user['id'],
+                "$or": [
+                    {"customer_id": current_user['id']},
+                    {"user_id": current_user['id']}
+                ],
                 "valid_until": {"$gt": datetime.now(timezone.utc).isoformat()}
             }
         },
@@ -1480,42 +1484,24 @@ async def get_available_visits(current_user: dict = Depends(get_current_user)):
     # 1. Unassigned (no rider) - available for any rider to accept
     # 2. Assigned to THIS specific rider - show in their active visits
     
-    # Query for unassigned visits (available to all riders)
-    unassigned_query = {
-        "status": {"$in": ["pending", "confirmed"]},
-        "$and": [
-            {"$or": [{"rider_id": None}, {"rider_id": {"$exists": False}}]},
-            {"$or": [{"assigned_rider_id": None}, {"assigned_rider_id": {"$exists": False}}]}
-        ]
-    }
-    
-    # Query for visits assigned to this rider but not yet started
-    assigned_to_me_query = {
-        "status": {"$in": ["pending", "confirmed", "assigned"]},
-        "$or": [
+    # Combine queries - need to use explicit $or since we have nested $or
+    visits = await db.visit_bookings.find(
+        {"$or": [
+            # Unassigned pending/confirmed visits
+            {"status": "pending", "rider_id": None, "assigned_rider_id": None},
+            {"status": "confirmed", "rider_id": None, "assigned_rider_id": None},
+            # Assigned to this rider
             {"rider_id": current_user['id']},
             {"assigned_rider_id": current_user['id']}
-        ]
-    }
-    
-    # Combine both queries
-    visits = await db.visit_bookings.find(
-        {"$or": [unassigned_query, assigned_to_me_query]}, 
+        ]}, 
         {"_id": 0}
     ).limit(50).to_list(None)
     
+    # Filter to only show pending/confirmed/assigned status
+    visits = [v for v in visits if v.get('status') in ['pending', 'confirmed', 'assigned']]
+    
     # Debug: Log query results
     print(f"DEBUG: Rider {current_user['id']} query returned {len(visits)} visits")
-    print(f"DEBUG: Unassigned query: {unassigned_query}")
-    
-    # Also try a simpler query to see all pending/confirmed visits
-    all_pending = await db.visit_bookings.find(
-        {"status": {"$in": ["pending", "confirmed"]}},
-        {"_id": 0, "status": 1, "rider_id": 1, "assigned_rider_id": 1}
-    ).limit(20).to_list(None)
-    print(f"DEBUG: All pending/confirmed visits: {len(all_pending)}")
-    for v in all_pending[:3]:
-        print(f"DEBUG:   - status:{v.get('status')} rider_id:{v.get('rider_id')} assigned:{v.get('assigned_rider_id')}")
     
     # Batch fetch all property IDs to avoid N+1 queries
     all_prop_ids = []
@@ -1628,10 +1614,15 @@ async def accept_visit(visit_id: str, current_user: dict = Depends(get_current_u
     rider_lat = rider.get('current_lat') or rider.get('latitude')
     rider_lng = rider.get('current_lng') or rider.get('longitude')
     
-    # Get the visit to check distance
-    visit = await db.visit_bookings.find_one({"id": visit_id, "status": "pending"}, {"_id": 0})
+    # Get the visit to check distance - accept both pending and confirmed status
+    # Using $or for status matching due to MongoDB query behavior
+    visit = await db.visit_bookings.find_one({
+        "id": visit_id, 
+        "$or": [{"status": "pending"}, {"status": "confirmed"}],
+        "rider_id": None  # Simple equality for null check
+    }, {"_id": 0})
     if not visit:
-        raise HTTPException(status_code=400, detail="Visit not available")
+        raise HTTPException(status_code=400, detail="Visit not available or already assigned")
     
     # Get property coordinates to verify distance
     prop_ids = visit.get('property_ids', [])
@@ -1654,9 +1645,14 @@ async def accept_visit(visit_id: str, current_user: dict = Depends(get_current_u
                     )
     
     result = await db.visit_bookings.update_one(
-        {"id": visit_id, "status": "pending"},
+        {
+            "id": visit_id, 
+            "$or": [{"status": "pending"}, {"status": "confirmed"}],
+            "rider_id": None  # Simple equality for null check
+        },
         {"$set": {
             "rider_id": current_user['id'], 
+            "assigned_rider_id": current_user['id'],  # Set both for consistency
             "status": "rider_assigned",
             "current_step": "go_to_customer"
         }}
@@ -1668,12 +1664,19 @@ async def accept_visit(visit_id: str, current_user: dict = Depends(get_current_u
     # Return visit with ALL property details including exact location
     visit = await db.visit_bookings.find_one({"id": visit_id}, {"_id": 0})
     
-    # Get customer details
-    customer = await db.users.find_one({"id": visit['customer_id']}, {"_id": 0, "password": 0})
+    # Get customer details - check both customer_id and user_id for compatibility
+    customer_id = visit.get('customer_id') or visit.get('user_id')
+    customer = None
+    if customer_id:
+        customer = await db.users.find_one({"id": customer_id}, {"_id": 0, "password": 0})
     
     # Get all properties with FULL details including exact address
     properties = []
-    for prop_id in visit.get('property_ids', []):
+    prop_ids = visit.get('property_ids', [])
+    # Also check for single property_id field
+    if not prop_ids and visit.get('property_id'):
+        prop_ids = [visit.get('property_id')]
+    for prop_id in prop_ids:
         prop = await db.properties.find_one({"id": prop_id}, {"_id": 0})
         if prop:
             properties.append(prop)
@@ -2527,6 +2530,9 @@ class ManualVisitCreate(BaseModel):
     assigned_rider_id: Optional[str] = None
     notes: Optional[str] = None
     property_count: int = 1
+    pickup_location: Optional[str] = None
+    pickup_lat: Optional[float] = None
+    pickup_lng: Optional[float] = None
 
 @api_router.get("/admin/search-customer")
 async def search_customer(phone: str, current_user: dict = Depends(get_current_user)):
@@ -2614,12 +2620,22 @@ async def create_manual_visit(data: ManualVisitCreate, current_user: dict = Depe
             "property_location": f"{prop.get('area_name', '')}, {prop.get('city', '')}",
             "preferred_date": data.preferred_date,
             "preferred_time": data.preferred_time,
+            "scheduled_date": data.preferred_date,  # Alias for compatibility
+            "scheduled_time": data.preferred_time,  # Alias for compatibility
             "status": "pending",
             "rider_id": None,  # Required for available visits endpoint
-            "assigned_rider_id": data.assigned_rider_id,
+            "assigned_rider_id": data.assigned_rider_id if data.assigned_rider_id else None,
+            "current_step": "waiting",  # Required for rider flow
+            "current_property_index": 0,
+            "total_properties": 1,
+            "otp": str(uuid.uuid4().int)[:6],  # Generate OTP for customer verification
             "payment_status": "completed",
             "payment_method": data.payment_method,
             "amount_paid": data.payment_amount / len(data.property_ids),
+            "total_earnings": 100,  # ₹100 per property for rider
+            "pickup_location": data.pickup_location if hasattr(data, 'pickup_location') and data.pickup_location else "",
+            "pickup_lat": data.pickup_lat if hasattr(data, 'pickup_lat') else None,
+            "pickup_lng": data.pickup_lng if hasattr(data, 'pickup_lng') else None,
             "created_by": "admin_manual",
             "created_at": datetime.now(timezone.utc)
         }
