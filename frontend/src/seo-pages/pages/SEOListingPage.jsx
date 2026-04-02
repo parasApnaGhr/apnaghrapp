@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Search, SlidersHorizontal, ChevronRight, Home, MapPin, ArrowLeft, Grid, List } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
 import SEOHead from '../components/SEOHead';
 import SEOPropertyCard from '../components/SEOPropertyCard';
 import SEOFAQSection from '../components/SEOFAQSection';
@@ -325,11 +326,10 @@ const SEOListingPage = ({ listingType = 'rent' }) => {
 
           {/* Area Content */}
           {areaContent && (
-            <section className="mt-12 prose prose-lg max-w-none">
-              <div 
-                className="bg-white rounded-xl border border-gray-200 p-6 md:p-8"
-                dangerouslySetInnerHTML={{ __html: areaContent.replace(/\n/g, '<br/>') }}
-              />
+            <section className="mt-12">
+              <div className="bg-white rounded-xl border border-gray-200 p-6 md:p-8 prose prose-lg max-w-none prose-headings:text-gray-900 prose-p:text-gray-700 prose-strong:text-gray-900 prose-ul:text-gray-700">
+                <ReactMarkdown>{areaContent}</ReactMarkdown>
+              </div>
             </section>
           )}
 
