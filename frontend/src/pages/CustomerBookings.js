@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { visitAPI } from '../utils/api';
-import { ArrowLeft, Calendar, MapPin, User, Clock, Home, Phone, Navigation } from 'lucide-react';
+import { ArrowLeft, Calendar, MapPin, User, Clock, Home, Phone, Navigation, RefreshCw, X, Locate } from 'lucide-react';
 import { toast } from 'sonner';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const CustomerBookings = () => {
   const navigate = useNavigate();
@@ -11,6 +12,9 @@ const CustomerBookings = () => {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedBooking, setSelectedBooking] = useState(null);
+  const [trackingData, setTrackingData] = useState(null);
+  const [showTrackingModal, setShowTrackingModal] = useState(false);
+  const [trackingLoading, setTrackingLoading] = useState(false);
 
   useEffect(() => {
     loadBookings();
@@ -35,6 +39,42 @@ const CustomerBookings = () => {
       setSelectedBooking(response.data);
     } catch (error) {
       toast.error('Failed to load booking details');
+    }
+  };
+
+  // Track rider live location and ETA
+  const handleTrackRider = async (booking) => {
+    setTrackingLoading(true);
+    setShowTrackingModal(true);
+    try {
+      const response = await visitAPI.trackVisit(booking.id);
+      setTrackingData({
+        ...response.data,
+        booking: booking
+      });
+    } catch (error) {
+      console.error('Track rider error:', error);
+      toast.error('Unable to get tracking info');
+      setTrackingData({ error: true, booking: booking });
+    } finally {
+      setTrackingLoading(false);
+    }
+  };
+
+  // Refresh tracking data
+  const refreshTracking = async () => {
+    if (!trackingData?.booking) return;
+    setTrackingLoading(true);
+    try {
+      const response = await visitAPI.trackVisit(trackingData.booking.id);
+      setTrackingData({
+        ...response.data,
+        booking: trackingData.booking
+      });
+    } catch (error) {
+      console.error('Refresh tracking error:', error);
+    } finally {
+      setTrackingLoading(false);
     }
   };
 
@@ -176,23 +216,17 @@ const CustomerBookings = () => {
                           )}
                         </div>
                         
-                        {/* ETA Section - if rider is on the way */}
-                        {['pickup_started', 'navigating'].includes(booking.status) && booking.rider_lat && booking.rider_lng && (
+                        {/* Track Rider Button - Uber Style */}
+                        {['rider_assigned', 'pickup_started', 'at_customer', 'navigating', 'at_property'].includes(booking.status) && (
                           <div className="mt-4 pt-4 border-t border-white/20">
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-2">
-                                <Navigation className="w-4 h-4" />
-                                <span className="text-sm">Rider is on the way</span>
-                              </div>
-                              <button
-                                onClick={() => {
-                                  window.open(`https://www.google.com/maps?q=${booking.rider_lat},${booking.rider_lng}`, '_blank');
-                                }}
-                                className="text-xs bg-white/20 px-3 py-1 rounded-full hover:bg-white/30 transition-colors"
-                              >
-                                View on Map
-                              </button>
-                            </div>
+                            <button
+                              onClick={() => handleTrackRider(booking)}
+                              className="w-full py-3 bg-white text-[#04473C] rounded-lg font-semibold flex items-center justify-center gap-2 hover:bg-white/90 transition-colors"
+                              data-testid={`track-rider-btn-${booking.id}`}
+                            >
+                              <Locate className="w-5 h-5" />
+                              Track Rider Live
+                            </button>
                           </div>
                         )}
                       </div>
@@ -367,6 +401,162 @@ const CustomerBookings = () => {
             </div>
           </div>
         )}
+
+        {/* Live Tracking Modal - Uber Style */}
+        <AnimatePresence>
+          {showTrackingModal && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/60 flex items-end sm:items-center justify-center z-50"
+              onClick={() => setShowTrackingModal(false)}
+            >
+              <motion.div
+                initial={{ y: 100, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: 100, opacity: 0 }}
+                className="bg-white w-full sm:max-w-md sm:rounded-xl rounded-t-3xl overflow-hidden"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {/* Header */}
+                <div className="bg-gradient-to-r from-[#04473C] to-[#065f4e] p-5 text-white">
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="text-xl font-bold">Live Tracking</h3>
+                    <button
+                      onClick={() => setShowTrackingModal(false)}
+                      className="p-1 hover:bg-white/20 rounded-full transition-colors"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
+                  <p className="text-sm text-white/80">Real-time rider location</p>
+                </div>
+
+                {/* Content */}
+                <div className="p-5">
+                  {trackingLoading ? (
+                    <div className="flex items-center justify-center py-12">
+                      <div className="text-center">
+                        <div className="w-12 h-12 border-4 border-[#04473C] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                        <p className="text-[#4A626C]">Getting location...</p>
+                      </div>
+                    </div>
+                  ) : trackingData?.error ? (
+                    <div className="text-center py-8">
+                      <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <MapPin className="w-8 h-8 text-amber-600" />
+                      </div>
+                      <p className="font-medium text-[#264653] mb-2">Location Unavailable</p>
+                      <p className="text-sm text-[#4A626C]">The rider's location is not available right now</p>
+                    </div>
+                  ) : trackingData ? (
+                    <div className="space-y-5">
+                      {/* Rider Info */}
+                      <div className="flex items-center gap-4 p-4 bg-[#F3F2EB] rounded-xl">
+                        <div className="w-14 h-14 bg-[#04473C] rounded-full flex items-center justify-center">
+                          <User className="w-7 h-7 text-white" />
+                        </div>
+                        <div className="flex-1">
+                          <p className="font-bold text-lg">{trackingData.rider?.name || trackingData.booking?.rider_name || 'Your Rider'}</p>
+                          <div className="flex items-center gap-2 mt-1">
+                            {trackingData.rider?.is_online && (
+                              <span className="inline-flex items-center gap-1 text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">
+                                <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
+                                Online
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        {(trackingData.rider?.phone || trackingData.booking?.rider_phone) && (
+                          <a
+                            href={`tel:${trackingData.rider?.phone || trackingData.booking?.rider_phone}`}
+                            className="w-12 h-12 bg-[#04473C] rounded-full flex items-center justify-center"
+                          >
+                            <Phone className="w-5 h-5 text-white" />
+                          </a>
+                        )}
+                      </div>
+
+                      {/* ETA Card - THE KEY FEATURE */}
+                      {trackingData.eta && (
+                        <div className="bg-gradient-to-br from-[#2A9D8F] to-[#238b7e] text-white p-5 rounded-xl">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <p className="text-sm text-white/80 uppercase tracking-wider mb-1">Estimated Arrival</p>
+                              <p className="text-4xl font-bold">{trackingData.eta.eta_text || `${Math.round(trackingData.eta.eta_minutes)} min`}</p>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-sm text-white/80">Distance</p>
+                              <p className="text-2xl font-semibold">{trackingData.eta.distance_km} km</p>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Current Location */}
+                      {trackingData.rider?.current_lat && trackingData.rider?.current_lng && (
+                        <div className="space-y-3">
+                          <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg">
+                            <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                              <Locate className="w-5 h-5 text-blue-600" />
+                            </div>
+                            <div className="flex-1">
+                              <p className="font-medium text-[#264653]">Rider's Current Location</p>
+                              <p className="text-xs text-[#4A626C]">
+                                {trackingData.rider.current_lat.toFixed(4)}, {trackingData.rider.current_lng.toFixed(4)}
+                              </p>
+                            </div>
+                          </div>
+
+                          {/* View on Google Maps */}
+                          <button
+                            onClick={() => {
+                              window.open(`https://www.google.com/maps?q=${trackingData.rider.current_lat},${trackingData.rider.current_lng}`, '_blank');
+                            }}
+                            className="w-full py-3 bg-[#264653] text-white rounded-lg font-medium flex items-center justify-center gap-2"
+                            data-testid="view-map-btn"
+                          >
+                            <Navigation className="w-5 h-5" />
+                            View on Google Maps
+                          </button>
+                        </div>
+                      )}
+
+                      {/* No Location Available */}
+                      {(!trackingData.rider?.current_lat || !trackingData.rider?.current_lng) && !trackingData.eta && (
+                        <div className="text-center py-6 bg-amber-50 rounded-xl">
+                          <Clock className="w-10 h-10 text-amber-500 mx-auto mb-3" />
+                          <p className="font-medium text-[#264653]">Waiting for Location</p>
+                          <p className="text-sm text-[#4A626C] mt-1">The rider hasn't shared their location yet</p>
+                        </div>
+                      )}
+
+                      {/* Visit Status */}
+                      <div className="p-4 border border-[#E5E3D8] rounded-xl">
+                        <p className="text-sm text-[#4A626C] mb-2">Current Status</p>
+                        <p className="font-semibold text-[#04473C] capitalize">
+                          {trackingData.visit?.current_step?.replace(/_/g, ' ') || trackingData.booking?.status?.replace(/_/g, ' ') || 'In Progress'}
+                        </p>
+                      </div>
+
+                      {/* Refresh Button */}
+                      <button
+                        onClick={refreshTracking}
+                        disabled={trackingLoading}
+                        className="w-full py-3 border-2 border-[#04473C] text-[#04473C] rounded-lg font-medium flex items-center justify-center gap-2 hover:bg-[#04473C] hover:text-white transition-colors"
+                        data-testid="refresh-tracking-btn"
+                      >
+                        <RefreshCw className={`w-5 h-5 ${trackingLoading ? 'animate-spin' : ''}`} />
+                        Refresh Location
+                      </button>
+                    </div>
+                  ) : null}
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </main>
     </div>
   );

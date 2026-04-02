@@ -1,8 +1,8 @@
 # ApnaGhr Test Credentials
 
 ## Customer Account
-- **Phone:** 9915087635
-- **Password:** paras123
+- **Phone:** 7696046257
+- **Password:** naveen@001
 - **Name:** Paras
 - **Role:** customer
 
@@ -12,13 +12,6 @@
 - **Name:** Admin User
 - **Role:** admin
 
-## Rider Account
-- **Phone:** 9915413810
-- **Password:** paras123
-- **Name:** Paras
-- **Role:** rider
-- **Status:** Online (default)
-
 ## Test Rider Account
 - **Phone:** 6111222333
 - **Password:** rider123
@@ -26,12 +19,12 @@
 - **Role:** rider
 
 ## Alternative Rider
-- **Phone:** 8888888888
-- **Password:** (password not set - check MongoDB)
-- **Name:** Aman Singh
+- **Phone:** 9915413810
+- **Password:** paras123
+- **Name:** Paras
 - **Role:** rider
 
-## Seller Account (NEW)
+## Seller Account
 - **Phone:** 9898989898
 - **Password:** seller123
 - **Name:** Test Seller Raj

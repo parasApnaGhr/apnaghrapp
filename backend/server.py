@@ -2161,9 +2161,10 @@ async def save_compliance_check(visit_id: str, data: ComplianceCheckData, curren
         "created_at": datetime.now(timezone.utc).isoformat()
     }
     
-    await db.compliance_checks.insert_one(compliance_record)
+    # Insert into compliance_checks collection
+    await db.compliance_checks.insert_one(compliance_record.copy())  # Use copy to prevent _id mutation
     
-    # Also append to visit record
+    # Also append to visit record (use original record without _id)
     await db.visit_bookings.update_one(
         {"id": visit_id},
         {"$push": {"compliance_checks": compliance_record}}

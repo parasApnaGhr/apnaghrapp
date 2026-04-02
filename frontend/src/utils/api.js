@@ -155,6 +155,8 @@ export const visitAPI = {
   uploadProof: (visitId, formData) => api.post(`/visits/${visitId}/upload-proof`, formData, {
     headers: { 'Content-Type': 'multipart/form-data' }
   }),
+  // Live tracking - Uber-like customer tracking
+  trackVisit: (visitId) => api.get(`/visits/${visitId}/track`),
 };
 
 export const riderAPI = {
