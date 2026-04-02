@@ -184,17 +184,58 @@ const RiderDashboard = () => {
       const numProperties = response.data.properties?.length || 1;
       const optimizedRoute = response.data.optimized_route;
       
+      // Get pickup location for navigation
+      const pickupLocation = response.data.visit?.pickup_location;
+      const pickupLat = response.data.visit?.pickup_lat;
+      const pickupLng = response.data.visit?.pickup_lng;
+      const customerName = response.data.visit?.customer_name || 'Customer';
+      
       if (numProperties > 1 && optimizedRoute) {
         toast.success(
-          `Visit accepted! ${numProperties} properties, ${optimizedRoute.total_distance_km} km total. Route optimized!`,
+          `Visit accepted! ${numProperties} properties, ${optimizedRoute.total_distance_km} km total. Opening navigation...`,
           { duration: 5000 }
         );
       } else {
-        toast.success('Visit accepted! Navigate to customer pickup location');
+        toast.success('Visit accepted! Opening navigation to pickup location...', { duration: 3000 });
       }
+      
+      // Auto-open Google Maps navigation after a short delay (Uber-like experience)
+      setTimeout(() => {
+        openNavigationToPickup(pickupLat, pickupLng, pickupLocation, customerName);
+      }, 1500);
+      
     } catch (error) {
       toast.error(error.response?.data?.detail || 'Failed to accept visit');
     }
+  };
+
+  // Open Google Maps navigation to pickup location (Uber-like)
+  const openNavigationToPickup = (lat, lng, address, customerName) => {
+    let navigationUrl;
+    
+    if (lat && lng) {
+      // If we have coordinates, use them for precise navigation
+      navigationUrl = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&travelmode=driving`;
+    } else if (address) {
+      // Fallback to address-based navigation
+      const encodedAddress = encodeURIComponent(address);
+      navigationUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodedAddress}&travelmode=driving`;
+    } else {
+      toast.info('Pickup location not available. Please contact customer for directions.');
+      return;
+    }
+    
+    // Show a toast with navigation info
+    toast.success(
+      `Navigating to ${customerName}'s pickup location`,
+      { 
+        duration: 4000,
+        icon: '🧭'
+      }
+    );
+    
+    // Open Google Maps in new tab (works on both mobile and desktop)
+    window.open(navigationUrl, '_blank');
   };
 
   const handleAcceptTask = async (taskId) => {
@@ -335,11 +376,21 @@ const RiderDashboard = () => {
   };
 
   const openNavigation = (address, lat, lng) => {
+    let navigationUrl;
+    
     if (lat && lng) {
-      window.open(`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`, '_blank');
+      // Precise navigation with coordinates + driving mode
+      navigationUrl = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&travelmode=driving`;
+    } else if (address) {
+      // Address-based navigation
+      navigationUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(address)}&travelmode=driving`;
     } else {
-      window.open(`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(address)}`, '_blank');
+      toast.error('Location not available');
+      return;
     }
+    
+    // Open Google Maps
+    window.open(navigationUrl, '_blank');
   };
 
   // ToLet Task Photo Upload handlers
@@ -682,19 +733,32 @@ const RiderDashboard = () => {
                 </div>
 
                 <div className="p-6 space-y-4">
-                  {/* Location */}
+                  {/* Location with prominent NAVIGATE button - Uber Style */}
                   {stepInfo.location && (
-                    <button
-                      onClick={() => openNavigation(stepInfo.location, stepInfo.lat, stepInfo.lng)}
-                      className="w-full p-4 bg-[#F5F3F0] flex items-center justify-between hover:bg-[#E5E1DB] transition-colors"
-                      data-testid="navigate-button"
-                    >
-                      <div className="flex items-center gap-3">
-                        <MapPin className="w-5 h-5 text-[#04473C]" strokeWidth={1.5} />
-                        <span className="text-left text-[#1A1C20]">{stepInfo.location}</span>
+                    <div className="bg-gradient-to-r from-[#1a73e8] to-[#4285f4] rounded-xl p-4 text-white">
+                      <div className="flex items-start gap-3 mb-3">
+                        <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
+                          <MapPin className="w-5 h-5" strokeWidth={2} />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs text-white/70 uppercase tracking-wider mb-1">
+                            {stepInfo.title === 'Go to Customer' ? 'Pickup Location' : 'Navigate To'}
+                          </p>
+                          <p className="font-medium text-white leading-tight">{stepInfo.location}</p>
+                        </div>
                       </div>
-                      <Navigation className="w-5 h-5 text-[#04473C]" strokeWidth={1.5} />
-                    </button>
+                      <button
+                        onClick={() => {
+                          openNavigation(stepInfo.location, stepInfo.lat, stepInfo.lng);
+                          toast.success('Opening Google Maps...', { icon: '🧭', duration: 2000 });
+                        }}
+                        className="w-full py-3 bg-white text-[#1a73e8] rounded-lg font-bold flex items-center justify-center gap-2 hover:bg-white/90 transition-colors"
+                        data-testid="navigate-button"
+                      >
+                        <Navigation className="w-5 h-5" strokeWidth={2} />
+                        NAVIGATE IN GOOGLE MAPS
+                      </button>
+                    </div>
                   )}
 
                   {/* OTP */}
