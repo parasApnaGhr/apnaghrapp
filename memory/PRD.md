@@ -666,6 +666,119 @@ bookings = await db.visit_bookings.find(
 - ✅ Read-only operations
 - ✅ Lead capture stored in localStorage (not core DB)
 
+## Rider Onboarding + Legal System (December 2025) ✅ COMPLETE
+
+### 🆕 Multi-Step Rider Onboarding Form
+**Route**: `/join-as-rider` (public, no auth required)
+
+**Steps**:
+1. **Basic Details** - Full Name, Mobile, City, Areas selection
+2. **KYC Verification** - Aadhaar Card, PAN Card (optional), Selfie upload
+3. **Work Details** - Vehicle ownership, Driving License, Experience, Availability
+4. **Payment Details** - UPI ID (required), Bank Account (optional)
+5. **Legal Agreements** - 5 mandatory checkboxes (Non-Circumvention, Commission Protection, Penalty Clause, Work Compliance, Payment Terms)
+6. **Review & Submit** - Summary and final submission
+
+**Frontend Files**:
+- `/app/frontend/src/pages/onboarding/RiderOnboarding.jsx`
+
+### 🆕 Admin Rider Applications Panel
+**Location**: Admin Dashboard → "Rider Applications" tab
+
+**Features**:
+- Stats cards (Total, Pending, Approved, Rejected, Banned)
+- Search by name, phone, city
+- Filter by status and city
+- View application details modal
+- Approve/Reject applications
+- Ban riders with reason
+
+**Frontend Files**:
+- `/app/frontend/src/components/RiderApplicationsPanel.jsx`
+- `/app/frontend/src/pages/AdminDashboard.js` (includes panel)
+
+### 🆕 Role-Specific Privacy Policy Pages
+**Routes**:
+- `/privacy-policy-riders`
+- `/privacy-policy-customers`
+- `/privacy-policy-sellers`
+- `/privacy-policy-builders`
+- `/privacy-policy-advertisers`
+
+**Frontend File**: `/app/frontend/src/pages/PrivacyPolicyPage.jsx`
+
+### Backend API Endpoints
+| Endpoint | Method | Auth | Description |
+|----------|--------|------|-------------|
+| `/api/rider-applications` | POST | Public | Submit new application |
+| `/api/rider-applications/check/{mobile}` | GET | Public | Check if mobile has application |
+| `/api/admin/rider-applications` | GET | Admin | List all applications |
+| `/api/admin/rider-applications/stats` | GET | Admin | Get stats by status/city |
+| `/api/admin/rider-applications/{id}` | GET | Admin | Get application details |
+| `/api/admin/rider-applications/{id}/review` | PATCH | Admin | Approve/reject application |
+| `/api/admin/rider-applications/{id}/ban` | PATCH | Admin | Ban rider |
+
+### SEO Pages Updated
+- `/earn-money-by-visiting-properties` → CTAs link to `/join-as-rider`
+- `/become-property-rider/:city` → CTAs link to `/join-as-rider`
+
+### Legal Updates
+- Jurisdiction: Bathinda, Punjab (updated in LegalPolicies.js)
+- Anti-bypass clauses in onboarding form
+- Commission protection agreements
+
+### Database Schema (New Collection)
+```javascript
+// rider_applications collection
+{
+  id: "app_xxx",
+  full_name: "string",
+  mobile: "string (10 digits)",
+  whatsapp: "string (optional)",
+  city: "string",
+  areas: ["array of strings"],
+  aadhaar_url: "string (file URL)",
+  pan_url: "string (optional)",
+  selfie_url: "string",
+  has_vehicle: boolean,
+  driving_license_url: "string (if has_vehicle)",
+  experience: "string (optional)",
+  availability: "full_time | part_time | weekends",
+  upi_id: "string",
+  bank_name: "string (optional)",
+  account_number: "string (optional)",
+  ifsc_code: "string (optional)",
+  account_holder_name: "string (optional)",
+  legal_agreements: {
+    non_circumvention: true,
+    commission_protection: true,
+    penalty_clause: true,
+    work_compliance: true,
+    payment_terms: true,
+    agreed_at: "ISO timestamp"
+  },
+  status: "pending | under_review | approved | rejected | banned",
+  reviewed_by: "admin_user_id (if reviewed)",
+  reviewed_at: "ISO timestamp",
+  rejection_reason: "string (if rejected)",
+  ban_reason: "string (if banned)",
+  banned_at: "ISO timestamp",
+  created_at: "ISO timestamp",
+  updated_at: "ISO timestamp"
+}
+```
+
+### Testing Status ✅
+- Backend: 18/18 tests passed
+- Frontend: All features verified
+- Test file: `/app/backend/tests/test_rider_onboarding.py`
+- Test report: `/app/test_reports/iteration_14.json`
+
+### Bug Fixed During Testing
+**Issue**: `/api/admin/rider-applications/stats` returned 404 "Application not found"
+**Root Cause**: FastAPI route order - `/{application_id}` matched "stats" as an ID
+**Fix**: Moved `/stats` endpoint before `/{application_id}` in server.py
+
 ## Known Environment Note
 ⚠️ **Preview vs Production Database**: The preview environment (`field-rider-ops.preview.emergentagent.com`) uses a separate MongoDB database from production (`apnaghrapp.in`). Test users created on production won't appear in preview. Always test with preview-specific data or recreate test scenarios on preview.
 
