@@ -711,8 +711,23 @@ const Login = () => {
           )}
         </AnimatePresence>
 
+        {/* Become a Rider CTA */}
+        <div className="mt-8 pt-6 border-t border-[#E5E1DB]">
+          <Link 
+            to="/join-as-rider"
+            className="flex items-center justify-center gap-2 w-full py-3 bg-gradient-to-r from-[#065f4e] to-[#04473C] text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
+            data-testid="become-rider-link"
+          >
+            <Briefcase className="w-5 h-5" />
+            Become a Rider - Earn ₹2000/day
+          </Link>
+          <p className="text-center text-xs text-[#4A4D53] mt-2">
+            No experience needed • Flexible hours • Instant payments
+          </p>
+        </div>
+
         {/* Terms & Privacy */}
-        <p className="text-center text-xs text-[#4A4D53] mt-8">
+        <p className="text-center text-xs text-[#4A4D53] mt-6">
           By continuing, you agree to our{' '}
           <Link to="/legal" className="text-[#04473C] hover:underline">Terms of Service</Link>
           {' '}and{' '}
