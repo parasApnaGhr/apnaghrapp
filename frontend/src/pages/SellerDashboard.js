@@ -504,27 +504,78 @@ const SellerDashboard = () => {
       </div>
 
       <main className="max-w-7xl mx-auto px-6 py-8">
-        {/* Seller Earnings Potential Banner with Image */}
+        {/* Hero Banner - Work From Home Earning */}
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="relative overflow-hidden mb-6 rounded-lg h-40"
+          className="relative overflow-hidden mb-6 rounded-2xl"
         >
-          <img 
-            src="https://customer-assets.emergentagent.com/job_field-rider-ops/artifacts/ckuq2u78_IMG_7403.jpeg"
-            alt="ApnaGhr Seller"
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#C6A87C]/90 to-[#C6A87C]/60 flex items-center justify-between p-6">
-            <div className="text-[#1A1C20]">
-              <p className="text-xs font-medium uppercase tracking-wider opacity-70">Your Earning Potential</p>
-              <p className="text-2xl font-bold mt-1">₹500 - ₹10,000 <span className="text-sm font-normal">per deal</span></p>
-            </div>
-            <div className="text-right">
-              <div className="bg-[#04473C] text-white px-3 py-1.5 text-xs font-bold tracking-wide mb-1">
-                UNLIMITED EARNINGS
+          <div className="grid md:grid-cols-2 bg-gradient-to-br from-[#04473C] via-[#065f4e] to-[#087f5b]">
+            {/* Left Side - Earnings Info */}
+            <div className="p-8 text-white">
+              <div className="flex items-center gap-2 mb-4">
+                <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+                <span className="text-sm text-white/80">Work From Home • Flexible Hours</span>
               </div>
-              <p className="text-[10px] text-[#1A1C20]/70">Share properties • Earn commissions</p>
+              <h2 className="text-3xl font-bold mb-2" style={{ fontFamily: 'Playfair Display, serif' }}>
+                Earn ₹50,000+ Monthly
+              </h2>
+              <p className="text-white/80 mb-6">Share properties with your network and earn commissions on every successful deal</p>
+              
+              {/* Earnings Breakdown */}
+              <div className="grid grid-cols-3 gap-3 mb-6">
+                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3 text-center">
+                  <div className="text-2xl font-bold text-[#C6A87C]">₹500</div>
+                  <div className="text-xs text-white/70">Per Visit Booked</div>
+                </div>
+                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3 text-center">
+                  <div className="text-2xl font-bold text-[#C6A87C]">₹5,000</div>
+                  <div className="text-xs text-white/70">Per Rental Deal</div>
+                </div>
+                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3 text-center">
+                  <div className="text-2xl font-bold text-[#C6A87C]">₹10,000</div>
+                  <div className="text-xs text-white/70">Per Sale Deal</div>
+                </div>
+              </div>
+              
+              {/* How It Works */}
+              <div className="space-y-2">
+                <div className="flex items-center gap-3 text-sm">
+                  <div className="w-6 h-6 bg-[#C6A87C] rounded-full flex items-center justify-center text-[#04473C] font-bold text-xs">1</div>
+                  <span>Share property links with your contacts</span>
+                </div>
+                <div className="flex items-center gap-3 text-sm">
+                  <div className="w-6 h-6 bg-[#C6A87C] rounded-full flex items-center justify-center text-[#04473C] font-bold text-xs">2</div>
+                  <span>Client books a visit using your referral</span>
+                </div>
+                <div className="flex items-center gap-3 text-sm">
+                  <div className="w-6 h-6 bg-[#C6A87C] rounded-full flex items-center justify-center text-[#04473C] font-bold text-xs">3</div>
+                  <span>Earn commission when deal closes</span>
+                </div>
+              </div>
+            </div>
+            
+            {/* Right Side - Image */}
+            <div className="hidden md:block relative">
+              <img 
+                src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&q=80"
+                alt="Work from home earning"
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-l from-transparent to-[#04473C]/50" />
+              
+              {/* Floating Stats */}
+              <div className="absolute bottom-6 left-6 bg-white/95 backdrop-blur-sm rounded-xl p-4 shadow-lg">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 bg-[#04473C] rounded-full flex items-center justify-center">
+                    <TrendingUp className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <div className="text-2xl font-bold text-[#04473C]">500+</div>
+                    <div className="text-xs text-gray-500">Active Sellers Earning</div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </motion.div>
@@ -878,9 +929,29 @@ const SellerDashboard = () => {
           </motion.div>
         )}
 
-        {/* Referrals Tab */}
+        {/* Referrals Tab - Enhanced with Visit Tracking */}
         {activeTab === 'referrals' && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+            {/* Summary Cards */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+              <div className="bg-white border border-[#E5E1DB] p-4 text-center">
+                <div className="text-2xl font-bold text-[#04473C]">{referrals.length}</div>
+                <div className="text-xs text-[#4A4D53]">Total Leads</div>
+              </div>
+              <div className="bg-white border border-[#E5E1DB] p-4 text-center">
+                <div className="text-2xl font-bold text-blue-600">{referrals.filter(r => r.status === 'booked').length}</div>
+                <div className="text-xs text-[#4A4D53]">Visits Booked</div>
+              </div>
+              <div className="bg-white border border-[#E5E1DB] p-4 text-center">
+                <div className="text-2xl font-bold text-purple-600">{referrals.filter(r => r.status === 'visited').length}</div>
+                <div className="text-xs text-[#4A4D53]">Visits Done</div>
+              </div>
+              <div className="bg-white border border-[#E5E1DB] p-4 text-center">
+                <div className="text-2xl font-bold text-green-600">{referrals.filter(r => r.status === 'deal_closed').length}</div>
+                <div className="text-xs text-[#4A4D53]">Deals Closed</div>
+              </div>
+            </div>
+
             <div className="space-y-4">
               {referrals.length === 0 ? (
                 <div className="bg-white border border-[#E5E1DB] p-12 text-center">
@@ -890,46 +961,127 @@ const SellerDashboard = () => {
                 </div>
               ) : (
                 referrals.map((ref) => (
-                  <div key={ref.id} className="bg-white border border-[#E5E1DB] p-4">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-2">
-                          <div className="w-10 h-10 bg-[#04473C] text-white flex items-center justify-center font-medium">
-                            {ref.client_name?.[0] || '?'}
+                  <div key={ref.id} className="bg-white border border-[#E5E1DB] overflow-hidden">
+                    {/* Status Progress Bar */}
+                    <div className="h-1 bg-gray-100">
+                      <div 
+                        className={`h-full transition-all ${
+                          ref.status === 'deal_closed' ? 'w-full bg-green-500' :
+                          ref.status === 'visited' ? 'w-3/4 bg-blue-500' :
+                          ref.status === 'booked' ? 'w-1/2 bg-[#C6A87C]' :
+                          ref.status === 'registered' ? 'w-1/4 bg-purple-500' :
+                          'w-[10%] bg-gray-300'
+                        }`}
+                      />
+                    </div>
+                    
+                    <div className="p-4">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3 mb-2">
+                            <div className="w-12 h-12 bg-gradient-to-br from-[#04473C] to-[#065f4e] text-white rounded-full flex items-center justify-center font-bold text-lg">
+                              {ref.client_name?.[0]?.toUpperCase() || '?'}
+                            </div>
+                            <div>
+                              <p className="font-bold text-lg">{ref.client_name || 'Pending Conversion'}</p>
+                              {ref.client_phone && (
+                                <a href={`tel:${ref.client_phone}`} className="text-sm text-[#04473C] hover:underline flex items-center gap-1">
+                                  <Phone className="w-3 h-3" />
+                                  {ref.client_phone}
+                                </a>
+                              )}
+                            </div>
                           </div>
-                          <div>
-                            <p className="font-medium">{ref.client_name || 'Pending Conversion'}</p>
-                            {ref.client_phone && (
-                              <p className="text-sm text-[#4A4D53]">{ref.client_phone}</p>
-                            )}
+                          
+                          {ref.property && (
+                            <div className="bg-[#F5F3F0] p-3 rounded-lg mb-3">
+                              <p className="text-sm font-medium">
+                                <Home className="w-4 h-4 inline mr-1 text-[#04473C]" />
+                                {ref.property.title}
+                              </p>
+                              <p className="text-sm text-[#4A4D53]">
+                                {ref.property.area_name}, {ref.property.city} • ₹{ref.property.rent?.toLocaleString()}/mo
+                              </p>
+                            </div>
+                          )}
+                          
+                          {/* Visit Status Timeline */}
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <div className={`flex items-center gap-1 px-2 py-1 rounded text-xs ${
+                              ref.status === 'shared' || ref.status === 'clicked' ? 'bg-gray-100 text-gray-600' : 'bg-gray-50 text-gray-400'
+                            }`}>
+                              <Share2 className="w-3 h-3" /> Shared
+                            </div>
+                            <ArrowRight className="w-3 h-3 text-gray-300" />
+                            <div className={`flex items-center gap-1 px-2 py-1 rounded text-xs ${
+                              ref.status === 'registered' ? 'bg-purple-100 text-purple-700' : 
+                              ['booked', 'visited', 'deal_closed'].includes(ref.status) ? 'bg-purple-50 text-purple-400' :
+                              'bg-gray-50 text-gray-400'
+                            }`}>
+                              <UserCheck className="w-3 h-3" /> Registered
+                            </div>
+                            <ArrowRight className="w-3 h-3 text-gray-300" />
+                            <div className={`flex items-center gap-1 px-2 py-1 rounded text-xs ${
+                              ref.status === 'booked' ? 'bg-[#C6A87C]/30 text-[#8B6914] font-medium' : 
+                              ['visited', 'deal_closed'].includes(ref.status) ? 'bg-[#C6A87C]/20 text-[#C6A87C]' :
+                              'bg-gray-50 text-gray-400'
+                            }`}>
+                              <Calendar className="w-3 h-3" /> Visit Booked
+                            </div>
+                            <ArrowRight className="w-3 h-3 text-gray-300" />
+                            <div className={`flex items-center gap-1 px-2 py-1 rounded text-xs ${
+                              ref.status === 'visited' ? 'bg-blue-100 text-blue-700 font-medium' : 
+                              ref.status === 'deal_closed' ? 'bg-blue-50 text-blue-400' :
+                              'bg-gray-50 text-gray-400'
+                            }`}>
+                              <MapPin className="w-3 h-3" /> Visited
+                            </div>
+                            <ArrowRight className="w-3 h-3 text-gray-300" />
+                            <div className={`flex items-center gap-1 px-2 py-1 rounded text-xs ${
+                              ref.status === 'deal_closed' ? 'bg-green-100 text-green-700 font-medium' : 'bg-gray-50 text-gray-400'
+                            }`}>
+                              <CheckCircle className="w-3 h-3" /> Deal Closed
+                            </div>
                           </div>
+                          
+                          {/* Visit Details if booked */}
+                          {ref.visit_details && (
+                            <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                              <p className="text-sm font-medium text-blue-800 mb-1">
+                                📅 Visit Scheduled
+                              </p>
+                              <p className="text-sm text-blue-700">
+                                {ref.visit_details.scheduled_date} at {ref.visit_details.scheduled_time}
+                              </p>
+                              {ref.visit_details.rider_name && (
+                                <p className="text-xs text-blue-600 mt-1">
+                                  Rider: {ref.visit_details.rider_name}
+                                </p>
+                              )}
+                            </div>
+                          )}
                         </div>
-                        {ref.property && (
-                          <p className="text-sm text-[#4A4D53] mb-2">
-                            <Home className="w-3 h-3 inline mr-1" />
-                            {ref.property.title} • ₹{ref.property.rent?.toLocaleString()}/mo
+                        
+                        <div className="text-right ml-4">
+                          <span className={`px-3 py-1.5 text-xs font-bold rounded-full ${
+                            ref.status === 'deal_closed' ? 'bg-green-100 text-green-700' :
+                            ref.status === 'visited' ? 'bg-blue-100 text-blue-700' :
+                            ref.status === 'booked' ? 'bg-[#C6A87C]/30 text-[#8B6914]' :
+                            ref.status === 'registered' ? 'bg-purple-100 text-purple-700' :
+                            'bg-gray-100 text-gray-600'
+                          }`}>
+                            {ref.status?.replace('_', ' ').toUpperCase()}
+                          </span>
+                          {ref.commission_amount && (
+                            <p className="text-xl font-bold text-green-600 mt-3">
+                              +₹{ref.commission_amount.toLocaleString()}
+                            </p>
+                          )}
+                          <p className="text-xs text-[#4A4D53] mt-2">
+                            <Clock className="w-3 h-3 inline mr-1" />
+                            {new Date(ref.created_at).toLocaleDateString()}
                           </p>
-                        )}
-                        <p className="text-xs text-[#4A4D53]">
-                          <Clock className="w-3 h-3 inline mr-1" />
-                          Shared {new Date(ref.created_at).toLocaleDateString()}
-                        </p>
-                      </div>
-                      <div className="text-right">
-                        <span className={`px-3 py-1 text-xs font-medium ${
-                          ref.status === 'deal_closed' ? 'bg-green-100 text-green-700' :
-                          ref.status === 'visited' ? 'bg-blue-100 text-blue-700' :
-                          ref.status === 'booked' ? 'bg-[#C6A87C]/20 text-[#C6A87C]' :
-                          ref.status === 'registered' ? 'bg-purple-100 text-purple-700' :
-                          'bg-gray-100 text-gray-600'
-                        }`}>
-                          {ref.status?.replace('_', ' ').toUpperCase()}
-                        </span>
-                        {ref.commission_amount && (
-                          <p className="text-lg font-medium text-green-600 mt-2">
-                            +₹{ref.commission_amount.toLocaleString()}
-                          </p>
-                        )}
+                        </div>
                       </div>
                     </div>
                   </div>
