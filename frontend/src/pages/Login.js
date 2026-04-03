@@ -273,13 +273,111 @@ const Login = () => {
   ];
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6 bg-[#FDFCFB] relative overflow-hidden">
-      {/* Premium Background */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-0 left-0 w-full h-full bg-[url('https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1920&q=80')] bg-cover bg-center opacity-[0.03]" />
+    <div className="min-h-screen flex bg-[#FDFCFB] relative overflow-hidden">
+      {/* Left Side - Earn Money Showcase */}
+      <div className="hidden lg:flex lg:w-1/2 relative bg-gradient-to-br from-[#04473C] via-[#065f4e] to-[#087f5b] overflow-hidden">
+        {/* Background Pattern */}
+        <div className="absolute inset-0">
+          <div className="absolute top-0 left-0 w-full h-full bg-[url('https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1920')] bg-cover bg-center opacity-10" />
+          <div className="absolute top-20 right-20 w-72 h-72 bg-white/10 rounded-full blur-3xl" />
+          <div className="absolute bottom-20 left-20 w-96 h-96 bg-[#C6A87C]/20 rounded-full blur-3xl" />
+        </div>
+        
+        {/* Content */}
+        <div className="relative z-10 flex flex-col justify-center px-12 py-16 text-white">
+          <motion.div
+            initial={{ opacity: 0, x: -30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.2 }}
+          >
+            <span className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full text-sm mb-6">
+              <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+              Now Hiring in 60+ Cities
+            </span>
+            
+            <h1 className="text-4xl lg:text-5xl font-bold mb-4 leading-tight" style={{ fontFamily: 'Playfair Display, serif' }}>
+              Earn Money by<br />
+              <span className="text-[#C6A87C]">Visiting Properties</span>
+            </h1>
+            
+            <p className="text-white/80 text-lg mb-8 max-w-md">
+              Join 500+ riders earning ₹35,000 - ₹75,000 monthly. Flexible hours, instant payments, no experience needed.
+            </p>
+            
+            {/* Stats */}
+            <div className="grid grid-cols-3 gap-6 mb-8">
+              <div className="text-center p-4 bg-white/10 backdrop-blur-sm rounded-xl">
+                <div className="text-3xl font-bold text-[#C6A87C]">₹2000</div>
+                <div className="text-white/70 text-sm">Per Day</div>
+              </div>
+              <div className="text-center p-4 bg-white/10 backdrop-blur-sm rounded-xl">
+                <div className="text-3xl font-bold text-[#C6A87C]">60+</div>
+                <div className="text-white/70 text-sm">Cities</div>
+              </div>
+              <div className="text-center p-4 bg-white/10 backdrop-blur-sm rounded-xl">
+                <div className="text-3xl font-bold text-[#C6A87C]">500+</div>
+                <div className="text-white/70 text-sm">Riders</div>
+              </div>
+            </div>
+            
+            {/* CTA Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Link 
+                to="/join-as-rider"
+                className="flex items-center justify-center gap-2 px-8 py-4 bg-[#C6A87C] text-[#04473C] rounded-xl font-bold text-lg hover:bg-[#d4b78a] transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+              >
+                <Briefcase className="w-5 h-5" />
+                Become a Rider
+              </Link>
+              <Link 
+                to="/earn-money-by-visiting-properties"
+                className="flex items-center justify-center gap-2 px-8 py-4 bg-white/20 backdrop-blur-sm text-white rounded-xl font-medium hover:bg-white/30 transition-all border border-white/30"
+              >
+                Learn More
+                <ChevronRight className="w-5 h-5" />
+              </Link>
+            </div>
+            
+            {/* Testimonial */}
+            <div className="mt-10 p-5 bg-white/10 backdrop-blur-sm rounded-xl border border-white/20">
+              <p className="text-white/90 italic mb-3">"I earn ₹45,000+ monthly with flexible hours. Best decision ever!"</p>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-[#C6A87C] rounded-full flex items-center justify-center font-bold text-[#04473C]">RS</div>
+                <div>
+                  <div className="font-medium">Rajesh Singh</div>
+                  <div className="text-white/60 text-sm">Rider since 2024 • Mohali</div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </div>
+      
+      {/* Right Side - Login Form */}
+      <div className="w-full lg:w-1/2 flex flex-col items-center justify-center p-6 lg:p-12 relative">
+        {/* Mobile Earn Money Banner */}
+        <Link 
+          to="/earn-money-by-visiting-properties"
+          className="lg:hidden w-full max-w-md mb-6 p-4 bg-gradient-to-r from-[#04473C] to-[#065f4e] rounded-xl text-white flex items-center justify-between shadow-lg"
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 bg-[#C6A87C] rounded-full flex items-center justify-center">
+              <Briefcase className="w-6 h-6 text-[#04473C]" />
+            </div>
+            <div>
+              <div className="font-bold">Earn ₹2000/day</div>
+              <div className="text-white/80 text-sm">Become a Rider</div>
+            </div>
+          </div>
+          <ChevronRight className="w-6 h-6" />
+        </Link>
+
+        {/* Background for mobile */}
+        <div className="absolute inset-0 pointer-events-none lg:hidden">
+          <div className="absolute top-0 left-0 w-full h-full bg-[url('https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1920&q=80')] bg-cover bg-center opacity-[0.03]" />
+        </div>
         <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-[#04473C]/5 rounded-full blur-3xl translate-x-1/2 -translate-y-1/2" />
         <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-[#C6A87C]/10 rounded-full blur-3xl -translate-x-1/2 translate-y-1/2" />
-      </div>
 
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
@@ -713,6 +811,7 @@ const Login = () => {
           <Link to="/legal" className="text-[#04473C] hover:underline">Privacy Policy</Link>
         </p>
       </motion.div>
+      </div>
 
       {/* Terms Acceptance Modal */}
       <TermsAcceptanceModal
