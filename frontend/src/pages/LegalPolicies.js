@@ -1,18 +1,18 @@
 // Legal Policies Page - All ApnaGhr Terms & Policies
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { 
   ArrowLeft, Shield, FileText, Users, UserCheck, 
-  Building2, AlertTriangle, Scale, MapPin, ChevronDown, ChevronUp
+  Building2, AlertTriangle, Scale, MapPin, ChevronDown, ChevronUp, ExternalLink
 } from 'lucide-react';
 
 const LegalPolicies = () => {
   const navigate = useNavigate();
   const [expandedSection, setExpandedSection] = useState(null);
 
-  const lastUpdated = "April 1, 2026";
-  const jurisdiction = "Chandigarh / Mohali";
+  const lastUpdated = "April 2026";
+  const jurisdiction = "Bathinda, Punjab";
 
   const sections = [
     {
@@ -57,6 +57,21 @@ By using ApnaGhr.com, you agree:
 • All property visits, negotiations, and deals must happen through the platform
 • Users must not misuse contact details shared within the platform
 • Any attempt to bypass the platform is strictly prohibited
+
+**Platform Role:**
+• ApnaGhr acts as a facilitator connecting customers, property owners, and riders
+• The platform is not party to any rental or sale transaction
+• All transactions should go through the system for proper tracking
+
+**Strict Anti-Bypass Policy:**
+• All communication regarding properties must go through ApnaGhr
+• Direct dealing outside the platform is a breach of contract
+• Platform reserves the right to monitor communications for compliance
+
+**Account Suspension:**
+• The Company reserves the right to suspend accounts for violations
+• Suspension can occur without prior notice for serious violations
+• All pending earnings may be forfeited upon violation
 
 **The Company reserves the right to:**
 • Suspend or terminate accounts
@@ -186,8 +201,22 @@ All disputes are subject to jurisdiction of:
 **${jurisdiction}**
 
 Any legal proceedings will be conducted under the laws applicable in this jurisdiction.
+
+**Dispute Resolution:**
+• Parties agree to first attempt amicable resolution
+• If unresolved, matter shall be referred to courts in Bathinda, Punjab
+• Indian laws shall govern all agreements
       `
     }
+  ];
+
+  // Privacy policy links for different roles
+  const privacyLinks = [
+    { role: 'riders', label: 'Riders', path: '/privacy-policy-riders' },
+    { role: 'customers', label: 'Customers', path: '/privacy-policy-customers' },
+    { role: 'sellers', label: 'Sellers', path: '/privacy-policy-sellers' },
+    { role: 'builders', label: 'Builders', path: '/privacy-policy-builders' },
+    { role: 'advertisers', label: 'Advertisers', path: '/privacy-policy-advertisers' },
   ];
 
   const toggleSection = (id) => {
@@ -309,6 +338,29 @@ Any legal proceedings will be conducted under the laws applicable in this jurisd
             ApnaGhr reserves the right to update policies anytime without prior notice.
             Continued use = acceptance of updated terms.
           </p>
+        </div>
+
+        {/* Role-Specific Privacy Policies */}
+        <div className="mt-8 bg-white rounded-xl p-6 border border-[#E5E1DB]">
+          <h3 className="font-semibold text-[#04473C] mb-4 flex items-center gap-2">
+            <Shield className="w-5 h-5" />
+            Role-Specific Privacy Policies
+          </h3>
+          <p className="text-[#4A4D53] mb-4">
+            We have detailed privacy policies for each user type. Please review the policy applicable to you:
+          </p>
+          <div className="flex flex-wrap gap-3">
+            {privacyLinks.map((link) => (
+              <Link
+                key={link.role}
+                to={link.path}
+                className="flex items-center gap-2 px-4 py-2 bg-[#04473C]/10 text-[#04473C] rounded-lg hover:bg-[#04473C]/20 transition-colors"
+              >
+                {link.label}
+                <ExternalLink className="w-4 h-4" />
+              </Link>
+            ))}
+          </div>
         </div>
 
         {/* Footer */}

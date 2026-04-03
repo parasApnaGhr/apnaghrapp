@@ -546,6 +546,117 @@ class ResetPasswordRequest(BaseModel):
     otp: str
     new_password: str
 
+# ============================================
+# RIDER ONBOARDING MODELS - New Module
+# ============================================
+
+class RiderApplicationBasicDetails(BaseModel):
+    full_name: str
+    mobile: str
+    whatsapp: Optional[str] = None
+    city: str
+    areas: List[str] = []
+
+class RiderApplicationKYC(BaseModel):
+    aadhaar_url: str
+    pan_url: Optional[str] = None
+    selfie_url: str
+
+class RiderApplicationWorkDetails(BaseModel):
+    has_vehicle: bool = False
+    driving_license_url: Optional[str] = None
+    experience: Optional[str] = None
+    availability: str = "full_time"  # full_time, part_time, weekends
+
+class RiderApplicationPayment(BaseModel):
+    upi_id: str
+    bank_name: Optional[str] = None
+    account_number: Optional[str] = None
+    ifsc_code: Optional[str] = None
+    account_holder_name: Optional[str] = None
+
+class RiderApplicationLegalAgreements(BaseModel):
+    non_circumvention: bool = False
+    commission_protection: bool = False
+    penalty_clause: bool = False
+    work_compliance: bool = False
+    payment_terms: bool = False
+    agreed_at: Optional[str] = None
+
+class RiderApplication(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    # Basic Details
+    full_name: str
+    mobile: str
+    whatsapp: Optional[str] = None
+    city: str
+    areas: List[str] = []
+    # KYC
+    aadhaar_url: Optional[str] = None
+    pan_url: Optional[str] = None
+    selfie_url: Optional[str] = None
+    # Work Details
+    has_vehicle: bool = False
+    driving_license_url: Optional[str] = None
+    experience: Optional[str] = None
+    availability: str = "full_time"
+    # Payment
+    upi_id: Optional[str] = None
+    bank_name: Optional[str] = None
+    account_number: Optional[str] = None
+    ifsc_code: Optional[str] = None
+    account_holder_name: Optional[str] = None
+    # Legal Agreements
+    legal_agreements: Optional[RiderApplicationLegalAgreements] = None
+    # Application Status
+    status: str = "pending"  # pending, under_review, approved, rejected, banned
+    rejection_reason: Optional[str] = None
+    reviewed_by: Optional[str] = None
+    reviewed_at: Optional[str] = None
+    # Tracking
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: Optional[datetime] = None
+    # Linked user (after approval)
+    user_id: Optional[str] = None
+
+class RiderApplicationCreate(BaseModel):
+    # Basic Details
+    full_name: str
+    mobile: str
+    whatsapp: Optional[str] = None
+    city: str
+    areas: List[str] = []
+    # KYC
+    aadhaar_url: str
+    pan_url: Optional[str] = None
+    selfie_url: str
+    # Work Details
+    has_vehicle: bool = False
+    driving_license_url: Optional[str] = None
+    experience: Optional[str] = None
+    availability: str = "full_time"
+    # Payment
+    upi_id: str
+    bank_name: Optional[str] = None
+    account_number: Optional[str] = None
+    ifsc_code: Optional[str] = None
+    account_holder_name: Optional[str] = None
+    # Legal Agreements
+    non_circumvention: bool
+    commission_protection: bool
+    penalty_clause: bool
+    work_compliance: bool
+    payment_terms: bool
+
+class RiderApplicationReview(BaseModel):
+    status: str  # approved, rejected
+    rejection_reason: Optional[str] = None
+
+# ============================================
+# END RIDER ONBOARDING MODELS
+# ============================================
+
 @api_router.post("/auth/forgot-password")
 async def forgot_password(request: ForgotPasswordRequest):
     """Request password reset OTP via SMS or Email"""
@@ -1130,6 +1241,281 @@ async def get_sitemap_xml():
 
 # ============================================
 # End SEO Module Endpoints
+# ============================================
+
+# ============================================
+# RIDER ONBOARDING ENDPOINTS - New Module
+# Public endpoints for rider applications
+# ============================================
+
+@api_router.post("/rider-applications")
+async def create_rider_application(application: RiderApplicationCreate):
+    """
+    Submit a new rider application - PUBLIC endpoint
+    No authentication required for initial submission
+    """
+    # Check if mobile already has a pending/approved application
+    existing = await db.rider_applications.find_one({
+        "mobile": application.mobile,
+        "status": {"$in": ["pending", "under_review", "approved"]}
+    })
+    if existing:
+        if existing.get("status") == "approved":
+            raise HTTPException(status_code=400, detail="You are already a registered rider")
+        raise HTTPException(status_code=400, detail="You already have a pending application")
+    
+    # Check if all legal agreements are accepted
+    if not all([
+        application.non_circumvention,
+        application.commission_protection,
+        application.penalty_clause,
+        application.work_compliance,
+        application.payment_terms
+    ]):
+        raise HTTPException(status_code=400, detail="All legal agreements must be accepted")
+    
+    # Create application
+    app_data = RiderApplication(
+        full_name=application.full_name,
+        mobile=application.mobile,
+        whatsapp=application.whatsapp,
+        city=application.city,
+        areas=application.areas,
+        aadhaar_url=application.aadhaar_url,
+        pan_url=application.pan_url,
+        selfie_url=application.selfie_url,
+        has_vehicle=application.has_vehicle,
+        driving_license_url=application.driving_license_url,
+        experience=application.experience,
+        availability=application.availability,
+        upi_id=application.upi_id,
+        bank_name=application.bank_name,
+        account_number=application.account_number,
+        ifsc_code=application.ifsc_code,
+        account_holder_name=application.account_holder_name,
+        legal_agreements=RiderApplicationLegalAgreements(
+            non_circumvention=application.non_circumvention,
+            commission_protection=application.commission_protection,
+            penalty_clause=application.penalty_clause,
+            work_compliance=application.work_compliance,
+            payment_terms=application.payment_terms,
+            agreed_at=datetime.now(timezone.utc).isoformat()
+        ),
+        status="pending"
+    )
+    
+    await db.rider_applications.insert_one(app_data.model_dump())
+    
+    return {
+        "message": "Application submitted successfully. Our team will review and activate your account.",
+        "application_id": app_data.id,
+        "status": "pending"
+    }
+
+@api_router.get("/rider-applications/check/{mobile}")
+async def check_rider_application(mobile: str):
+    """Check if a mobile number has an existing application"""
+    application = await db.rider_applications.find_one(
+        {"mobile": mobile},
+        {"_id": 0, "id": 1, "status": 1, "created_at": 1}
+    )
+    if application:
+        return {
+            "exists": True,
+            "status": application.get("status"),
+            "application_id": application.get("id")
+        }
+    return {"exists": False}
+
+@api_router.get("/admin/rider-applications")
+async def get_rider_applications(
+    status: Optional[str] = None,
+    city: Optional[str] = None,
+    skip: int = 0,
+    limit: int = 50,
+    current_user: dict = Depends(get_current_user)
+):
+    """Get all rider applications - Admin only"""
+    if current_user.get("role") not in ["admin", "rider_admin"]:
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    query = {}
+    if status:
+        query["status"] = status
+    if city:
+        query["city"] = {"$regex": city, "$options": "i"}
+    
+    applications = await db.rider_applications.find(query, {"_id": 0}).sort("created_at", -1).skip(skip).limit(limit).to_list(limit)
+    total = await db.rider_applications.count_documents(query)
+    
+    return {
+        "applications": applications,
+        "total": total,
+        "skip": skip,
+        "limit": limit
+    }
+
+@api_router.get("/admin/rider-applications/{application_id}")
+async def get_rider_application(application_id: str, current_user: dict = Depends(get_current_user)):
+    """Get a specific rider application - Admin only"""
+    if current_user.get("role") not in ["admin", "rider_admin"]:
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    application = await db.rider_applications.find_one({"id": application_id}, {"_id": 0})
+    if not application:
+        raise HTTPException(status_code=404, detail="Application not found")
+    
+    return application
+
+@api_router.patch("/admin/rider-applications/{application_id}/review")
+async def review_rider_application(
+    application_id: str,
+    review: RiderApplicationReview,
+    current_user: dict = Depends(get_current_user)
+):
+    """Approve or reject a rider application - Admin only"""
+    if current_user.get("role") not in ["admin", "rider_admin"]:
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    application = await db.rider_applications.find_one({"id": application_id}, {"_id": 0})
+    if not application:
+        raise HTTPException(status_code=404, detail="Application not found")
+    
+    if application.get("status") not in ["pending", "under_review"]:
+        raise HTTPException(status_code=400, detail=f"Cannot review application with status: {application.get('status')}")
+    
+    update_data = {
+        "status": review.status,
+        "reviewed_by": current_user.get("id"),
+        "reviewed_at": datetime.now(timezone.utc).isoformat(),
+        "updated_at": datetime.now(timezone.utc)
+    }
+    
+    if review.status == "rejected" and review.rejection_reason:
+        update_data["rejection_reason"] = review.rejection_reason
+    
+    # If approved, create a rider user account
+    if review.status == "approved":
+        # Check if user already exists
+        existing_user = await db.users.find_one({"phone": application.get("mobile")})
+        if existing_user:
+            # Update existing user to rider role
+            await db.users.update_one(
+                {"phone": application.get("mobile")},
+                {"$set": {"role": "rider", "city": application.get("city")}}
+            )
+            update_data["user_id"] = existing_user.get("id")
+        else:
+            # Create new rider user
+            import secrets
+            temp_password = secrets.token_urlsafe(8)
+            new_user = {
+                "id": str(uuid.uuid4()),
+                "name": application.get("full_name"),
+                "phone": application.get("mobile"),
+                "password": bcrypt.hashpw(temp_password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8'),
+                "role": "rider",
+                "city": application.get("city"),
+                "created_at": datetime.now(timezone.utc).isoformat(),
+                "upi_id": application.get("upi_id"),
+                "bank_details": {
+                    "bank_name": application.get("bank_name"),
+                    "account_number": application.get("account_number"),
+                    "ifsc_code": application.get("ifsc_code"),
+                    "account_holder_name": application.get("account_holder_name")
+                },
+                "documents": {
+                    "aadhaar_url": application.get("aadhaar_url"),
+                    "pan_url": application.get("pan_url"),
+                    "selfie_url": application.get("selfie_url"),
+                    "driving_license_url": application.get("driving_license_url")
+                },
+                "areas": application.get("areas", []),
+                "availability": application.get("availability"),
+                "has_vehicle": application.get("has_vehicle"),
+                "legal_agreements": application.get("legal_agreements")
+            }
+            await db.users.insert_one(new_user)
+            update_data["user_id"] = new_user["id"]
+            # Note: In production, send temp_password via SMS
+    
+    await db.rider_applications.update_one(
+        {"id": application_id},
+        {"$set": update_data}
+    )
+    
+    return {"message": f"Application {review.status}", "status": review.status}
+
+@api_router.patch("/admin/rider-applications/{application_id}/ban")
+async def ban_rider_application(
+    application_id: str,
+    reason: Optional[str] = None,
+    current_user: dict = Depends(get_current_user)
+):
+    """Ban a rider - Admin only"""
+    if current_user.get("role") not in ["admin", "rider_admin"]:
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    application = await db.rider_applications.find_one({"id": application_id}, {"_id": 0})
+    if not application:
+        raise HTTPException(status_code=404, detail="Application not found")
+    
+    update_data = {
+        "status": "banned",
+        "rejection_reason": reason or "Violation of platform policies",
+        "reviewed_by": current_user.get("id"),
+        "reviewed_at": datetime.now(timezone.utc).isoformat(),
+        "updated_at": datetime.now(timezone.utc)
+    }
+    
+    await db.rider_applications.update_one(
+        {"id": application_id},
+        {"$set": update_data}
+    )
+    
+    # Also ban the user if exists
+    if application.get("user_id"):
+        await db.users.update_one(
+            {"id": application.get("user_id")},
+            {"$set": {"status": "banned", "banned_reason": reason}}
+        )
+    
+    return {"message": "Rider banned successfully"}
+
+@api_router.get("/admin/rider-applications/stats")
+async def get_rider_application_stats(current_user: dict = Depends(get_current_user)):
+    """Get rider application statistics - Admin only"""
+    if current_user.get("role") not in ["admin", "rider_admin"]:
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    pipeline = [
+        {"$group": {
+            "_id": "$status",
+            "count": {"$sum": 1}
+        }}
+    ]
+    
+    stats = await db.rider_applications.aggregate(pipeline).to_list(100)
+    
+    # Get city distribution
+    city_pipeline = [
+        {"$group": {
+            "_id": "$city",
+            "count": {"$sum": 1}
+        }},
+        {"$sort": {"count": -1}},
+        {"$limit": 10}
+    ]
+    city_stats = await db.rider_applications.aggregate(city_pipeline).to_list(10)
+    
+    return {
+        "by_status": {s["_id"]: s["count"] for s in stats if s["_id"]},
+        "by_city": {c["_id"]: c["count"] for c in city_stats if c["_id"]},
+        "total": await db.rider_applications.count_documents({})
+    }
+
+# ============================================
+# END RIDER ONBOARDING ENDPOINTS
 # ============================================
 
 @api_router.get("/properties/{property_id}")

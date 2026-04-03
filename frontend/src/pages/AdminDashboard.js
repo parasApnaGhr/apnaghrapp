@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import { 
   Users, Package, Bike, LogOut, Home, DollarSign, 
-  Settings, MapPin, CheckSquare, CreditCard, BarChart3, Image, Upload, UserPlus, Gift, QrCode
+  Settings, MapPin, CheckSquare, CreditCard, BarChart3, Image, Upload, UserPlus, Gift, QrCode, ClipboardList
 } from 'lucide-react';
 import CustomerSupportPanel from '../components/CustomerSupportPanel';
 import InventoryPanel from '../components/InventoryPanel';
@@ -20,6 +20,7 @@ import PropertyAnalyticsPanel from '../components/PropertyAnalyticsPanel';
 import NotificationsDropdown from '../components/NotificationsDropdown';
 import ImageMigrationTool from '../components/ImageMigrationTool';
 import BulkImageUploader from '../components/BulkImageUploader';
+import RiderApplicationsPanel from '../components/RiderApplicationsPanel';
 
 const AdminDashboard = () => {
   const { user, logout } = useAuth();
@@ -36,6 +37,7 @@ const AdminDashboard = () => {
     { id: 'payouts', label: 'Payouts', icon: CreditCard },
     { id: 'promotions', label: 'Promotions', icon: Gift },
     { id: 'analytics', label: 'Property Analytics', icon: BarChart3 },
+    { id: 'rider-applications', label: 'Rider Applications', icon: ClipboardList },
     { id: 'riders', label: 'Riders', icon: Bike },
     { id: 'sellers', label: 'Sellers', icon: UserPlus },
     { id: 'support', label: 'Support', icon: Users },
@@ -257,6 +259,7 @@ const AdminDashboard = () => {
         {activePanel === 'payouts' && <PayoutsPanel />}
         {activePanel === 'promotions' && <PromotionsPanel />}
         {activePanel === 'analytics' && <PropertyAnalyticsPanel />}
+        {activePanel === 'rider-applications' && <RiderApplicationsPanel />}
         {activePanel === 'riders' && <RiderManagementPanel />}
         {activePanel === 'sellers' && <SellerManagementPanel />}
         {activePanel === 'support' && <CustomerSupportPanel />}

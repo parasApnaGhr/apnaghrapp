@@ -23,6 +23,10 @@ import CustomerPrivacy from './pages/CustomerPrivacy';
 import RiderProfile from './pages/RiderProfile';
 import LegalPolicies from './pages/LegalPolicies';
 import AddPropertyLocation from './pages/AddPropertyLocation';
+// New Rider Onboarding Module
+import RiderOnboarding from './pages/onboarding/RiderOnboarding';
+// Privacy Policy Pages
+import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 // SEO Module - Isolated imports (read-only, no DB modifications)
 import SEOListingPage from './seo-pages/pages/SEOListingPage';
 import BlogListPage from './seo-pages/pages/BlogListPage';
@@ -252,6 +256,22 @@ const AppRoutes = () => {
       <Route path="/earn-money-by-visiting-properties" element={<EarnMoneyPage />} />
       <Route path="/become-property-rider/:city" element={<CityRiderPage />} />
       <Route path="/earn-2000-per-day-real-estate" element={<Earn2000Page />} />
+
+      {/* ============================================
+          RIDER ONBOARDING MODULE - New rider applications
+          PUBLIC route - no authentication required
+          ============================================ */}
+      <Route path="/join-as-rider" element={<RiderOnboarding />} />
+
+      {/* ============================================
+          PRIVACY POLICY PAGES - Role-specific policies
+          PUBLIC routes - no authentication required
+          ============================================ */}
+      <Route path="/privacy-policy-riders" element={<PrivacyPolicyPage role="riders" />} />
+      <Route path="/privacy-policy-customers" element={<PrivacyPolicyPage role="customers" />} />
+      <Route path="/privacy-policy-sellers" element={<PrivacyPolicyPage role="sellers" />} />
+      <Route path="/privacy-policy-builders" element={<PrivacyPolicyPage role="builders" />} />
+      <Route path="/privacy-policy-advertisers" element={<PrivacyPolicyPage role="advertisers" />} />
 
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
