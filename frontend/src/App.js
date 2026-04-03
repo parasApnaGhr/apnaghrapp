@@ -13,6 +13,7 @@ import PaymentSuccess from './pages/PaymentSuccess';
 import RiderDashboard from './pages/RiderDashboard';
 import AdminDashboard from './pages/AdminDashboard';
 import SellerDashboard from './pages/SellerDashboard';
+import BuilderDashboard from './pages/BuilderDashboard';
 import PackersMovers from './pages/PackersMovers';
 import AdvertiseWithUs from './pages/AdvertiseWithUs';
 import CustomerProfile from './pages/CustomerProfile';
@@ -64,8 +65,10 @@ const AppRoutes = () => {
   const { user } = useAuth();
 
   const getRedirectPath = (role) => {
-    if (role === 'customer' || role === 'advertiser' || role === 'builder') {
+    if (role === 'customer' || role === 'advertiser') {
       return '/customer';
+    } else if (role === 'builder') {
+      return '/builder';
     } else if (role === 'rider') {
       return '/rider';
     } else if (role === 'seller') {
@@ -85,10 +88,20 @@ const AppRoutes = () => {
       <Route path="/legal" element={<LegalPolicies />} />
       <Route path="/add-location/:propertyId" element={<AddPropertyLocation />} />
 
+      {/* BUILDER DASHBOARD */}
+      <Route
+        path="/builder"
+        element={
+          <ProtectedRoute allowedRoles={['builder']}>
+            <BuilderDashboard />
+          </ProtectedRoute>
+        }
+      />
+
       <Route
         path="/customer"
         element={
-          <ProtectedRoute allowedRoles={['customer', 'advertiser', 'builder']}>
+          <ProtectedRoute allowedRoles={['customer', 'advertiser']}>
             <CustomerHome />
           </ProtectedRoute>
         }

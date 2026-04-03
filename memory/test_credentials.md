@@ -31,6 +31,12 @@
 - **Name:** Test Seller Raj
 - **Role:** seller
 
+## Builder Account
+- **Phone:** 6333444555
+- **Password:** build123
+- **Name:** Test Builder
+- **Role:** builder
+
 ## Production URL
 - **URL:** https://apnaghrapp.in
 
