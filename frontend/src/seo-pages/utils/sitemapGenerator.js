@@ -3,6 +3,7 @@
 
 import { CITIES, AREAS, PROPERTY_TYPES, LISTING_TYPES, BUDGET_RANGES } from '../data/seoData';
 import { BLOGS } from '../data/blogData';
+import { CITIES_FOR_RIDERS } from '../data/riderEarningData';
 
 const SITE_URL = 'https://apnaghrapp.in';
 
@@ -18,6 +19,9 @@ export const generateSitemapXML = () => {
     { url: '/', priority: '1.0', changefreq: 'daily' },
     { url: '/blogs', priority: '0.9', changefreq: 'daily' },
     { url: '/legal', priority: '0.3', changefreq: 'monthly' },
+    // Rider Earning Pages
+    { url: '/earn-money-by-visiting-properties', priority: '0.9', changefreq: 'weekly' },
+    { url: '/earn-2000-per-day-real-estate', priority: '0.9', changefreq: 'weekly' },
   ];
 
   staticPages.forEach(page => {
@@ -26,6 +30,16 @@ export const generateSitemapXML = () => {
       lastmod: now,
       changefreq: page.changefreq,
       priority: page.priority
+    });
+  });
+
+  // Rider city pages
+  CITIES_FOR_RIDERS.forEach(city => {
+    urls.push({
+      loc: `${SITE_URL}/become-property-rider/${city.slug}`,
+      lastmod: now,
+      changefreq: 'weekly',
+      priority: '0.8'
     });
   });
 
@@ -142,7 +156,10 @@ export const generateSitemapIndex = () => {
  * Count total SEO pages
  */
 export const countTotalPages = () => {
-  let total = 3; // Static pages (home, blogs, legal)
+  let total = 5; // Static pages (home, blogs, legal, earn-money, earn-2000)
+  
+  // Rider city pages
+  total += CITIES_FOR_RIDERS.length;
   
   CITIES.forEach(city => {
     LISTING_TYPES.forEach(listing => {

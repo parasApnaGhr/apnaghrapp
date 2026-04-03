@@ -28,6 +28,10 @@ import SEOListingPage from './seo-pages/pages/SEOListingPage';
 import BlogListPage from './seo-pages/pages/BlogListPage';
 import BlogPostPage from './seo-pages/pages/BlogPostPage';
 import SitemapPage from './seo-pages/pages/SitemapPage';
+// Rider Earning SEO Pages - Informational + Lead Capture (no core transaction logic)
+import EarnMoneyPage from './seo-pages/pages/EarnMoneyPage';
+import CityRiderPage from './seo-pages/pages/CityRiderPage';
+import Earn2000Page from './seo-pages/pages/Earn2000Page';
 import '@/App.css';
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
@@ -243,6 +247,11 @@ const AppRoutes = () => {
       <Route path="/rent/:slug" element={<SEOListingPage listingType="rent" />} />
       <Route path="/buy/:slug" element={<SEOListingPage listingType="buy" />} />
       <Route path="/pg/:slug" element={<SEOListingPage listingType="pg" />} />
+      
+      {/* Rider Earning SEO Pages - Informational + Lead Capture */}
+      <Route path="/earn-money-by-visiting-properties" element={<EarnMoneyPage />} />
+      <Route path="/become-property-rider/:city" element={<CityRiderPage />} />
+      <Route path="/earn-2000-per-day-real-estate" element={<Earn2000Page />} />
 
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

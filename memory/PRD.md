@@ -584,7 +584,7 @@ bookings = await db.visit_bookings.find(
 ### 🆕 Complete SEO Module Implementation
 
 #### Features Delivered
-1. **Programmatic SEO Pages** - 1,367+ auto-generated pages
+1. **Programmatic SEO Pages** - 1,400+ auto-generated pages
    - Routes: `/rent/:slug`, `/buy/:slug`, `/pg/:slug`
    - Examples: `/rent/flats-in-mohali`, `/buy/2bhk-in-chandigarh`, `/rent/flats-in-sector-70-mohali`
    - Dynamic content generation based on URL parameters
@@ -598,15 +598,27 @@ bookings = await db.visit_bookings.find(
    - FAQ sections with schema markup
    - Related articles recommendations
 
-3. **Sitemap Generator**
+3. **Rider Earning SEO Pages** (NEW - April 2, 2026)
+   - `/earn-money-by-visiting-properties` - Main earning landing page
+   - `/become-property-rider/:city` - City-specific pages (11 cities)
+   - `/earn-2000-per-day-real-estate` - High earner targeting page
+   - Features:
+     - Earnings Calculator (interactive slider)
+     - Lead capture form (stored in localStorage, isolated from core DB)
+     - Testimonials (static/dummy)
+     - FAQs with schema markup
+     - City-specific content and stats
+     - Pro tips for earning more
+
+4. **Sitemap Generator**
    - Interactive sitemap page at `/sitemap`
    - XML sitemap API at `/api/sitemap.xml`
    - Download sitemap.xml button
-   - Shows 1,367+ pages count
+   - Shows 1,400+ pages count
 
-4. **SEO Features**
+5. **SEO Features**
    - Dynamic meta titles and descriptions
-   - Schema.org markup (FAQPage, RealEstateListing, Article)
+   - Schema.org markup (FAQPage, RealEstateListing, Article, JobPosting)
    - Canonical URLs
    - Open Graph tags
    - Breadcrumb navigation
@@ -619,15 +631,21 @@ bookings = await db.visit_bookings.find(
 │   ├── SEOHead.jsx          # Meta tags, schema markup
 │   ├── SEOPropertyCard.jsx   # Property card component
 │   ├── SEOFAQSection.jsx     # FAQ accordion with schema
-│   └── SEOInternalLinks.jsx  # Related searches, nearby areas
+│   ├── SEOInternalLinks.jsx  # Related searches, nearby areas
+│   ├── RiderLeadForm.jsx     # Lead capture form (NEW)
+│   └── EarningsCalculator.jsx # Interactive calculator (NEW)
 ├── data/
 │   ├── seoData.js            # Cities, areas, property types, budgets
-│   └── blogData.js           # Blog content (10 articles)
+│   ├── blogData.js           # Blog content (10 articles)
+│   └── riderEarningData.js   # Rider earning data (NEW)
 ├── pages/
 │   ├── SEOListingPage.jsx    # Dynamic SEO property page
 │   ├── BlogListPage.jsx      # Blog listing page
 │   ├── BlogPostPage.jsx      # Individual blog post
-│   └── SitemapPage.jsx       # Interactive sitemap
+│   ├── SitemapPage.jsx       # Interactive sitemap
+│   ├── EarnMoneyPage.jsx     # Main earning page (NEW)
+│   ├── CityRiderPage.jsx     # City-specific rider page (NEW)
+│   └── Earn2000Page.jsx      # High earner page (NEW)
 ├── utils/
 │   ├── seoUtils.js           # Content generation, URL parsing
 │   ├── contentCache.js       # LocalStorage caching
@@ -646,6 +664,7 @@ bookings = await db.visit_bookings.find(
 - ✅ Completely isolated module
 - ✅ Public routes (no auth required)
 - ✅ Read-only operations
+- ✅ Lead capture stored in localStorage (not core DB)
 
 ## Known Environment Note
 ⚠️ **Preview vs Production Database**: The preview environment (`field-rider-ops.preview.emergentagent.com`) uses a separate MongoDB database from production (`apnaghrapp.in`). Test users created on production won't appear in preview. Always test with preview-specific data or recreate test scenarios on preview.
