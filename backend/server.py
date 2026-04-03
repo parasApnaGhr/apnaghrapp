@@ -178,6 +178,9 @@ class Property(BaseModel):
     available: bool = True
     verified_owner: bool = False
     premium_listing: bool = False
+    # Owner contact for internal staff verification (NOT shown to customers/riders)
+    owner_contact: Optional[str] = None
+    owner_name: Optional[str] = None
     # Analytics & Status Tracking
     visit_count: int = 0
     weekly_visits: int = 0
@@ -208,6 +211,9 @@ class PropertyCreate(BaseModel):
     images: List[str] = []
     video_url: Optional[str] = None
     amenities: List[str] = []
+    # Owner contact for internal staff verification
+    owner_contact: Optional[str] = None
+    owner_name: Optional[str] = None
 
 class VisitPackage(BaseModel):
     model_config = ConfigDict(extra="ignore")
@@ -1052,7 +1058,7 @@ async def get_properties(
     if furnishing:
         query["furnishing"] = furnishing
     
-    properties = await db.properties.find(query, {"_id": 0, "exact_address": 0, "latitude": 0, "longitude": 0}).limit(50).to_list(None)
+    properties = await db.properties.find(query, {"_id": 0, "exact_address": 0, "latitude": 0, "longitude": 0, "owner_contact": 0, "owner_name": 0}).limit(50).to_list(None)
     return properties
 
 # PUBLIC endpoint - no auth required for viewing property (for shared links)
@@ -1061,7 +1067,7 @@ async def get_public_property(property_id: str):
     """Get property details without authentication - for shared links"""
     property_data = await db.properties.find_one(
         {"id": property_id}, 
-        {"_id": 0, "exact_address": 0, "latitude": 0, "longitude": 0, "owner_phone": 0}
+        {"_id": 0, "exact_address": 0, "latitude": 0, "longitude": 0, "owner_phone": 0, "owner_contact": 0, "owner_name": 0}
     )
     if not property_data:
         raise HTTPException(status_code=404, detail="Property not found")
@@ -1550,7 +1556,7 @@ async def ban_rider_application(
 
 @api_router.get("/properties/{property_id}")
 async def get_property(property_id: str, current_user: dict = Depends(get_current_user)):
-    property_data = await db.properties.find_one({"id": property_id}, {"_id": 0, "exact_address": 0, "latitude": 0, "longitude": 0})
+    property_data = await db.properties.find_one({"id": property_id}, {"_id": 0, "exact_address": 0, "latitude": 0, "longitude": 0, "owner_contact": 0, "owner_name": 0})
     if not property_data:
         raise HTTPException(status_code=404, detail="Property not found")
     return property_data

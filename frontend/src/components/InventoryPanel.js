@@ -26,6 +26,8 @@ const InventoryPanel = () => {
     images: [],
     video_url: '',
     amenities: [],
+    owner_contact: '',
+    owner_name: '',
   });
   const [submitting, setSubmitting] = useState(false);
 
@@ -86,6 +88,8 @@ const InventoryPanel = () => {
       images: [],
       video_url: '',
       amenities: [],
+      owner_contact: '',
+      owner_name: '',
     });
     setEditingProperty(null);
   };
@@ -138,6 +142,8 @@ const InventoryPanel = () => {
       images: property.images || [],
       video_url: property.video_url || '',
       amenities: property.amenities || [],
+      owner_contact: property.owner_contact || '',
+      owner_name: property.owner_name || '',
     });
     setEditingProperty(property);
     setShowAddForm(true);
@@ -556,6 +562,41 @@ const InventoryPanel = () => {
               )}
             </div>
 
+            {/* Owner Contact Section - Internal Use Only */}
+            <div className="md:col-span-2 p-4 bg-amber-50 border-2 border-amber-300 rounded-xl">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-amber-600 font-bold text-sm">🔒 INTERNAL USE ONLY</span>
+                <span className="text-xs text-amber-700 bg-amber-100 px-2 py-1 rounded">Not visible to customers/riders</span>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-bold text-[#111111] mb-1">Owner Name</label>
+                  <input
+                    type="text"
+                    placeholder="Property owner's name"
+                    value={formData.owner_name}
+                    onChange={(e) => setFormData({ ...formData, owner_name: e.target.value })}
+                    className="input-field"
+                    data-testid="owner-name-input"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold text-[#111111] mb-1">Owner Contact Number</label>
+                  <input
+                    type="tel"
+                    placeholder="10-digit mobile number"
+                    value={formData.owner_contact}
+                    onChange={(e) => setFormData({ ...formData, owner_contact: e.target.value.replace(/\D/g, '').slice(0, 10) })}
+                    className="input-field"
+                    data-testid="owner-contact-input"
+                  />
+                </div>
+              </div>
+              <p className="text-xs text-amber-700 mt-2">
+                Use this to verify property availability. This info will NEVER be shown to customers or riders.
+              </p>
+            </div>
+
             <div className="md:col-span-2">
               <label className="block text-sm font-bold text-[#111111] mb-1">Amenities</label>
               <input
@@ -639,6 +680,12 @@ const InventoryPanel = () => {
                     <p className="text-lg font-bold text-[#FF5A5F]" style={{ fontFamily: 'Outfit' }}>
                       ₹{property.rent?.toLocaleString()}/mo
                     </p>
+                    {/* Owner Contact - Admin Only */}
+                    {property.owner_contact && (
+                      <p className="text-xs text-amber-700 bg-amber-50 px-2 py-1 rounded mt-1 inline-flex items-center gap-1">
+                        🔒 Owner: {property.owner_name || 'N/A'} • <a href={`tel:${property.owner_contact}`} className="font-bold hover:underline">{property.owner_contact}</a>
+                      </p>
+                    )}
                     <div className="flex gap-2 mt-1">
                       {property.images?.length > 0 && (
                         <span className="text-xs bg-[#F3F4F6] px-2 py-0.5 rounded">
