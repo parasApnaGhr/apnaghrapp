@@ -1,0 +1,18 @@
+# ApnaGhr Robots.txt
+# Allow all search engines to crawl
+
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://apnaghrapp.in/api/sitemap.xml
+
+# Crawl-delay (optional, be nice to servers)
+Crawl-delay: 1
+
+# Disallow admin and private areas
+Disallow: /admin
+Disallow: /api/admin
+Disallow: /rider
+Disallow: /customer
+Disallow: /seller

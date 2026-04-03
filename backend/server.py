@@ -1177,17 +1177,20 @@ async def get_sitemap_xml():
     site_url = "https://apnaghrapp.in"
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     
-    # Static SEO data
-    cities = ["mohali", "chandigarh", "panchkula", "kharar", "zirakpur", "derabassi", "ludhiana", "jalandhar", "amritsar", "bathinda", "patiala"]
-    areas = {
-        "mohali": ["sector-70", "sector-71", "sector-79", "sector-80", "sector-82", "sector-91", "phase-5", "phase-7", "aerocity", "it-city"],
-        "chandigarh": ["sector-17", "sector-22", "sector-35", "sector-43", "sector-44", "manimajra"],
-        "panchkula": ["sector-4", "sector-9", "sector-12", "sector-20"],
-        "kharar": ["kharar-main", "sunny-enclave", "landran"],
-        "zirakpur": ["zirakpur-main", "vip-road", "patiala-road", "baltana"]
-    }
-    property_types = ["1bhk", "2bhk", "3bhk", "4bhk", "studio", "villa"]
-    listing_types = ["rent", "buy", "pg"]
+    # All 60 cities
+    cities = [
+        "delhi", "mumbai", "bangalore", "chennai", "kolkata", "hyderabad", "pune", "ahmedabad",
+        "jaipur", "lucknow", "kanpur", "nagpur", "indore", "thane", "bhopal", "visakhapatnam",
+        "patna", "vadodara", "ghaziabad", "ludhiana", "agra", "nashik", "faridabad", "meerut",
+        "rajkot", "varanasi", "srinagar", "aurangabad", "dhanbad", "amritsar", "navi-mumbai",
+        "allahabad", "ranchi", "howrah", "coimbatore", "jabalpur", "gwalior", "vijayawada",
+        "jodhpur", "madurai", "raipur", "kota", "chandigarh", "guwahati", "solapur", "hubli",
+        "mysore", "tiruchirappalli", "bareilly", "aligarh", "tiruppur", "moradabad", "jalandhar",
+        "bhubaneswar", "salem", "warangal", "guntur", "bhiwandi", "mohali", "bathinda"
+    ]
+    
+    property_types = ["flats", "1bhk", "2bhk", "3bhk", "4bhk", "studio", "villa"]
+    listing_types = ["rent", "buy"]
     
     # Blog slugs (static list)
     blog_slugs = [
@@ -1202,26 +1205,26 @@ async def get_sitemap_xml():
     
     # Static pages
     urls.append({"loc": f"{site_url}/", "priority": "1.0", "changefreq": "daily"})
-    urls.append({"loc": f"{site_url}/blogs", "priority": "0.9", "changefreq": "daily"})
+    urls.append({"loc": f"{site_url}/blog", "priority": "0.9", "changefreq": "daily"})
     urls.append({"loc": f"{site_url}/sitemap", "priority": "0.5", "changefreq": "weekly"})
     urls.append({"loc": f"{site_url}/legal", "priority": "0.3", "changefreq": "monthly"})
+    urls.append({"loc": f"{site_url}/join-as-rider", "priority": "0.8", "changefreq": "weekly"})
+    urls.append({"loc": f"{site_url}/earn-money-by-visiting-properties", "priority": "0.9", "changefreq": "weekly"})
+    urls.append({"loc": f"{site_url}/earn-2000-per-day-real-estate", "priority": "0.8", "changefreq": "weekly"})
     
-    # City pages
+    # City SEO pages
     for city in cities:
+        # Rider earning pages
+        urls.append({"loc": f"{site_url}/become-property-rider/{city}", "priority": "0.8", "changefreq": "weekly"})
+        
+        # Property pages
         for listing_type in listing_types:
-            urls.append({"loc": f"{site_url}/{listing_type}/flats-in-{city}", "priority": "0.8", "changefreq": "weekly"})
             for prop_type in property_types:
                 urls.append({"loc": f"{site_url}/{listing_type}/{prop_type}-in-{city}", "priority": "0.7", "changefreq": "weekly"})
-        
-        # Area pages
-        city_areas = areas.get(city, [])
-        for area in city_areas:
-            for listing_type in ["rent", "buy"]:
-                urls.append({"loc": f"{site_url}/{listing_type}/flats-in-{area}-{city}", "priority": "0.7", "changefreq": "weekly"})
     
     # Blog pages
     for slug in blog_slugs:
-        urls.append({"loc": f"{site_url}/blogs/{slug}", "priority": "0.7", "changefreq": "monthly"})
+        urls.append({"loc": f"{site_url}/blog/{slug}", "priority": "0.7", "changefreq": "monthly"})
     
     # Build XML
     xml = '<?xml version="1.0" encoding="UTF-8"?>\n'
@@ -1238,6 +1241,33 @@ async def get_sitemap_xml():
     xml += '</urlset>'
     
     return Response(content=xml, media_type="application/xml")
+
+
+@api_router.get("/robots.txt")
+async def get_robots_txt():
+    """
+    Returns robots.txt for search engines - PUBLIC endpoint
+    """
+    robots_content = """# ApnaGhr Robots.txt
+# Allow all search engines to crawl
+
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://apnaghrapp.in/api/sitemap.xml
+
+# Crawl-delay (be nice to servers)
+Crawl-delay: 1
+
+# Disallow admin and private areas
+Disallow: /admin
+Disallow: /api/admin
+Disallow: /rider
+Disallow: /customer
+Disallow: /seller
+"""
+    return Response(content=robots_content, media_type="text/plain")
 
 # ============================================
 # End SEO Module Endpoints
