@@ -31,6 +31,28 @@ const CustomerHome = () => {
   const [myBookings, setMyBookings] = useState([]);
   const [bookingsLoading, setBookingsLoading] = useState(true);
 
+  // Track lead when user interacts with property
+  const trackLead = async (source, propertyId = null) => {
+    try {
+      await api.post('/leads/track', {
+        source,
+        property_id: propertyId,
+        user_id: user?.id,
+        device_info: navigator.userAgent,
+        page_url: window.location.pathname
+      });
+    } catch (error) {
+      // Silent fail - don't interrupt user experience
+      console.log('Lead tracking error:', error);
+    }
+  };
+
+  // Track property click
+  const handlePropertyClick = (property) => {
+    trackLead('property_click', property.id);
+    navigate(`/customer/property/${property.id}`);
+  };
+
   useEffect(() => {
     loadProperties();
     loadAppSettings();
@@ -581,7 +603,7 @@ const CustomerHome = () => {
                   key={property.id}
                   variants={itemVariants}
                   className="property-card group cursor-pointer"
-                  onClick={() => navigate(`/customer/property/${property.id}`)}
+                  onClick={() => handlePropertyClick(property)}
                   data-testid={`property-card-${property.id}`}
                 >
                   {/* Image */}

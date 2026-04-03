@@ -275,6 +275,20 @@ const SellerDashboard = () => {
       setShareData(response.data);
       setShareProperty(property);
       setShowShareModal(true);
+      
+      // Track seller referral lead
+      try {
+        await api.post('/leads/track', {
+          source: 'seller_referral',
+          property_id: property.id,
+          referred_by_seller_id: user?.id,
+          seller_referral_code: response.data?.referral_code,
+          device_info: navigator.userAgent,
+          page_url: window.location.pathname
+        });
+      } catch (e) {
+        // Silent fail
+      }
     } catch (error) {
       toast.error('Failed to generate share link');
     }
