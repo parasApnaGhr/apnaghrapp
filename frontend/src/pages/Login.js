@@ -264,10 +264,10 @@ const Login = () => {
     }
   };
 
+  // Note: Rider registration is handled via /join-as-rider onboarding flow
   const roleOptions = [
     { value: 'customer', label: 'Find a Home', desc: 'Browse & book visits', icon: Home },
     { value: 'seller', label: 'Join as Seller', desc: 'Earn ₹500-₹10,000 per deal', icon: Briefcase },
-    { value: 'rider', label: 'Join as Rider', desc: 'Earn ₹150/visit + ₹500 bonus', icon: User },
     { value: 'advertiser', label: 'Advertise', desc: 'Promote your business', icon: Mail },
     { value: 'builder', label: 'List Properties', desc: 'Builder/Owner account', icon: Home }
   ];
@@ -300,28 +300,7 @@ const Login = () => {
             <p className="text-[#4A4D53] text-sm tracking-wide">Reset your password</p>
           ) : isRegister ? (
             <>
-              {formData.role === 'rider' ? (
-                <div className="space-y-2">
-                  <p className="text-[#04473C] font-medium text-sm">India's #1 Field Rider Network</p>
-                  <p className="text-[#4A4D53] text-xs">Earn by visiting properties</p>
-                  <div className="flex items-center justify-center gap-4 mt-3">
-                    <div className="text-center">
-                      <p className="text-xl font-bold text-[#04473C]">₹150</p>
-                      <p className="text-[10px] text-[#4A4D53]">per visit</p>
-                    </div>
-                    <div className="w-px h-8 bg-[#E5E1DB]" />
-                    <div className="text-center">
-                      <p className="text-xl font-bold text-[#04473C]">Daily</p>
-                      <p className="text-[10px] text-[#4A4D53]">payouts</p>
-                    </div>
-                    <div className="w-px h-8 bg-[#E5E1DB]" />
-                    <div className="text-center">
-                      <p className="text-xl font-bold text-[#C6A87C]">+₹500</p>
-                      <p className="text-[10px] text-[#4A4D53]">bonus/10 visits</p>
-                    </div>
-                  </div>
-                </div>
-              ) : formData.role === 'seller' ? (
+              {formData.role === 'seller' ? (
                 <div className="space-y-1">
                   <p className="text-[#04473C] font-medium text-sm">Join Our Sales Network</p>
                   <p className="text-[#4A4D53] text-xs">Earn up to ₹10,000 per deal</p>
