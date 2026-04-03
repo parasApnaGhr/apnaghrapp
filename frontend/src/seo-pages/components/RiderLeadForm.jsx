@@ -140,16 +140,100 @@ const RiderLeadForm = ({ source = 'seo_page', city = null }) => {
               required
             >
               <option value="">Select your city</option>
-              <option value="Mohali">Mohali</option>
-              <option value="Chandigarh">Chandigarh</option>
-              <option value="Panchkula">Panchkula</option>
-              <option value="Zirakpur">Zirakpur</option>
-              <option value="Kharar">Kharar</option>
-              <option value="Ludhiana">Ludhiana</option>
-              <option value="Jalandhar">Jalandhar</option>
-              <option value="Amritsar">Amritsar</option>
-              <option value="Patiala">Patiala</option>
-              <option value="Bathinda">Bathinda</option>
+              <optgroup label="Metro Cities">
+                <option value="Delhi">Delhi</option>
+                <option value="Mumbai">Mumbai</option>
+                <option value="Bangalore">Bangalore</option>
+                <option value="Hyderabad">Hyderabad</option>
+                <option value="Chennai">Chennai</option>
+                <option value="Kolkata">Kolkata</option>
+                <option value="Pune">Pune</option>
+                <option value="Ahmedabad">Ahmedabad</option>
+              </optgroup>
+              <optgroup label="NCR Region">
+                <option value="Noida">Noida</option>
+                <option value="Gurgaon">Gurgaon</option>
+                <option value="Ghaziabad">Ghaziabad</option>
+                <option value="Faridabad">Faridabad</option>
+              </optgroup>
+              <optgroup label="Punjab & Chandigarh">
+                <option value="Chandigarh">Chandigarh</option>
+                <option value="Mohali">Mohali</option>
+                <option value="Zirakpur">Zirakpur</option>
+                <option value="Ludhiana">Ludhiana</option>
+                <option value="Jalandhar">Jalandhar</option>
+                <option value="Amritsar">Amritsar</option>
+                <option value="Patiala">Patiala</option>
+                <option value="Bathinda">Bathinda</option>
+              </optgroup>
+              <optgroup label="Haryana">
+                <option value="Panchkula">Panchkula</option>
+                <option value="Hisar">Hisar</option>
+                <option value="Rohtak">Rohtak</option>
+                <option value="Panipat">Panipat</option>
+                <option value="Karnal">Karnal</option>
+                <option value="Ambala">Ambala</option>
+              </optgroup>
+              <optgroup label="Rajasthan">
+                <option value="Jaipur">Jaipur</option>
+                <option value="Ajmer">Ajmer</option>
+                <option value="Alwar">Alwar</option>
+              </optgroup>
+              <optgroup label="Uttar Pradesh">
+                <option value="Lucknow">Lucknow</option>
+                <option value="Agra">Agra</option>
+                <option value="Kanpur">Kanpur</option>
+                <option value="Varanasi">Varanasi</option>
+                <option value="Meerut">Meerut</option>
+              </optgroup>
+              <optgroup label="Gujarat">
+                <option value="Surat">Surat</option>
+                <option value="Vadodara">Vadodara</option>
+                <option value="Rajkot">Rajkot</option>
+              </optgroup>
+              <optgroup label="Madhya Pradesh">
+                <option value="Indore">Indore</option>
+                <option value="Bhopal">Bhopal</option>
+                <option value="Ujjain">Ujjain</option>
+                <option value="Gwalior">Gwalior</option>
+              </optgroup>
+              <optgroup label="Maharashtra">
+                <option value="Nagpur">Nagpur</option>
+                <option value="Nashik">Nashik</option>
+                <option value="Aurangabad">Aurangabad</option>
+              </optgroup>
+              <optgroup label="Tamil Nadu">
+                <option value="Coimbatore">Coimbatore</option>
+                <option value="Trichy">Trichy</option>
+                <option value="Madurai">Madurai</option>
+              </optgroup>
+              <optgroup label="Karnataka">
+                <option value="Mysore">Mysore</option>
+              </optgroup>
+              <optgroup label="Andhra Pradesh">
+                <option value="Vijayawada">Vijayawada</option>
+                <option value="Visakhapatnam">Visakhapatnam</option>
+              </optgroup>
+              <optgroup label="Uttarakhand">
+                <option value="Dehradun">Dehradun</option>
+                <option value="Haldwani">Haldwani</option>
+                <option value="Haridwar">Haridwar</option>
+              </optgroup>
+              <optgroup label="Eastern India">
+                <option value="Patna">Patna</option>
+                <option value="Ranchi">Ranchi</option>
+                <option value="Bhubaneswar">Bhubaneswar</option>
+                <option value="Guwahati">Guwahati</option>
+                <option value="Siliguri">Siliguri</option>
+              </optgroup>
+              <optgroup label="Chhattisgarh">
+                <option value="Raipur">Raipur</option>
+                <option value="Bilaspur">Bilaspur</option>
+                <option value="Durg">Durg</option>
+              </optgroup>
+              <optgroup label="J&K">
+                <option value="Jammu">Jammu</option>
+              </optgroup>
               <option value="Other">Other</option>
             </select>
           </div>

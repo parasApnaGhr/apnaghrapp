@@ -9,9 +9,9 @@ export const EARNING_STATS = {
   averageEarningsPerDay: 1500,
   monthlyPotential: 45000,
   topEarnerMonthly: 75000,
-  totalRiders: 500,
-  citiesActive: 11,
-  propertiesListed: 5000,
+  totalRiders: 12000,
+  citiesActive: 60,
+  propertiesListed: 50000,
 };
 
 export const EARNING_TIERS = [
@@ -176,17 +176,86 @@ export const RIDER_FAQS = [
 ];
 
 export const CITIES_FOR_RIDERS = [
-  { slug: 'mohali', name: 'Mohali', state: 'Punjab', activeRiders: 85, avgEarnings: '₹38,000' },
+  // Metro Cities
+  { slug: 'delhi', name: 'Delhi', state: 'Delhi', activeRiders: 850, avgEarnings: '₹48,000' },
+  { slug: 'mumbai', name: 'Mumbai', state: 'Maharashtra', activeRiders: 920, avgEarnings: '₹52,000' },
+  { slug: 'bangalore', name: 'Bangalore', state: 'Karnataka', activeRiders: 780, avgEarnings: '₹50,000' },
+  { slug: 'hyderabad', name: 'Hyderabad', state: 'Telangana', activeRiders: 620, avgEarnings: '₹46,000' },
+  { slug: 'chennai', name: 'Chennai', state: 'Tamil Nadu', activeRiders: 540, avgEarnings: '₹44,000' },
+  { slug: 'kolkata', name: 'Kolkata', state: 'West Bengal', activeRiders: 480, avgEarnings: '₹40,000' },
+  { slug: 'pune', name: 'Pune', state: 'Maharashtra', activeRiders: 520, avgEarnings: '₹45,000' },
+  { slug: 'ahmedabad', name: 'Ahmedabad', state: 'Gujarat', activeRiders: 380, avgEarnings: '₹42,000' },
+  // NCR Region
+  { slug: 'noida', name: 'Noida', state: 'Uttar Pradesh', activeRiders: 420, avgEarnings: '₹46,000' },
+  { slug: 'gurgaon', name: 'Gurgaon', state: 'Haryana', activeRiders: 480, avgEarnings: '₹48,000' },
+  { slug: 'ghaziabad', name: 'Ghaziabad', state: 'Uttar Pradesh', activeRiders: 220, avgEarnings: '₹38,000' },
+  { slug: 'faridabad', name: 'Faridabad', state: 'Haryana', activeRiders: 180, avgEarnings: '₹36,000' },
+  // Gujarat
+  { slug: 'surat', name: 'Surat', state: 'Gujarat', activeRiders: 280, avgEarnings: '₹40,000' },
+  { slug: 'vadodara', name: 'Vadodara', state: 'Gujarat', activeRiders: 160, avgEarnings: '₹36,000' },
+  { slug: 'rajkot', name: 'Rajkot', state: 'Gujarat', activeRiders: 120, avgEarnings: '₹34,000' },
+  // Rajasthan
+  { slug: 'jaipur', name: 'Jaipur', state: 'Rajasthan', activeRiders: 340, avgEarnings: '₹42,000' },
+  { slug: 'ajmer', name: 'Ajmer', state: 'Rajasthan', activeRiders: 65, avgEarnings: '₹30,000' },
+  { slug: 'alwar', name: 'Alwar', state: 'Rajasthan', activeRiders: 55, avgEarnings: '₹28,000' },
+  // Uttar Pradesh
+  { slug: 'lucknow', name: 'Lucknow', state: 'Uttar Pradesh', activeRiders: 260, avgEarnings: '₹38,000' },
+  { slug: 'agra', name: 'Agra', state: 'Uttar Pradesh', activeRiders: 140, avgEarnings: '₹32,000' },
+  { slug: 'kanpur', name: 'Kanpur', state: 'Uttar Pradesh', activeRiders: 180, avgEarnings: '₹34,000' },
+  { slug: 'varanasi', name: 'Varanasi', state: 'Uttar Pradesh', activeRiders: 120, avgEarnings: '₹30,000' },
+  { slug: 'meerut', name: 'Meerut', state: 'Uttar Pradesh', activeRiders: 95, avgEarnings: '₹32,000' },
+  // Madhya Pradesh
+  { slug: 'indore', name: 'Indore', state: 'Madhya Pradesh', activeRiders: 220, avgEarnings: '₹38,000' },
+  { slug: 'bhopal', name: 'Bhopal', state: 'Madhya Pradesh', activeRiders: 180, avgEarnings: '₹36,000' },
+  { slug: 'ujjain', name: 'Ujjain', state: 'Madhya Pradesh', activeRiders: 45, avgEarnings: '₹28,000' },
+  { slug: 'gwalior', name: 'Gwalior', state: 'Madhya Pradesh', activeRiders: 75, avgEarnings: '₹30,000' },
+  // Punjab & Chandigarh
   { slug: 'chandigarh', name: 'Chandigarh', state: 'Chandigarh', activeRiders: 120, avgEarnings: '₹42,000' },
-  { slug: 'panchkula', name: 'Panchkula', state: 'Haryana', activeRiders: 45, avgEarnings: '₹35,000' },
+  { slug: 'mohali', name: 'Mohali', state: 'Punjab', activeRiders: 85, avgEarnings: '₹38,000' },
   { slug: 'zirakpur', name: 'Zirakpur', state: 'Punjab', activeRiders: 65, avgEarnings: '₹36,000' },
-  { slug: 'kharar', name: 'Kharar', state: 'Punjab', activeRiders: 35, avgEarnings: '₹32,000' },
-  { slug: 'ludhiana', name: 'Ludhiana', state: 'Punjab', activeRiders: 75, avgEarnings: '₹40,000' },
   { slug: 'jalandhar', name: 'Jalandhar', state: 'Punjab', activeRiders: 55, avgEarnings: '₹34,000' },
+  { slug: 'ludhiana', name: 'Ludhiana', state: 'Punjab', activeRiders: 75, avgEarnings: '₹40,000' },
   { slug: 'amritsar', name: 'Amritsar', state: 'Punjab', activeRiders: 60, avgEarnings: '₹33,000' },
-  { slug: 'patiala', name: 'Patiala', state: 'Punjab', activeRiders: 40, avgEarnings: '₹30,000' },
   { slug: 'bathinda', name: 'Bathinda', state: 'Punjab', activeRiders: 30, avgEarnings: '₹28,000' },
+  { slug: 'patiala', name: 'Patiala', state: 'Punjab', activeRiders: 40, avgEarnings: '₹30,000' },
+  { slug: 'kharar', name: 'Kharar', state: 'Punjab', activeRiders: 35, avgEarnings: '₹32,000' },
   { slug: 'derabassi', name: 'Dera Bassi', state: 'Punjab', activeRiders: 25, avgEarnings: '₹29,000' },
+  { slug: 'panchkula', name: 'Panchkula', state: 'Haryana', activeRiders: 45, avgEarnings: '₹35,000' },
+  // Haryana
+  { slug: 'hisar', name: 'Hisar', state: 'Haryana', activeRiders: 55, avgEarnings: '₹30,000' },
+  { slug: 'rohtak', name: 'Rohtak', state: 'Haryana', activeRiders: 50, avgEarnings: '₹29,000' },
+  { slug: 'panipat', name: 'Panipat', state: 'Haryana', activeRiders: 45, avgEarnings: '₹28,000' },
+  { slug: 'karnal', name: 'Karnal', state: 'Haryana', activeRiders: 40, avgEarnings: '₹28,000' },
+  { slug: 'ambala', name: 'Ambala', state: 'Haryana', activeRiders: 50, avgEarnings: '₹30,000' },
+  // Uttarakhand
+  { slug: 'dehradun', name: 'Dehradun', state: 'Uttarakhand', activeRiders: 95, avgEarnings: '₹34,000' },
+  { slug: 'haldwani', name: 'Haldwani', state: 'Uttarakhand', activeRiders: 35, avgEarnings: '₹28,000' },
+  { slug: 'haridwar', name: 'Haridwar', state: 'Uttarakhand', activeRiders: 40, avgEarnings: '₹28,000' },
+  // Maharashtra
+  { slug: 'nagpur', name: 'Nagpur', state: 'Maharashtra', activeRiders: 180, avgEarnings: '₹36,000' },
+  { slug: 'nashik', name: 'Nashik', state: 'Maharashtra', activeRiders: 120, avgEarnings: '₹34,000' },
+  { slug: 'aurangabad', name: 'Aurangabad', state: 'Maharashtra', activeRiders: 85, avgEarnings: '₹32,000' },
+  // Tamil Nadu
+  { slug: 'coimbatore', name: 'Coimbatore', state: 'Tamil Nadu', activeRiders: 180, avgEarnings: '₹38,000' },
+  { slug: 'trichy', name: 'Trichy', state: 'Tamil Nadu', activeRiders: 75, avgEarnings: '₹32,000' },
+  { slug: 'madurai', name: 'Madurai', state: 'Tamil Nadu', activeRiders: 95, avgEarnings: '₹34,000' },
+  // Karnataka
+  { slug: 'mysore', name: 'Mysore', state: 'Karnataka', activeRiders: 110, avgEarnings: '₹35,000' },
+  // Andhra Pradesh
+  { slug: 'vijayawada', name: 'Vijayawada', state: 'Andhra Pradesh', activeRiders: 95, avgEarnings: '₹34,000' },
+  { slug: 'visakhapatnam', name: 'Visakhapatnam', state: 'Andhra Pradesh', activeRiders: 120, avgEarnings: '₹36,000' },
+  // Eastern India
+  { slug: 'patna', name: 'Patna', state: 'Bihar', activeRiders: 140, avgEarnings: '₹32,000' },
+  { slug: 'ranchi', name: 'Ranchi', state: 'Jharkhand', activeRiders: 85, avgEarnings: '₹30,000' },
+  { slug: 'bhubaneswar', name: 'Bhubaneswar', state: 'Odisha', activeRiders: 110, avgEarnings: '₹34,000' },
+  { slug: 'guwahati', name: 'Guwahati', state: 'Assam', activeRiders: 75, avgEarnings: '₹32,000' },
+  { slug: 'siliguri', name: 'Siliguri', state: 'West Bengal', activeRiders: 55, avgEarnings: '₹30,000' },
+  // Chhattisgarh
+  { slug: 'raipur', name: 'Raipur', state: 'Chhattisgarh', activeRiders: 95, avgEarnings: '₹32,000' },
+  { slug: 'bilaspur', name: 'Bilaspur', state: 'Chhattisgarh', activeRiders: 40, avgEarnings: '₹28,000' },
+  { slug: 'durg', name: 'Durg', state: 'Chhattisgarh', activeRiders: 45, avgEarnings: '₹28,000' },
+  // Jammu & Kashmir
+  { slug: 'jammu', name: 'Jammu', state: 'Jammu & Kashmir', activeRiders: 55, avgEarnings: '₹30,000' },
 ];
 
 export const BENEFITS = [
