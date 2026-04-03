@@ -94,12 +94,12 @@ const CityRiderPage = () => {
                 <span className="font-bold text-xl text-[#04473C]">ApnaGhr</span>
               </Link>
               
-              <a
-                href="#apply"
+              <Link
+                to="/join-as-rider"
                 className="px-6 py-2 bg-[#04473C] text-white rounded-lg font-medium hover:bg-[#033530]"
               >
                 Apply Now
-              </a>
+              </Link>
             </div>
           </div>
         </header>
@@ -137,13 +137,13 @@ const CityRiderPage = () => {
                   </div>
                 </div>
 
-                <a
-                  href="#apply"
+                <Link
+                  to="/join-as-rider"
                   className="inline-flex items-center gap-2 px-8 py-4 bg-yellow-400 text-gray-900 rounded-xl font-bold text-lg hover:bg-yellow-300 transition-colors"
                 >
                   Join Now in {cityData.name}
                   <ChevronRight className="w-5 h-5" />
-                </a>
+                </Link>
               </div>
 
               <div className="hidden lg:block">

@@ -71,12 +71,12 @@ const EarnMoneyPage = () => {
                 <span className="font-bold text-xl text-[#04473C]">ApnaGhr</span>
               </Link>
               
-              <a
-                href="#apply"
+              <Link
+                to="/join-as-rider"
                 className="px-6 py-2 bg-[#04473C] text-white rounded-lg font-medium hover:bg-[#033530]"
               >
                 Apply Now
-              </a>
+              </Link>
             </div>
           </div>
         </header>
@@ -118,13 +118,13 @@ const EarnMoneyPage = () => {
                   </div>
                 </div>
 
-                <a
-                  href="#apply"
+                <Link
+                  to="/join-as-rider"
                   className="inline-flex items-center gap-2 px-8 py-4 bg-yellow-400 text-gray-900 rounded-xl font-bold text-lg hover:bg-yellow-300 transition-colors"
                 >
                   Start Earning Today
                   <ChevronRight className="w-5 h-5" />
-                </a>
+                </Link>
               </div>
 
               <div className="hidden lg:block">
@@ -234,8 +234,8 @@ const EarnMoneyPage = () => {
                     </div>
                   </div>
 
-                  <a
-                    href="#apply"
+                  <Link
+                    to="/join-as-rider"
                     className={`block w-full py-3 rounded-xl font-bold text-center ${
                       tier.tier === 'Pro'
                         ? 'bg-[#04473C] text-white hover:bg-[#033530]'
@@ -243,7 +243,7 @@ const EarnMoneyPage = () => {
                     }`}
                   >
                     Join Now
-                  </a>
+                  </Link>
                 </div>
               ))}
             </div>

@@ -1355,6 +1355,38 @@ async def get_rider_applications(
         "limit": limit
     }
 
+@api_router.get("/admin/rider-applications/stats")
+async def get_rider_application_stats(current_user: dict = Depends(get_current_user)):
+    """Get rider application statistics - Admin only"""
+    if current_user.get("role") not in ["admin", "rider_admin"]:
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    pipeline = [
+        {"$group": {
+            "_id": "$status",
+            "count": {"$sum": 1}
+        }}
+    ]
+    
+    stats = await db.rider_applications.aggregate(pipeline).to_list(100)
+    
+    # Get city distribution
+    city_pipeline = [
+        {"$group": {
+            "_id": "$city",
+            "count": {"$sum": 1}
+        }},
+        {"$sort": {"count": -1}},
+        {"$limit": 10}
+    ]
+    city_stats = await db.rider_applications.aggregate(city_pipeline).to_list(10)
+    
+    return {
+        "by_status": {s["_id"]: s["count"] for s in stats if s["_id"]},
+        "by_city": {c["_id"]: c["count"] for c in city_stats if c["_id"]},
+        "total": await db.rider_applications.count_documents({})
+    }
+
 @api_router.get("/admin/rider-applications/{application_id}")
 async def get_rider_application(application_id: str, current_user: dict = Depends(get_current_user)):
     """Get a specific rider application - Admin only"""
@@ -1481,38 +1513,6 @@ async def ban_rider_application(
         )
     
     return {"message": "Rider banned successfully"}
-
-@api_router.get("/admin/rider-applications/stats")
-async def get_rider_application_stats(current_user: dict = Depends(get_current_user)):
-    """Get rider application statistics - Admin only"""
-    if current_user.get("role") not in ["admin", "rider_admin"]:
-        raise HTTPException(status_code=403, detail="Admin access required")
-    
-    pipeline = [
-        {"$group": {
-            "_id": "$status",
-            "count": {"$sum": 1}
-        }}
-    ]
-    
-    stats = await db.rider_applications.aggregate(pipeline).to_list(100)
-    
-    # Get city distribution
-    city_pipeline = [
-        {"$group": {
-            "_id": "$city",
-            "count": {"$sum": 1}
-        }},
-        {"$sort": {"count": -1}},
-        {"$limit": 10}
-    ]
-    city_stats = await db.rider_applications.aggregate(city_pipeline).to_list(10)
-    
-    return {
-        "by_status": {s["_id"]: s["count"] for s in stats if s["_id"]},
-        "by_city": {c["_id"]: c["count"] for c in city_stats if c["_id"]},
-        "total": await db.rider_applications.count_documents({})
-    }
 
 # ============================================
 # END RIDER ONBOARDING ENDPOINTS
