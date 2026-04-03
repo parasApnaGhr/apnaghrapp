@@ -523,18 +523,16 @@ const SellerDashboard = () => {
               <p className="text-white/80 mb-6">Share properties with your network and earn commissions on every successful deal</p>
               
               {/* Earnings Breakdown */}
-              <div className="grid grid-cols-3 gap-3 mb-6">
-                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3 text-center">
-                  <div className="text-2xl font-bold text-[#C6A87C]">₹500</div>
-                  <div className="text-xs text-white/70">Per Visit Booked</div>
+              <div className="grid grid-cols-2 gap-3 mb-6">
+                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center">
+                  <div className="text-3xl font-bold text-[#C6A87C]">₹5,000</div>
+                  <div className="text-sm text-white/70">Per Rental Deal</div>
+                  <div className="text-xs text-white/50 mt-1">After payment done</div>
                 </div>
-                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3 text-center">
-                  <div className="text-2xl font-bold text-[#C6A87C]">₹5,000</div>
-                  <div className="text-xs text-white/70">Per Rental Deal</div>
-                </div>
-                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3 text-center">
-                  <div className="text-2xl font-bold text-[#C6A87C]">₹10,000</div>
-                  <div className="text-xs text-white/70">Per Sale Deal</div>
+                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center">
+                  <div className="text-3xl font-bold text-[#C6A87C]">₹10,000</div>
+                  <div className="text-sm text-white/70">Per Sale Deal</div>
+                  <div className="text-xs text-white/50 mt-1">After payment done</div>
                 </div>
               </div>
               
@@ -546,11 +544,11 @@ const SellerDashboard = () => {
                 </div>
                 <div className="flex items-center gap-3 text-sm">
                   <div className="w-6 h-6 bg-[#C6A87C] rounded-full flex items-center justify-center text-[#04473C] font-bold text-xs">2</div>
-                  <span>Client books a visit using your referral</span>
+                  <span>Client visits & finalizes the property</span>
                 </div>
                 <div className="flex items-center gap-3 text-sm">
                   <div className="w-6 h-6 bg-[#C6A87C] rounded-full flex items-center justify-center text-[#04473C] font-bold text-xs">3</div>
-                  <span>Earn commission when deal closes</span>
+                  <span>Get paid when deal payment is complete</span>
                 </div>
               </div>
             </div>
