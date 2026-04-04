@@ -2,16 +2,45 @@
 Leads Routes - Lead tracking and management
 """
 from fastapi import APIRouter, Depends, HTTPException, Request
-from fastapi.responses import Response
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel, Field, ConfigDict
 from typing import Optional, List
 from datetime import datetime, timezone
 import uuid
+import jwt
+import os
 
 router = APIRouter(tags=["leads"])
+security = HTTPBearer()
 
-# Import db and auth from main server
-from server import db, get_current_user
+# Database reference - will be set by main app
+db = None
+
+def set_database(database):
+    global db
+    db = database
+
+# JWT auth
+JWT_SECRET = os.environ.get('JWT_SECRET', 'apnaghr-visit-platform-2024')
+JWT_ALGORITHM = 'HS256'
+
+async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    """Extract user from JWT token"""
+    try:
+        token = credentials.credentials
+        payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+        user_id = payload.get('user_id')
+        if not user_id:
+            raise HTTPException(status_code=401, detail="Invalid token")
+        
+        user = await db.users.find_one({"id": user_id}, {"_id": 0})
+        if not user:
+            raise HTTPException(status_code=401, detail="User not found")
+        return user
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail="Token expired")
+    except jwt.InvalidTokenError:
+        raise HTTPException(status_code=401, detail="Invalid token")
 
 # ============ MODELS ============
 

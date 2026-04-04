@@ -2,15 +2,45 @@
 Builder Routes - Project management, events, leads for builders
 """
 from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel, Field, ConfigDict
 from typing import Optional, List
 from datetime import datetime, timezone
 import uuid
+import jwt
+import os
 
 router = APIRouter(prefix="/builder", tags=["builder"])
+security = HTTPBearer()
 
-# Import db and auth from main server
-from server import db, get_current_user
+# Database reference - will be set by main app
+db = None
+
+def set_database(database):
+    global db
+    db = database
+
+# JWT auth
+JWT_SECRET = os.environ.get('JWT_SECRET', 'apnaghr-visit-platform-2024')
+JWT_ALGORITHM = 'HS256'
+
+async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    """Extract user from JWT token"""
+    try:
+        token = credentials.credentials
+        payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+        user_id = payload.get('user_id')
+        if not user_id:
+            raise HTTPException(status_code=401, detail="Invalid token")
+        
+        user = await db.users.find_one({"id": user_id}, {"_id": 0})
+        if not user:
+            raise HTTPException(status_code=401, detail="User not found")
+        return user
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail="Token expired")
+    except jwt.InvalidTokenError:
+        raise HTTPException(status_code=401, detail="Invalid token")
 
 # ============ MODELS ============
 
@@ -412,6 +442,54 @@ async def get_builder_events(current_user: dict = Depends(get_current_user)):
     return events
 
 
+@router.get("/events/{event_id}")
+async def get_builder_event(event_id: str, current_user: dict = Depends(get_current_user)):
+    """Get specific event details"""
+    if current_user['role'] != 'builder':
+        raise HTTPException(status_code=403, detail="Builder access required")
+    
+    event = await db.builder_events.find_one(
+        {"id": event_id, "builder_id": current_user['id']},
+        {"_id": 0}
+    )
+    
+    if not event:
+        raise HTTPException(status_code=404, detail="Event not found")
+    
+    return event
+
+
+@router.put("/events/{event_id}")
+async def update_builder_event(event_id: str, update_data: dict, current_user: dict = Depends(get_current_user)):
+    """Update event details"""
+    if current_user['role'] != 'builder':
+        raise HTTPException(status_code=403, detail="Builder access required")
+    
+    result = await db.builder_events.update_one(
+        {"id": event_id, "builder_id": current_user['id']},
+        {"$set": update_data}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Event not found")
+    
+    event = await db.builder_events.find_one({"id": event_id}, {"_id": 0})
+    return event
+
+
+@router.delete("/events/{event_id}")
+async def delete_builder_event(event_id: str, current_user: dict = Depends(get_current_user)):
+    """Delete an event"""
+    if current_user['role'] != 'builder':
+        raise HTTPException(status_code=403, detail="Builder access required")
+    
+    result = await db.builder_events.delete_one({"id": event_id, "builder_id": current_user['id']})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Event not found")
+    
+    return {"success": True}
+
+
 @router.get("/events/{event_id}/registrations")
 async def get_event_registrations(event_id: str, current_user: dict = Depends(get_current_user)):
     """Get all registrations for an event"""
@@ -424,3 +502,126 @@ async def get_event_registrations(event_id: str, current_user: dict = Depends(ge
     ).to_list(None)
     
     return registrations
+
+
+
+# ============ PUBLIC ENDPOINTS ============
+
+@router.get("/public")
+async def get_public_projects(
+    phase: Optional[str] = None,
+    city: Optional[str] = None,
+    project_type: Optional[str] = None,
+    min_price: Optional[float] = None,
+    max_price: Optional[float] = None
+):
+    """Get all active builder projects - PUBLIC"""
+    query = {"status": "active", "subscription_status": "active"}
+    
+    if phase:
+        query["phase"] = phase
+    if city:
+        query["city"] = {"$regex": city, "$options": "i"}
+    if project_type:
+        query["project_type"] = project_type
+    if min_price:
+        query["min_price"] = {"$gte": min_price}
+    if max_price:
+        query["max_price"] = {"$lte": max_price}
+    
+    projects = await db.builder_projects.find(
+        query,
+        {"_id": 0, "builder_phone": 0, "builder_email": 0, "admin_notes": 0}
+    ).sort("is_featured", -1).to_list(50)
+    
+    return projects
+
+
+@router.get("/public/{project_id}")
+async def get_public_project(project_id: str, request: Request):
+    """Get single project details - PUBLIC"""
+    project = await db.builder_projects.find_one(
+        {"id": project_id, "status": "active"},
+        {"_id": 0, "builder_phone": 0, "builder_email": 0, "admin_notes": 0}
+    )
+    
+    if not project:
+        raise HTTPException(status_code=404, detail="Project not found")
+    
+    # Increment view count
+    await db.builder_projects.update_one(
+        {"id": project_id},
+        {"$inc": {"total_views": 1}}
+    )
+    
+    return project
+
+
+@router.post("/public/{project_id}/inquiry")
+async def submit_project_inquiry(project_id: str, inquiry_data: dict, request: Request):
+    """Submit inquiry for a project - PUBLIC"""
+    project = await db.builder_projects.find_one({"id": project_id})
+    
+    if not project:
+        raise HTTPException(status_code=404, detail="Project not found")
+    
+    lead = BuilderProjectLead(
+        project_id=project_id,
+        builder_id=project.get("builder_id"),
+        name=inquiry_data.get("name"),
+        phone=inquiry_data.get("phone"),
+        email=inquiry_data.get("email"),
+        interested_unit_type=inquiry_data.get("unit_type"),
+        budget_range=inquiry_data.get("budget"),
+        timeline=inquiry_data.get("timeline"),
+        source="inquiry_form",
+        page_url=inquiry_data.get("page_url")
+    )
+    
+    await db.builder_project_leads.insert_one(lead.model_dump())
+    
+    # Update project stats
+    await db.builder_projects.update_one(
+        {"id": project_id},
+        {"$inc": {"total_inquiries": 1}}
+    )
+    
+    return {"success": True, "message": "Inquiry submitted successfully"}
+
+
+@router.post("/public/{project_id}/click")
+async def track_project_click(project_id: str):
+    """Track click on project - PUBLIC"""
+    await db.builder_projects.update_one(
+        {"id": project_id},
+        {"$inc": {"total_clicks": 1}}
+    )
+    return {"success": True}
+
+
+# ============ ADMIN ENDPOINTS ============
+
+@router.get("/admin/all")
+async def admin_get_builder_projects(current_user: dict = Depends(get_current_user)):
+    """Get all builder projects - Admin only"""
+    if current_user['role'] != 'admin':
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    projects = await db.builder_projects.find({}, {"_id": 0}).sort("created_at", -1).to_list(None)
+    return projects
+
+
+@router.patch("/admin/{project_id}")
+async def admin_update_project(project_id: str, update_data: dict, current_user: dict = Depends(get_current_user)):
+    """Update project status - Admin only"""
+    if current_user['role'] != 'admin':
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    update_data["updated_at"] = datetime.now(timezone.utc)
+    
+    await db.builder_projects.update_one(
+        {"id": project_id},
+        {"$set": update_data}
+    )
+    
+    return {"success": True}

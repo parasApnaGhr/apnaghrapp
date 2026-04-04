@@ -497,21 +497,28 @@ See `/app/memory/test_credentials.md`
 ### P2 - Enhancements
 1. **Real SMS/Email OTP** - Currently returns OTP in response (Dev Mode)
 2. **Live WebSockets** - Real-time rider tracking (currently polling)
-3. **Backend Refactoring** - Break down monolithic server.py
+3. **Backend Refactoring** - ✅ COMPLETED (December 4, 2025)
 
 ## Architecture
 
 ```
 /app/
 ├── backend/
-│   ├── server.py          # Main API server (~2900 lines)
-│   ├── routes/            # Auth, packers, advertising, chatbot, seller (NEW)
+│   ├── server.py          # Main API server (~5000 lines, down from 5840)
+│   ├── routes/            
+│   │   ├── builder.py     # Builder project management, events, leads (NEW - extracted)
+│   │   ├── leads.py       # Lead tracking and management (NEW - extracted)
+│   │   ├── packers.py     # Packers & Movers module
+│   │   ├── advertising.py # Advertising module
+│   │   ├── chatbot.py     # AI Chatbot routes
+│   │   ├── seller.py      # Seller/calling agent module
+│   │   └── tracking.py    # Real-time GPS tracking
 │   ├── services/          # Cashfree, notifications, image storage
 │   └── seed_production.py # Production data migration
 ├── frontend/
 │   ├── src/
-│   │   ├── pages/         # All pages (Premium styled) + SellerDashboard
-│   │   ├── components/    # Reusable components + SellerManagementPanel
+│   │   ├── pages/         # All pages (Premium styled) + BuilderDashboard
+│   │   ├── components/    # Reusable components + LeadsPanel
 │   │   ├── index.css      # Premium design system
 │   │   └── utils/api.js   # API utilities
 └── memory/
