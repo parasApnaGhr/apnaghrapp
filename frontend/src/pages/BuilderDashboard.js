@@ -94,7 +94,7 @@ const EMICalculator = ({ minPrice, maxPrice }) => {
 };
 
 // Project Card Component
-const ProjectCard = ({ project, onEdit, onViewLeads }) => {
+const ProjectCard = ({ project, onEdit, onViewLeads, onManageEvents }) => {
   const [expanded, setExpanded] = useState(false);
   
   const getPhaseColor = (phase) => {
@@ -184,6 +184,15 @@ const ProjectCard = ({ project, onEdit, onViewLeads }) => {
               <Users className="w-4 h-4" />
               View Leads
             </button>
+            {project.phase === 'pre_pre_launch' && (
+              <button
+                onClick={() => onManageEvents(project)}
+                className="flex items-center gap-1 px-3 py-1.5 bg-purple-600 text-white rounded-lg text-sm hover:bg-purple-700"
+              >
+                <Calendar className="w-4 h-4" />
+                Manage Events
+              </button>
+            )}
             <button
               onClick={() => onEdit(project)}
               className="flex items-center gap-1 px-3 py-1.5 border border-[#E5E1DB] rounded-lg text-sm hover:bg-[#F5F3F0]"
@@ -827,6 +836,403 @@ const LeadsModal = ({ isOpen, onClose, project }) => {
   );
 };
 
+// Events Management Modal
+const EventsModal = ({ isOpen, onClose, project, onEventCreated }) => {
+  const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [showAddEvent, setShowAddEvent] = useState(false);
+  const [eventForm, setEventForm] = useState({
+    event_name: '',
+    event_type: 'investor_meetup',
+    description: '',
+    city: '',
+    venue: '',
+    venue_address: '',
+    event_date: '',
+    start_time: '10:00',
+    end_time: '13:00',
+    max_attendees: 50,
+    registration_fee: 0
+  });
+  const [selectedEvent, setSelectedEvent] = useState(null);
+  const [registrations, setRegistrations] = useState([]);
+  const [loadingRegistrations, setLoadingRegistrations] = useState(false);
+  
+  useEffect(() => {
+    if (isOpen && project) {
+      fetchEvents();
+    }
+  }, [isOpen, project]);
+  
+  const fetchEvents = async () => {
+    try {
+      setLoading(true);
+      const response = await api.get('/builder/events');
+      const projectEvents = response.data?.filter(e => e.project_id === project.id) || [];
+      setEvents(projectEvents);
+    } catch (error) {
+      console.error('Error fetching events:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  const fetchRegistrations = async (eventId) => {
+    try {
+      setLoadingRegistrations(true);
+      const response = await api.get(`/builder/events/${eventId}/registrations`);
+      setRegistrations(response.data || []);
+    } catch (error) {
+      console.error('Error fetching registrations:', error);
+    } finally {
+      setLoadingRegistrations(false);
+    }
+  };
+  
+  const handleCreateEvent = async (e) => {
+    e.preventDefault();
+    try {
+      await api.post('/builder/events', {
+        ...eventForm,
+        project_id: project.id
+      });
+      toast.success('Event created successfully');
+      setShowAddEvent(false);
+      setEventForm({
+        event_name: '',
+        event_type: 'investor_meetup',
+        description: '',
+        city: '',
+        venue: '',
+        venue_address: '',
+        event_date: '',
+        start_time: '10:00',
+        end_time: '13:00',
+        max_attendees: 50,
+        registration_fee: 0
+      });
+      fetchEvents();
+      if (onEventCreated) onEventCreated();
+    } catch (error) {
+      toast.error('Failed to create event');
+    }
+  };
+  
+  const handleViewRegistrations = (event) => {
+    setSelectedEvent(event);
+    fetchRegistrations(event.id);
+  };
+  
+  if (!isOpen) return null;
+  
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="bg-white rounded-xl max-w-5xl w-full max-h-[90vh] overflow-y-auto"
+      >
+        <div className="sticky top-0 bg-white border-b border-[#E5E1DB] p-4 flex items-center justify-between z-10">
+          <div>
+            <h2 className="text-xl font-bold">Investor Events</h2>
+            <p className="text-sm text-[#4A4D53]">{project?.project_name}</p>
+          </div>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setShowAddEvent(true)}
+              className="flex items-center gap-2 px-4 py-2 bg-[#04473C] text-white rounded-lg hover:bg-[#033530]"
+            >
+              <Plus className="w-4 h-4" />
+              Create Event
+            </button>
+            <button onClick={onClose} className="p-2 hover:bg-[#F5F3F0] rounded-lg">
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+        </div>
+        
+        <div className="p-6">
+          {/* Add Event Form */}
+          {showAddEvent && (
+            <motion.form
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              onSubmit={handleCreateEvent}
+              className="bg-purple-50 border border-purple-200 rounded-xl p-6 mb-6"
+            >
+              <h3 className="font-bold text-purple-800 mb-4 flex items-center gap-2">
+                <Calendar className="w-5 h-5" />
+                Create New Investor Event
+              </h3>
+              
+              <div className="grid md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1">Event Name *</label>
+                  <input
+                    type="text"
+                    value={eventForm.event_name}
+                    onChange={(e) => setEventForm({ ...eventForm, event_name: e.target.value })}
+                    placeholder="e.g., Investor Meetup - Mohali"
+                    className="w-full px-4 py-2 border border-[#E5E1DB] rounded-lg"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Event Type *</label>
+                  <select
+                    value={eventForm.event_type}
+                    onChange={(e) => setEventForm({ ...eventForm, event_type: e.target.value })}
+                    className="w-full px-4 py-2 border border-[#E5E1DB] rounded-lg"
+                  >
+                    <option value="investor_meetup">Investor Meetup</option>
+                    <option value="site_visit">Site Visit</option>
+                    <option value="webinar">Webinar</option>
+                    <option value="launch_event">Launch Event</option>
+                  </select>
+                </div>
+              </div>
+              
+              <div className="mt-4">
+                <label className="block text-sm font-medium mb-1">Description</label>
+                <textarea
+                  value={eventForm.description}
+                  onChange={(e) => setEventForm({ ...eventForm, description: e.target.value })}
+                  placeholder="Describe the event, what investors can expect..."
+                  className="w-full px-4 py-2 border border-[#E5E1DB] rounded-lg"
+                  rows={2}
+                />
+              </div>
+              
+              <div className="grid md:grid-cols-3 gap-4 mt-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1">City *</label>
+                  <input
+                    type="text"
+                    value={eventForm.city}
+                    onChange={(e) => setEventForm({ ...eventForm, city: e.target.value })}
+                    placeholder="e.g., Mohali"
+                    className="w-full px-4 py-2 border border-[#E5E1DB] rounded-lg"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Venue Name *</label>
+                  <input
+                    type="text"
+                    value={eventForm.venue}
+                    onChange={(e) => setEventForm({ ...eventForm, venue: e.target.value })}
+                    placeholder="e.g., Hotel Taj, Sector 70"
+                    className="w-full px-4 py-2 border border-[#E5E1DB] rounded-lg"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Full Address</label>
+                  <input
+                    type="text"
+                    value={eventForm.venue_address}
+                    onChange={(e) => setEventForm({ ...eventForm, venue_address: e.target.value })}
+                    placeholder="Full venue address"
+                    className="w-full px-4 py-2 border border-[#E5E1DB] rounded-lg"
+                  />
+                </div>
+              </div>
+              
+              <div className="grid md:grid-cols-4 gap-4 mt-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1">Event Date *</label>
+                  <input
+                    type="date"
+                    value={eventForm.event_date}
+                    onChange={(e) => setEventForm({ ...eventForm, event_date: e.target.value })}
+                    className="w-full px-4 py-2 border border-[#E5E1DB] rounded-lg"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Start Time</label>
+                  <input
+                    type="time"
+                    value={eventForm.start_time}
+                    onChange={(e) => setEventForm({ ...eventForm, start_time: e.target.value })}
+                    className="w-full px-4 py-2 border border-[#E5E1DB] rounded-lg"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">End Time</label>
+                  <input
+                    type="time"
+                    value={eventForm.end_time}
+                    onChange={(e) => setEventForm({ ...eventForm, end_time: e.target.value })}
+                    className="w-full px-4 py-2 border border-[#E5E1DB] rounded-lg"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Max Attendees</label>
+                  <input
+                    type="number"
+                    value={eventForm.max_attendees}
+                    onChange={(e) => setEventForm({ ...eventForm, max_attendees: parseInt(e.target.value) })}
+                    className="w-full px-4 py-2 border border-[#E5E1DB] rounded-lg"
+                  />
+                </div>
+              </div>
+              
+              <div className="flex justify-end gap-3 mt-6">
+                <button
+                  type="button"
+                  onClick={() => setShowAddEvent(false)}
+                  className="px-4 py-2 border border-[#E5E1DB] rounded-lg hover:bg-[#F5F3F0]"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 flex items-center gap-2"
+                >
+                  <Calendar className="w-4 h-4" />
+                  Create Event
+                </button>
+              </div>
+            </motion.form>
+          )}
+          
+          {/* Events List */}
+          {loading ? (
+            <div className="text-center py-12 text-[#4A4D53]">Loading events...</div>
+          ) : events.length === 0 && !showAddEvent ? (
+            <div className="text-center py-12">
+              <Calendar className="w-16 h-16 text-[#D0C9C0] mx-auto mb-4" />
+              <h3 className="text-lg font-bold mb-2">No Events Yet</h3>
+              <p className="text-[#4A4D53] mb-4">Create investor events to attract potential investors</p>
+              <button
+                onClick={() => setShowAddEvent(true)}
+                className="flex items-center gap-2 px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 mx-auto"
+              >
+                <Plus className="w-5 h-5" />
+                Create Your First Event
+              </button>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {events.map((event) => (
+                <div key={event.id} className="bg-white border border-[#E5E1DB] rounded-xl overflow-hidden">
+                  <div className="p-4">
+                    <div className="flex items-start justify-between">
+                      <div className="flex gap-4">
+                        <div className="w-16 h-16 bg-purple-100 rounded-lg flex flex-col items-center justify-center">
+                          <span className="text-2xl font-bold text-purple-700">
+                            {new Date(event.event_date).getDate()}
+                          </span>
+                          <span className="text-xs text-purple-600">
+                            {new Date(event.event_date).toLocaleDateString('en-US', { month: 'short' })}
+                          </span>
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${
+                              event.status === 'upcoming' ? 'bg-green-100 text-green-700' :
+                              event.status === 'completed' ? 'bg-gray-100 text-gray-700' :
+                              'bg-yellow-100 text-yellow-700'
+                            }`}>
+                              {event.status?.toUpperCase()}
+                            </span>
+                            <span className="px-2 py-0.5 text-xs bg-purple-100 text-purple-700 rounded-full">
+                              {event.event_type?.replace('_', ' ').toUpperCase()}
+                            </span>
+                          </div>
+                          <h3 className="text-lg font-bold">{event.event_name}</h3>
+                          <p className="text-sm text-[#4A4D53] flex items-center gap-1">
+                            <MapPin className="w-3 h-3" />
+                            {event.venue}, {event.city}
+                          </p>
+                          <p className="text-sm text-[#4A4D53] flex items-center gap-1">
+                            <Clock className="w-3 h-3" />
+                            {event.start_time} - {event.end_time}
+                          </p>
+                        </div>
+                      </div>
+                      
+                      <div className="text-right">
+                        <div className="text-2xl font-bold text-purple-600">
+                          {event.registered_count || 0}/{event.max_attendees}
+                        </div>
+                        <div className="text-xs text-[#4A4D53]">Registered</div>
+                        <button
+                          onClick={() => handleViewRegistrations(event)}
+                          className="mt-2 flex items-center gap-1 px-3 py-1.5 bg-purple-100 text-purple-700 rounded-lg text-sm hover:bg-purple-200"
+                        >
+                          <Users className="w-4 h-4" />
+                          View Registrations
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Registrations Panel */}
+                  {selectedEvent?.id === event.id && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      className="border-t border-[#E5E1DB] bg-[#F5F3F0]/50 p-4"
+                    >
+                      <h4 className="font-bold mb-3 flex items-center gap-2">
+                        <Users className="w-4 h-4 text-purple-600" />
+                        Registered Investors ({registrations.length})
+                      </h4>
+                      
+                      {loadingRegistrations ? (
+                        <div className="text-center py-4 text-[#4A4D53]">Loading...</div>
+                      ) : registrations.length === 0 ? (
+                        <div className="text-center py-4 text-[#4A4D53]">No registrations yet</div>
+                      ) : (
+                        <div className="grid md:grid-cols-2 gap-3">
+                          {registrations.map((reg) => (
+                            <div key={reg.id} className="bg-white p-3 rounded-lg border border-[#E5E1DB]">
+                              <div className="flex items-start justify-between">
+                                <div>
+                                  <div className="font-medium">{reg.name}</div>
+                                  <a href={`tel:${reg.phone}`} className="text-sm text-[#04473C] hover:underline flex items-center gap-1">
+                                    <Phone className="w-3 h-3" />
+                                    {reg.phone}
+                                  </a>
+                                  {reg.investment_capacity && (
+                                    <span className="text-xs text-[#4A4D53] bg-[#F5F3F0] px-2 py-0.5 rounded mt-1 inline-block">
+                                      Budget: {reg.investment_capacity}
+                                    </span>
+                                  )}
+                                </div>
+                                <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${
+                                  reg.attended ? 'bg-green-100 text-green-700' :
+                                  reg.status === 'confirmed' ? 'bg-blue-100 text-blue-700' :
+                                  'bg-yellow-100 text-yellow-700'
+                                }`}>
+                                  {reg.attended ? 'ATTENDED' : reg.status?.toUpperCase()}
+                                </span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      
+                      <button
+                        onClick={() => setSelectedEvent(null)}
+                        className="mt-3 text-sm text-[#4A4D53] hover:text-[#04473C]"
+                      >
+                        Hide Registrations
+                      </button>
+                    </motion.div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </motion.div>
+    </div>
+  );
+};
+
 // Main Builder Dashboard
 const BuilderDashboard = () => {
   const { user, logout } = useAuth();
@@ -837,6 +1243,7 @@ const BuilderDashboard = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [editProject, setEditProject] = useState(null);
   const [showLeadsModal, setShowLeadsModal] = useState(false);
+  const [showEventsModal, setShowEventsModal] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
   const [filterPhase, setFilterPhase] = useState('all');
   
@@ -884,6 +1291,11 @@ const BuilderDashboard = () => {
   const handleViewLeads = (project) => {
     setSelectedProject(project);
     setShowLeadsModal(true);
+  };
+  
+  const handleManageEvents = (project) => {
+    setSelectedProject(project);
+    setShowEventsModal(true);
   };
   
   const filteredProjects = filterPhase === 'all' 
@@ -1030,6 +1442,7 @@ const BuilderDashboard = () => {
                 project={project}
                 onEdit={handleEditProject}
                 onViewLeads={handleViewLeads}
+                onManageEvents={handleManageEvents}
               />
             ))}
           </div>
@@ -1048,6 +1461,13 @@ const BuilderDashboard = () => {
         isOpen={showLeadsModal}
         onClose={() => { setShowLeadsModal(false); setSelectedProject(null); }}
         project={selectedProject}
+      />
+      
+      <EventsModal
+        isOpen={showEventsModal}
+        onClose={() => { setShowEventsModal(false); setSelectedProject(null); }}
+        project={selectedProject}
+        onEventCreated={fetchDashboardData}
       />
     </div>
   );
