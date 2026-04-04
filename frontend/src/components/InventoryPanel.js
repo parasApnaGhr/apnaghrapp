@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import { propertyAPI, getMediaUrl } from '../utils/api';
 import api from '../utils/api';
 import FileUploader from './FileUploader';
+import AIPropertyValidator from './AIPropertyValidator';
 
 const InventoryPanel = () => {
   const [properties, setProperties] = useState([]);
@@ -96,6 +97,22 @@ const InventoryPanel = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Validation
+    if (!formData.description || formData.description.length < 50) {
+      toast.error('Description must be at least 50 characters');
+      return;
+    }
+    
+    const amenitiesArray = Array.isArray(formData.amenities) 
+      ? formData.amenities.filter(a => a.trim())
+      : formData.amenities.split(',').map(a => a.trim()).filter(a => a);
+    
+    if (amenitiesArray.length < 3) {
+      toast.error('Please add at least 3 amenities');
+      return;
+    }
+    
     setSubmitting(true);
     
     try {
@@ -103,9 +120,7 @@ const InventoryPanel = () => {
         ...formData,
         rent: parseFloat(formData.rent),
         bhk: parseInt(formData.bhk),
-        amenities: Array.isArray(formData.amenities) 
-          ? formData.amenities.filter(a => a.trim())
-          : formData.amenities.split(',').map(a => a.trim()).filter(a => a),
+        amenities: amenitiesArray,
       };
       
       if (editingProperty) {
@@ -598,15 +613,42 @@ const InventoryPanel = () => {
             </div>
 
             <div className="md:col-span-2">
-              <label className="block text-sm font-bold text-[#111111] mb-1">Amenities</label>
+              <label className="block text-sm font-bold text-[#111111] mb-1">Amenities *</label>
               <input
                 type="text"
                 placeholder="Parking, Gym, Swimming Pool, Security"
                 value={Array.isArray(formData.amenities) ? formData.amenities.join(', ') : formData.amenities}
                 onChange={(e) => setFormData({ ...formData, amenities: e.target.value.split(',').map(a => a.trim()).filter(a => a) })}
                 className="input-field"
+                required
               />
-              <p className="text-xs text-[#52525B] mt-1">Separate with commas</p>
+              <p className="text-xs text-[#52525B] mt-1">Separate with commas (minimum 3 required)</p>
+            </div>
+
+            {/* AI Property Validator */}
+            <div className="md:col-span-2">
+              <AIPropertyValidator
+                propertyData={formData}
+                onSuggestionsUpdate={(analysis) => {
+                  // Auto-update property type if detected with high confidence
+                  if (analysis.detected_type && analysis.type_confidence > 0.7) {
+                    const typeMap = {
+                      'apartment': 'Apartment',
+                      'house': 'House',
+                      'villa': 'Villa',
+                      'studio': 'Studio',
+                      'pg': 'PG'
+                    };
+                    if (typeMap[analysis.detected_type] && typeMap[analysis.detected_type] !== formData.property_type) {
+                      // Don't auto-change, just let the validator show the suggestion
+                    }
+                  }
+                }}
+                onTypeDetected={(type) => {
+                  // Optional: Could auto-fill type
+                }}
+                isEditing={!!editingProperty}
+              />
             </div>
 
             <div className="md:col-span-2 flex gap-3 pt-4">

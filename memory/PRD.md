@@ -497,6 +497,47 @@ See `/app/memory/test_credentials.md`
 ### P2 - Enhancements
 1. **Real SMS/Email OTP** - Currently returns OTP in response (Dev Mode)
 2. **Live WebSockets** - Real-time rider tracking (currently polling)
+## Latest Updates (December 4, 2025)
+
+### New Features Implemented:
+1. **Voice Search (🗣️)** - Both Sellers and Customers
+   - Tap microphone button to speak
+   - Supports: "Show Patiala flats", "2BHK under 15k", "Chandigarh apartments"
+   - Auto-parses city, BHK, price range, property type
+   - Works with Indian English for city names
+
+2. **AI Property Validator (Admin)**
+   - Real-time analysis as admin types
+   - Auto-detects property type (apartment/house/villa/studio/pg)
+   - Description quality assessment (poor/fair/good/excellent)
+   - Missing amenities suggestions
+   - Issues and improvement suggestions
+   - Validation score (0-100%)
+
+3. **Seller Leads System**
+   - New "Receive Leads" tab in Seller Dashboard
+   - Admin controls who can receive leads
+   - Manual lead assignment by admin
+   - Webhook endpoint for external lead sources: POST /api/webhook/leads
+   - Auto-assignment based on seller's area preferences
+   - Lead status tracking (new → contacted → interested → converted)
+
+4. **Property Validation Requirements**
+   - Description minimum 50 characters (mandatory)
+   - Amenities minimum 3 items (mandatory)
+   - Frontend and backend validation
+
+### API Endpoints Added:
+- POST /api/admin/property/ai-validate - AI property analysis
+- GET /api/seller/leads - Get seller's assigned leads
+- GET /api/seller/lead-settings - Get lead receiving settings
+- PATCH /api/seller/lead-settings - Update lead settings
+- PATCH /api/seller/leads/{lead_id} - Update lead status
+- GET /api/admin/seller-leads - Get all seller leads (admin)
+- POST /api/admin/seller-leads/assign - Assign lead to seller
+- PATCH /api/admin/sellers/{seller_id}/lead-access - Toggle lead access
+- POST /api/webhook/leads - External webhook for leads
+
 3. **Backend Refactoring** - ✅ COMPLETED (December 4, 2025)
 
 ## Architecture

@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { adminSellerAPI } from '../utils/api';
+import api from '../utils/api';
 import { 
   Users, CheckCircle, X, DollarSign, TrendingUp, 
-  Phone, Mail, MapPin, Clock, Plus, Eye, CreditCard
+  Phone, Mail, MapPin, Clock, Plus, Eye, CreditCard, UserPlus, Bell, BellOff
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -303,6 +304,38 @@ const SellerManagementPanel = () => {
                   <p className="text-xs text-[#4A4D53]">Earnings</p>
                   <p className="font-medium text-green-600">₹{seller.wallet?.total_earnings?.toLocaleString() || 0}</p>
                 </div>
+              </div>
+
+              {/* Lead Access Toggle */}
+              <div className="flex items-center justify-between py-2 border-t border-[#E5E1DB]">
+                <div className="flex items-center gap-2">
+                  {seller.admin_lead_enabled ? (
+                    <Bell className="w-4 h-4 text-green-600" />
+                  ) : (
+                    <BellOff className="w-4 h-4 text-gray-400" />
+                  )}
+                  <span className="text-sm text-[#4A4D53]">Receive Leads</span>
+                </div>
+                <button
+                  onClick={async () => {
+                    try {
+                      await api.patch(`/admin/sellers/${seller.id}/lead-access`, null, {
+                        params: { enable: !seller.admin_lead_enabled }
+                      });
+                      toast.success(seller.admin_lead_enabled ? 'Lead access disabled' : 'Lead access enabled');
+                      loadSellers();
+                    } catch (error) {
+                      toast.error('Failed to update lead access');
+                    }
+                  }}
+                  className={`px-3 py-1 text-xs font-medium rounded-full ${
+                    seller.admin_lead_enabled
+                      ? 'bg-green-100 text-green-700'
+                      : 'bg-gray-100 text-gray-600'
+                  }`}
+                >
+                  {seller.admin_lead_enabled ? 'Enabled' : 'Disabled'}
+                </button>
               </div>
 
               {/* Actions */}

@@ -8,9 +8,11 @@ import {
   MapPin, Phone, Clock, TrendingUp, Wallet, Search, 
   Filter, Send, X, ExternalLink, CheckCircle, AlertCircle,
   Navigation, RefreshCw, Copy, Eye, ClipboardList, Plus, Calendar,
-  PhoneCall, UserCheck, XCircle, ArrowRight
+  PhoneCall, UserCheck, XCircle, ArrowRight, UserPlus
 } from 'lucide-react';
 import { toast } from 'sonner';
+import VoiceSearch from '../components/VoiceSearch';
+import SellerLeadsPanel from '../components/SellerLeadsPanel';
 
 const FOLLOWUP_STATUSES = [
   { value: 'new_lead', label: 'New Lead', color: 'bg-blue-100 text-blue-800' },
@@ -498,6 +500,7 @@ const SellerDashboard = () => {
               { id: 'referrals', label: 'My Referrals', icon: Users },
               { id: 'visits', label: 'Client Visits', icon: MapPin },
               { id: 'earnings', label: 'Earnings', icon: Wallet },
+              { id: 'leads', label: 'Receive Leads', icon: UserPlus },
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -838,8 +841,24 @@ const SellerDashboard = () => {
         {/* Properties Tab */}
         {activeTab === 'properties' && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-            {/* Filters */}
+            {/* Filters with Voice Search */}
             <div className="bg-white border border-[#E5E1DB] p-4 mb-6">
+              <div className="flex items-center gap-3 mb-3">
+                <VoiceSearch 
+                  onSearch={(filters, rawText) => {
+                    setPropertyFilters(prev => ({
+                      ...prev,
+                      city: filters.city || prev.city,
+                      min_rent: filters.min_rent || prev.min_rent,
+                      max_rent: filters.max_rent || prev.max_rent,
+                      bhk: filters.bhk || prev.bhk
+                    }));
+                    setTimeout(() => loadProperties(), 100);
+                  }}
+                  placeholder="Try: 'Show Patiala flats' or '2BHK under 15k'"
+                />
+                <span className="text-sm text-[#4A4D53]">or use filters below</span>
+              </div>
               <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
                 <input
                   type="text"
@@ -1256,6 +1275,13 @@ const SellerDashboard = () => {
                 </div>
               </>
             )}
+          </motion.div>
+        )}
+
+        {/* Leads Tab */}
+        {activeTab === 'leads' && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+            <SellerLeadsPanel sellerId={user?.id} />
           </motion.div>
         )}
       </main>

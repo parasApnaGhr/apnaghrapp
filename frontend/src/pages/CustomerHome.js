@@ -8,6 +8,7 @@ import { toast } from 'sonner';
 import api from '../utils/api';
 import AIChatbot from '../components/AIChatbot';
 import TermsAcceptanceModal from '../components/TermsAcceptanceModal';
+import VoiceSearch from '../components/VoiceSearch';
 
 const CustomerHome = () => {
   const { user, logout } = useAuth();
@@ -257,6 +258,20 @@ const CustomerHome = () => {
                 className="premium-input pl-12"
               />
             </div>
+            <VoiceSearch
+              onSearch={(voiceFilters, rawText) => {
+                setFilters(prev => ({
+                  ...prev,
+                  city: voiceFilters.city || prev.city,
+                  min_rent: voiceFilters.min_rent || prev.min_rent,
+                  max_rent: voiceFilters.max_rent || prev.max_rent,
+                  bhk: voiceFilters.bhk || prev.bhk,
+                  furnishing: voiceFilters.furnishing || prev.furnishing
+                }));
+                setTimeout(() => handleSearch(), 100);
+              }}
+              placeholder="Try: 'Show Patiala flats' or '2BHK under 15k'"
+            />
             <button
               onClick={() => setShowFilters(!showFilters)}
               data-testid="filter-button"
