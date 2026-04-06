@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import { 
   Users, Package, Bike, LogOut, Home, DollarSign, 
-  Settings, MapPin, CheckSquare, CreditCard, BarChart3, Image, Upload, UserPlus, Gift, QrCode, ClipboardList, Target
+  Settings, MapPin, CheckSquare, CreditCard, BarChart3, Image, Upload, UserPlus, Gift, QrCode, ClipboardList, Target, Trophy
 } from 'lucide-react';
 import CustomerSupportPanel from '../components/CustomerSupportPanel';
 import InventoryPanel from '../components/InventoryPanel';
@@ -22,6 +22,7 @@ import ImageMigrationTool from '../components/ImageMigrationTool';
 import BulkImageUploader from '../components/BulkImageUploader';
 import RiderApplicationsPanel from '../components/RiderApplicationsPanel';
 import LeadsPanel from '../components/LeadsPanel';
+import AdminPerformancePanel from '../components/AdminPerformancePanel';
 
 const AdminDashboard = () => {
   const { user, logout } = useAuth();
@@ -32,6 +33,7 @@ const AdminDashboard = () => {
   const tabs = [
     { id: 'overview', label: 'Overview', icon: null },
     { id: 'leads', label: 'Leads', icon: Target },
+    { id: 'seller-performance', label: 'Seller Performance', icon: Trophy },
     { id: 'tracking', label: 'Live Tracking', icon: MapPin },
     { id: 'approvals', label: 'Visit Approvals', icon: CheckSquare },
     { id: 'manual-visit', label: 'Create Visit', icon: QrCode },
@@ -255,6 +257,7 @@ const AdminDashboard = () => {
         )}
 
         {activePanel === 'leads' && <LeadsPanel />}
+        {activePanel === 'seller-performance' && <AdminPerformancePanel />}
         {activePanel === 'tracking' && <LiveTrackingPanel />}
         {activePanel === 'approvals' && <VisitApprovalPanel />}
         {activePanel === 'manual-visit' && <ManualVisitPanel />}

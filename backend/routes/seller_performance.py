@@ -327,6 +327,9 @@ async def submit_daily_end(
     # Calculate working hours
     working_hours = 0
     if login_time:
+        # Handle timezone-naive datetime from MongoDB
+        if login_time.tzinfo is None:
+            login_time = login_time.replace(tzinfo=timezone.utc)
         working_hours = (now - login_time).total_seconds() / 3600
     
     # Update activity
