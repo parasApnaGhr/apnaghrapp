@@ -12,6 +12,22 @@
 - **Name:** Admin User
 - **Role:** admin
 
+## Admin Access Keys
+- **Admin Key:** 0219 (Full access to all modules)
+- **Inventory Key:** inventory2024 (Restricted to Inventory & Analytics only)
+
+## Predefined Inventory Users
+- Rahul Sharma
+- Priya Patel
+- Amit Kumar
+- Neha Singh
+- Vikash Gupta
+- Anjali Verma
+- Deepak Yadav
+- Pooja Kumari
+- Raj Malhotra
+- Sunita Devi
+
 ## Rider Accounts
 ### Primary Rider
 - **Phone:** 9877704235

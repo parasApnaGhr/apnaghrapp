@@ -18,8 +18,70 @@ ApnaGhr Visit Platform is a production-ready multi-role rental property platform
 - **🆕 Property GPS Coordinates** - For rider navigation to properties
 - **🆕 Uber-like Customer Tracking** - Track Rider Live button with ETA display
 - **🆕 Complete Seller Tracking + Scoring + Earnings System** (April 2026)
+- **🆕 Access Type Selection & Inventory Mode System** (April 2026)
 
 ## Latest Updates (April 6, 2026)
+
+### 🆕 Access Type Selection & Inventory Mode - IMPLEMENTED ✅
+
+**Access Type Selection (after Admin login):**
+- Modal appears after admin login to select access type
+- **Admin Access**: Requires key "0219" for full unrestricted access
+- **Inventory Access**: Requires key "inventory2024" for restricted access
+
+**Inventory Mode Features:**
+- Restricted to only: My Dashboard, Inventory, Property Analytics tabs
+- All other admin sections hidden and blocked
+
+**Inventory Login Workflow:**
+1. **User Selection** - Select from predefined user list (no random names)
+2. **Photo Capture** - Optional selfie for attendance (camera integration)
+3. **Work Plan** - Multi-select cities with target properties per city
+
+**Session & Tracking:**
+- Unique Session ID for each login
+- Login/Logout time captured
+- Properties added tracked per user/session
+- City-wise breakdown of additions
+- Points system: 1 property = 1 point
+
+**Performance Logic:**
+- < 30 properties = "Needs Attention"
+- >= 30 properties = "Good Performance"
+
+**Inventory User Dashboard:**
+- Added Today, Target, Points Earned, Cities stats
+- Target Progress bar with percentage
+- City-wise breakdown
+- End Session button
+
+**Admin Inventory Team Panel:**
+- Daily Tracking with sessions table
+- Performance tab with top performers and needs attention
+- Settings tab to manage predefined users and inventory key
+
+**API Endpoints:**
+- `POST /api/inventory/verify-key` - Verify admin/inventory key
+- `GET /api/inventory/predefined-users` - Get/update user list
+- `GET /api/inventory/available-cities` - Get cities for work plan
+- `POST /api/inventory/inventory-login` - Start inventory session
+- `POST /api/inventory/inventory-logout` - End inventory session
+- `GET /api/inventory/my-inventory-stats` - Get session stats
+- `POST /api/inventory/track-property-added` - Track property addition
+- `GET /api/inventory/admin/inventory-team` - Admin: all sessions
+- `GET /api/inventory/admin/inventory-user-detail/{session_id}` - Admin: session detail
+- `POST /api/inventory/admin/update-inventory-key` - Admin: update key
+
+**Files Created:**
+- `/app/backend/routes/inventory_access.py` - All backend APIs
+- `/app/frontend/src/components/AccessTypeModal.jsx` - Access type selection
+- `/app/frontend/src/components/InventoryLoginModal.jsx` - Inventory login flow
+- `/app/frontend/src/components/InventoryUserDashboard.jsx` - User dashboard
+- `/app/frontend/src/components/InventoryTeamPerformance.jsx` - Admin panel
+
+**Testing:** 19/19 backend tests passed ✅
+
+---
 
 ### 🆕 Seller Push Notifications - IMPLEMENTED ✅
 
