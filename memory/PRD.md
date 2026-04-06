@@ -17,8 +17,98 @@ ApnaGhr Visit Platform is a production-ready multi-role rental property platform
 - **🆕 GPS Location Capture** - Use Current Location for pickup and address
 - **🆕 Property GPS Coordinates** - For rider navigation to properties
 - **🆕 Uber-like Customer Tracking** - Track Rider Live button with ETA display
+- **🆕 Complete Seller Tracking + Scoring + Earnings System** (April 2026)
 
-## Latest Updates (April 2, 2026)
+## Latest Updates (April 6, 2026)
+
+### 🆕 Complete Seller Performance Management System - IMPLEMENTED ✅
+
+**Features Implemented:**
+
+#### Phase 1: Daily Tracking + Reporting
+- ✅ **Hidden Login Tracking** - Captures login_time, logout_time (visible only to admin)
+- ✅ **Daily Start Form** - Mandatory form after seller login:
+  - Upload Image (office selfie - optional)
+  - Today's Plan (text)
+  - Planned Visits (number)
+  - Expected Deals (number)
+- ✅ **Daily Motivation Quote** - Shows 1 quote/day, controlled from admin
+- ✅ **Daily End Report** - Mandatory before logout:
+  - Clients Called
+  - Visits Booked
+  - Deals Closed
+  - Properties Shared
+  - Tomorrow Visits Planned
+- ✅ **Warning Rules** - If Calls < 60 or Shares < 20: warning flag + alert on next login
+
+#### Phase 2: Performance Scoring + Leaderboard
+- ✅ **Scoring Formula**: `(Properties shared × 1) + (Visits Booked × 5) + (Deals Closed × 20)`
+- ✅ **Bonus Points**:
+  - 20+ shares: +10 points
+  - 5+ visits: +15 points
+  - 1+ deals: +25 points
+- ✅ **Penalty Points**:
+  - < 20 shares: -10 points
+  - No login: -50 points
+  - Late login (after 11 AM): -10 points
+- ✅ **Performance Tags**: Top Performer (500+) | Good (300-500) | Average (150-300) | Low (<150)
+- ✅ **Daily & Monthly Leaderboard** - Automatically ranked by score
+- ✅ **Risk Flag** - Marked "At Risk" if score < 100 for 3 days
+
+#### Phase 3: Earnings + Payout System
+- ✅ **NO Base Salary** (per user request)
+- ✅ **Performance Bonus**: 100 points = ₹50
+- ✅ **High Performer Bonus**:
+  - 10+ deals: ₹5,000
+  - 15+ deals: ₹10,000
+  - 20+ deals: ₹20,000
+- ✅ **Commission Structure** (per deal based on rent):
+  - ₹10k-14.9k: ₹500
+  - ₹15k-19.9k: ₹780
+  - ₹20k-25k: ₹1,000
+  - ₹25k-30k: ₹1,300
+  - ₹31k-35k: ₹2,000
+  - ₹35k-40k: ₹2,200
+  - ₹41k-45k: ₹2,500
+  - ₹46k-49k: ₹2,700
+  - ₹50k-70k: ₹5,000
+  - ₹71k-100k: ₹8,000
+  - ₹105k-150k: ₹10,000
+- ✅ **Earnings Prediction** - Dynamic message: "If you close X more deals → Earn ₹XXXX more"
+- ✅ **Admin Payout Management** - Mark individual or bulk sellers as paid
+
+**API Endpoints (Seller Performance):**
+- `GET /api/seller-performance/check-daily-status` - Check if start report needed
+- `POST /api/seller-performance/daily-start` - Submit daily start report
+- `POST /api/seller-performance/daily-end` - Submit daily end report
+- `GET /api/seller-performance/my-performance` - Get seller's performance data
+- `GET /api/seller-performance/my-activity-history` - Get activity history
+- `GET /api/seller-performance/admin/sellers-tracking` - Admin: Get all sellers tracking
+- `GET /api/seller-performance/admin/seller-detail/{seller_id}` - Admin: Get seller detail
+- `GET /api/seller-performance/admin/leaderboard` - Admin: Get leaderboard (daily/monthly)
+- `GET /api/seller-performance/admin/earnings` - Admin: Get all earnings for payout
+- `POST /api/seller-performance/admin/mark-paid` - Admin: Mark sellers as paid
+- `POST /api/seller-performance/admin/motivation-quote` - Admin: Add quote
+- `GET /api/seller-performance/admin/motivation-quotes` - Admin: Get all quotes
+- `DELETE /api/seller-performance/admin/motivation-quote/{id}` - Admin: Delete quote
+
+**Files Created/Updated:**
+- `/app/backend/routes/seller_performance.py` - Complete backend with all APIs
+- `/app/frontend/src/components/DailyStartModal.jsx` - Daily start form modal
+- `/app/frontend/src/components/DailyEndModal.jsx` - Daily end report modal
+- `/app/frontend/src/components/SellerPerformancePanel.jsx` - Seller performance view
+- `/app/frontend/src/components/AdminPerformancePanel.jsx` - Admin performance management
+- `/app/frontend/src/pages/SellerDashboard.js` - Updated with Performance tab
+- `/app/frontend/src/pages/AdminDashboard.js` - Updated with Seller Performance tab
+
+**Bug Fixed:**
+- Timezone bug in daily-end endpoint - MongoDB stores offset-naive datetime, causing TypeError when calculating working hours. Fixed by adding timezone handling.
+
+**Testing:** 22/22 backend tests passed ✅
+
+---
+
+## Previous Updates (April 2, 2026)
 
 ### 🔴 P0 Bug Fixes - Critical Production Issues RESOLVED
 

@@ -30,6 +30,12 @@
 - **Password:** seller123
 - **Name:** Test Seller Raj
 - **Role:** seller
+- **Features:** Daily Start/End reports, Performance tracking, Earnings view
+
+## Alternative Seller Accounts (Production)
+- **Phone:** 7347383375
+- **Password:** Mudit@123
+- **Name:** Mudit (Production seller)
 
 ## Builder Account
 - **Phone:** 6333444555
