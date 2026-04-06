@@ -25,8 +25,12 @@ const InventoryLoginModal = ({ isOpen, onSessionStarted }) => {
   const [availableCities, setAvailableCities] = useState([]);
   const [selectedCities, setSelectedCities] = useState([]);
   const [cityTargets, setCityTargets] = useState({});
+  const [showAddCity, setShowAddCity] = useState(false);
+  const [customCity, setCustomCity] = useState('');
+  const [addingCity, setAddingCity] = useState(false);
 
   const API_URL = process.env.REACT_APP_BACKEND_URL;
+  const DEFAULT_CITY_TARGET = 15; // Default target per city
 
   useEffect(() => {
     if (isOpen) {
@@ -188,12 +192,61 @@ const InventoryLoginModal = ({ isOpen, onSessionStarted }) => {
       setCityTargets(newTargets);
     } else {
       setSelectedCities([...selectedCities, city]);
-      setCityTargets({ ...cityTargets, [city]: 10 }); // Default target
+      setCityTargets({ ...cityTargets, [city]: DEFAULT_CITY_TARGET }); // Default target 15
     }
   };
 
   const updateCityTarget = (city, value) => {
     setCityTargets({ ...cityTargets, [city]: parseInt(value) || 0 });
+  };
+
+  const handleAddNewCity = async () => {
+    if (!customCity.trim()) {
+      setError('Please enter a city name');
+      return;
+    }
+    
+    const trimmedCity = customCity.trim();
+    
+    if (availableCities.some(c => c.toLowerCase() === trimmedCity.toLowerCase())) {
+      setError('This city already exists. Please select it from the list.');
+      return;
+    }
+    
+    setAddingCity(true);
+    setError('');
+    
+    try {
+      const token = localStorage.getItem('token');
+      
+      // Add city to database
+      const response = await fetch(`${API_URL}/api/inventory/add-city`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ city: trimmedCity })
+      });
+      
+      if (response.ok) {
+        // Add to local list and auto-select
+        setAvailableCities([...availableCities, trimmedCity].sort());
+        setSelectedCities([...selectedCities, trimmedCity]);
+        setCityTargets({ ...cityTargets, [trimmedCity]: DEFAULT_CITY_TARGET });
+        setShowAddCity(false);
+        setCustomCity('');
+        toast.success(`City "${trimmedCity}" added! Target set to ${DEFAULT_CITY_TARGET}.`);
+      } else {
+        const data = await response.json();
+        setError(data.detail || 'Failed to add city. Please try again.');
+      }
+    } catch (err) {
+      console.error('Failed to add city:', err);
+      setError('Connection error. Please try again.');
+    } finally {
+      setAddingCity(false);
+    }
   };
 
   const handleStartSession = async () => {
@@ -508,9 +561,10 @@ const InventoryLoginModal = ({ isOpen, onSessionStarted }) => {
                   <label className="block text-sm font-medium text-[#1A1C20] mb-2">
                     <MapPin className="w-4 h-4 inline mr-1" />
                     Select Cities & Set Targets
+                    <span className="text-xs text-[#4A4D53] font-normal ml-2">(Default: {DEFAULT_CITY_TARGET} per city)</span>
                   </label>
                   
-                  <div className="space-y-2 max-h-48 overflow-y-auto border border-[#E5E1DB] rounded-lg p-3">
+                  <div className="space-y-2 max-h-40 overflow-y-auto border border-[#E5E1DB] rounded-lg p-3">
                     {availableCities.map((city) => (
                       <div
                         key={city}
@@ -533,7 +587,7 @@ const InventoryLoginModal = ({ isOpen, onSessionStarted }) => {
                             type="number"
                             min="1"
                             max="100"
-                            value={cityTargets[city] || 10}
+                            value={cityTargets[city] || DEFAULT_CITY_TARGET}
                             onChange={(e) => updateCityTarget(city, e.target.value)}
                             className="w-16 px-2 py-1 text-sm border border-[#E5E1DB] rounded text-center"
                             placeholder="Target"
@@ -542,6 +596,64 @@ const InventoryLoginModal = ({ isOpen, onSessionStarted }) => {
                       </div>
                     ))}
                   </div>
+                  
+                  {/* Add City Option */}
+                  {!showAddCity ? (
+                    <button
+                      onClick={() => {
+                        setShowAddCity(true);
+                        setError('');
+                      }}
+                      className="w-full mt-2 p-2 border-2 border-dashed border-[#C6A87C] text-[#C6A87C] rounded-lg hover:bg-[#FDF8F3] transition-all flex items-center justify-center gap-2 text-sm font-medium"
+                    >
+                      <Plus className="w-4 h-4" />
+                      Add New City
+                    </button>
+                  ) : (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="mt-2 p-3 bg-[#FDF8F3] rounded-lg border border-[#C6A87C]/30"
+                    >
+                      <p className="text-xs text-[#4A4D53] mb-2">
+                        Enter city name (Target will be set to {DEFAULT_CITY_TARGET})
+                      </p>
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          value={customCity}
+                          onChange={(e) => setCustomCity(e.target.value)}
+                          placeholder="Enter city name"
+                          className="flex-1 px-3 py-2 border border-[#E5E1DB] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#C6A87C]/20 focus:border-[#C6A87C]"
+                          autoFocus
+                        />
+                        <button
+                          onClick={() => {
+                            setShowAddCity(false);
+                            setCustomCity('');
+                            setError('');
+                          }}
+                          className="px-3 py-2 border border-[#E5E1DB] text-[#4A4D53] rounded-lg hover:bg-white transition-all text-sm"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          onClick={handleAddNewCity}
+                          disabled={addingCity || !customCity.trim()}
+                          className="px-3 py-2 bg-[#C6A87C] text-white rounded-lg hover:bg-[#B8956C] transition-all disabled:opacity-50 disabled:cursor-not-allowed text-sm flex items-center gap-1"
+                        >
+                          {addingCity ? (
+                            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                          ) : (
+                            <>
+                              <Plus className="w-3 h-3" />
+                              Add
+                            </>
+                          )}
+                        </button>
+                      </div>
+                    </motion.div>
+                  )}
                 </div>
 
                 {/* Summary */}

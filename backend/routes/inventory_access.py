@@ -394,11 +394,69 @@ async def get_available_cities(current_user: dict = Depends(get_current_user)):
     # Filter out empty values and clean up
     cities = [c for c in cities if c and c.strip()]
     
+    # Get custom added cities
+    custom_cities = await db.app_settings.find_one({"key": "custom_inventory_cities"}, {"_id": 0})
+    if custom_cities and custom_cities.get("value"):
+        cities.extend(custom_cities["value"])
+    
+    # Remove duplicates (case-insensitive)
+    seen = set()
+    unique_cities = []
+    for city in cities:
+        if city.lower() not in seen:
+            seen.add(city.lower())
+            unique_cities.append(city)
+    
     # If no cities found, return default list
-    if not cities:
-        cities = [
+    if not unique_cities:
+        unique_cities = [
             "Chandigarh", "Mohali", "Panchkula", "Zirakpur", "Kharar",
             "Derabassi", "Rajpura", "Lalru", "Dera Bassi", "New Chandigarh"
         ]
     
-    return {"cities": sorted(cities)}
+    return {"cities": sorted(unique_cities)}
+
+
+
+# ============ ADD NEW CITY ============
+
+class AddCityRequest(BaseModel):
+    city: str
+
+@router.post("/add-city")
+async def add_city(request: AddCityRequest, current_user: dict = Depends(get_current_user)):
+    """Add a new city to the available cities list"""
+    
+    city_name = request.city.strip()
+    
+    if not city_name:
+        raise HTTPException(status_code=400, detail="City name cannot be empty")
+    
+    if len(city_name) < 2:
+        raise HTTPException(status_code=400, detail="City name must be at least 2 characters")
+    
+    # Check if city already exists in properties
+    existing_cities = await db.properties.distinct("city")
+    existing_cities = [c.lower() for c in existing_cities if c]
+    
+    if city_name.lower() in existing_cities:
+        raise HTTPException(status_code=400, detail="This city already exists")
+    
+    # Get or create custom cities list
+    custom_cities = await db.app_settings.find_one({"key": "custom_inventory_cities"}, {"_id": 0})
+    cities_list = custom_cities.get("value", []) if custom_cities else []
+    
+    # Check if already in custom list
+    if city_name.lower() in [c.lower() for c in cities_list]:
+        raise HTTPException(status_code=400, detail="This city already exists")
+    
+    # Add to custom cities
+    cities_list.append(city_name)
+    
+    await db.app_settings.update_one(
+        {"key": "custom_inventory_cities"},
+        {"$set": {"key": "custom_inventory_cities", "value": cities_list, "updated_at": datetime.now(timezone.utc)}},
+        upsert=True
+    )
+    
+    return {"success": True, "message": f"City '{city_name}' added successfully", "city": city_name}
