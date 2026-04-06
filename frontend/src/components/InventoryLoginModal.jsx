@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Camera, User, MapPin, Target, Check, AlertCircle, Clock, RefreshCw } from 'lucide-react';
+import { Camera, User, MapPin, Target, Check, AlertCircle, Clock, RefreshCw, Plus, UserPlus } from 'lucide-react';
 import { toast } from 'sonner';
 
 const InventoryLoginModal = ({ isOpen, onSessionStarted }) => {
@@ -11,6 +11,9 @@ const InventoryLoginModal = ({ isOpen, onSessionStarted }) => {
   // User selection
   const [predefinedUsers, setPredefinedUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState('');
+  const [showAddName, setShowAddName] = useState(false);
+  const [customName, setCustomName] = useState('');
+  const [addingName, setAddingName] = useState(false);
   
   // Photo capture
   const [photoBase64, setPhotoBase64] = useState(null);
@@ -47,6 +50,52 @@ const InventoryLoginModal = ({ isOpen, onSessionStarted }) => {
       }
     } catch (err) {
       console.error('Failed to fetch users:', err);
+    }
+  };
+
+  const handleAddNewName = async () => {
+    if (!customName.trim()) {
+      setError('Please enter your name');
+      return;
+    }
+    
+    const trimmedName = customName.trim();
+    
+    if (predefinedUsers.includes(trimmedName)) {
+      setError('This name already exists. Please select it from the list.');
+      return;
+    }
+    
+    setAddingName(true);
+    setError('');
+    
+    try {
+      const token = localStorage.getItem('token');
+      const updatedUsers = [...predefinedUsers, trimmedName];
+      
+      const response = await fetch(`${API_URL}/api/inventory/predefined-users`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(updatedUsers)
+      });
+      
+      if (response.ok) {
+        setPredefinedUsers(updatedUsers);
+        setSelectedUser(trimmedName);
+        setShowAddName(false);
+        setCustomName('');
+        toast.success(`Welcome ${trimmedName}! Your name has been added.`);
+      } else {
+        setError('Failed to add name. Please try again.');
+      }
+    } catch (err) {
+      console.error('Failed to add name:', err);
+      setError('Connection error. Please try again.');
+    } finally {
+      setAddingName(false);
     }
   };
 
@@ -261,21 +310,88 @@ const InventoryLoginModal = ({ isOpen, onSessionStarted }) => {
                   Select Your Name
                 </label>
                 
-                <div className="grid grid-cols-2 gap-2 max-h-60 overflow-y-auto">
-                  {predefinedUsers.map((user) => (
+                {!showAddName ? (
+                  <>
+                    <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto">
+                      {predefinedUsers.map((user) => (
+                        <button
+                          key={user}
+                          onClick={() => setSelectedUser(user)}
+                          className={`p-3 text-sm rounded-lg border-2 transition-all text-left ${
+                            selectedUser === user
+                              ? 'border-[#C6A87C] bg-[#FDF8F3] text-[#1A1C20] font-medium'
+                              : 'border-[#E5E1DB] hover:border-[#C6A87C]/50'
+                          }`}
+                        >
+                          {user}
+                        </button>
+                      ))}
+                    </div>
+                    
+                    {/* Add Your Name Button */}
                     <button
-                      key={user}
-                      onClick={() => setSelectedUser(user)}
-                      className={`p-3 text-sm rounded-lg border-2 transition-all text-left ${
-                        selectedUser === user
-                          ? 'border-[#C6A87C] bg-[#FDF8F3] text-[#1A1C20] font-medium'
-                          : 'border-[#E5E1DB] hover:border-[#C6A87C]/50'
-                      }`}
+                      onClick={() => {
+                        setShowAddName(true);
+                        setSelectedUser('');
+                        setError('');
+                      }}
+                      className="w-full p-3 border-2 border-dashed border-[#C6A87C] text-[#C6A87C] rounded-lg hover:bg-[#FDF8F3] transition-all flex items-center justify-center gap-2 text-sm font-medium"
                     >
-                      {user}
+                      <UserPlus className="w-4 h-4" />
+                      My name is not here - Add it
                     </button>
-                  ))}
-                </div>
+                  </>
+                ) : (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="space-y-4"
+                  >
+                    <div className="p-4 bg-[#FDF8F3] rounded-lg border border-[#C6A87C]/30">
+                      <p className="text-sm text-[#4A4D53] mb-3">
+                        Enter your full name below. It will be saved for future logins.
+                      </p>
+                      <input
+                        type="text"
+                        value={customName}
+                        onChange={(e) => setCustomName(e.target.value)}
+                        placeholder="Enter your full name"
+                        className="w-full px-4 py-3 border border-[#E5E1DB] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#C6A87C]/20 focus:border-[#C6A87C]"
+                        autoFocus
+                      />
+                    </div>
+                    
+                    <div className="flex gap-3">
+                      <button
+                        onClick={() => {
+                          setShowAddName(false);
+                          setCustomName('');
+                          setError('');
+                        }}
+                        className="flex-1 py-3 border border-[#E5E1DB] text-[#4A4D53] rounded-lg font-medium hover:bg-[#F8F7F5] transition-all"
+                      >
+                        Back to List
+                      </button>
+                      <button
+                        onClick={handleAddNewName}
+                        disabled={addingName || !customName.trim()}
+                        className="flex-1 py-3 bg-gradient-to-r from-[#C6A87C] to-[#B8956C] text-white rounded-lg font-medium hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                      >
+                        {addingName ? (
+                          <>
+                            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                            Adding...
+                          </>
+                        ) : (
+                          <>
+                            <Plus className="w-4 h-4" />
+                            Add & Select
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </motion.div>
+                )}
 
                 {error && (
                   <motion.div
@@ -288,14 +404,16 @@ const InventoryLoginModal = ({ isOpen, onSessionStarted }) => {
                   </motion.div>
                 )}
 
-                <button
-                  onClick={handleStep1Next}
-                  disabled={!selectedUser}
-                  className="w-full py-3 bg-gradient-to-r from-[#C6A87C] to-[#B8956C] text-white rounded-lg font-medium hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                >
-                  Continue to Photo
-                  <Check className="w-4 h-4" />
-                </button>
+                {!showAddName && (
+                  <button
+                    onClick={handleStep1Next}
+                    disabled={!selectedUser}
+                    className="w-full py-3 bg-gradient-to-r from-[#C6A87C] to-[#B8956C] text-white rounded-lg font-medium hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  >
+                    Continue to Photo
+                    <Check className="w-4 h-4" />
+                  </button>
+                )}
               </motion.div>
             )}
 
