@@ -84,6 +84,7 @@ from routes.leads import router as leads_router, set_database as set_leads_db
 from routes.seller_leads import router as seller_leads_router, set_database as set_seller_leads_db
 from routes.ai_validation import router as ai_validation_router, set_database as set_ai_validation_db
 from routes.seller_performance import router as seller_performance_router, set_database as set_seller_performance_db
+from routes.inventory_access import router as inventory_access_router
 from services.cashfree_service import get_cashfree_service, CashfreePaymentService
 
 ROOT_DIR = Path(__file__).parent
@@ -4913,6 +4914,7 @@ app.include_router(leads_router, prefix="/api")
 app.include_router(seller_leads_router, prefix="/api")
 app.include_router(ai_validation_router, prefix="/api")
 app.include_router(seller_performance_router, prefix="/api")
+app.include_router(inventory_access_router, prefix="/api/inventory")
 
 # ============ TEST/DEMO ENDPOINT FOR MULTI-VISIT ============
 @app.post("/api/demo/create-multi-visit")

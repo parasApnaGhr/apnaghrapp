@@ -7,7 +7,7 @@ import api from '../utils/api';
 import FileUploader from './FileUploader';
 import AIPropertyValidator from './AIPropertyValidator';
 
-const InventoryPanel = () => {
+const InventoryPanel = ({ inventorySession }) => {
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
@@ -32,6 +32,8 @@ const InventoryPanel = () => {
   });
   const [submitting, setSubmitting] = useState(false);
 
+  const API_URL = process.env.REACT_APP_BACKEND_URL;
+
   useEffect(() => {
     loadProperties();
   }, []);
@@ -46,6 +48,21 @@ const InventoryPanel = () => {
       toast.error('Failed to load properties');
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Track property added for inventory user
+  const trackPropertyAdded = async (city) => {
+    if (!inventorySession?.session_id) return;
+    
+    try {
+      const token = localStorage.getItem('token');
+      await fetch(`${API_URL}/api/inventory/track-property-added?session_id=${inventorySession.session_id}&city=${encodeURIComponent(city)}`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+    } catch (err) {
+      console.error('Failed to track property:', err);
     }
   };
 
@@ -129,6 +146,11 @@ const InventoryPanel = () => {
       } else {
         await propertyAPI.createProperty(propertyData);
         toast.success('Property added successfully!');
+        
+        // Track property added for inventory user
+        if (inventorySession) {
+          await trackPropertyAdded(formData.city || 'Unknown');
+        }
       }
       
       setShowAddForm(false);
