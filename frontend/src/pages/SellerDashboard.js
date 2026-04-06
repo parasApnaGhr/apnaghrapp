@@ -8,11 +8,14 @@ import {
   MapPin, Phone, Clock, TrendingUp, Wallet, Search, 
   Filter, Send, X, ExternalLink, CheckCircle, AlertCircle,
   Navigation, RefreshCw, Copy, Eye, ClipboardList, Plus, Calendar,
-  PhoneCall, UserCheck, XCircle, ArrowRight, UserPlus
+  PhoneCall, UserCheck, XCircle, ArrowRight, UserPlus, Trophy, Target
 } from 'lucide-react';
 import { toast } from 'sonner';
 import VoiceSearch from '../components/VoiceSearch';
 import SellerLeadsPanel from '../components/SellerLeadsPanel';
+import DailyStartModal from '../components/DailyStartModal';
+import DailyEndModal from '../components/DailyEndModal';
+import SellerPerformancePanel from '../components/SellerPerformancePanel';
 
 const FOLLOWUP_STATUSES = [
   { value: 'new_lead', label: 'New Lead', color: 'bg-blue-100 text-blue-800' },
@@ -92,8 +95,45 @@ const SellerDashboard = () => {
     loss_reason: ''
   });
   
+  // Daily tracking modals
+  const [showDailyStart, setShowDailyStart] = useState(false);
+  const [showDailyEnd, setShowDailyEnd] = useState(false);
+  const [dailyStatus, setDailyStatus] = useState(null);
+  const [pendingLogout, setPendingLogout] = useState(null);
+  
+  // Check daily status on load
+  const checkDailyStatus = async () => {
+    try {
+      const response = await api.get('/seller-performance/check-daily-status');
+      setDailyStatus(response.data);
+      
+      // Show pending logout modal first if needed
+      if (response.data.needs_pending_logout) {
+        setPendingLogout(response.data.pending_logout_date);
+        setShowDailyEnd(true);
+      }
+      // Then show start report if needed
+      else if (response.data.needs_start_report) {
+        setShowDailyStart(true);
+      }
+    } catch (error) {
+      console.error('Failed to check daily status:', error);
+    }
+  };
+  
+  const handleLogoutClick = () => {
+    // Check if daily end report is submitted
+    if (dailyStatus && dailyStatus.today_activity && !dailyStatus.today_activity.logout_report_submitted) {
+      setShowDailyEnd(true);
+    } else {
+      // Proceed with normal logout
+      logout();
+    }
+  };
+  
   useEffect(() => {
     if (user?.approval_status === 'approved') {
+      checkDailyStatus();
       loadDashboard();
     }
   }, [user]);
@@ -121,13 +161,14 @@ const SellerDashboard = () => {
     }
   };
 
-  const loadProperties = async () => {
+  const loadProperties = async (customFilters = null) => {
     try {
+      const filtersToUse = customFilters || propertyFilters;
       const cleanFilters = {};
-      if (propertyFilters.city) cleanFilters.city = propertyFilters.city;
-      if (propertyFilters.min_rent) cleanFilters.min_rent = propertyFilters.min_rent;
-      if (propertyFilters.max_rent) cleanFilters.max_rent = propertyFilters.max_rent;
-      if (propertyFilters.bhk) cleanFilters.bhk = propertyFilters.bhk;
+      if (filtersToUse.city) cleanFilters.city = filtersToUse.city;
+      if (filtersToUse.min_rent) cleanFilters.min_rent = filtersToUse.min_rent;
+      if (filtersToUse.max_rent) cleanFilters.max_rent = filtersToUse.max_rent;
+      if (filtersToUse.bhk) cleanFilters.bhk = filtersToUse.bhk;
       
       const response = await sellerAPI.getProperties(cleanFilters);
       setProperties(response.data || []);
@@ -135,6 +176,18 @@ const SellerDashboard = () => {
       toast.error('Failed to load properties');
     }
   };
+
+  const handlePropertySearch = () => {
+    // Load with current state - state should already be up to date
+    // since onChange updates state on every keystroke
+    loadProperties(propertyFilters);
+  };
+  
+  // Debug: log filter state
+  useEffect(() => {
+    console.log('Property filters updated:', propertyFilters);
+  }, [propertyFilters]);
+
 
   const loadReferrals = async () => {
     try {
@@ -481,7 +534,7 @@ const SellerDashboard = () => {
                 <Copy className="w-4 h-4" />
                 Code: <span className="font-bold">{user?.referral_code || dashboard?.referral_code}</span>
               </motion.div>
-              <button onClick={logout} className="p-2 hover:bg-[#F5F3F0] transition-colors rounded-full" data-testid="logout-button">
+              <button onClick={handleLogoutClick} className="p-2 hover:bg-[#F5F3F0] transition-colors rounded-full" data-testid="logout-button">
                 <LogOut className="w-5 h-5 text-[#4A4D53]" strokeWidth={1.5} />
               </button>
             </div>
@@ -495,6 +548,7 @@ const SellerDashboard = () => {
           <div className="flex gap-1 overflow-x-auto">
             {[
               { id: 'dashboard', label: 'Overview', icon: TrendingUp },
+              { id: 'performance', label: 'Performance', icon: Trophy },
               { id: 'followups', label: 'Follow-ups', icon: ClipboardList },
               { id: 'properties', label: 'Properties', icon: Home },
               { id: 'referrals', label: 'My Referrals', icon: Users },
@@ -846,14 +900,15 @@ const SellerDashboard = () => {
               <div className="flex items-center gap-3 mb-3">
                 <VoiceSearch 
                   onSearch={(filters, rawText) => {
-                    setPropertyFilters(prev => ({
-                      ...prev,
-                      city: filters.city || prev.city,
-                      min_rent: filters.min_rent || prev.min_rent,
-                      max_rent: filters.max_rent || prev.max_rent,
-                      bhk: filters.bhk || prev.bhk
-                    }));
-                    setTimeout(() => loadProperties(), 100);
+                    const newFilters = {
+                      ...propertyFilters,
+                      city: filters.city || propertyFilters.city,
+                      min_rent: filters.min_rent || propertyFilters.min_rent,
+                      max_rent: filters.max_rent || propertyFilters.max_rent,
+                      bhk: filters.bhk || propertyFilters.bhk
+                    };
+                    setPropertyFilters(newFilters);
+                    loadProperties(newFilters);
                   }}
                   placeholder="Try: 'Show Patiala flats' or '2BHK under 15k'"
                 />
@@ -892,7 +947,7 @@ const SellerDashboard = () => {
                   <option value="3">3 BHK</option>
                   <option value="4">4+ BHK</option>
                 </select>
-                <button onClick={loadProperties} className="btn-primary py-2 text-sm">
+                <button onClick={handlePropertySearch} className="btn-primary py-2 text-sm">
                   <Search className="w-4 h-4 mr-1" /> Search
                 </button>
               </div>
@@ -1284,7 +1339,42 @@ const SellerDashboard = () => {
             <SellerLeadsPanel sellerId={user?.id} />
           </motion.div>
         )}
+
+        {/* Performance Tab */}
+        {activeTab === 'performance' && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+            <SellerPerformancePanel />
+          </motion.div>
+        )}
       </main>
+
+      {/* Daily Start Modal - Mandatory */}
+      <DailyStartModal
+        isOpen={showDailyStart}
+        onComplete={() => {
+          setShowDailyStart(false);
+          checkDailyStatus();
+        }}
+        warnings={dailyStatus?.warnings || []}
+        motivationQuote={dailyStatus?.motivation_quote}
+        quoteAuthor={dailyStatus?.quote_author}
+      />
+
+      {/* Daily End Modal - Before Logout */}
+      <DailyEndModal
+        isOpen={showDailyEnd}
+        onComplete={() => {
+          setShowDailyEnd(false);
+          setPendingLogout(null);
+          if (!pendingLogout) {
+            logout();
+          } else {
+            checkDailyStatus();
+          }
+        }}
+        isPending={!!pendingLogout}
+        pendingDate={pendingLogout}
+      />
 
       {/* Share Modal */}
       <AnimatePresence>

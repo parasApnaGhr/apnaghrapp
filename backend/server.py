@@ -83,6 +83,7 @@ from routes.builder import router as builder_router, set_database as set_builder
 from routes.leads import router as leads_router, set_database as set_leads_db
 from routes.seller_leads import router as seller_leads_router, set_database as set_seller_leads_db
 from routes.ai_validation import router as ai_validation_router, set_database as set_ai_validation_db
+from routes.seller_performance import router as seller_performance_router, set_database as set_seller_performance_db
 from services.cashfree_service import get_cashfree_service, CashfreePaymentService
 
 ROOT_DIR = Path(__file__).parent
@@ -98,6 +99,7 @@ set_builder_db(db)
 set_leads_db(db)
 set_seller_leads_db(db)
 set_ai_validation_db(db)
+set_seller_performance_db(db)
 
 app = FastAPI(title="ApnaGhr Visit Platform", version="2.0")
 api_router = APIRouter(prefix="/api")
@@ -4910,6 +4912,7 @@ app.include_router(builder_router, prefix="/api")
 app.include_router(leads_router, prefix="/api")
 app.include_router(seller_leads_router, prefix="/api")
 app.include_router(ai_validation_router, prefix="/api")
+app.include_router(seller_performance_router, prefix="/api")
 
 # ============ TEST/DEMO ENDPOINT FOR MULTI-VISIT ============
 @app.post("/api/demo/create-multi-visit")

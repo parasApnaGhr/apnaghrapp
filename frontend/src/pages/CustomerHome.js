@@ -260,15 +260,17 @@ const CustomerHome = () => {
             </div>
             <VoiceSearch
               onSearch={(voiceFilters, rawText) => {
-                setFilters(prev => ({
-                  ...prev,
-                  city: voiceFilters.city || prev.city,
-                  min_rent: voiceFilters.min_rent || prev.min_rent,
-                  max_rent: voiceFilters.max_rent || prev.max_rent,
-                  bhk: voiceFilters.bhk || prev.bhk,
-                  furnishing: voiceFilters.furnishing || prev.furnishing
-                }));
-                setTimeout(() => handleSearch(), 100);
+                const newFilters = {
+                  ...filters,
+                  city: voiceFilters.city || filters.city,
+                  min_rent: voiceFilters.min_rent || filters.min_rent,
+                  max_rent: voiceFilters.max_rent || filters.max_rent,
+                  bhk: voiceFilters.bhk || filters.bhk,
+                  furnishing: voiceFilters.furnishing || filters.furnishing
+                };
+                setFilters(newFilters);
+                // Use timeout to ensure state is updated before search
+                setTimeout(() => loadProperties(), 200);
               }}
               placeholder="Try: 'Show Patiala flats' or '2BHK under 15k'"
             />
