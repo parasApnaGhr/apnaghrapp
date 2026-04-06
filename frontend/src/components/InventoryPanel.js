@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Edit, Trash2, CheckCircle, Home, X, Video, Image as ImageIcon, RefreshCw, MapPin, Search } from 'lucide-react';
+import { Plus, Edit, Trash2, CheckCircle, Home, X, Video, Image as ImageIcon, RefreshCw, MapPin, Search, Target, Award, TrendingUp } from 'lucide-react';
 import { toast } from 'sonner';
 import { propertyAPI, getMediaUrl } from '../utils/api';
 import api from '../utils/api';
@@ -12,6 +12,7 @@ const InventoryPanel = ({ inventorySession }) => {
   const [loading, setLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingProperty, setEditingProperty] = useState(null);
+  const [sessionStats, setSessionStats] = useState(null);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -38,6 +39,32 @@ const InventoryPanel = ({ inventorySession }) => {
     loadProperties();
   }, []);
 
+  // Fetch session stats for inventory user
+  useEffect(() => {
+    if (inventorySession?.session_id) {
+      fetchSessionStats();
+      // Refresh stats every 30 seconds
+      const interval = setInterval(fetchSessionStats, 30000);
+      return () => clearInterval(interval);
+    }
+  }, [inventorySession]);
+
+  const fetchSessionStats = async () => {
+    if (!inventorySession?.session_id) return;
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_URL}/api/inventory/my-inventory-stats?session_id=${inventorySession.session_id}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await response.json();
+      if (response.ok) {
+        setSessionStats(data);
+      }
+    } catch (err) {
+      console.error('Failed to fetch session stats:', err);
+    }
+  };
+
   const loadProperties = async () => {
     try {
       setLoading(true);
@@ -57,10 +84,23 @@ const InventoryPanel = ({ inventorySession }) => {
     
     try {
       const token = localStorage.getItem('token');
-      await fetch(`${API_URL}/api/inventory/track-property-added?session_id=${inventorySession.session_id}&city=${encodeURIComponent(city)}`, {
+      const response = await fetch(`${API_URL}/api/inventory/track-property-added?session_id=${inventorySession.session_id}&city=${encodeURIComponent(city)}`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` }
       });
+      const data = await response.json();
+      if (response.ok) {
+        // Update local session stats immediately
+        setSessionStats(prev => ({
+          ...prev,
+          properties_added: data.properties_added,
+          properties_added_by_city: data.city_breakdown,
+          points_earned: data.points_earned,
+          performance_status: data.performance_status,
+          achievement_percentage: prev?.total_target > 0 ? (data.properties_added / prev.total_target * 100) : 0
+        }));
+        toast.success(`+1 point! Total: ${data.points_earned} points`);
+      }
     } catch (err) {
       console.error('Failed to track property:', err);
     }
@@ -229,6 +269,70 @@ const InventoryPanel = ({ inventorySession }) => {
           </button>
         </div>
       </div>
+
+      {/* Inventory Session Stats Banner */}
+      {inventorySession && sessionStats && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-6 bg-gradient-to-r from-[#C6A87C] to-[#B8956C] text-white rounded-xl p-4"
+        >
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
+                <Target className="w-5 h-5" />
+              </div>
+              <div>
+                <p className="text-white/80 text-xs">Your Session Progress</p>
+                <p className="font-semibold">{sessionStats.user_name || inventorySession.user_name}</p>
+              </div>
+            </div>
+            
+            <div className="flex flex-wrap items-center gap-6">
+              <div className="text-center">
+                <p className="text-2xl font-bold">{sessionStats.properties_added || 0}</p>
+                <p className="text-xs text-white/80">Added</p>
+              </div>
+              <div className="text-center">
+                <p className="text-2xl font-bold">{sessionStats.total_target || 0}</p>
+                <p className="text-xs text-white/80">Target</p>
+              </div>
+              <div className="text-center">
+                <div className="flex items-center gap-1">
+                  <Award className="w-4 h-4" />
+                  <p className="text-2xl font-bold">{sessionStats.points_earned || 0}</p>
+                </div>
+                <p className="text-xs text-white/80">Points</p>
+              </div>
+              <div className="text-center">
+                <p className="text-lg font-semibold">{(sessionStats.achievement_percentage || 0).toFixed(0)}%</p>
+                <p className="text-xs text-white/80">Complete</p>
+              </div>
+              <div className={`px-3 py-1 rounded-full text-xs font-medium ${
+                sessionStats.performance_status === 'Good Performance' 
+                  ? 'bg-green-500/30 text-white' 
+                  : sessionStats.properties_added > 0 
+                    ? 'bg-yellow-500/30 text-white'
+                    : 'bg-white/20 text-white'
+              }`}>
+                {sessionStats.performance_status || 'In Progress'}
+              </div>
+            </div>
+          </div>
+          
+          {/* Progress bar */}
+          <div className="mt-3">
+            <div className="h-2 bg-white/20 rounded-full overflow-hidden">
+              <motion.div
+                initial={{ width: 0 }}
+                animate={{ width: `${Math.min(sessionStats.achievement_percentage || 0, 100)}%` }}
+                transition={{ duration: 0.5 }}
+                className="h-full bg-white rounded-full"
+              />
+            </div>
+          </div>
+        </motion.div>
+      )}
 
       {/* Stats */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-6">
