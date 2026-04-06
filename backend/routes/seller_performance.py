@@ -48,6 +48,134 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
         raise HTTPException(status_code=401, detail="Invalid token")
 
 
+# ============ NOTIFICATION HELPERS ============
+
+async def send_seller_notification(seller_id: str, notification_type: str, title: str, message: str):
+    """Send a notification to a seller"""
+    notification = {
+        "id": str(uuid.uuid4()),
+        "user_id": seller_id,
+        "type": notification_type,
+        "title": title,
+        "message": message,
+        "read": False,
+        "created_at": datetime.now(timezone.utc)
+    }
+    await db.notifications.insert_one(notification)
+    return notification
+
+
+async def check_and_notify_milestones(seller_id: str, monthly_data: dict):
+    """Check for bonus milestones and send notifications"""
+    total_deals = monthly_data.get('total_deals', 0)
+    total_score = monthly_data.get('total_score', 0)
+    
+    notifications = []
+    
+    # Deal milestone notifications
+    if total_deals == 9:
+        notifications.append({
+            "type": "milestone_approaching",
+            "title": "🎯 Almost There!",
+            "message": "You're just 1 deal away from the ₹5,000 High Performer Bonus! Keep pushing!"
+        })
+    elif total_deals == 10:
+        notifications.append({
+            "type": "milestone_reached",
+            "title": "🏆 Bonus Unlocked!",
+            "message": "Congratulations! You've closed 10 deals and earned ₹5,000 High Performer Bonus!"
+        })
+    elif total_deals == 14:
+        notifications.append({
+            "type": "milestone_approaching",
+            "title": "🚀 Next Level Approaching!",
+            "message": "1 more deal to unlock ₹10,000 bonus! You're doing amazing!"
+        })
+    elif total_deals == 15:
+        notifications.append({
+            "type": "milestone_reached",
+            "title": "💎 Premium Performer!",
+            "message": "WOW! 15 deals closed! You've earned ₹10,000 High Performer Bonus!"
+        })
+    elif total_deals == 19:
+        notifications.append({
+            "type": "milestone_approaching",
+            "title": "🔥 Elite Status Incoming!",
+            "message": "Just 1 deal away from the massive ₹20,000 bonus! Go for it!"
+        })
+    elif total_deals == 20:
+        notifications.append({
+            "type": "milestone_reached",
+            "title": "👑 ELITE PERFORMER!",
+            "message": "LEGENDARY! 20 deals closed! You've earned the maximum ₹20,000 High Performer Bonus!"
+        })
+    
+    # Score milestone notifications
+    if total_score >= 500 and total_score < 510:
+        notifications.append({
+            "type": "rank_change",
+            "title": "⭐ Top Performer Status!",
+            "message": "You've reached 500+ points and earned 'Top Performer' status!"
+        })
+    elif total_score >= 300 and total_score < 310:
+        notifications.append({
+            "type": "rank_change",
+            "title": "📈 Performance Upgrade!",
+            "message": "Great progress! You've reached 'Good' performance level with 300+ points!"
+        })
+    
+    # Send all notifications
+    for notif in notifications:
+        await send_seller_notification(seller_id, notif["type"], notif["title"], notif["message"])
+    
+    return len(notifications)
+
+
+async def send_daily_score_notification(seller_id: str, score_data: dict, rank: int = None):
+    """Send notification about daily score"""
+    score = score_data.get('final_score', 0)
+    bonus = score_data.get('bonus', 0)
+    penalty = score_data.get('penalty', 0)
+    
+    if score >= 100:
+        title = "🌟 Great Day!"
+        message = f"You scored {score} points today! "
+        if bonus > 0:
+            message += f"(+{bonus} bonus) "
+        message += "Keep up the excellent work!"
+    elif score >= 50:
+        title = "💪 Good Effort!"
+        message = f"You scored {score} points today. "
+        if penalty > 0:
+            message += f"You lost {penalty} points to penalties. "
+        message += "Tomorrow, aim higher!"
+    else:
+        title = "📊 Daily Score Update"
+        message = f"You scored {score} points today. "
+        if penalty > 0:
+            message += f"(-{penalty} penalty) "
+        message += "Let's improve tomorrow!"
+    
+    if rank and rank <= 3:
+        message += f" 🏅 You're ranked #{rank} today!"
+    
+    await send_seller_notification(seller_id, "daily_score", title, message)
+
+
+async def send_rank_change_notification(seller_id: str, old_rank: int, new_rank: int, period: str = "daily"):
+    """Send notification when rank changes significantly"""
+    if new_rank < old_rank:
+        # Improved rank
+        title = "📈 Rank Up!"
+        message = f"Your {period} rank improved from #{old_rank} to #{new_rank}! Great work!"
+        await send_seller_notification(seller_id, "rank_change", title, message)
+    elif new_rank > old_rank and (new_rank - old_rank) >= 3:
+        # Dropped rank significantly
+        title = "⚠️ Rank Alert"
+        message = f"Your {period} rank dropped from #{old_rank} to #{new_rank}. Time to step up!"
+        await send_seller_notification(seller_id, "rank_change", title, message)
+
+
 # ============ COMMISSION STRUCTURE ============
 COMMISSION_SLABS = [
     (10000, 14999, 500),
@@ -279,6 +407,14 @@ async def submit_daily_start(
     
     await db.seller_daily_activity.insert_one(activity)
     
+    # Send motivational notification
+    await send_seller_notification(
+        current_user['id'],
+        "daily_start",
+        "🌅 Day Started!",
+        f"Your daily start report is submitted. You planned {report.planned_visits} visits and {report.expected_deals} deals. Go crush it!"
+    )
+    
     return {"success": True, "message": "Daily start report submitted", "activity_id": activity['id']}
 
 
@@ -354,6 +490,30 @@ async def submit_daily_end(
     
     # Update monthly score
     await update_monthly_score(current_user['id'])
+    
+    # Get updated monthly data for milestone checks
+    month = now.strftime('%Y-%m')
+    monthly_data = await db.seller_monthly_performance.find_one({
+        "seller_id": current_user['id'],
+        "month": month
+    }, {"_id": 0})
+    
+    # Send notifications
+    # 1. Daily score notification
+    await send_daily_score_notification(current_user['id'], score_data)
+    
+    # 2. Check for bonus milestones
+    if monthly_data:
+        await check_and_notify_milestones(current_user['id'], monthly_data)
+    
+    # 3. Warning notification if needed
+    if warning_flag:
+        await send_seller_notification(
+            current_user['id'],
+            "performance_warning",
+            "⚠️ Performance Alert",
+            f"Today's activity was below target. Calls: {report.clients_called}/60, Properties shared: {report.properties_shared}/20. Let's improve tomorrow!"
+        )
     
     return {
         "success": True,

@@ -16,6 +16,7 @@ import SellerLeadsPanel from '../components/SellerLeadsPanel';
 import DailyStartModal from '../components/DailyStartModal';
 import DailyEndModal from '../components/DailyEndModal';
 import SellerPerformancePanel from '../components/SellerPerformancePanel';
+import NotificationsDropdown from '../components/NotificationsDropdown';
 
 const FOLLOWUP_STATUSES = [
   { value: 'new_lead', label: 'New Lead', color: 'bg-blue-100 text-blue-800' },
@@ -534,6 +535,7 @@ const SellerDashboard = () => {
                 <Copy className="w-4 h-4" />
                 Code: <span className="font-bold">{user?.referral_code || dashboard?.referral_code}</span>
               </motion.div>
+              <NotificationsDropdown />
               <button onClick={handleLogoutClick} className="p-2 hover:bg-[#F5F3F0] transition-colors rounded-full" data-testid="logout-button">
                 <LogOut className="w-5 h-5 text-[#4A4D53]" strokeWidth={1.5} />
               </button>

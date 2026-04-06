@@ -48,6 +48,19 @@ const NotificationsDropdown = () => {
       case 'visit_approved':
       case 'payout_processed':
         return <IndianRupee className="w-4 h-4 text-emerald-500" />;
+      // Seller performance notification types
+      case 'daily_start':
+        return <Clock className="w-4 h-4 text-blue-500" />;
+      case 'daily_score':
+        return <Check className="w-4 h-4 text-green-500" />;
+      case 'milestone_approaching':
+        return <Bell className="w-4 h-4 text-yellow-500" />;
+      case 'milestone_reached':
+        return <IndianRupee className="w-4 h-4 text-green-500" />;
+      case 'rank_change':
+        return <Bell className="w-4 h-4 text-purple-500" />;
+      case 'performance_warning':
+        return <Bell className="w-4 h-4 text-red-500" />;
       default:
         return <Bell className="w-4 h-4 text-[#E07A5F]" />;
     }
