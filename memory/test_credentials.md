@@ -51,7 +51,9 @@
 ## Alternative Seller Accounts (Production)
 - **Phone:** 7347383375
 - **Password:** Mudit@123
-- **Name:** Mudit (Production seller)
+- **Name:** Mudit
+- **Role:** seller
+- **Referral Code:** MUDIT6676
 
 ## Builder Account
 - **Phone:** 6333444555
