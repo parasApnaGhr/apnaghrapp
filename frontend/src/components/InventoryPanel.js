@@ -80,11 +80,29 @@ const InventoryPanel = ({ inventorySession }) => {
 
   // Track property added for inventory user
   const trackPropertyAdded = async (city) => {
-    if (!inventorySession?.session_id) return;
+    // Try to get session from prop or sessionStorage
+    let sessionId = inventorySession?.session_id;
+    
+    if (!sessionId) {
+      const savedSession = sessionStorage.getItem('inventorySession');
+      if (savedSession) {
+        try {
+          const parsed = JSON.parse(savedSession);
+          sessionId = parsed.session_id;
+        } catch (e) {
+          console.error('Failed to parse inventory session:', e);
+        }
+      }
+    }
+    
+    if (!sessionId) {
+      console.log('No inventory session found - skipping tracking');
+      return;
+    }
     
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`${API_URL}/api/inventory/track-property-added?session_id=${inventorySession.session_id}&city=${encodeURIComponent(city)}`, {
+      const response = await fetch(`${API_URL}/api/inventory/track-property-added?session_id=${sessionId}&city=${encodeURIComponent(city)}`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -100,6 +118,8 @@ const InventoryPanel = ({ inventorySession }) => {
           achievement_percentage: prev?.total_target > 0 ? (data.properties_added / prev.total_target * 100) : 0
         }));
         toast.success(`+1 point! Total: ${data.points_earned} points`);
+      } else {
+        console.error('Track property failed:', data);
       }
     } catch (err) {
       console.error('Failed to track property:', err);
@@ -187,10 +207,8 @@ const InventoryPanel = ({ inventorySession }) => {
         await propertyAPI.createProperty(propertyData);
         toast.success('Property added successfully!');
         
-        // Track property added for inventory user
-        if (inventorySession) {
-          await trackPropertyAdded(formData.city || 'Unknown');
-        }
+        // Track property added for inventory user (checks sessionStorage as fallback)
+        await trackPropertyAdded(formData.city || 'Unknown');
       }
       
       setShowAddForm(false);

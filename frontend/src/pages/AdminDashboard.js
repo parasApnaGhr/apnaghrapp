@@ -69,6 +69,7 @@ const AdminDashboard = () => {
   // Handle inventory session started
   const handleInventorySessionStarted = (sessionData) => {
     setInventorySession(sessionData);
+    sessionStorage.setItem('inventorySession', JSON.stringify(sessionData));
     setShowInventoryLoginModal(false);
     setActivePanel('inventory-dashboard');
   };
