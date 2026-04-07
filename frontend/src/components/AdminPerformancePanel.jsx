@@ -4,7 +4,7 @@ import {
   Users, Trophy, TrendingUp, Clock, Calendar, AlertTriangle,
   CheckCircle, XCircle, DollarSign, Eye, RefreshCw, Search,
   Award, Target, Zap, ChevronDown, ChevronRight, Plus, Edit,
-  Trash2, MessageCircle
+  Trash2, MessageCircle, Lock, Unlock, ShieldAlert
 } from 'lucide-react';
 import api from '../utils/api';
 import { toast } from 'sonner';
@@ -22,10 +22,19 @@ const AdminPerformancePanel = () => {
   const [sellerDetail, setSellerDetail] = useState(null);
   const [showQuoteModal, setShowQuoteModal] = useState(false);
   const [newQuote, setNewQuote] = useState({ quote: '', author: '', date: '' });
+  const [lockedSellers, setLockedSellers] = useState([]);
+  const [unlocking, setUnlocking] = useState(null);
 
   useEffect(() => {
     loadData();
   }, [selectedDate, selectedMonth]);
+
+  // Load locked sellers when tab changes
+  useEffect(() => {
+    if (activeTab === 'locked') {
+      loadLockedSellers();
+    }
+  }, [activeTab]);
 
   const loadData = async () => {
     setLoading(true);
@@ -103,6 +112,29 @@ const AdminPerformancePanel = () => {
     }
   };
 
+  const loadLockedSellers = async () => {
+    try {
+      const response = await api.get('/seller-verification/admin/locked-sellers');
+      setLockedSellers(response.data.locked_sellers || []);
+    } catch (error) {
+      console.error('Failed to load locked sellers:', error);
+      toast.error('Failed to load locked sellers');
+    }
+  };
+
+  const unlockSeller = async (sellerId) => {
+    setUnlocking(sellerId);
+    try {
+      const response = await api.post(`/seller-verification/admin/unlock-seller/${sellerId}`);
+      toast.success(response.data.message || 'Account unlocked successfully');
+      loadLockedSellers();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Failed to unlock seller');
+    } finally {
+      setUnlocking(null);
+    }
+  };
+
   const formatTime = (dateStr) => {
     if (!dateStr) return '-';
     const date = new Date(dateStr);
@@ -136,11 +168,12 @@ const AdminPerformancePanel = () => {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-2 border-b border-[#E5E1DB] pb-2">
+      <div className="flex gap-2 border-b border-[#E5E1DB] pb-2 overflow-x-auto">
         {[
           { id: 'tracking', label: 'Daily Tracking', icon: Clock },
           { id: 'leaderboard', label: 'Leaderboard', icon: Trophy },
           { id: 'earnings', label: 'Earnings & Payout', icon: DollarSign },
+          { id: 'locked', label: 'Locked Sellers', icon: Lock },
           { id: 'quotes', label: 'Motivation Quotes', icon: MessageCircle }
         ].map((tab) => (
           <button
@@ -446,6 +479,123 @@ const AdminPerformancePanel = () => {
               </tbody>
             </table>
           </div>
+        </motion.div>
+      )}
+
+      {activeTab === 'locked' && (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+          {/* Locked Sellers Header */}
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <ShieldAlert className="w-5 h-5 text-red-500" />
+              <h3 className="text-lg font-semibold text-[#1A1C20]">Locked Seller Accounts</h3>
+              <span className="px-2 py-0.5 bg-red-100 text-red-700 rounded-full text-sm font-medium">
+                {lockedSellers.length}
+              </span>
+            </div>
+            <button
+              onClick={loadLockedSellers}
+              className="flex items-center gap-2 px-4 py-2 bg-[#04473C] text-white rounded-lg hover:bg-[#065f4e]"
+            >
+              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+              Refresh
+            </button>
+          </div>
+
+          {/* Info Box */}
+          <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6">
+            <div className="flex items-start gap-3">
+              <AlertTriangle className="w-5 h-5 text-amber-600 mt-0.5" />
+              <div>
+                <p className="font-medium text-amber-800">Seller Account Locking Rule</p>
+                <p className="text-sm text-amber-700 mt-1">
+                  Accounts are automatically locked when a seller marks more than 10 referrals as "Closed Lost" within a 7-day period. 
+                  This prevents potential misuse of the referral system.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Locked Sellers List */}
+          {lockedSellers.length === 0 ? (
+            <div className="bg-white rounded-xl border border-[#E5E1DB] p-12 text-center">
+              <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
+                <CheckCircle className="w-8 h-8 text-green-500" />
+              </div>
+              <h3 className="text-lg font-medium text-[#1A1C20] mb-2">No Locked Accounts</h3>
+              <p className="text-[#4A4D53]">All seller accounts are currently active and in good standing.</p>
+            </div>
+          ) : (
+            <div className="bg-white rounded-xl border border-[#E5E1DB] overflow-hidden">
+              <table className="w-full">
+                <thead className="bg-red-50">
+                  <tr>
+                    <th className="px-4 py-3 text-left text-sm font-semibold text-red-800">Seller</th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold text-red-800">Locked At</th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold text-red-800">Reason</th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold text-red-800">Closed Lost Count</th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold text-red-800">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {lockedSellers.map((seller, idx) => (
+                    <tr key={idx} className="border-t border-[#E5E1DB] hover:bg-red-50/50">
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
+                            <Lock className="w-5 h-5 text-red-500" />
+                          </div>
+                          <div>
+                            <p className="font-medium text-[#1A1C20]">{seller.seller_name || 'Unknown'}</p>
+                            <p className="text-xs text-[#4A4D53]">{seller.seller_phone}</p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3">
+                        <p className="text-sm text-[#1A1C20]">
+                          {seller.locked_at ? new Date(seller.locked_at).toLocaleDateString('en-IN', {
+                            day: 'numeric',
+                            month: 'short',
+                            year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          }) : '-'}
+                        </p>
+                      </td>
+                      <td className="px-4 py-3">
+                        <p className="text-sm text-red-600">{seller.reason}</p>
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className="px-3 py-1 bg-red-100 text-red-700 rounded-full font-medium">
+                          {seller.closed_lost_count || 0} lost
+                        </span>
+                      </td>
+                      <td className="px-4 py-3">
+                        <button
+                          onClick={() => unlockSeller(seller.seller_id)}
+                          disabled={unlocking === seller.seller_id}
+                          className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                          data-testid={`unlock-seller-${seller.seller_id}`}
+                        >
+                          {unlocking === seller.seller_id ? (
+                            <>
+                              <RefreshCw className="w-4 h-4 animate-spin" />
+                              Unlocking...
+                            </>
+                          ) : (
+                            <>
+                              <Unlock className="w-4 h-4" />
+                              Unlock Account
+                            </>
+                          )}
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </motion.div>
       )}
 
