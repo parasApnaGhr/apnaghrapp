@@ -395,46 +395,58 @@ async def submit_daily_start(
     # Check if already submitted
     existing = await db.seller_daily_activity.find_one({
         "seller_id": current_user['id'],
-        "date": today,
-        "start_report_submitted": True
+        "date": today
     })
     
-    if existing:
-        raise HTTPException(status_code=400, detail="Start report already submitted today")
+    if existing and existing.get('start_report_submitted'):
+        # Already submitted - just return success (don't block the user)
+        return {"success": True, "message": "Start report already submitted today", "activity_id": existing.get('id')}
     
     # Save image if provided
     image_url = None
     if report.image_base64:
-        # In production, upload to cloud storage
-        # For now, store as data URL or skip
-        image_url = f"data:image/jpeg;base64,{report.image_base64[:100]}..."  # Truncate for storage
+        image_url = f"data:image/jpeg;base64,{report.image_base64[:100]}..."
     
-    activity = {
-        "id": str(uuid.uuid4()),
-        "seller_id": current_user['id'],
-        "seller_name": current_user.get('name'),
-        "date": today,
-        "login_time": now,
-        "logout_time": None,
-        "image_url": image_url,
-        "today_plan": report.today_plan,
-        "planned_visits": report.planned_visits,
-        "expected_deals": report.expected_deals,
-        "start_report_submitted": True,
-        "logout_report_submitted": False,
-        # End of day fields
-        "clients_called": 0,
-        "visits_booked": 0,
-        "deals_closed": 0,
-        "properties_shared": 0,
-        "tomorrow_visits": 0,
-        # Scoring
-        "daily_score": 0,
-        "warning_flag": False,
-        "created_at": now
-    }
-    
-    await db.seller_daily_activity.insert_one(activity)
+    if existing:
+        # Update existing record (created by check-daily-status)
+        await db.seller_daily_activity.update_one(
+            {"seller_id": current_user['id'], "date": today},
+            {"$set": {
+                "image_url": image_url,
+                "today_plan": report.today_plan,
+                "planned_visits": report.planned_visits,
+                "expected_deals": report.expected_deals,
+                "start_report_submitted": True
+            }}
+        )
+        activity_id = existing.get('id')
+    else:
+        # Create new record
+        activity = {
+            "id": str(uuid.uuid4()),
+            "seller_id": current_user['id'],
+            "seller_name": current_user.get('name'),
+            "seller_phone": current_user.get('phone'),
+            "date": today,
+            "login_time": now,
+            "logout_time": None,
+            "image_url": image_url,
+            "today_plan": report.today_plan,
+            "planned_visits": report.planned_visits,
+            "expected_deals": report.expected_deals,
+            "start_report_submitted": True,
+            "logout_report_submitted": False,
+            "clients_called": 0,
+            "visits_booked": 0,
+            "deals_closed": 0,
+            "properties_shared": 0,
+            "tomorrow_visits": 0,
+            "daily_score": 0,
+            "warning_flag": False,
+            "created_at": now
+        }
+        await db.seller_daily_activity.insert_one(activity)
+        activity_id = activity['id']
     
     # Send motivational notification
     await send_seller_notification(
@@ -444,7 +456,7 @@ async def submit_daily_start(
         f"Your daily start report is submitted. You planned {report.planned_visits} visits and {report.expected_deals} deals. Go crush it!"
     )
     
-    return {"success": True, "message": "Daily start report submitted", "activity_id": activity['id']}
+    return {"success": True, "message": "Daily start report submitted", "activity_id": activity_id}
 
 
 @router.post("/daily-end")
