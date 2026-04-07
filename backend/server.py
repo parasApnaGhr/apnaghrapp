@@ -4725,6 +4725,53 @@ async def get_server_files(current_user: dict = Depends(get_current_user)):
     return {"images": images, "videos": videos}
 
 
+@api_router.get("/admin/properties/export-csv")
+async def export_properties_csv(current_user: dict = Depends(get_current_user)):
+    """Export all properties as CSV"""
+    if current_user['role'] not in ['admin', 'inventory_admin', 'support_admin']:
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    import csv
+    import io
+    
+    properties = await db.properties.find({}, {"_id": 0}).sort("created_at", -1).to_list(1000)
+    
+    output = io.StringIO()
+    writer = csv.writer(output)
+    
+    # Header
+    writer.writerow([
+        'S.No', 'Title', 'City', 'Area', 'Property Type', 'BHK', 
+        'Rent', 'Furnishing', 'Owner Name', 'Owner Contact',
+        'Amenities', 'Status', 'Created Date'
+    ])
+    
+    # Data
+    for i, p in enumerate(properties, 1):
+        writer.writerow([
+            i,
+            p.get('title', ''),
+            p.get('city', ''),
+            p.get('area_name', ''),
+            p.get('property_type', ''),
+            p.get('bhk', ''),
+            p.get('rent', ''),
+            p.get('furnishing', ''),
+            p.get('owner_name', ''),
+            p.get('owner_contact', ''),
+            ', '.join(str(a) for a in (p.get('amenities', []) or [])[:5]),
+            'Available' if p.get('available', True) else 'Rented',
+            (p.get('created_at', '')[:10] if p.get('created_at') else '')
+        ])
+    
+    csv_content = output.getvalue()
+    
+    return Response(
+        content=csv_content,
+        media_type="text/csv",
+        headers={"Content-Disposition": "attachment; filename=inventory_sheet.csv"}
+    )
+
 
 @api_router.put("/admin/properties/{property_id}")
 async def update_admin_property(property_id: str, property_data: PropertyCreate, current_user: dict = Depends(get_current_user)):
@@ -4752,7 +4799,7 @@ async def get_property_analytics(current_user: dict = Depends(get_current_user))
         raise HTTPException(status_code=403, detail="Admin access required")
     
     # Get all properties with analytics
-    properties = await db.properties.find({}, {"_id": 0}).sort("visit_count", -1).to_list(200)
+    properties = await db.properties.find({}, {"_id": 0}).sort("visit_count", -1).to_list(500)
     
     # Calculate properties needing status check (not checked in 24 hours)
     cutoff = (datetime.now(timezone.utc) - timedelta(days=1)).isoformat()
