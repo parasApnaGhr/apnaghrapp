@@ -302,12 +302,41 @@ async def check_daily_status(current_user: dict = Depends(get_current_user)):
         raise HTTPException(status_code=403, detail="Seller access required")
     
     today = datetime.now(timezone.utc).strftime('%Y-%m-%d')
+    now = datetime.now(timezone.utc)
     
     # Check for today's activity
     activity = await db.seller_daily_activity.find_one({
         "seller_id": current_user['id'],
         "date": today
     }, {"_id": 0})
+    
+    # If no activity exists, create one immediately to track login
+    if not activity:
+        activity = {
+            "id": str(uuid.uuid4()),
+            "seller_id": current_user['id'],
+            "seller_name": current_user.get('name'),
+            "seller_phone": current_user.get('phone'),
+            "date": today,
+            "login_time": now,
+            "logout_time": None,
+            "start_report_submitted": False,
+            "logout_report_submitted": False,
+            "today_plan": None,
+            "planned_visits": 0,
+            "expected_deals": 0,
+            "clients_called": 0,
+            "properties_shared": 0,
+            "visits_booked": 0,
+            "deals_closed": 0,
+            "tomorrow_visits_planned": 0,
+            "daily_score": 0,
+            "warning_flag": False,
+            "created_at": now
+        }
+        await db.seller_daily_activity.insert_one(activity.copy())
+        # Remove _id for response
+        activity.pop('_id', None)
     
     # Check for pending logout report from yesterday
     yesterday = (datetime.now(timezone.utc) - timedelta(days=1)).strftime('%Y-%m-%d')
@@ -340,8 +369,8 @@ async def check_daily_status(current_user: dict = Depends(get_current_user)):
     }, {"_id": 0})
     
     return {
-        "needs_start_report": activity is None,
-        "start_report_submitted": activity.get('start_report_submitted', False) if activity else False,
+        "needs_start_report": not activity.get('start_report_submitted', False),
+        "start_report_submitted": activity.get('start_report_submitted', False),
         "needs_pending_logout": pending_logout is not None,
         "pending_logout_date": yesterday if pending_logout else None,
         "warnings": warnings,
