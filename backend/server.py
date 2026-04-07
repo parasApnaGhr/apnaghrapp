@@ -92,7 +92,18 @@ ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
 mongo_url = os.environ['MONGO_URL']
-client = AsyncIOMotorClient(mongo_url)
+# Add connection pool settings for better performance
+client = AsyncIOMotorClient(
+    mongo_url,
+    maxPoolSize=50,
+    minPoolSize=10,
+    maxIdleTimeMS=60000,
+    connectTimeoutMS=10000,
+    serverSelectionTimeoutMS=10000,
+    socketTimeoutMS=20000,
+    retryWrites=True,
+    retryReads=True
+)
 db = client[os.environ['DB_NAME']]
 
 # Set database for modular routes
