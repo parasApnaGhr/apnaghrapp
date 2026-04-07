@@ -46,6 +46,9 @@ const DailyStartModal = ({ isOpen, onComplete, warnings = [], motivationQuote, q
     setSubmitting(true);
     try {
       await api.post('/seller-performance/daily-start', formData);
+      // Mark that we showed the modal today
+      const today = new Date().toISOString().split('T')[0];
+      sessionStorage.setItem('dailyStartShown', today);
       toast.success('Daily start report submitted! Have a productive day!');
       onComplete();
     } catch (error) {

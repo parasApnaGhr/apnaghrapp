@@ -141,13 +141,17 @@ const SellerDashboard = () => {
       const response = await api.get('/seller-performance/check-daily-status');
       setDailyStatus(response.data);
       
+      // Check if we already showed the start modal this session
+      const startModalShown = sessionStorage.getItem('dailyStartShown');
+      const today = new Date().toISOString().split('T')[0];
+      
       // Show pending logout modal first if needed
       if (response.data.needs_pending_logout) {
         setPendingLogout(response.data.pending_logout_date);
         setShowDailyEnd(true);
       }
-      // Then show start report if needed
-      else if (response.data.needs_start_report) {
+      // Then show start report if needed AND not already shown today
+      else if (response.data.needs_start_report && startModalShown !== today) {
         setShowDailyStart(true);
       }
     } catch (error) {
