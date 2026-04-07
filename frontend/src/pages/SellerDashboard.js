@@ -258,7 +258,7 @@ const SellerDashboard = () => {
   // Follow-up functions
   const loadFollowups = async () => {
     try {
-      const response = await api.get('/seller/followups');
+      const response = await api.get('/seller/followups?limit=200');
       setFollowups(response.data.followups || []);
       setFollowupStats(response.data.stats);
     } catch (error) {
@@ -267,22 +267,26 @@ const SellerDashboard = () => {
   };
 
   const handleCreateFollowup = async () => {
-    if (!newFollowup.client_name || !newFollowup.client_phone || !newFollowup.notes) {
-      toast.error('Please fill in client name, phone and notes');
-      return;
-    }
-    if (newFollowup.notes.length < 10) {
-      toast.error('Notes must be at least 10 characters');
+    if (!newFollowup.client_name || !newFollowup.client_phone) {
+      toast.error('Please fill in client name and phone');
       return;
     }
 
     try {
-      await api.post('/seller/followups', {
+      const response = await api.post('/seller/followups', {
         ...newFollowup,
+        notes: newFollowup.notes || 'New lead',
         client_budget: newFollowup.client_budget ? parseFloat(newFollowup.client_budget) : null,
         call_duration_mins: newFollowup.call_duration_mins ? parseInt(newFollowup.call_duration_mins) : null
       });
-      toast.success('Follow-up created successfully');
+      
+      // Check if duplicate was found
+      if (response.data.duplicate) {
+        toast.info('Lead already exists for this client');
+      } else {
+        toast.success('Follow-up created successfully');
+      }
+      
       setShowAddFollowup(false);
       setNewFollowup({
         client_name: '',
