@@ -4994,6 +4994,25 @@ logger = logging.getLogger(__name__)
 async def seed_default_accounts():
     """Create default admin and test accounts on first run"""
     
+    # Create database indexes for faster queries
+    try:
+        await db.users.create_index("phone", unique=True)
+        await db.users.create_index("id")
+        await db.users.create_index("role")
+        await db.properties.create_index("id")
+        await db.properties.create_index("city")
+        await db.properties.create_index("status")
+        await db.properties.create_index([("city", 1), ("status", 1)])
+        await db.seller_daily_activity.create_index([("seller_id", 1), ("date", 1)])
+        await db.seller_daily_activity.create_index("date")
+        await db.visit_bookings.create_index("customer_id")
+        await db.visit_bookings.create_index("rider_id")
+        await db.visit_bookings.create_index("status")
+        await db.seller_client_referrals.create_index([("seller_id", 1), ("verification_status", 1)])
+        logger.info("Database indexes created/verified")
+    except Exception as e:
+        logger.warning(f"Index creation warning: {e}")
+    
     # First, seed production data from preview export (if available)
     try:
         from seed_production import seed_production_data
