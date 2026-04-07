@@ -8,7 +8,7 @@ import {
   MapPin, Phone, Clock, TrendingUp, Wallet, Search, 
   Filter, Send, X, ExternalLink, CheckCircle, AlertCircle,
   Navigation, RefreshCw, Copy, Eye, ClipboardList, Plus, Calendar,
-  PhoneCall, UserCheck, XCircle, ArrowRight, UserPlus, Trophy, Target
+  PhoneCall, UserCheck, XCircle, ArrowRight, UserPlus, Trophy, Target, Lock
 } from 'lucide-react';
 import { toast } from 'sonner';
 import VoiceSearch from '../components/VoiceSearch';
@@ -17,6 +17,7 @@ import DailyStartModal from '../components/DailyStartModal';
 import DailyEndModal from '../components/DailyEndModal';
 import SellerPerformancePanel from '../components/SellerPerformancePanel';
 import NotificationsDropdown from '../components/NotificationsDropdown';
+import ClientVerificationModal from '../components/ClientVerificationModal';
 
 const FOLLOWUP_STATUSES = [
   { value: 'new_lead', label: 'New Lead', color: 'bg-blue-100 text-blue-800' },
@@ -102,6 +103,38 @@ const SellerDashboard = () => {
   const [dailyStatus, setDailyStatus] = useState(null);
   const [pendingLogout, setPendingLogout] = useState(null);
   
+  // Client verification
+  const [showVerificationModal, setShowVerificationModal] = useState(false);
+  const [shareLockStatus, setShareLockStatus] = useState({ share_locked: false, pending_count: 0 });
+  const [accountLocked, setAccountLocked] = useState(false);
+
+  const API_URL = process.env.REACT_APP_BACKEND_URL;
+
+  // Check share lock status
+  const checkShareLockStatus = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_URL}/api/seller-verification/check-share-lock`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setShareLockStatus(data);
+        
+        if (data.account_locked) {
+          setAccountLocked(true);
+          toast.error('Your account is locked. Contact admin to unlock.');
+        } else if (data.share_locked && data.pending_count > 0) {
+          // Show verification modal on login if there are pending verifications
+          setShowVerificationModal(true);
+        }
+      }
+    } catch (err) {
+      console.error('Failed to check share lock:', err);
+    }
+  };
+
   // Check daily status on load
   const checkDailyStatus = async () => {
     try {
@@ -135,6 +168,7 @@ const SellerDashboard = () => {
   useEffect(() => {
     if (user?.approval_status === 'approved') {
       checkDailyStatus();
+      checkShareLockStatus();
       loadDashboard();
     }
   }, [user]);
@@ -326,6 +360,19 @@ const SellerDashboard = () => {
   };
 
   const handleShareProperty = async (property) => {
+    // Check if account is locked
+    if (accountLocked) {
+      toast.error('Your account is locked. Contact admin to unlock.');
+      return;
+    }
+    
+    // Check if share is locked due to pending verifications
+    if (shareLockStatus.share_locked) {
+      toast.error(`Verify ${shareLockStatus.pending_count} pending client(s) to unlock sharing.`);
+      setShowVerificationModal(true);
+      return;
+    }
+    
     try {
       const response = await sellerAPI.shareProperty({ property_id: property.id });
       setShareData(response.data);
@@ -1003,11 +1050,24 @@ const SellerDashboard = () => {
                       </p>
                       <button
                         onClick={() => handleShareProperty(property)}
-                        className="btn-primary py-2 px-4 text-sm flex items-center gap-1"
+                        className={`py-2 px-4 text-sm flex items-center gap-1 rounded-lg font-medium transition-all ${
+                          shareLockStatus.share_locked || accountLocked
+                            ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                            : 'btn-primary'
+                        }`}
                         data-testid={`share-${property.id}`}
                       >
-                        <Share2 className="w-4 h-4" />
-                        Share
+                        {shareLockStatus.share_locked || accountLocked ? (
+                          <>
+                            <Lock className="w-4 h-4" />
+                            Locked
+                          </>
+                        ) : (
+                          <>
+                            <Share2 className="w-4 h-4" />
+                            Share
+                          </>
+                        )}
                       </button>
                     </div>
                   </div>
@@ -1376,6 +1436,17 @@ const SellerDashboard = () => {
         }}
         isPending={!!pendingLogout}
         pendingDate={pendingLogout}
+      />
+
+      {/* Client Verification Modal */}
+      <ClientVerificationModal
+        isOpen={showVerificationModal}
+        onComplete={() => {
+          setShowVerificationModal(false);
+          setShareLockStatus({ share_locked: false, pending_count: 0 });
+          toast.success('Share feature unlocked!');
+        }}
+        onClose={() => setShowVerificationModal(false)}
       />
 
       {/* Share Modal */}
