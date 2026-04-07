@@ -950,6 +950,22 @@ Shared by: {current_user['name']} (ApnaGhr Partner)"""
         if data.status not in FOLLOWUP_STATUSES:
             raise HTTPException(status_code=400, detail=f"Invalid status. Must be one of: {FOLLOWUP_STATUSES}")
         
+        # Check for duplicate - same seller + same client phone (that's not closed)
+        existing = await db.seller_followups.find_one({
+            "seller_id": current_user['id'],
+            "client_phone": data.client_phone,
+            "is_closed": False
+        })
+        
+        if existing:
+            # Return the existing follow-up instead of creating duplicate
+            return {
+                "id": existing["id"],
+                "message": "Lead already exists for this client",
+                "status": existing["status"],
+                "duplicate": True
+            }
+        
         followup = {
             "id": str(uuid.uuid4()),
             "seller_id": current_user['id'],
@@ -1257,6 +1273,42 @@ Shared by: {current_user['name']} (ApnaGhr Partner)"""
         return {
             "clients": list(clients.values()),
             "total": len(clients)
+        }
+    
+    @api_router.post("/admin/cleanup-duplicate-followups")
+    async def cleanup_duplicate_followups(current_user: dict = Depends(get_current_user)):
+        """Remove duplicate follow-ups, keeping only the oldest one per client phone per seller"""
+        if current_user['role'] != 'admin':
+            raise HTTPException(status_code=403, detail="Admin access required")
+        
+        # Get all followups grouped by seller_id + client_phone
+        pipeline = [
+            {"$match": {"is_closed": False}},
+            {"$sort": {"created_at": 1}},  # Oldest first
+            {"$group": {
+                "_id": {"seller_id": "$seller_id", "client_phone": "$client_phone"},
+                "followups": {"$push": {"id": "$id", "created_at": "$created_at"}},
+                "count": {"$sum": 1}
+            }},
+            {"$match": {"count": {"$gt": 1}}}  # Only groups with duplicates
+        ]
+        
+        duplicates = await db.seller_followups.aggregate(pipeline).to_list(1000)
+        
+        total_deleted = 0
+        for group in duplicates:
+            # Keep the first (oldest), delete the rest
+            followup_ids = group["followups"]
+            ids_to_delete = [f["id"] for f in followup_ids[1:]]  # Skip first one
+            
+            if ids_to_delete:
+                result = await db.seller_followups.delete_many({"id": {"$in": ids_to_delete}})
+                total_deleted += result.deleted_count
+        
+        return {
+            "message": f"Cleanup complete. Removed {total_deleted} duplicate follow-ups.",
+            "duplicates_found": len(duplicates),
+            "deleted": total_deleted
         }
     
     return router
