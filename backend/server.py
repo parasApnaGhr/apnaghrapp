@@ -1071,7 +1071,7 @@ async def get_properties(
     if furnishing:
         query["furnishing"] = furnishing
     
-    properties = await db.properties.find(query, {"_id": 0, "exact_address": 0, "latitude": 0, "longitude": 0, "owner_contact": 0, "owner_name": 0}).limit(50).to_list(None)
+    properties = await db.properties.find(query, {"_id": 0, "exact_address": 0, "latitude": 0, "longitude": 0, "owner_contact": 0, "owner_name": 0}).limit(200).to_list(None)
     return properties
 
 # PUBLIC endpoint - no auth required for viewing property (for shared links)
@@ -4660,7 +4660,7 @@ async def get_all_admin_properties(current_user: dict = Depends(get_current_user
     if current_user['role'] not in ['admin', 'inventory_admin', 'support_admin']:
         raise HTTPException(status_code=403, detail="Admin access required")
     
-    properties = await db.properties.find({}, {"_id": 0}).sort("created_at", -1).to_list(500)
+    properties = await db.properties.find({}, {"_id": 0}).sort("created_at", -1).to_list(1000)
     return properties
 
 
