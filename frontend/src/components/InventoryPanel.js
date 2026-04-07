@@ -193,11 +193,15 @@ const InventoryPanel = ({ inventorySession }) => {
     setSubmitting(true);
     
     try {
+      // Ensure images is always an array
+      const safeImages = Array.isArray(formData.images) ? formData.images : [];
+      
       const propertyData = {
         ...formData,
-        rent: parseFloat(formData.rent),
-        bhk: parseInt(formData.bhk),
+        rent: parseFloat(formData.rent) || 0,
+        bhk: parseInt(formData.bhk) || 1,
         amenities: amenitiesArray,
+        images: safeImages,
       };
       
       if (editingProperty) {
@@ -215,7 +219,8 @@ const InventoryPanel = ({ inventorySession }) => {
       resetForm();
       loadProperties();
     } catch (error) {
-      toast.error(error.response?.data?.detail || 'Failed to save property');
+      console.error('Property save error:', error);
+      toast.error(error.response?.data?.detail || 'Failed to save property. Please try again.');
     } finally {
       setSubmitting(false);
     }
