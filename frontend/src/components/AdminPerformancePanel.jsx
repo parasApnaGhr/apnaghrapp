@@ -138,14 +138,17 @@ const AdminPerformancePanel = () => {
   const formatTime = (dateStr) => {
     if (!dateStr) return '-';
     const date = new Date(dateStr);
-    return date.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+    return date.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Kolkata' });
   };
 
   const getAttendanceStatus = (activity) => {
     if (activity.no_login) return { status: 'absent', color: 'bg-red-100 text-red-700' };
     if (!activity.login_time) return { status: 'not logged in', color: 'bg-gray-100 text-gray-600' };
     
-    const loginHour = new Date(activity.login_time).getHours();
+    // Convert to IST and check hours
+    const loginDate = new Date(activity.login_time);
+    const istTime = new Date(loginDate.toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }));
+    const loginHour = istTime.getHours();
     if (loginHour >= 11) return { status: 'late', color: 'bg-yellow-100 text-yellow-700' };
     return { status: 'on time', color: 'bg-green-100 text-green-700' };
   };
@@ -210,13 +213,21 @@ const AdminPerformancePanel = () => {
             <div className="bg-green-50 rounded-xl p-4">
               <p className="text-green-600 text-sm">On Time</p>
               <p className="text-2xl font-bold text-green-700">
-                {trackingData.filter(t => !t.no_login && t.login_time && new Date(t.login_time).getHours() < 11).length}
+                {trackingData.filter(t => {
+                  if (t.no_login || !t.login_time) return false;
+                  const istTime = new Date(new Date(t.login_time).toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }));
+                  return istTime.getHours() < 11;
+                }).length}
               </p>
             </div>
             <div className="bg-yellow-50 rounded-xl p-4">
               <p className="text-yellow-600 text-sm">Late Login</p>
               <p className="text-2xl font-bold text-yellow-700">
-                {trackingData.filter(t => !t.no_login && t.login_time && new Date(t.login_time).getHours() >= 11).length}
+                {trackingData.filter(t => {
+                  if (t.no_login || !t.login_time) return false;
+                  const istTime = new Date(new Date(t.login_time).toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }));
+                  return istTime.getHours() >= 11;
+                }).length}
               </p>
             </div>
             <div className="bg-red-50 rounded-xl p-4">

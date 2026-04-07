@@ -1603,7 +1603,7 @@ const SellerDashboard = () => {
                   >
                     <p className="text-sm">{msg.message}</p>
                     <p className="text-xs opacity-70 mt-1">
-                      {new Date(msg.created_at).toLocaleTimeString()}
+                      {new Date(msg.created_at).toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata' })}
                     </p>
                   </div>
                 ))}
