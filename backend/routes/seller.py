@@ -120,7 +120,7 @@ class FollowUpCreate(BaseModel):
     property_id: Optional[str] = None
     visit_id: Optional[str] = None
     status: str  # interested, not_interested, callback, negotiating, site_visit_done, deal_in_progress, closed_won, closed_lost
-    notes: str = Field(..., min_length=10, description="Minimum 10 characters required")
+    notes: str = Field(default="", min_length=0, description="Notes about the lead")
     next_followup_date: Optional[str] = None
     call_duration_mins: Optional[int] = None
     client_budget: Optional[float] = None
@@ -128,14 +128,14 @@ class FollowUpCreate(BaseModel):
 
 class FollowUpUpdate(BaseModel):
     status: str
-    notes: str = Field(..., min_length=10, description="Minimum 10 characters required")
+    notes: str = Field(default="", min_length=0, description="Notes about the follow-up")
     next_followup_date: Optional[str] = None
     call_duration_mins: Optional[int] = None
 
 class LeadCloseRequest(BaseModel):
     followup_id: str
     outcome: str  # closed_won, closed_lost
-    final_notes: str = Field(..., min_length=20, description="Minimum 20 characters required for closing")
+    final_notes: str = Field(default="", min_length=0, description="Final notes for closing")
     brokerage_amount: Optional[float] = None  # Required if closed_won
     loss_reason: Optional[str] = None  # Required if closed_lost
 
