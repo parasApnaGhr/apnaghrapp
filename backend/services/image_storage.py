@@ -1,18 +1,63 @@
 """
 MongoDB-based Image Storage Service
 Stores images permanently in MongoDB GridFS - survives all deployments
+Includes image compression for faster uploads
 """
 
 import os
 import uuid
 import base64
+import io
 from datetime import datetime, timezone
 from typing import Optional
 from fastapi import UploadFile, HTTPException
 from motor.motor_asyncio import AsyncIOMotorGridFSBucket
+from PIL import Image
 import logging
 
 logger = logging.getLogger(__name__)
+
+# Max image dimensions and quality for compression
+MAX_IMAGE_WIDTH = 1920
+MAX_IMAGE_HEIGHT = 1920
+JPEG_QUALITY = 80
+
+def compress_image(content: bytes, content_type: str) -> tuple:
+    """Compress image to reduce size while maintaining quality"""
+    try:
+        # Skip compression for non-image files or small files
+        if not content_type or not content_type.startswith('image/'):
+            return content, content_type
+        
+        # Skip if already small (under 500KB)
+        if len(content) < 500 * 1024:
+            return content, content_type
+        
+        # Open image
+        img = Image.open(io.BytesIO(content))
+        
+        # Convert RGBA to RGB for JPEG
+        if img.mode in ('RGBA', 'P'):
+            img = img.convert('RGB')
+        
+        # Resize if too large
+        original_size = img.size
+        if img.width > MAX_IMAGE_WIDTH or img.height > MAX_IMAGE_HEIGHT:
+            img.thumbnail((MAX_IMAGE_WIDTH, MAX_IMAGE_HEIGHT), Image.Resampling.LANCZOS)
+            logger.info(f"Resized image from {original_size} to {img.size}")
+        
+        # Compress to JPEG
+        output = io.BytesIO()
+        img.save(output, format='JPEG', quality=JPEG_QUALITY, optimize=True)
+        compressed = output.getvalue()
+        
+        logger.info(f"Compressed image: {len(content)} -> {len(compressed)} bytes ({int(len(compressed)/len(content)*100)}%)")
+        
+        return compressed, 'image/jpeg'
+        
+    except Exception as e:
+        logger.warning(f"Image compression failed, using original: {e}")
+        return content, content_type
 
 class ImageStorageService:
     """Service for permanent image storage in MongoDB"""
@@ -29,27 +74,33 @@ class ImageStorageService:
     
     async def upload_image(self, file: UploadFile, user_id: str = None) -> dict:
         """
-        Upload image to MongoDB GridFS
+        Upload image to MongoDB GridFS with compression
         Returns: dict with image_id and url
         """
         try:
             # Read file content
             content = await file.read()
+            original_size = len(content)
+            content_type = file.content_type or "image/jpeg"
+            
+            # Compress image if it's an image file
+            if content_type.startswith('image/'):
+                content, content_type = compress_image(content, content_type)
             
             # Generate unique ID
             image_id = str(uuid.uuid4())
             
             # Determine file extension
-            original_filename = file.filename or "image.jpg"
-            extension = original_filename.split('.')[-1].lower() if '.' in original_filename else 'jpg'
+            extension = 'jpg' if content_type == 'image/jpeg' else (file.filename or "image.jpg").split('.')[-1].lower()
             
             # Store metadata
             metadata = {
-                "original_filename": original_filename,
-                "content_type": file.content_type or f"image/{extension}",
+                "original_filename": file.filename or "image.jpg",
+                "content_type": content_type,
                 "uploaded_by": user_id,
                 "uploaded_at": datetime.now(timezone.utc).isoformat(),
-                "size": len(content)
+                "size": len(content),
+                "original_size": original_size
             }
             
             # Upload to GridFS
@@ -63,7 +114,7 @@ class ImageStorageService:
             # Return URL that points to our serve endpoint
             url = f"/api/images/{image_id}.{extension}"
             
-            logger.info(f"Image uploaded: {filename}, size: {len(content)} bytes")
+            logger.info(f"Image uploaded: {filename}, size: {len(content)} bytes (original: {original_size})")
             
             return {
                 "image_id": image_id,
