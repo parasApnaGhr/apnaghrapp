@@ -4,6 +4,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import JSONResponse, Response
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
+from starlette.middleware.gzip import GZipMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 from bson import ObjectId
 import os
@@ -18,6 +19,21 @@ import jwt
 import aiofiles
 import json
 import math
+from functools import lru_cache
+import asyncio
+
+# Simple in-memory cache for frequently accessed data
+_cache = {}
+_cache_expiry = {}
+
+def get_cache(key, default=None):
+    if key in _cache and _cache_expiry.get(key, 0) > datetime.now().timestamp():
+        return _cache[key]
+    return default
+
+def set_cache(key, value, ttl_seconds=60):
+    _cache[key] = value
+    _cache_expiry[key] = datetime.now().timestamp() + ttl_seconds
 
 # Custom JSON encoder that handles MongoDB ObjectId and other non-serializable types
 class MongoJSONEncoder(json.JSONEncoder):
@@ -438,7 +454,8 @@ class AssignRider(BaseModel):
     rider_id: str
 
 def hash_password(password: str) -> str:
-    return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+    # Use 10 rounds instead of default 12 for faster performance (still secure)
+    return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt(rounds=10)).decode('utf-8')
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     return bcrypt.checkpw(plain_password.encode('utf-8'), hashed_password.encode('utf-8'))
@@ -1060,6 +1077,14 @@ async def get_properties(
     furnishing: Optional[str] = None,
     current_user: dict = Depends(get_current_user)
 ):
+    # Build cache key from filters
+    cache_key = f"props:{city}:{min_rent}:{max_rent}:{bhk}:{furnishing}"
+    
+    # Check cache first (30 second TTL)
+    cached = get_cache(cache_key)
+    if cached is not None:
+        return cached
+    
     query = {"available": True}
     
     # Case-insensitive partial match for city/area_name
@@ -1083,6 +1108,10 @@ async def get_properties(
         query["furnishing"] = furnishing
     
     properties = await db.properties.find(query, {"_id": 0, "exact_address": 0, "latitude": 0, "longitude": 0, "owner_contact": 0, "owner_name": 0}).limit(200).to_list(None)
+    
+    # Cache the result
+    set_cache(cache_key, properties, ttl_seconds=30)
+    
     return properties
 
 # PUBLIC endpoint - no auth required for viewing property (for shared links)
@@ -4985,6 +5014,9 @@ async def create_demo_multi_visit():
 # Mount uploads directory for serving files
 # Using /api/uploads to ensure proper routing through Kubernetes ingress
 app.mount("/api/uploads", StaticFiles(directory="/app/uploads"), name="uploads")
+
+# Add GZip compression for faster responses
+app.add_middleware(GZipMiddleware, minimum_size=500)
 
 app.add_middleware(
     CORSMiddleware,
