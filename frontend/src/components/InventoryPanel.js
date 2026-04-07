@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Edit, Trash2, CheckCircle, Home, X, Video, Image as ImageIcon, RefreshCw, MapPin, Search, Target, Award, TrendingUp } from 'lucide-react';
+import { Plus, Edit, Trash2, CheckCircle, Home, X, Video, Image as ImageIcon, RefreshCw, MapPin, Search, Target, Award, TrendingUp, Download } from 'lucide-react';
 import { toast } from 'sonner';
 import { propertyAPI, getMediaUrl } from '../utils/api';
 import api from '../utils/api';
@@ -265,6 +265,32 @@ const InventoryPanel = ({ inventorySession }) => {
   const verifiedCount = properties.filter(p => p.verified_owner).length;
   const premiumCount = properties.filter(p => p.premium_listing).length;
 
+  // Download inventory sheet as CSV
+  const downloadInventorySheet = () => {
+    const token = localStorage.getItem('token');
+    const url = `${API_URL}/api/admin/properties/export-csv`;
+    
+    fetch(url, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    })
+    .then(response => response.blob())
+    .then(blob => {
+      const downloadUrl = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = downloadUrl;
+      a.download = 'inventory_sheet.csv';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(downloadUrl);
+      toast.success('Inventory sheet downloaded!');
+    })
+    .catch(err => {
+      toast.error('Failed to download inventory sheet');
+      console.error(err);
+    });
+  };
+
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
@@ -272,6 +298,15 @@ const InventoryPanel = ({ inventorySession }) => {
           Property Inventory
         </h2>
         <div className="flex gap-2">
+          <button
+            onClick={downloadInventorySheet}
+            className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+            title="Download Inventory Sheet"
+            data-testid="download-inventory-btn"
+          >
+            <Download className="w-4 h-4" />
+            Download Sheet
+          </button>
           <button
             onClick={loadProperties}
             className="p-2 hover:bg-gray-100 rounded-lg"
