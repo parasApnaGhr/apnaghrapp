@@ -83,6 +83,55 @@ ApnaGhr Visit Platform is a production-ready multi-role rental property platform
 
 ---
 
+### 🆕 Seller Client Verification System (24-Hour Rule) - IMPLEMENTED ✅ (April 7, 2026)
+
+**Core Rule:** Sellers must verify their client referrals after 24 hours. The Share feature is LOCKED until all pending verifications are completed.
+
+**Verification Options:**
+1. **Closed Won** - Deal successful, client converted
+2. **Closed Lost** - Client not interested / deal lost
+3. **Still in Progress** - Following up (requires notes)
+
+**Account Locking Rule:**
+- If a seller submits >10 "Closed Lost" in a rolling 7-day period → Account is LOCKED automatically
+- Only ADMIN can unlock a locked seller account
+- Locked sellers cannot share properties until unlocked
+
+**Frontend Components:**
+- `ClientVerificationModal.jsx` - Modal for sellers to verify pending clients
+- Share button shows "Locked" state when verifications are pending
+- Account locked message shown when account is locked
+
+**Admin Features:**
+- **Locked Sellers Tab** in Seller Performance panel
+- Shows locked seller details (name, phone, lock date, reason, closed_lost count)
+- "Unlock Account" button for each locked seller
+- Info box explaining the locking rule
+
+**API Endpoints:**
+- `GET /api/seller-verification/check-share-lock` - Check if share is locked
+- `GET /api/seller-verification/pending-verifications` - Get pending verifications
+- `POST /api/seller-verification/track-referral` - Track new client referral
+- `POST /api/seller-verification/verify-client` - Submit verification
+- `GET /api/seller-verification/verification-history` - Get verification history
+- `GET /api/seller-verification/admin/locked-sellers` - Admin: Get all locked sellers
+- `POST /api/seller-verification/admin/unlock-seller/{seller_id}` - Admin: Unlock seller
+- `GET /api/seller-verification/admin/seller-verification-stats` - Admin: Get all seller stats
+
+**Files Created/Updated:**
+- `/app/backend/routes/seller_verification.py` - All backend verification logic
+- `/app/frontend/src/components/ClientVerificationModal.jsx` - Verification modal
+- `/app/frontend/src/components/AdminPerformancePanel.jsx` - Added Locked Sellers tab
+- `/app/frontend/src/pages/SellerDashboard.js` - Share lock integration
+
+**Database Collections:**
+- `seller_client_referrals` - Tracks referrals with verification_status
+- `seller_account_locks` - Tracks locked accounts with lock/unlock history
+
+**Testing:** 16/16 backend tests passed ✅
+
+---
+
 ### 🆕 Seller Push Notifications - IMPLEMENTED ✅
 
 **Notification Types:**
