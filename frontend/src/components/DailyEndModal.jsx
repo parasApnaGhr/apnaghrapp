@@ -26,23 +26,38 @@ const DailyEndModal = ({
   const handleSubmit = async () => {
     setSubmitting(true);
     try {
+      // Ensure all values are integers
+      const submitData = {
+        clients_called: parseInt(formData.clients_called) || 0,
+        visits_booked: parseInt(formData.visits_booked) || 0,
+        deals_closed: parseInt(formData.deals_closed) || 0,
+        properties_shared: parseInt(formData.properties_shared) || 0,
+        tomorrow_visits: parseInt(formData.tomorrow_visits) || 0
+      };
+      
+      console.log('Submitting data:', submitData, 'isPending:', isPending, 'date:', pendingDate);
+      
       let response;
       if (isPending && pendingDate) {
-        response = await api.post(`/seller-performance/submit-pending-logout?date=${pendingDate}`, formData);
+        response = await api.post(`/seller-performance/submit-pending-logout?date=${pendingDate}`, submitData);
       } else {
-        response = await api.post('/seller-performance/daily-end', formData);
+        response = await api.post('/seller-performance/daily-end', submitData);
       }
       
+      console.log('Response:', response.data);
       setScoreResult(response.data.score);
       
       // Show result for 3 seconds then close
       setTimeout(() => {
         toast.success('Daily report submitted successfully!');
+        setSubmitting(false);
         onComplete();
       }, 3000);
       
     } catch (error) {
-      toast.error(error.response?.data?.detail || 'Failed to submit report');
+      console.error('Submit error:', error.response?.data || error);
+      const errorMsg = error.response?.data?.detail || 'Failed to submit report. Please try again.';
+      toast.error(errorMsg);
       setSubmitting(false);
     }
   };
