@@ -108,17 +108,19 @@ ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
 mongo_url = os.environ['MONGO_URL']
-# Add connection pool settings for better performance
+# Add connection pool settings for better performance and reliability
 client = AsyncIOMotorClient(
     mongo_url,
-    maxPoolSize=50,
-    minPoolSize=10,
-    maxIdleTimeMS=60000,
-    connectTimeoutMS=10000,
-    serverSelectionTimeoutMS=10000,
-    socketTimeoutMS=20000,
+    maxPoolSize=100,
+    minPoolSize=20,
+    maxIdleTimeMS=45000,
+    connectTimeoutMS=5000,
+    serverSelectionTimeoutMS=5000,
+    socketTimeoutMS=10000,
     retryWrites=True,
-    retryReads=True
+    retryReads=True,
+    waitQueueTimeoutMS=5000,
+    heartbeatFrequencyMS=10000
 )
 db = client[os.environ['DB_NAME']]
 
@@ -5064,6 +5066,30 @@ app.mount("/api/uploads", StaticFiles(directory="/app/uploads"), name="uploads")
 
 # Add GZip compression for faster responses
 app.add_middleware(GZipMiddleware, minimum_size=500)
+
+# Add request timeout middleware
+from starlette.middleware.base import BaseHTTPMiddleware
+import asyncio
+
+class TimeoutMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request, call_next):
+        try:
+            # 30 second timeout for all requests
+            response = await asyncio.wait_for(call_next(request), timeout=30.0)
+            return response
+        except asyncio.TimeoutError:
+            return JSONResponse(
+                status_code=504,
+                content={"detail": "Request timeout. Please try again."}
+            )
+        except Exception as e:
+            logger.error(f"Request error: {str(e)}")
+            return JSONResponse(
+                status_code=500,
+                content={"detail": "Server error. Please try again."}
+            )
+
+app.add_middleware(TimeoutMiddleware)
 
 app.add_middleware(
     CORSMiddleware,

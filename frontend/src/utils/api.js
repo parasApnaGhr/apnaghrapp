@@ -67,18 +67,42 @@ const api = axios.create({
   timeout: 30000, // 30 second timeout
 });
 
+// Retry logic for failed requests
+const MAX_RETRIES = 2;
+const RETRY_DELAY = 1000;
+
+const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+  config.retryCount = config.retryCount || 0;
   return config;
 });
 
-// Handle response errors globally
+// Handle response errors globally with retry
 api.interceptors.response.use(
   (response) => response,
-  (error) => {
+  async (error) => {
+    const config = error.config;
+    
+    // Retry on network errors or 5xx errors (not 401, 403, 404)
+    const shouldRetry = (
+      config.retryCount < MAX_RETRIES &&
+      (error.code === 'ECONNABORTED' || // Timeout
+       error.code === 'ERR_NETWORK' || // Network error
+       (error.response?.status >= 500 && error.response?.status < 600)) // Server errors
+    );
+    
+    if (shouldRetry) {
+      config.retryCount += 1;
+      console.log(`Retrying request (${config.retryCount}/${MAX_RETRIES}):`, config.url);
+      await sleep(RETRY_DELAY * config.retryCount);
+      return api(config);
+    }
+    
     // Handle 401 unauthorized - clear token and redirect to login
     if (error.response?.status === 401) {
       localStorage.removeItem('token');
