@@ -340,12 +340,22 @@ async def check_daily_status(current_user: dict = Depends(get_current_user)):
     
     # Check for pending logout report from yesterday
     yesterday = (datetime.now(timezone.utc) - timedelta(days=1)).strftime('%Y-%m-%d')
-    pending_logout = await db.seller_daily_activity.find_one({
+    
+    # First check if ANY record for yesterday has logout submitted (handles duplicates)
+    yesterday_completed = await db.seller_daily_activity.find_one({
         "seller_id": current_user['id'],
         "date": yesterday,
-        "logout_time": None,
-        "logout_report_submitted": {"$ne": True}
-    }, {"_id": 0})
+        "logout_report_submitted": True
+    })
+    
+    # Only show pending if no completed record exists
+    pending_logout = None
+    if not yesterday_completed:
+        pending_logout = await db.seller_daily_activity.find_one({
+            "seller_id": current_user['id'],
+            "date": yesterday,
+            "logout_report_submitted": {"$ne": True}
+        }, {"_id": 0})
     
     # Check for warnings
     warnings = []
@@ -612,7 +622,7 @@ async def submit_pending_logout(
         "late_submission": True
     }
     
-    await db.seller_daily_activity.update_one(
+    await db.seller_daily_activity.update_many(
         {"seller_id": current_user['id'], "date": date},
         {"$set": update_data}
     )
@@ -620,6 +630,40 @@ async def submit_pending_logout(
     await update_monthly_score(current_user['id'])
     
     return {"success": True, "message": "Pending report submitted", "score": score_data}
+
+
+@router.post("/dismiss-pending-logout")
+async def dismiss_pending_logout(
+    date: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """Dismiss/skip pending logout report - marks all records for that date as submitted with 0 score"""
+    if current_user['role'] != 'seller':
+        raise HTTPException(status_code=403, detail="Seller access required")
+    
+    # Mark all records for that date as submitted with penalty
+    update_data = {
+        "logout_time": datetime.strptime(date + " 18:00:00", "%Y-%m-%d %H:%M:%S").replace(tzinfo=timezone.utc),
+        "logout_report_submitted": True,
+        "late_submission": True,
+        "dismissed": True,
+        "daily_score": 0,
+        "score_breakdown": {
+            "base_score": 0,
+            "bonus": 0,
+            "penalty": 100,
+            "final_score": 0
+        }
+    }
+    
+    result = await db.seller_daily_activity.update_many(
+        {"seller_id": current_user['id'], "date": date, "logout_report_submitted": {"$ne": True}},
+        {"$set": update_data}
+    )
+    
+    return {"success": True, "message": f"Pending report dismissed for {date}", "records_updated": result.modified_count}
+
+
 
 
 async def update_monthly_score(seller_id: str):

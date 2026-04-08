@@ -62,6 +62,22 @@ const DailyEndModal = ({
     }
   };
 
+  const handleDismiss = async () => {
+    if (!isPending || !pendingDate) return;
+    
+    setSubmitting(true);
+    try {
+      await api.post(`/seller-performance/dismiss-pending-logout?date=${pendingDate}`);
+      toast.success('Report skipped. A penalty has been applied.');
+      onComplete();
+    } catch (error) {
+      console.error('Dismiss error:', error.response?.data || error);
+      toast.error('Failed to skip report. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -294,6 +310,17 @@ const DailyEndModal = ({
                     </>
                   )}
                 </button>
+
+                {/* Skip Button for Pending Reports */}
+                {isPending && (
+                  <button
+                    onClick={handleDismiss}
+                    disabled={submitting}
+                    className="w-full py-3 mt-2 border border-gray-300 text-gray-600 rounded-xl font-medium hover:bg-gray-50 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Skip (Apply -100 penalty)
+                  </button>
+                )}
               </motion.div>
             )}
           </div>
