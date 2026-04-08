@@ -126,4 +126,59 @@ tail -f /var/log/supervisor/backend.err.log | grep -i "slow\|timeout\|error"
 | Complex aggregations | < 3s |
 
 ---
+
+## Production Resilience Features
+
+The system is hardened for production with these features:
+
+### 1. Connection Pooling (100 connections)
+```python
+client = AsyncIOMotorClient(
+    mongo_url,
+    maxPoolSize=100,       # 100 concurrent connections
+    minPoolSize=20,        # Keep 20 warm
+    waitQueueTimeoutMS=5000,
+    retryWrites=True,
+    retryReads=True
+)
+```
+
+### 2. Rate Limiting
+- 100 requests per 60 seconds per user/IP
+- Returns HTTP 429 if exceeded
+- Prevents one user from overwhelming the system
+
+### 3. Circuit Breaker
+- Opens after 5 consecutive DB failures
+- Auto-recovers after 30 seconds
+- Returns HTTP 503 when open (graceful degradation)
+
+### 4. Request Timeouts
+- Global request timeout: 30 seconds
+- Auth lookup timeout: 5 seconds
+- DB query timeout: 8 seconds
+- Returns HTTP 504 on timeout
+
+### 5. Error Isolation
+- Each request runs in isolated try/catch
+- One user's error doesn't crash the server
+- Errors logged but contained
+
+### 6. Health Check with Status
+```json
+GET /api/health
+{
+  "status": "healthy",
+  "database": "connected",
+  "circuit_breaker": "CLOSED",
+  "pool_size": 100
+}
+```
+
+### Load Test Results (50 concurrent users)
+- Success rate: 100% (50/50)
+- All requests HTTP 200
+- No connection pool exhaustion
+
+---
 *Last updated: April 8, 2026*

@@ -21,6 +21,69 @@ import json
 import math
 from functools import lru_cache
 import asyncio
+from collections import defaultdict
+import time
+
+# ============ PRODUCTION RESILIENCE UTILITIES ============
+
+# Rate limiting storage (per user/IP)
+_rate_limit_store = defaultdict(list)
+RATE_LIMIT_REQUESTS = 100  # Max requests
+RATE_LIMIT_WINDOW = 60  # Per 60 seconds
+
+def check_rate_limit(identifier: str) -> bool:
+    """Check if user/IP has exceeded rate limit. Returns True if allowed."""
+    now = time.time()
+    # Clean old entries
+    _rate_limit_store[identifier] = [t for t in _rate_limit_store[identifier] if now - t < RATE_LIMIT_WINDOW]
+    
+    if len(_rate_limit_store[identifier]) >= RATE_LIMIT_REQUESTS:
+        return False
+    
+    _rate_limit_store[identifier].append(now)
+    return True
+
+# Circuit breaker for database operations
+class CircuitBreaker:
+    def __init__(self, failure_threshold=5, recovery_timeout=30):
+        self.failure_count = 0
+        self.failure_threshold = failure_threshold
+        self.recovery_timeout = recovery_timeout
+        self.last_failure_time = 0
+        self.state = "CLOSED"  # CLOSED, OPEN, HALF_OPEN
+    
+    def record_failure(self):
+        self.failure_count += 1
+        self.last_failure_time = time.time()
+        if self.failure_count >= self.failure_threshold:
+            self.state = "OPEN"
+            logging.warning("Circuit breaker OPEN - too many DB failures")
+    
+    def record_success(self):
+        self.failure_count = 0
+        self.state = "CLOSED"
+    
+    def can_execute(self) -> bool:
+        if self.state == "CLOSED":
+            return True
+        if self.state == "OPEN":
+            if time.time() - self.last_failure_time > self.recovery_timeout:
+                self.state = "HALF_OPEN"
+                return True
+            return False
+        return True  # HALF_OPEN
+
+db_circuit_breaker = CircuitBreaker()
+
+# Request timeout wrapper
+async def with_timeout(coro, timeout_seconds=10):
+    """Execute coroutine with timeout"""
+    try:
+        return await asyncio.wait_for(coro, timeout=timeout_seconds)
+    except asyncio.TimeoutError:
+        raise HTTPException(status_code=504, detail="Request timeout - please try again")
+
+# ============ CACHE UTILITIES ============
 
 # Simple in-memory cache for frequently accessed data
 _cache = {}
@@ -34,6 +97,26 @@ def get_cache(key, default=None):
 def set_cache(key, value, ttl_seconds=60):
     _cache[key] = value
     _cache_expiry[key] = datetime.now().timestamp() + ttl_seconds
+
+def clear_expired_cache():
+    """Periodically clean expired cache entries to prevent memory leaks"""
+    now = datetime.now().timestamp()
+    expired_keys = [k for k, exp in _cache_expiry.items() if exp < now]
+    for k in expired_keys:
+        _cache.pop(k, None)
+        _cache_expiry.pop(k, None)
+
+# Safe database query wrapper with timeout
+async def safe_db_query(query_coro, timeout_seconds=8, default=None):
+    """Execute database query with timeout and error handling"""
+    try:
+        return await asyncio.wait_for(query_coro, timeout=timeout_seconds)
+    except asyncio.TimeoutError:
+        logging.warning(f"Database query timeout after {timeout_seconds}s")
+        return default
+    except Exception as e:
+        logging.error(f"Database query error: {str(e)}")
+        return default
 
 # Custom JSON encoder that handles MongoDB ObjectId and other non-serializable types
 class MongoJSONEncoder(json.JSONEncoder):
@@ -141,6 +224,51 @@ set_uploads_db(db)
 app = FastAPI(title="ApnaGhr Visit Platform", version="2.0")
 api_router = APIRouter(prefix="/api")
 security = HTTPBearer()
+
+# ============ PRODUCTION MIDDLEWARE ============
+
+@app.middleware("http")
+async def error_isolation_middleware(request: Request, call_next):
+    """Isolate errors per request - one user's error won't affect others"""
+    try:
+        # Check rate limit (by IP or user)
+        client_ip = request.client.host if request.client else "unknown"
+        auth_header = request.headers.get("Authorization", "")
+        identifier = auth_header[-20:] if auth_header else client_ip
+        
+        if not check_rate_limit(identifier):
+            return JSONResponse(
+                status_code=429,
+                content={"detail": "Too many requests. Please slow down."}
+            )
+        
+        # Check circuit breaker
+        if not db_circuit_breaker.can_execute():
+            return JSONResponse(
+                status_code=503,
+                content={"detail": "Service temporarily unavailable. Please retry in 30 seconds."}
+            )
+        
+        # Execute request with global timeout
+        try:
+            response = await asyncio.wait_for(call_next(request), timeout=30.0)
+            db_circuit_breaker.record_success()
+            return response
+        except asyncio.TimeoutError:
+            db_circuit_breaker.record_failure()
+            return JSONResponse(
+                status_code=504,
+                content={"detail": "Request timeout. Please try again."}
+            )
+            
+    except Exception as e:
+        # Log error but don't crash the server
+        logging.error(f"Request error (isolated): {str(e)}")
+        db_circuit_breaker.record_failure()
+        return JSONResponse(
+            status_code=500,
+            content={"detail": "An error occurred. Please try again."}
+        )
 
 JWT_SECRET = os.environ.get('JWT_SECRET', 'apnaghr-visit-platform-2024')
 JWT_ALGORITHM = 'HS256'
@@ -480,14 +608,26 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
     try:
         token = credentials.credentials
         payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
-        user = await db.users.find_one({"id": payload['user_id']}, {"_id": 0})
+        
+        # Use timeout for user lookup to prevent slow queries from blocking
+        user = await asyncio.wait_for(
+            db.users.find_one({"id": payload['user_id']}, {"_id": 0}),
+            timeout=5.0
+        )
         if not user:
             raise HTTPException(status_code=401, detail="User not found")
         return user
+    except asyncio.TimeoutError:
+        raise HTTPException(status_code=503, detail="Authentication service busy. Please retry.")
     except jwt.ExpiredSignatureError:
         raise HTTPException(status_code=401, detail="Token expired")
-    except Exception:
+    except jwt.InvalidTokenError:
         raise HTTPException(status_code=401, detail="Invalid token")
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Auth error: {str(e)}")
+        raise HTTPException(status_code=401, detail="Authentication failed")
 
 # Auth endpoints
 @api_router.post("/auth/register", response_model=UserResponse)
@@ -908,10 +1048,23 @@ async def serve_image(filename: str):
 async def api_health_check():
     """Health check endpoint accessible via /api/health"""
     try:
-        await client.admin.command('ping')
-        return {"status": "healthy", "database": "connected", "version": "2.0"}
+        # Use timeout for DB ping to prevent blocking
+        await asyncio.wait_for(client.admin.command('ping'), timeout=5.0)
+        
+        # Clean expired cache periodically (piggyback on health check)
+        clear_expired_cache()
+        
+        return {
+            "status": "healthy", 
+            "database": "connected", 
+            "version": "2.0",
+            "circuit_breaker": db_circuit_breaker.state,
+            "pool_size": client.options.pool_options.max_pool_size
+        }
+    except asyncio.TimeoutError:
+        return {"status": "degraded", "database": "slow", "error": "Database response timeout"}
     except Exception as e:
-        return {"status": "unhealthy", "error": str(e)}
+        return {"status": "unhealthy", "database": "disconnected", "error": str(e)}
 
 # Manual seed endpoint for production database
 @api_router.post("/admin/seed-database")
