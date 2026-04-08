@@ -608,7 +608,7 @@ Shared by: {current_user['name']} (ApnaGhr Partner)"""
         status: Optional[str] = None,
         current_user: dict = Depends(get_current_user)
     ):
-        """Admin: Get all sellers"""
+        """Admin: Get all sellers - OPTIMIZED with batch queries"""
         if current_user.get('role') not in ['admin', 'support_admin']:
             raise HTTPException(status_code=403, detail="Admin access required")
         
@@ -621,25 +621,44 @@ Shared by: {current_user['name']} (ApnaGhr Partner)"""
             {"_id": 0, "password": 0}
         ).sort("created_at", -1).to_list(200)
         
-        # Add stats for each seller
+        if not sellers:
+            return sellers
+        
+        # Batch fetch all seller IDs
+        seller_ids = [s["id"] for s in sellers]
+        
+        # Batch aggregation for referral stats
+        referral_stats_pipeline = [
+            {"$match": {"seller_id": {"$in": seller_ids}}},
+            {"$group": {
+                "_id": "$seller_id",
+                "total_referrals": {"$sum": 1},
+                "converted": {"$sum": {"$cond": [{"$in": ["$status", ["booked", "visited", "deal_closed"]]}, 1, 0]}},
+                "deals_closed": {"$sum": {"$cond": [{"$eq": ["$status", "deal_closed"]}, 1, 0]}}
+            }}
+        ]
+        referral_stats = await db.seller_referrals.aggregate(referral_stats_pipeline).to_list(None)
+        stats_map = {s["_id"]: s for s in referral_stats}
+        
+        # Batch fetch all wallets
+        wallets = await db.seller_wallets.find(
+            {"seller_id": {"$in": seller_ids}},
+            {"_id": 0, "seller_id": 1, "total_earnings": 1, "pending_earnings": 1}
+        ).to_list(None)
+        wallet_map = {w["seller_id"]: w for w in wallets}
+        
+        # Attach stats and wallets to sellers
         for seller in sellers:
+            sid = seller["id"]
+            stats = stats_map.get(sid, {})
             seller["stats"] = {
-                "total_referrals": await db.seller_referrals.count_documents({"seller_id": seller["id"]}),
-                "converted": await db.seller_referrals.count_documents({
-                    "seller_id": seller["id"],
-                    "status": {"$in": ["booked", "visited", "deal_closed"]}
-                }),
-                "deals_closed": await db.seller_referrals.count_documents({
-                    "seller_id": seller["id"],
-                    "status": "deal_closed"
-                })
+                "total_referrals": stats.get("total_referrals", 0),
+                "converted": stats.get("converted", 0),
+                "deals_closed": stats.get("deals_closed", 0)
             }
-            
-            # Get wallet
-            wallet = await db.seller_wallets.find_one(
-                {"seller_id": seller["id"]},
-                {"_id": 0, "total_earnings": 1, "pending_earnings": 1}
-            )
+            wallet = wallet_map.get(sid)
+            if wallet:
+                wallet.pop("seller_id", None)
             seller["wallet"] = wallet
         
         return sellers
@@ -1006,7 +1025,7 @@ Shared by: {current_user['name']} (ApnaGhr Partner)"""
         is_closed: Optional[bool] = None,
         limit: int = 50
     ):
-        """Get all follow-ups for the seller"""
+        """Get all follow-ups for the seller - OPTIMIZED"""
         if current_user['role'] != 'seller':
             raise HTTPException(status_code=403, detail="Seller access required")
         
@@ -1021,19 +1040,30 @@ Shared by: {current_user['name']} (ApnaGhr Partner)"""
             {"_id": 0}
         ).sort("updated_at", -1).limit(limit).to_list(length=limit)
         
-        # Get statistics
-        total = await db.seller_followups.count_documents({"seller_id": current_user['id']})
-        active = await db.seller_followups.count_documents({"seller_id": current_user['id'], "is_closed": False})
-        won = await db.seller_followups.count_documents({"seller_id": current_user['id'], "status": "closed_won"})
-        lost = await db.seller_followups.count_documents({"seller_id": current_user['id'], "status": "closed_lost"})
+        # Get all statistics in single aggregation
+        stats_pipeline = [
+            {"$match": {"seller_id": current_user['id']}},
+            {"$group": {
+                "_id": None,
+                "total": {"$sum": 1},
+                "active": {"$sum": {"$cond": [{"$eq": ["$is_closed", False]}, 1, 0]}},
+                "won": {"$sum": {"$cond": [{"$eq": ["$status", "closed_won"]}, 1, 0]}},
+                "lost": {"$sum": {"$cond": [{"$eq": ["$status", "closed_lost"]}, 1, 0]}}
+            }}
+        ]
+        stats_result = await db.seller_followups.aggregate(stats_pipeline).to_list(1)
+        
+        stats = stats_result[0] if stats_result else {"total": 0, "active": 0, "won": 0, "lost": 0}
+        total = stats.get("total", 0)
+        won = stats.get("won", 0)
         
         return {
             "followups": followups,
             "stats": {
                 "total": total,
-                "active": active,
+                "active": stats.get("active", 0),
                 "closed_won": won,
-                "closed_lost": lost,
+                "closed_lost": stats.get("lost", 0),
                 "conversion_rate": round((won / total * 100), 1) if total > 0 else 0
             }
         }

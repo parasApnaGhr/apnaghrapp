@@ -2104,6 +2104,9 @@ async def book_visit(booking_data: VisitBookingCreate, current_user: dict = Depe
 @api_router.get("/visits/my-bookings")
 async def get_my_bookings(current_user: dict = Depends(get_current_user)):
     # Search by customer_id, user_id, OR customer_phone to support all booking types
+    # - customer_id: Standard bookings
+    # - user_id: Legacy bookings
+    # - customer_phone: Admin manual bookings where customer account was created later
     try:
         bookings = await db.visit_bookings.find(
             {"$or": [
@@ -2114,68 +2117,41 @@ async def get_my_bookings(current_user: dict = Depends(get_current_user)):
             {"_id": 0}
         ).sort("created_at", -1).to_list(50)
         
-        if not bookings:
-            return []
-        
-        # Batch collect all rider IDs and property IDs
-        rider_ids = set()
-        property_ids = set()
-        for booking in bookings:
-            rid = booking.get('rider_id') or booking.get('assigned_rider_id')
-            if rid:
-                rider_ids.add(rid)
-            prop_ids = booking.get('property_ids', [])
-            if not prop_ids and booking.get('property_id'):
-                prop_ids = [booking.get('property_id')]
-            for pid in prop_ids[:1]:  # Only first property
-                property_ids.add(pid)
-        
-        # Batch fetch riders
-        rider_map = {}
-        if rider_ids:
-            riders = await db.users.find(
-                {"id": {"$in": list(rider_ids)}}, 
-                {"_id": 0, "password": 0}
-            ).to_list(None)
-            rider_map = {r['id']: r for r in riders}
-        
-        # Batch fetch properties
-        prop_map = {}
-        if property_ids:
-            props = await db.properties.find(
-                {"id": {"$in": list(property_ids)}}, 
-                {"_id": 0, "id": 1, "title": 1, "area_name": 1, "city": 1}
-            ).to_list(None)
-            prop_map = {p['id']: p for p in props}
-        
-        # Enrich bookings
+        # Enrich bookings with rider information
         enriched_bookings = []
         for booking in bookings:
             booking_copy = dict(booking)
             
-            # Add rider info
+            # Get rider details if rider is assigned
             rider_id = booking.get('rider_id') or booking.get('assigned_rider_id')
-            if rider_id and rider_id in rider_map:
-                rider = rider_map[rider_id]
-                booking_copy['rider_name'] = rider.get('name', 'Assigned Rider')
-                booking_copy['rider_phone'] = rider.get('phone')
-                booking_copy['rider_photo'] = rider.get('photo')
-                booking_copy['rider_lat'] = rider.get('current_lat')
-                booking_copy['rider_lng'] = rider.get('current_lng')
-                booking_copy['rider_is_online'] = rider.get('is_online', False)
+            if rider_id:
+                rider = await db.users.find_one(
+                    {"id": rider_id}, 
+                    {"_id": 0, "password": 0}
+                )
+                if rider:
+                    booking_copy['rider_name'] = rider.get('name', 'Assigned Rider')
+                    booking_copy['rider_phone'] = rider.get('phone')
+                    booking_copy['rider_photo'] = rider.get('photo')
+                    # Include rider's current location for tracking
+                    booking_copy['rider_lat'] = rider.get('current_lat')
+                    booking_copy['rider_lng'] = rider.get('current_lng')
+                    booking_copy['rider_is_online'] = rider.get('is_online', False)
             
-            # Add property info
+            # Get first property info for display
             prop_ids = booking.get('property_ids', [])
             if not prop_ids and booking.get('property_id'):
                 prop_ids = [booking.get('property_id')]
-            if prop_ids and prop_ids[0] in prop_map:
-                first_prop = prop_map[prop_ids[0]]
-                booking_copy['property_title'] = first_prop.get('title')
-                booking_copy['property_area'] = first_prop.get('area_name')
-                booking_copy['property_city'] = first_prop.get('city')
+            if prop_ids:
+                first_prop = await db.properties.find_one({"id": prop_ids[0]}, {"_id": 0})
+                if first_prop:
+                    booking_copy['property_title'] = first_prop.get('title')
+                    booking_copy['property_area'] = first_prop.get('area_name')
+                    booking_copy['property_city'] = first_prop.get('city')
             
             enriched_bookings.append(booking_copy)
         
+        # Sanitize all documents to handle any ObjectId references
         return sanitize_mongo_doc(enriched_bookings)
     except Exception as e:
         import traceback
