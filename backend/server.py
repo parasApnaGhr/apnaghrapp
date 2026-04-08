@@ -102,6 +102,7 @@ from routes.ai_validation import router as ai_validation_router, set_database as
 from routes.seller_performance import router as seller_performance_router, set_database as set_seller_performance_db
 from routes.inventory_access import router as inventory_access_router
 from routes.seller_verification import router as seller_verification_router
+from routes.auth import router as auth_router, set_database as set_auth_db, get_current_user, hash_password, verify_password, create_jwt_token
 from services.cashfree_service import get_cashfree_service, CashfreePaymentService
 
 ROOT_DIR = Path(__file__).parent
@@ -131,6 +132,7 @@ set_leads_db(db)
 set_seller_leads_db(db)
 set_ai_validation_db(db)
 set_seller_performance_db(db)
+set_auth_db(db)
 
 app = FastAPI(title="ApnaGhr Visit Platform", version="2.0")
 api_router = APIRouter(prefix="/api")
@@ -4996,6 +4998,7 @@ setup_seller_routes(api_router, db, get_current_user, bcrypt)
 app.include_router(api_router)
 
 # Include new modular routes
+app.include_router(auth_router, prefix="/api/auth")
 app.include_router(packers_router, prefix="/api")
 app.include_router(advertising_router, prefix="/api")
 app.include_router(tracking_router, prefix="/api")
