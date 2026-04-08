@@ -1,0 +1,61 @@
+{
+  "export_date": "2026-04-08T08:24:42.818853",
+  "source": "https://apnaghrapp.in",
+  "files": [
+    {
+      "filename": "sellers.json",
+      "size_bytes": 5937,
+      "size_kb": 5.8
+    },
+    {
+      "filename": "seller_earnings.json",
+      "size_bytes": 1078,
+      "size_kb": 1.05
+    },
+    {
+      "filename": "locked_sellers.json",
+      "size_bytes": 40,
+      "size_kb": 0.04
+    },
+    {
+      "filename": "seller_leaderboard.json",
+      "size_bytes": 1069,
+      "size_kb": 1.04
+    },
+    {
+      "filename": "manual_visits.json",
+      "size_bytes": 19050,
+      "size_kb": 18.6
+    },
+    {
+      "filename": "seller_tracking.json",
+      "size_bytes": 3606,
+      "size_kb": 3.52
+    },
+    {
+      "filename": "riders.json",
+      "size_bytes": 4965,
+      "size_kb": 4.85
+    },
+    {
+      "filename": "users.json",
+      "size_bytes": 22,
+      "size_kb": 0.02
+    },
+    {
+      "filename": "properties.json",
+      "size_bytes": 283776,
+      "size_kb": 277.12
+    },
+    {
+      "filename": "rider_applications.json",
+      "size_bytes": 66,
+      "size_kb": 0.06
+    },
+    {
+      "filename": "inventory_sessions.json",
+      "size_bytes": 7485,
+      "size_kb": 7.31
+    }
+  ]
+}

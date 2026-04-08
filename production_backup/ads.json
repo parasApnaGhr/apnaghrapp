@@ -1,0 +1,229 @@
+[
+  {
+    "id": "04d0d576-ebf5-47c0-bbea-b819e7481e59",
+    "advertiser_id": "sample_advertiser_4",
+    "company_name": "Gupta Plywood & Hardware",
+    "tagline": "Quality Wood Solutions Since 1995",
+    "business_type": "Plywood & Hardware",
+    "image_url": "https://static.prod-images.emergentagent.com/jobs/c5c63c21-f087-4ea8-ae34-ba53073071fc/images/22a47974f1d113989ccb38d4b8ceaa22edd982181509219f30b7ffabe21b1842.png",
+    "target_url": "https://example.com/gupta-plywood",
+    "placement": [
+      "home"
+    ],
+    "package_type": "growth",
+    "status": "active",
+    "impressions": 1560,
+    "clicks": 69,
+    "start_date": "2026-03-28T07:17:08.064587+00:00",
+    "end_date": "2026-04-27T07:17:08.064589+00:00",
+    "created_at": "2026-03-28T07:17:08.064590+00:00",
+    "banner_image": "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800"
+  },
+  {
+    "id": "e627b283-73a4-40a7-9dec-fecc1e46e1b5",
+    "advertiser_id": "sample_advertiser_3",
+    "company_name": "Sharma Sanitary",
+    "tagline": "Premium Bath Solutions",
+    "business_type": "Sanitary & Bathroom",
+    "image_url": "https://static.prod-images.emergentagent.com/jobs/c5c63c21-f087-4ea8-ae34-ba53073071fc/images/62ab24ecd664b2413ede802a25b86bef4812edcc3f669936e2051c4d47fb5529.png",
+    "target_url": "https://example.com/sharma-sanitary",
+    "placement": [
+      "home",
+      "property"
+    ],
+    "package_type": "starter",
+    "status": "active",
+    "impressions": 890,
+    "clicks": 33,
+    "start_date": "2026-03-28T07:17:08.064575+00:00",
+    "end_date": "2026-04-27T07:17:08.064576+00:00",
+    "created_at": "2026-03-28T07:17:08.064578+00:00",
+    "banner_image": "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800"
+  },
+  {
+    "id": "c0c691ff-b77b-438c-83fd-81ecda6f267b",
+    "advertiser_id": "sample_advertiser_2",
+    "company_name": "BondedHomes",
+    "tagline": "Your Dream Home Awaits",
+    "business_type": "Real Estate",
+    "image_url": "https://images.pexels.com/photos/323780/pexels-photo-323780.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+    "target_url": "https://example.com/bondedhomes",
+    "placement": [
+      "home"
+    ],
+    "package_type": "elite",
+    "status": "active",
+    "impressions": 2100,
+    "clicks": 94,
+    "start_date": "2026-03-28T07:17:08.064565+00:00",
+    "end_date": "2026-04-27T07:17:08.064567+00:00",
+    "created_at": "2026-03-28T07:17:08.064569+00:00",
+    "banner_image": "https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?w=800"
+  },
+  {
+    "id": "3948c749-b9a6-40b3-83bb-9f5ce9169e6a",
+    "advertiser_id": "sample_advertiser_1",
+    "company_name": "Shivam Silk Store",
+    "tagline": "Exclusive Wedding Collection",
+    "business_type": "Fashion & Wedding",
+    "image_url": "https://static.prod-images.emergentagent.com/jobs/c5c63c21-f087-4ea8-ae34-ba53073071fc/images/ecf93641a2b386b345c66621f49e2fee5da4be159704b9f10e11b04553b85cab.png",
+    "target_url": "https://example.com/shivam-silk",
+    "placement": [
+      "home",
+      "property"
+    ],
+    "package_type": "premium",
+    "status": "active",
+    "impressions": 1250,
+    "clicks": 46,
+    "start_date": "2026-03-28T07:17:08.064536+00:00",
+    "end_date": "2026-04-27T07:17:08.064544+00:00",
+    "created_at": "2026-03-28T07:17:08.064558+00:00",
+    "banner_image": "https://images.unsplash.com/photo-1600573472550-8090b5e0745e?w=800"
+  },
+  {
+    "id": "d24c1191-d549-4e4f-854a-b84935b23f21",
+    "advertiser_id": "customer-001",
+    "company_name": "Apnaghr.com",
+    "package_tier": "starter",
+    "poster_images": [],
+    "video_url": null,
+    "target_url": "https://apnaghr.com/",
+    "description": "Construction business ",
+    "placement": [
+      "home",
+      "featured",
+      "property_detail"
+    ],
+    "status": "payment_pending",
+    "payment_status": null,
+    "payment_session_id": "apnaghr_349be75d0adb",
+    "impressions": 0,
+    "clicks": 0,
+    "start_date": "2026-03-28",
+    "end_date": "2026-04-28",
+    "amount_paid": 2999.0,
+    "rejection_reason": null,
+    "created_at": "2026-03-27T22:51:44.514083+00:00",
+    "banner_image": "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800"
+  },
+  {
+    "id": "2f1f7a9c-45ca-4c26-963a-0859e45e90c8",
+    "advertiser_id": "customer-001",
+    "company_name": "Test Verify Company",
+    "package_tier": "premium",
+    "poster_images": [],
+    "video_url": null,
+    "target_url": null,
+    "description": "Test ad",
+    "placement": [
+      "home_screen"
+    ],
+    "status": "payment_pending",
+    "payment_status": null,
+    "payment_session_id": "apnaghr_4340c7956ef5",
+    "impressions": 0,
+    "clicks": 0,
+    "start_date": "2026-04-01",
+    "end_date": "2026-04-30",
+    "amount_paid": 14999.0,
+    "rejection_reason": null,
+    "created_at": "2026-03-27T21:58:35.973651+00:00",
+    "banner_image": "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800"
+  },
+  {
+    "id": "25e0eb05-8e0c-47b0-ba53-f404140618b8",
+    "advertiser_id": "customer-001",
+    "company_name": "TEST_Payment Ad Company",
+    "package_tier": "growth",
+    "poster_images": [],
+    "video_url": null,
+    "target_url": null,
+    "description": "Test ad for payment initiation",
+    "placement": [
+      "home_screen",
+      "property_detail"
+    ],
+    "status": "payment_pending",
+    "payment_status": null,
+    "payment_session_id": "apnaghr_4302259ffb36",
+    "impressions": 0,
+    "clicks": 0,
+    "start_date": "2026-04-01",
+    "end_date": "2026-04-30",
+    "amount_paid": 7999.0,
+    "rejection_reason": null,
+    "created_at": "2026-03-27T21:58:09.761295+00:00",
+    "banner_image": "https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?w=800"
+  },
+  {
+    "id": "59f62768-528b-419b-8a28-f6a8ecb2919a",
+    "advertiser_id": "customer-001",
+    "company_name": "TEST_Ad Company",
+    "package_tier": "starter",
+    "poster_images": [
+      "https://example.com/poster1.jpg"
+    ],
+    "video_url": null,
+    "target_url": null,
+    "description": "Test advertisement for payment testing",
+    "placement": [
+      "home_screen"
+    ],
+    "status": "pending",
+    "payment_status": null,
+    "payment_session_id": null,
+    "impressions": 0,
+    "clicks": 0,
+    "start_date": "2026-04-01",
+    "end_date": "2026-04-30",
+    "amount_paid": 2999.0,
+    "rejection_reason": null,
+    "created_at": "2026-03-27T21:58:09.637516+00:00",
+    "banner_image": "https://images.unsplash.com/photo-1600573472550-8090b5e0745e?w=800"
+  },
+  {
+    "id": "6af1428c-b3c2-413d-858b-93164f255ce0",
+    "advertiser_id": "customer-001",
+    "company_name": "TEST_Company Ltd",
+    "package_tier": "starter",
+    "poster_images": [],
+    "video_url": null,
+    "target_url": null,
+    "description": "TEST_Best packers and movers in town!",
+    "placement": [
+      "home"
+    ],
+    "status": "pending",
+    "impressions": 0,
+    "clicks": 0,
+    "start_date": "2026-03-27",
+    "end_date": "2026-04-26",
+    "amount_paid": 2999.0,
+    "rejection_reason": null,
+    "created_at": "2026-03-27T20:24:17.490817+00:00",
+    "banner_image": "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800"
+  },
+  {
+    "id": "985b82c3-b188-4d4b-b67e-87a47caeae3e",
+    "advertiser_id": "customer-001",
+    "company_name": "TEST_Company Ltd",
+    "package_tier": "starter",
+    "poster_images": [],
+    "video_url": null,
+    "target_url": null,
+    "description": "TEST_Best packers and movers in town!",
+    "placement": [
+      "home"
+    ],
+    "status": "pending",
+    "impressions": 0,
+    "clicks": 0,
+    "start_date": "2026-03-27",
+    "end_date": "2026-04-26",
+    "amount_paid": 2999.0,
+    "rejection_reason": null,
+    "created_at": "2026-03-27T20:24:02.516018+00:00",
+    "banner_image": "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800"
+  }
+]

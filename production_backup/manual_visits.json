@@ -1,0 +1,661 @@
+[
+  {
+    "id": "435d8f65-0260-4e20-ac58-2416f5649ad5",
+    "user_id": "a963e73d-abf1-4e79-a3c2-cf524cc80c29",
+    "customer_name": "Paras Sharma",
+    "customer_phone": "9915413810",
+    "property_ids": [
+      "2b8fe855-e7d3-4a97-a844-5b411031db75",
+      "113aa4d4-bb4f-47e3-a7cc-680b6b2e4627"
+    ],
+    "properties": [
+      {
+        "id": "2b8fe855-e7d3-4a97-a844-5b411031db75",
+        "title": "3bhk apartment in mohali ",
+        "rent": 24997.0,
+        "area_name": "mohali sector 65",
+        "city": "mohali"
+      },
+      {
+        "id": "113aa4d4-bb4f-47e3-a7cc-680b6b2e4627",
+        "title": "3bhk",
+        "rent": 30000.0,
+        "area_name": "Sector 80",
+        "city": "Mohali"
+      }
+    ],
+    "property_count": 2,
+    "preferred_date": "2026-04-03",
+    "preferred_time": "10:00",
+    "status": "confirmed",
+    "payment_status": "completed",
+    "payment_method": "qr_code",
+    "payment_amount": 349.0,
+    "payment_reference": "",
+    "created_by": "admin_manual",
+    "admin_notes": "",
+    "created_at": "2026-04-02T17:14:23.747000"
+  },
+  {
+    "id": "946fbc87-70b8-4b57-a1fc-abe0917afd2a",
+    "user_id": "a963e73d-abf1-4e79-a3c2-cf524cc80c29",
+    "customer_name": "Paras Sharma",
+    "customer_phone": "9915413810",
+    "property_ids": [
+      "6d8e12d5-eb68-414a-be6a-3875e59ee908",
+      "ede21fd4-1d67-47ef-a550-5b221a4cc824",
+      "5daac75d-2d98-4ceb-9950-9751a3329ed0"
+    ],
+    "properties": [
+      {
+        "id": "6d8e12d5-eb68-414a-be6a-3875e59ee908",
+        "title": "2bhk",
+        "rent": 11000.0,
+        "area_name": "Virk colony ",
+        "city": "Patiala "
+      },
+      {
+        "id": "ede21fd4-1d67-47ef-a550-5b221a4cc824",
+        "title": "2bhk ",
+        "rent": 10000.0,
+        "area_name": "Aman nager ",
+        "city": "Patiala "
+      },
+      {
+        "id": "5daac75d-2d98-4ceb-9950-9751a3329ed0",
+        "title": "1bhk",
+        "rent": 7000.0,
+        "area_name": "Aman nager ",
+        "city": "Patiala "
+      }
+    ],
+    "property_count": 3,
+    "preferred_date": "2026-04-02",
+    "preferred_time": "10:00",
+    "status": "confirmed",
+    "payment_status": "completed",
+    "payment_method": "qr_code",
+    "payment_amount": 499.0,
+    "payment_reference": "",
+    "created_by": "admin_manual",
+    "admin_notes": "",
+    "created_at": "2026-04-02T14:39:45.708000"
+  },
+  {
+    "id": "b5e68e66-d60b-454f-b042-e18971ea844b",
+    "user_id": "37dab734-2218-4956-9aa5-c9dbddff5212",
+    "customer_name": "Naveen Sharma",
+    "customer_phone": "7696046257",
+    "property_ids": [
+      "2b8fe855-e7d3-4a97-a844-5b411031db75",
+      "7c943a72-a4a4-4e38-a8cd-0b210c0786b6",
+      "379cf51e-c32e-4a13-a8e4-94974108d4d6",
+      "4ac9fb18-bc91-4dd1-be18-ab3197d14037"
+    ],
+    "properties": [
+      {
+        "id": "2b8fe855-e7d3-4a97-a844-5b411031db75",
+        "title": "3bhk apartment in mohali ",
+        "rent": 24997.0,
+        "area_name": "mohali sector 65",
+        "city": "mohali"
+      },
+      {
+        "id": "7c943a72-a4a4-4e38-a8cd-0b210c0786b6",
+        "title": "2bhk",
+        "rent": 18000.0,
+        "area_name": "Kharar",
+        "city": "Sunny enclave "
+      },
+      {
+        "id": "379cf51e-c32e-4a13-a8e4-94974108d4d6",
+        "title": "2bhk",
+        "rent": 16000.0,
+        "area_name": "Kharar",
+        "city": "Sunny enclave ,sector 124"
+      },
+      {
+        "id": "4ac9fb18-bc91-4dd1-be18-ab3197d14037",
+        "title": "2bhk",
+        "rent": 20000.0,
+        "area_name": "Kharar ",
+        "city": "Near aujala"
+      }
+    ],
+    "property_count": 4,
+    "preferred_date": "2026-04-02",
+    "preferred_time": "10:00",
+    "status": "confirmed",
+    "payment_status": "completed",
+    "payment_method": "cash",
+    "payment_amount": 599.0,
+    "payment_reference": "",
+    "created_by": "admin_manual",
+    "admin_notes": "",
+    "created_at": "2026-04-01T22:22:18.036000"
+  },
+  {
+    "id": "834435c6-dc44-4c1d-a89f-8c0d89fcee56",
+    "user_id": "37dab734-2218-4956-9aa5-c9dbddff5212",
+    "customer_name": "Naveen Sharma",
+    "customer_phone": "7696046257",
+    "property_ids": [
+      "0bd03b38-8f3b-45a4-bf78-16bc7fce9d41",
+      "170d36bb-8c90-47bf-a0fb-f0afa630d623",
+      "379cf51e-c32e-4a13-a8e4-94974108d4d6",
+      "4ac9fb18-bc91-4dd1-be18-ab3197d14037"
+    ],
+    "properties": [
+      {
+        "id": "379cf51e-c32e-4a13-a8e4-94974108d4d6",
+        "title": "2bhk",
+        "rent": 16000.0,
+        "area_name": "Kharar",
+        "city": "Sunny enclave ,sector 124"
+      },
+      {
+        "id": "4ac9fb18-bc91-4dd1-be18-ab3197d14037",
+        "title": "2bhk",
+        "rent": 20000.0,
+        "area_name": "Kharar ",
+        "city": "Near aujala"
+      },
+      {
+        "id": "0bd03b38-8f3b-45a4-bf78-16bc7fce9d41",
+        "title": "3BHK ",
+        "rent": 20000.0,
+        "area_name": "Mander nagar",
+        "city": "Kharar"
+      },
+      {
+        "id": "170d36bb-8c90-47bf-a0fb-f0afa630d623",
+        "title": "3bhk",
+        "rent": 23000.0,
+        "area_name": "Sunny enclave ",
+        "city": "Kharar"
+      }
+    ],
+    "property_count": 4,
+    "preferred_date": "2026-04-02",
+    "preferred_time": "10:00",
+    "status": "confirmed",
+    "payment_status": "completed",
+    "payment_method": "qr_code",
+    "payment_amount": 599.0,
+    "payment_reference": "",
+    "created_by": "admin_manual",
+    "admin_notes": "",
+    "created_at": "2026-04-01T19:53:08.243000"
+  },
+  {
+    "id": "e41b5cb5-22ea-41a8-9b3f-0a97ba41960d",
+    "user_id": "37dab734-2218-4956-9aa5-c9dbddff5212",
+    "customer_name": "Naveen Sharma",
+    "customer_phone": "7696046257",
+    "property_ids": [
+      "2b8fe855-e7d3-4a97-a844-5b411031db75",
+      "113aa4d4-bb4f-47e3-a7cc-680b6b2e4627",
+      "bfb73cc5-05bc-4bc3-b089-e4f2c5b77295"
+    ],
+    "properties": [
+      {
+        "id": "2b8fe855-e7d3-4a97-a844-5b411031db75",
+        "title": "3bhk apartment in mohali ",
+        "rent": 24997.0,
+        "area_name": "mohali sector 65",
+        "city": "mohali"
+      },
+      {
+        "id": "113aa4d4-bb4f-47e3-a7cc-680b6b2e4627",
+        "title": "3bhk",
+        "rent": 30000.0,
+        "area_name": "Sector 80",
+        "city": "Mohali"
+      },
+      {
+        "id": "bfb73cc5-05bc-4bc3-b089-e4f2c5b77295",
+        "title": "4bhk",
+        "rent": 30000.0,
+        "area_name": "Sidhu colony ",
+        "city": "Patiala "
+      }
+    ],
+    "property_count": 3,
+    "preferred_date": "2026-04-02",
+    "preferred_time": "10:00",
+    "status": "confirmed",
+    "payment_status": "completed",
+    "payment_method": "bank_transfer",
+    "payment_amount": 499.0,
+    "payment_reference": "",
+    "created_by": "admin_manual",
+    "admin_notes": "",
+    "created_at": "2026-04-01T18:53:59.908000"
+  },
+  {
+    "id": "af27e6fa-858a-4b5c-aad7-a0a6bb2f1937",
+    "user_id": "37dab734-2218-4956-9aa5-c9dbddff5212",
+    "customer_name": "Naveen Sharma",
+    "customer_phone": "7696046257",
+    "property_ids": [
+      "2b8fe855-e7d3-4a97-a844-5b411031db75",
+      "113aa4d4-bb4f-47e3-a7cc-680b6b2e4627",
+      "379cf51e-c32e-4a13-a8e4-94974108d4d6"
+    ],
+    "properties": [
+      {
+        "id": "2b8fe855-e7d3-4a97-a844-5b411031db75",
+        "title": "3bhk apartment in mohali ",
+        "rent": 24997.0,
+        "area_name": "mohali sector 65",
+        "city": "mohali"
+      },
+      {
+        "id": "379cf51e-c32e-4a13-a8e4-94974108d4d6",
+        "title": "2bhk",
+        "rent": 16000.0,
+        "area_name": "Kharar",
+        "city": "Sunny enclave ,sector 124"
+      },
+      {
+        "id": "113aa4d4-bb4f-47e3-a7cc-680b6b2e4627",
+        "title": "3bhk",
+        "rent": 30000.0,
+        "area_name": "Sector 80",
+        "city": "Mohali"
+      }
+    ],
+    "property_count": 3,
+    "preferred_date": "2026-04-01",
+    "preferred_time": "10:00",
+    "status": "confirmed",
+    "payment_status": "completed",
+    "payment_method": "cash",
+    "payment_amount": 499.0,
+    "payment_reference": "",
+    "created_by": "admin_manual",
+    "admin_notes": "",
+    "created_at": "2026-04-01T12:42:02.597000"
+  },
+  {
+    "id": "8c65d105-36e7-43e3-b40c-585561c7f7bc",
+    "user_id": "37dab734-2218-4956-9aa5-c9dbddff5212",
+    "customer_name": "Naveen Sharma",
+    "customer_phone": "7696046257",
+    "property_ids": [
+      "01f9c907-a72c-4181-932f-38103b54c33b",
+      "9e501a64-d35b-4a58-b595-4edfad040f81",
+      "8097383a-6f5e-46dc-bb8b-f6645df9f81b"
+    ],
+    "properties": [
+      {
+        "id": "01f9c907-a72c-4181-932f-38103b54c33b",
+        "title": "2bhk",
+        "rent": 22000.0,
+        "area_name": "Chandigarh enclave ",
+        "city": "Zirakpur"
+      },
+      {
+        "id": "9e501a64-d35b-4a58-b595-4edfad040f81",
+        "title": "3bhk",
+        "rent": 15000.0,
+        "area_name": "Nagar kheda",
+        "city": "Zirakpur "
+      },
+      {
+        "id": "8097383a-6f5e-46dc-bb8b-f6645df9f81b",
+        "title": "2bhk",
+        "rent": 20000.0,
+        "area_name": "Dhakoli",
+        "city": "Zirakpur "
+      }
+    ],
+    "property_count": 3,
+    "preferred_date": "2026-04-01",
+    "preferred_time": "10:00",
+    "status": "confirmed",
+    "payment_status": "completed",
+    "payment_method": "qr_code",
+    "payment_amount": 499.0,
+    "payment_reference": "",
+    "created_by": "admin_manual",
+    "admin_notes": "",
+    "created_at": "2026-04-01T11:27:50.938000"
+  },
+  {
+    "id": "479c03ca-55e1-4648-9a50-370cd8ab7df5",
+    "user_id": "37dab734-2218-4956-9aa5-c9dbddff5212",
+    "customer_name": "Naveen Sharma",
+    "customer_phone": "7696046257",
+    "property_ids": [
+      "2b8fe855-e7d3-4a97-a844-5b411031db75",
+      "113aa4d4-bb4f-47e3-a7cc-680b6b2e4627"
+    ],
+    "properties": [
+      {
+        "id": "2b8fe855-e7d3-4a97-a844-5b411031db75",
+        "title": "3bhk apartment in mohali ",
+        "rent": 24997.0,
+        "area_name": "mohali sector 65",
+        "city": "mohali"
+      },
+      {
+        "id": "113aa4d4-bb4f-47e3-a7cc-680b6b2e4627",
+        "title": "3bhk",
+        "rent": 30000.0,
+        "area_name": "Sector 80",
+        "city": "Mohali"
+      }
+    ],
+    "property_count": 2,
+    "preferred_date": "2026-04-02",
+    "preferred_time": "10:00",
+    "status": "confirmed",
+    "payment_status": "completed",
+    "payment_method": "upi",
+    "payment_amount": 349.0,
+    "payment_reference": "",
+    "created_by": "admin_manual",
+    "admin_notes": "Visit for Mr N",
+    "created_at": "2026-04-01T08:04:22.008000"
+  },
+  {
+    "id": "00536199-f2c3-42d8-a81a-44e5fdbf4685",
+    "user_id": "37dab734-2218-4956-9aa5-c9dbddff5212",
+    "customer_name": "Naveen Sharma",
+    "customer_phone": "7696046257",
+    "property_ids": [
+      "2b8fe855-e7d3-4a97-a844-5b411031db75",
+      "7c943a72-a4a4-4e38-a8cd-0b210c0786b6",
+      "379cf51e-c32e-4a13-a8e4-94974108d4d6",
+      "4ac9fb18-bc91-4dd1-be18-ab3197d14037"
+    ],
+    "properties": [
+      {
+        "id": "2b8fe855-e7d3-4a97-a844-5b411031db75",
+        "title": "3bhk apartment in mohali ",
+        "rent": 24997.0,
+        "area_name": "mohali sector 65",
+        "city": "mohali"
+      },
+      {
+        "id": "7c943a72-a4a4-4e38-a8cd-0b210c0786b6",
+        "title": "2bhk",
+        "rent": 18000.0,
+        "area_name": "Kharar",
+        "city": "Sunny enclave "
+      },
+      {
+        "id": "379cf51e-c32e-4a13-a8e4-94974108d4d6",
+        "title": "2bhk",
+        "rent": 16000.0,
+        "area_name": "Kharar",
+        "city": "Sunny enclave ,sector 124"
+      },
+      {
+        "id": "4ac9fb18-bc91-4dd1-be18-ab3197d14037",
+        "title": "2bhk",
+        "rent": 20000.0,
+        "area_name": "Kharar ",
+        "city": "Near aujala"
+      }
+    ],
+    "property_count": 4,
+    "preferred_date": "2026-04-01",
+    "preferred_time": "10:00",
+    "status": "confirmed",
+    "payment_status": "completed",
+    "payment_method": "qr_code",
+    "payment_amount": 599.0,
+    "payment_reference": "",
+    "created_by": "admin_manual",
+    "admin_notes": "",
+    "created_at": "2026-03-31T22:57:23.595000"
+  },
+  {
+    "id": "92ee114c-94b6-4b10-a4a5-c9928e6426e6",
+    "user_id": "37dab734-2218-4956-9aa5-c9dbddff5212",
+    "customer_name": "Naveen Sharma",
+    "customer_phone": "7696046257",
+    "property_ids": [
+      "9a0330bb-ce21-4bf2-9913-0309767673db",
+      "a722cc32-a63b-4e75-a490-0cf440e0edb5",
+      "0d9914af-73c8-4a54-8bc4-371d1b268426",
+      "80b19390-1a57-47c3-b44a-6a855ba36067"
+    ],
+    "properties": [
+      {
+        "id": "a722cc32-a63b-4e75-a490-0cf440e0edb5",
+        "title": "1 bhk",
+        "rent": 9000.0,
+        "area_name": "Sector 127",
+        "city": "Kharar"
+      },
+      {
+        "id": "9a0330bb-ce21-4bf2-9913-0309767673db",
+        "title": "2bhk",
+        "rent": 10000.0,
+        "area_name": "Janta nagar ",
+        "city": "Kharar"
+      },
+      {
+        "id": "0d9914af-73c8-4a54-8bc4-371d1b268426",
+        "title": "2bhk",
+        "rent": 10000.0,
+        "area_name": "Shivalik city",
+        "city": "Kharar"
+      },
+      {
+        "id": "80b19390-1a57-47c3-b44a-6a855ba36067",
+        "title": "2bhk",
+        "rent": 12000.0,
+        "area_name": "Jhugian",
+        "city": "Kharar"
+      }
+    ],
+    "property_count": 4,
+    "preferred_date": "2026-04-01",
+    "preferred_time": "11:00",
+    "status": "confirmed",
+    "payment_status": "completed",
+    "payment_method": "qr_code",
+    "payment_amount": 599.0,
+    "payment_reference": "",
+    "created_by": "admin_manual",
+    "admin_notes": "",
+    "created_at": "2026-03-31T22:26:39.959000"
+  },
+  {
+    "id": "d4e72b44-cac7-4b81-831d-e094e877a41e",
+    "user_id": "37dab734-2218-4956-9aa5-c9dbddff5212",
+    "customer_name": "Naveen Sharma",
+    "customer_phone": "7696046257",
+    "property_ids": [
+      "2b8fe855-e7d3-4a97-a844-5b411031db75",
+      "7c943a72-a4a4-4e38-a8cd-0b210c0786b6",
+      "379cf51e-c32e-4a13-a8e4-94974108d4d6",
+      "4ac9fb18-bc91-4dd1-be18-ab3197d14037",
+      "5990d669-c1bf-406a-b052-a40f67b13178"
+    ],
+    "properties": [
+      {
+        "id": "2b8fe855-e7d3-4a97-a844-5b411031db75",
+        "title": "3bhk apartment in mohali ",
+        "rent": 24997.0,
+        "area_name": "mohali sector 65",
+        "city": "mohali"
+      },
+      {
+        "id": "7c943a72-a4a4-4e38-a8cd-0b210c0786b6",
+        "title": "2bhk",
+        "rent": 18000.0,
+        "area_name": "Kharar",
+        "city": "Sunny enclave "
+      },
+      {
+        "id": "379cf51e-c32e-4a13-a8e4-94974108d4d6",
+        "title": "2bhk",
+        "rent": 16000.0,
+        "area_name": "Kharar",
+        "city": "Sunny enclave ,sector 124"
+      },
+      {
+        "id": "4ac9fb18-bc91-4dd1-be18-ab3197d14037",
+        "title": "2bhk",
+        "rent": 20000.0,
+        "area_name": "Kharar ",
+        "city": "Near aujala"
+      },
+      {
+        "id": "5990d669-c1bf-406a-b052-a40f67b13178",
+        "title": "3bhk",
+        "rent": 26000.0,
+        "area_name": "Near darpan city",
+        "city": "Kharar"
+      }
+    ],
+    "property_count": 5,
+    "preferred_date": "2026-04-02",
+    "preferred_time": "11:00",
+    "status": "confirmed",
+    "payment_status": "completed",
+    "payment_method": "cash",
+    "payment_amount": 699.0,
+    "payment_reference": "",
+    "created_by": "admin_manual",
+    "admin_notes": "",
+    "created_at": "2026-03-31T20:11:22.017000"
+  },
+  {
+    "id": "c27dfe3d-65eb-4b18-a120-a72dfb318cb9",
+    "user_id": "75ade7cc-95a2-4371-92f4-da448da41479",
+    "customer_name": "Test After Deploy",
+    "customer_phone": "9998887771",
+    "property_ids": [
+      "2b8fe855-e7d3-4a97-a844-5b411031db75"
+    ],
+    "properties": [
+      {
+        "id": "2b8fe855-e7d3-4a97-a844-5b411031db75",
+        "title": "3bhk apartment in mohali ",
+        "rent": 24997.0,
+        "area_name": "mohali sector 65",
+        "city": "mohali"
+      }
+    ],
+    "property_count": 1,
+    "preferred_date": "2026-04-06",
+    "preferred_time": "11:00",
+    "status": "confirmed",
+    "payment_status": "completed",
+    "payment_method": "qr_code",
+    "payment_amount": 199.0,
+    "payment_reference": null,
+    "created_by": "admin_manual",
+    "admin_notes": null,
+    "created_at": "2026-03-31T09:22:36.696000"
+  },
+  {
+    "id": "18df6514-f3b1-4b4a-9309-a68257dc0c87",
+    "user_id": "618de63d-9dff-4fa7-8ee2-3ec256510e92",
+    "customer_name": "Production Test",
+    "customer_phone": "9871234567",
+    "property_ids": [
+      "2b8fe855-e7d3-4a97-a844-5b411031db75"
+    ],
+    "properties": [
+      {
+        "id": "2b8fe855-e7d3-4a97-a844-5b411031db75",
+        "title": "3bhk apartment in mohali ",
+        "rent": 24997.0,
+        "area_name": "mohali sector 65",
+        "city": "mohali"
+      }
+    ],
+    "property_count": 1,
+    "preferred_date": "2026-04-05",
+    "preferred_time": "10:00",
+    "status": "confirmed",
+    "payment_status": "completed",
+    "payment_method": "qr_code",
+    "payment_amount": 199.0,
+    "payment_reference": null,
+    "created_by": "admin_manual",
+    "admin_notes": null,
+    "created_at": "2026-03-31T09:06:47.618000"
+  },
+  {
+    "id": "b5b9a244-dbe7-4c9c-9d14-301b6aabf725",
+    "user_id": "37dab734-2218-4956-9aa5-c9dbddff5212",
+    "customer_name": "Naveen Sharma",
+    "customer_phone": "7696046257",
+    "property_ids": [
+      "80b19390-1a57-47c3-b44a-6a855ba36067",
+      "9a0330bb-ce21-4bf2-9913-0309767673db"
+    ],
+    "properties": [
+      {
+        "id": "9a0330bb-ce21-4bf2-9913-0309767673db",
+        "title": "2bhk",
+        "rent": 10000.0,
+        "area_name": "Janta nagar ",
+        "city": "Kharar"
+      },
+      {
+        "id": "80b19390-1a57-47c3-b44a-6a855ba36067",
+        "title": "2bhk",
+        "rent": 12000.0,
+        "area_name": "Jhugian",
+        "city": "Kharar"
+      }
+    ],
+    "property_count": 2,
+    "preferred_date": "2026-04-03",
+    "preferred_time": "10:00",
+    "status": "confirmed",
+    "payment_status": "completed",
+    "payment_method": "cash",
+    "payment_amount": 349.0,
+    "payment_reference": "",
+    "created_by": "admin_manual",
+    "admin_notes": "",
+    "created_at": "2026-03-31T09:00:44.619000"
+  },
+  {
+    "id": "04e8bb7b-baf1-46d7-829d-e96c5834f1c8",
+    "user_id": "37dab734-2218-4956-9aa5-c9dbddff5212",
+    "customer_name": "Naveen Sharma",
+    "customer_phone": "7696046257",
+    "property_ids": [
+      "2b8fe855-e7d3-4a97-a844-5b411031db75",
+      "7c943a72-a4a4-4e38-a8cd-0b210c0786b6"
+    ],
+    "properties": [
+      {
+        "id": "2b8fe855-e7d3-4a97-a844-5b411031db75",
+        "title": "3bhk apartment in mohali ",
+        "rent": 24997.0,
+        "area_name": "mohali sector 65",
+        "city": "mohali"
+      },
+      {
+        "id": "7c943a72-a4a4-4e38-a8cd-0b210c0786b6",
+        "title": "2bhk",
+        "rent": 18000.0,
+        "area_name": "Kharar",
+        "city": "Sunny enclave "
+      }
+    ],
+    "property_count": 2,
+    "preferred_date": "2026-03-31",
+    "preferred_time": "16:00",
+    "status": "confirmed",
+    "payment_status": "completed",
+    "payment_method": "cash",
+    "payment_amount": 349.0,
+    "payment_reference": "",
+    "created_by": "admin_manual",
+    "admin_notes": "",
+    "created_at": "2026-03-31T07:22:49.204000"
+  }
+]

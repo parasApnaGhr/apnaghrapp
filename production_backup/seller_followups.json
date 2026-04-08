@@ -1,0 +1,917 @@
+[
+  {
+    "id": "ef647eee-fa98-423e-8680-8eb9867dd725",
+    "seller_id": "26edd405-bd82-49de-948e-195f7c64dc14",
+    "client_phone": "6283135058",
+    "client_name": "ram rameshwar rai",
+    "property_id": null,
+    "visit_id": null,
+    "status": "interested",
+    "is_closed": false,
+    "history": [
+      {
+        "status": "interested",
+        "notes": "urgent need client want to visit ",
+        "next_followup_date": "",
+        "call_duration_mins": 15,
+        "timestamp": "2026-04-08T06:51:00.730759+00:00",
+        "updated_by": "26edd405-bd82-49de-948e-195f7c64dc14"
+      }
+    ],
+    "client_budget": 20000.0,
+    "client_requirements": "2bhk semi furnished ",
+    "total_followups": 1,
+    "created_at": "2026-04-08T06:51:00.730776+00:00",
+    "updated_at": "2026-04-08T06:51:00.730778+00:00",
+    "next_followup_date": "",
+    "_source_phone": "7347383375"
+  },
+  {
+    "id": "7a51067f-8ed6-4f70-962b-26dbb9cc3b06",
+    "seller_id": "26edd405-bd82-49de-948e-195f7c64dc14",
+    "client_phone": "9999988888",
+    "client_name": "Test Client",
+    "property_id": null,
+    "visit_id": null,
+    "status": "new_lead",
+    "is_closed": false,
+    "history": [
+      {
+        "status": "new_lead",
+        "notes": "API test",
+        "next_followup_date": null,
+        "call_duration_mins": null,
+        "timestamp": "2026-04-07T12:12:48.554606+00:00",
+        "updated_by": "26edd405-bd82-49de-948e-195f7c64dc14"
+      }
+    ],
+    "client_budget": null,
+    "client_requirements": null,
+    "total_followups": 1,
+    "created_at": "2026-04-07T12:12:48.554629+00:00",
+    "updated_at": "2026-04-07T12:12:48.554632+00:00",
+    "next_followup_date": null,
+    "_source_phone": "7347383375"
+  },
+  {
+    "id": "11420d94-0a60-4880-bffc-8f4cd1b61393",
+    "seller_id": "26edd405-bd82-49de-948e-195f7c64dc14",
+    "client_phone": "84587879903",
+    "client_name": "pafm,",
+    "property_id": null,
+    "visit_id": null,
+    "status": "interested",
+    "is_closed": false,
+    "history": [
+      {
+        "status": "interested",
+        "notes": "jhhdfjdlsjaksufxhbkcsanc.",
+        "next_followup_date": "2026-04-07T15:56",
+        "call_duration_mins": 23,
+        "timestamp": "2026-04-07T10:28:30.965950+00:00",
+        "updated_by": "26edd405-bd82-49de-948e-195f7c64dc14"
+      }
+    ],
+    "client_budget": 2500.0,
+    "client_requirements": "klfsgjdjdglfwhdfjdl",
+    "total_followups": 1,
+    "created_at": "2026-04-07T10:28:30.965974+00:00",
+    "updated_at": "2026-04-07T10:28:30.965977+00:00",
+    "next_followup_date": "2026-04-07T15:56",
+    "_source_phone": "7347383375"
+  },
+  {
+    "id": "1811f8bf-cb72-4f63-bae9-80b120d4fc76",
+    "seller_id": "26edd405-bd82-49de-948e-195f7c64dc14",
+    "client_phone": "6283058910",
+    "client_name": "Aman",
+    "property_id": null,
+    "visit_id": null,
+    "status": "new_lead",
+    "is_closed": false,
+    "history": [
+      {
+        "status": "new_lead",
+        "notes": "2 bhk furnished house for family ",
+        "next_followup_date": "2026-04-07T15:53",
+        "call_duration_mins": 1,
+        "timestamp": "2026-04-07T10:25:15.623603+00:00",
+        "updated_by": "26edd405-bd82-49de-948e-195f7c64dc14"
+      }
+    ],
+    "client_budget": 23000.0,
+    "client_requirements": "2 bhk",
+    "total_followups": 1,
+    "created_at": "2026-04-07T10:25:15.623620+00:00",
+    "updated_at": "2026-04-07T10:25:15.623623+00:00",
+    "next_followup_date": "2026-04-07T15:53",
+    "_source_phone": "7347383375"
+  },
+  {
+    "id": "ff9c4e25-a707-4679-9c5c-3f4427b78b08",
+    "seller_id": "26edd405-bd82-49de-948e-195f7c64dc14",
+    "client_phone": "99876567887",
+    "client_name": "p",
+    "property_id": null,
+    "visit_id": null,
+    "status": "contacted",
+    "is_closed": false,
+    "history": [
+      {
+        "status": "contacted",
+        "notes": "vkjkjghnvhggnghj",
+        "next_followup_date": "2026-04-07T15:47",
+        "call_duration_mins": 23,
+        "timestamp": "2026-04-07T10:17:56.652285+00:00",
+        "updated_by": "26edd405-bd82-49de-948e-195f7c64dc14"
+      },
+      {
+        "status": "contacted",
+        "notes": "test lead apnaghr IT ",
+        "next_followup_date": "2026-04-07T15:47",
+        "call_duration_mins": null,
+        "timestamp": "2026-04-07T10:18:50.087964+00:00",
+        "updated_by": "26edd405-bd82-49de-948e-195f7c64dc14"
+      }
+    ],
+    "client_budget": 56000.0,
+    "client_requirements": "near model town ",
+    "total_followups": 2,
+    "created_at": "2026-04-07T10:17:56.652312+00:00",
+    "updated_at": "2026-04-07T10:18:50.088056+00:00",
+    "next_followup_date": "2026-04-07T15:47",
+    "_source_phone": "7347383375"
+  },
+  {
+    "id": "a7dab180-fbcb-4089-83d5-bef07a398daa",
+    "seller_id": "26edd405-bd82-49de-948e-195f7c64dc14",
+    "client_phone": "9999888877",
+    "client_name": "Test Client",
+    "property_id": null,
+    "visit_id": null,
+    "status": "new_lead",
+    "is_closed": false,
+    "history": [
+      {
+        "status": "new_lead",
+        "notes": "Test lead from API call testing",
+        "next_followup_date": null,
+        "call_duration_mins": 5,
+        "timestamp": "2026-04-07T10:02:19.200984+00:00",
+        "updated_by": "26edd405-bd82-49de-948e-195f7c64dc14"
+      }
+    ],
+    "client_budget": 20000.0,
+    "client_requirements": "2BHK apartment needed",
+    "total_followups": 1,
+    "created_at": "2026-04-07T10:02:19.200996+00:00",
+    "updated_at": "2026-04-07T10:02:19.200999+00:00",
+    "next_followup_date": null,
+    "_source_phone": "7347383375"
+  },
+  {
+    "id": "6828be0c-6fd8-4c82-a007-b6782152c093",
+    "seller_id": "26edd405-bd82-49de-948e-195f7c64dc14",
+    "client_phone": "9915413810",
+    "client_name": "Paras",
+    "property_id": null,
+    "visit_id": null,
+    "status": "new_lead",
+    "is_closed": false,
+    "history": [
+      {
+        "status": "new_lead",
+        "notes": "Finalizes in 20 days ",
+        "next_followup_date": "2026-04-07T15:22",
+        "call_duration_mins": 15,
+        "timestamp": "2026-04-07T09:54:41.802802+00:00",
+        "updated_by": "26edd405-bd82-49de-948e-195f7c64dc14"
+      }
+    ],
+    "client_budget": 25000.0,
+    "client_requirements": "Bathinda model town ",
+    "total_followups": 1,
+    "created_at": "2026-04-07T09:54:41.802821+00:00",
+    "updated_at": "2026-04-07T09:54:41.802825+00:00",
+    "next_followup_date": "2026-04-07T15:22",
+    "_source_phone": "7347383375"
+  },
+  {
+    "id": "d96a500b-d1fa-4049-be23-e7587701ca61",
+    "seller_id": "26edd405-bd82-49de-948e-195f7c64dc14",
+    "client_phone": "7986277843",
+    "client_name": "RASHMI ",
+    "property_id": null,
+    "visit_id": null,
+    "status": "interested",
+    "is_closed": false,
+    "history": [
+      {
+        "status": "interested",
+        "notes": "GATED SOCIETY WITH IN A 2TO 3 DAYS URBAN ESTATE",
+        "next_followup_date": "",
+        "call_duration_mins": 10,
+        "timestamp": "2026-04-07T09:47:46.079003+00:00",
+        "updated_by": "26edd405-bd82-49de-948e-195f7c64dc14"
+      }
+    ],
+    "client_budget": 20000.0,
+    "client_requirements": "2BHK+ NON FURNISHED ",
+    "total_followups": 1,
+    "created_at": "2026-04-07T09:47:46.079018+00:00",
+    "updated_at": "2026-04-07T09:47:46.079022+00:00",
+    "next_followup_date": "",
+    "_source_phone": "7347383375"
+  },
+  {
+    "id": "b9ef2db7-35c4-4528-a2ed-deb45e395c32",
+    "seller_id": "26edd405-bd82-49de-948e-195f7c64dc14",
+    "client_phone": "7009313046",
+    "client_name": "tarun ",
+    "property_id": null,
+    "visit_id": null,
+    "status": "interested",
+    "is_closed": false,
+    "history": [
+      {
+        "status": "interested",
+        "notes": "immediate buyer ",
+        "next_followup_date": "",
+        "call_duration_mins": 20,
+        "timestamp": "2026-04-05T11:28:52.845766+00:00",
+        "updated_by": "26edd405-bd82-49de-948e-195f7c64dc14"
+      },
+      {
+        "status": "interested",
+        "notes": "test update",
+        "next_followup_date": null,
+        "call_duration_mins": 5,
+        "timestamp": "2026-04-07T09:12:47.947621+00:00",
+        "updated_by": "26edd405-bd82-49de-948e-195f7c64dc14"
+      }
+    ],
+    "client_budget": 45000.0,
+    "client_requirements": "fully furnished",
+    "total_followups": 2,
+    "created_at": "2026-04-05T11:28:52.845776+00:00",
+    "updated_at": "2026-04-07T09:12:47.947671+00:00",
+    "next_followup_date": null,
+    "_source_phone": "7347383375"
+  },
+  {
+    "id": "2168e906-bc9d-4fef-8972-f34c24f05c8a",
+    "seller_id": "26edd405-bd82-49de-948e-195f7c64dc14",
+    "client_phone": "855699239",
+    "client_name": "manjot",
+    "property_id": null,
+    "visit_id": null,
+    "status": "interested",
+    "is_closed": false,
+    "history": [
+      {
+        "status": "interested",
+        "notes": "sec 74 91 2bhk fully furnished immediate location mohali",
+        "next_followup_date": "",
+        "call_duration_mins": 10,
+        "timestamp": "2026-04-05T11:26:49.046475+00:00",
+        "updated_by": "26edd405-bd82-49de-948e-195f7c64dc14"
+      }
+    ],
+    "client_budget": 15000.0,
+    "client_requirements": "2bhk fully furnished ",
+    "total_followups": 1,
+    "created_at": "2026-04-05T11:26:49.046485+00:00",
+    "updated_at": "2026-04-05T11:26:49.046487+00:00",
+    "next_followup_date": "",
+    "_source_phone": "7347383375"
+  },
+  {
+    "id": "3f9a56d0-6f32-4e7d-afbd-497ccadf41a6",
+    "seller_id": "26edd405-bd82-49de-948e-195f7c64dc14",
+    "client_phone": "8956316385",
+    "client_name": "pallavi ",
+    "property_id": null,
+    "visit_id": null,
+    "status": "interested",
+    "is_closed": false,
+    "history": [
+      {
+        "status": "interested",
+        "notes": "3bhk+furnished + semi furnished all over chandigarh \nbudget :- 30k\nurgent neeed",
+        "next_followup_date": "",
+        "call_duration_mins": 14,
+        "timestamp": "2026-04-05T08:13:10.301339+00:00",
+        "updated_by": "26edd405-bd82-49de-948e-195f7c64dc14"
+      }
+    ],
+    "client_budget": 30000.0,
+    "client_requirements": "3bhk furnished or semi furnished ",
+    "total_followups": 1,
+    "created_at": "2026-04-05T08:13:10.301352+00:00",
+    "updated_at": "2026-04-05T08:13:10.301355+00:00",
+    "next_followup_date": "",
+    "_source_phone": "7347383375"
+  },
+  {
+    "id": "78f0ab50-e975-404c-a385-0924bb8f04c9",
+    "seller_id": "26edd405-bd82-49de-948e-195f7c64dc14",
+    "client_phone": "8696520009",
+    "client_name": "sandeep",
+    "property_id": null,
+    "visit_id": null,
+    "status": "interested",
+    "is_closed": false,
+    "history": [
+      {
+        "status": "interested",
+        "notes": "patiala:- bhupender road \nfurnished + 20k urgently need with in 3 days ",
+        "next_followup_date": "",
+        "call_duration_mins": 15,
+        "timestamp": "2026-04-04T09:44:32.135862+00:00",
+        "updated_by": "26edd405-bd82-49de-948e-195f7c64dc14"
+      }
+    ],
+    "client_budget": 20000.0,
+    "client_requirements": "4bhk independent house ",
+    "total_followups": 1,
+    "created_at": "2026-04-04T09:44:32.135919+00:00",
+    "updated_at": "2026-04-04T09:44:32.135925+00:00",
+    "next_followup_date": "",
+    "_source_phone": "7347383375"
+  },
+  {
+    "id": "35cb6c44-f9b6-4726-8fa6-2310a3383948",
+    "seller_id": "26edd405-bd82-49de-948e-195f7c64dc14",
+    "client_phone": "969860002",
+    "client_name": "Anjali",
+    "property_id": null,
+    "visit_id": null,
+    "status": "interested",
+    "is_closed": false,
+    "history": [
+      {
+        "status": "interested",
+        "notes": "patiala :- new bus stand , snow road \nneed urgently with in 3 days \nsunday visit ",
+        "next_followup_date": "",
+        "call_duration_mins": 10,
+        "timestamp": "2026-04-04T06:01:59.951735+00:00",
+        "updated_by": "26edd405-bd82-49de-948e-195f7c64dc14"
+      }
+    ],
+    "client_budget": 13000.0,
+    "client_requirements": "2bhk+furnished",
+    "total_followups": 1,
+    "created_at": "2026-04-04T06:01:59.951753+00:00",
+    "updated_at": "2026-04-04T06:01:59.951756+00:00",
+    "next_followup_date": "",
+    "_source_phone": "7347383375"
+  },
+  {
+    "id": "9c864440-7f05-473f-a324-49a74670aef2",
+    "seller_id": "26edd405-bd82-49de-948e-195f7c64dc14",
+    "client_phone": "9915642762",
+    "client_name": "Pushppreet singh",
+    "property_id": null,
+    "visit_id": null,
+    "status": "interested",
+    "is_closed": false,
+    "history": [
+      {
+        "status": "interested",
+        "notes": "patiala:-independent 3bhk\nnear university \nbudget :- 10000\nsemi furnished \nfinal within 2 to 3 days\n",
+        "next_followup_date": "",
+        "call_duration_mins": 10,
+        "timestamp": "2026-04-03T11:50:04.498934+00:00",
+        "updated_by": "26edd405-bd82-49de-948e-195f7c64dc14"
+      }
+    ],
+    "client_budget": 10000.0,
+    "client_requirements": "independent 3bhk ",
+    "total_followups": 1,
+    "created_at": "2026-04-03T11:50:04.498948+00:00",
+    "updated_at": "2026-04-03T11:50:04.498950+00:00",
+    "next_followup_date": "",
+    "_source_phone": "7347383375"
+  },
+  {
+    "id": "646ed083-4021-4bc9-8a0d-bd488780aee7",
+    "seller_id": "26edd405-bd82-49de-948e-195f7c64dc14",
+    "client_phone": "9420162665",
+    "client_name": "AMEET ",
+    "property_id": null,
+    "visit_id": null,
+    "status": "interested",
+    "is_closed": false,
+    "history": [
+      {
+        "status": "interested",
+        "notes": "LOCATION:- PATIALA :- MOTI BAGH , NEW OFFICER COLONY, ROSE AVENUE \nBUDGET:- 15K + NON FURNISHED \nURGENTLY NEED WITH IN 5 DAYS ",
+        "next_followup_date": "",
+        "call_duration_mins": 10,
+        "timestamp": "2026-04-03T09:19:20.474644+00:00",
+        "updated_by": "26edd405-bd82-49de-948e-195f7c64dc14"
+      }
+    ],
+    "client_budget": 15000.0,
+    "client_requirements": "3BHK OR 2BHK GROUND FLOOR ",
+    "total_followups": 1,
+    "created_at": "2026-04-03T09:19:20.474692+00:00",
+    "updated_at": "2026-04-03T09:19:20.474698+00:00",
+    "next_followup_date": "",
+    "_source_phone": "7347383375"
+  },
+  {
+    "id": "15301e48-1258-46fa-8093-5265a1247d9e",
+    "seller_id": "26edd405-bd82-49de-948e-195f7c64dc14",
+    "client_phone": "6371847473",
+    "client_name": "DOCTOR ",
+    "property_id": null,
+    "visit_id": null,
+    "status": "contacted",
+    "is_closed": false,
+    "history": [
+      {
+        "status": "contacted",
+        "notes": "NEED 2BHK OR 3 BHK \nLOCATION :- PATIALA , URBAN ESTATE PHASE 1 O 2 , RAJPUR \nNON FURNISHED \nNEED WITH IN 3 DAYS \nVISIT :-ON SUNDAY \nPASSION :- DOCTOR",
+        "next_followup_date": "",
+        "call_duration_mins": 10,
+        "timestamp": "2026-04-03T06:47:41.229730+00:00",
+        "updated_by": "26edd405-bd82-49de-948e-195f7c64dc14"
+      }
+    ],
+    "client_budget": 12000.0,
+    "client_requirements": "3BHK OR 2BHK NON FURNISHED",
+    "total_followups": 1,
+    "created_at": "2026-04-03T06:47:41.229755+00:00",
+    "updated_at": "2026-04-03T06:47:41.229757+00:00",
+    "next_followup_date": "",
+    "_source_phone": "7347383375"
+  },
+  {
+    "id": "0b1ced86-86b3-4f7a-8590-8c51d44e1c92",
+    "seller_id": "26edd405-bd82-49de-948e-195f7c64dc14",
+    "client_phone": "6284505273",
+    "client_name": "Garima ",
+    "property_id": null,
+    "visit_id": null,
+    "status": "contacted",
+    "is_closed": false,
+    "history": [
+      {
+        "status": "contacted",
+        "notes": "1bhk+fully furnished+8k nearby durga mandir rajpura urgently need visit on sunday government job\n",
+        "next_followup_date": "",
+        "call_duration_mins": 10,
+        "timestamp": "2026-04-03T06:15:16.499949+00:00",
+        "updated_by": "26edd405-bd82-49de-948e-195f7c64dc14"
+      }
+    ],
+    "client_budget": 8000.0,
+    "client_requirements": "1bhk nearby durga mandir rajpur",
+    "total_followups": 1,
+    "created_at": "2026-04-03T06:15:16.499991+00:00",
+    "updated_at": "2026-04-03T06:15:16.499994+00:00",
+    "next_followup_date": "",
+    "_source_phone": "7347383375"
+  },
+  {
+    "id": "f194aa94-2f58-4b65-b8d4-15dd0494eccb",
+    "seller_id": "26edd405-bd82-49de-948e-195f7c64dc14",
+    "client_phone": "7277907674",
+    "client_name": "Nimit Agrawal",
+    "property_id": null,
+    "visit_id": null,
+    "status": "contacted",
+    "is_closed": false,
+    "history": [
+      {
+        "status": "contacted",
+        "notes": "2bhk or 3bhk \nlocation :- patiala \nsemi furnished all over patiala",
+        "next_followup_date": "",
+        "call_duration_mins": 15,
+        "timestamp": "2026-04-03T05:39:57.799863+00:00",
+        "updated_by": "26edd405-bd82-49de-948e-195f7c64dc14"
+      }
+    ],
+    "client_budget": 18000.0,
+    "client_requirements": "2bhk or 3bhk location:- patiala semi furnished urgently need",
+    "total_followups": 1,
+    "created_at": "2026-04-03T05:39:57.799878+00:00",
+    "updated_at": "2026-04-03T05:39:57.799880+00:00",
+    "next_followup_date": "",
+    "_source_phone": "7347383375"
+  },
+  {
+    "id": "f0d3b2fc-1a89-4a32-b511-aab6e0a94012",
+    "seller_id": "0392f465-6658-4995-a51a-3a2b43cc384f",
+    "client_phone": "9599115978",
+    "client_name": "Nitin Sharma",
+    "property_id": null,
+    "visit_id": null,
+    "status": "contacted",
+    "is_closed": false,
+    "history": [
+      {
+        "status": "contacted",
+        "notes": "Location . punchkuola sector-9\nBudget - 25000\nSeme furnished  \n3 BHK\nvisit time - 15 Days ",
+        "next_followup_date": "2026-04-08T11:38",
+        "call_duration_mins": 10,
+        "timestamp": "2026-04-08T06:12:37.832643+00:00",
+        "updated_by": "0392f465-6658-4995-a51a-3a2b43cc384f"
+      }
+    ],
+    "client_budget": 25000.0,
+    "client_requirements": "3BHK",
+    "total_followups": 1,
+    "created_at": "2026-04-08T06:12:37.832669+00:00",
+    "updated_at": "2026-04-08T06:12:37.832673+00:00",
+    "next_followup_date": "2026-04-08T11:38",
+    "_source_phone": "9780179766"
+  },
+  {
+    "id": "715c5598-d8dc-4187-a598-5ece494e23c1",
+    "seller_id": "0392f465-6658-4995-a51a-3a2b43cc384f",
+    "client_phone": "9755095707",
+    "client_name": "Houseing User",
+    "property_id": null,
+    "visit_id": null,
+    "status": "contacted",
+    "is_closed": false,
+    "history": [
+      {
+        "status": "contacted",
+        "notes": "Location.Ludiyana\n2BHHK Furnished\nBudget.20000 TO 25000\nVisit time.1 TO 2 Days",
+        "next_followup_date": "2026-04-08T11:10",
+        "call_duration_mins": 2,
+        "timestamp": "2026-04-08T05:43:28.564681+00:00",
+        "updated_by": "0392f465-6658-4995-a51a-3a2b43cc384f"
+      }
+    ],
+    "client_budget": 25000.0,
+    "client_requirements": "2BHK",
+    "total_followups": 1,
+    "created_at": "2026-04-08T05:43:28.564706+00:00",
+    "updated_at": "2026-04-08T05:43:28.564708+00:00",
+    "next_followup_date": "2026-04-08T11:10",
+    "_source_phone": "9780179766"
+  },
+  {
+    "id": "cbb26662-dd89-4c1d-a4fc-686da59c2ca3",
+    "seller_id": "0392f465-6658-4995-a51a-3a2b43cc384f",
+    "client_phone": "8558060473",
+    "client_name": "Astha Sharma ",
+    "property_id": null,
+    "visit_id": null,
+    "status": "contacted",
+    "is_closed": false,
+    "history": [
+      {
+        "status": "contacted",
+        "notes": "location.zirakpur green lotus road\n2BHK non furnished \nbudget 15000 TO 18000\nvisit timeing 1 To 2 days ",
+        "next_followup_date": "2026-04-07T18:31",
+        "call_duration_mins": 10,
+        "timestamp": "2026-04-07T13:04:44.215676+00:00",
+        "updated_by": "0392f465-6658-4995-a51a-3a2b43cc384f"
+      }
+    ],
+    "client_budget": 18001.0,
+    "client_requirements": "2BHK",
+    "total_followups": 1,
+    "created_at": "2026-04-07T13:04:44.215713+00:00",
+    "updated_at": "2026-04-07T13:04:44.215716+00:00",
+    "next_followup_date": "2026-04-07T18:31",
+    "_source_phone": "9780179766"
+  },
+  {
+    "id": "3e62a17d-3e4b-4584-a4a1-76afdbeee5c8",
+    "seller_id": "0392f465-6658-4995-a51a-3a2b43cc384f",
+    "client_phone": "9988772447",
+    "client_name": "SandyKiran ",
+    "property_id": null,
+    "visit_id": null,
+    "status": "contacted",
+    "is_closed": false,
+    "history": [
+      {
+        "status": "contacted",
+        "notes": "location.zirakpur & punchkula inipendent house\nBudget.2 Cr\ntimeing.1 to 2 days urgent need",
+        "next_followup_date": "2026-04-07T17:17",
+        "call_duration_mins": 10,
+        "timestamp": "2026-04-07T11:53:08.232484+00:00",
+        "updated_by": "0392f465-6658-4995-a51a-3a2b43cc384f"
+      }
+    ],
+    "client_budget": 20000000.0,
+    "client_requirements": "4BHK furnished",
+    "total_followups": 1,
+    "created_at": "2026-04-07T11:53:08.232500+00:00",
+    "updated_at": "2026-04-07T11:53:08.232502+00:00",
+    "next_followup_date": "2026-04-07T17:17",
+    "_source_phone": "9780179766"
+  },
+  {
+    "id": "9826710d-e85a-414b-ba92-fbd99673397a",
+    "seller_id": "0392f465-6658-4995-a51a-3a2b43cc384f",
+    "client_phone": "9915413810",
+    "client_name": "Paras Sharma",
+    "property_id": null,
+    "visit_id": null,
+    "status": "negotiating",
+    "is_closed": false,
+    "history": [
+      {
+        "status": "negotiating",
+        "notes": "Test test test About to finalize property ",
+        "next_followup_date": "2026-04-07T17:03",
+        "call_duration_mins": 15,
+        "timestamp": "2026-04-07T11:33:45.090821+00:00",
+        "updated_by": "0392f465-6658-4995-a51a-3a2b43cc384f"
+      }
+    ],
+    "client_budget": 56000.0,
+    "client_requirements": "House ",
+    "total_followups": 1,
+    "created_at": "2026-04-07T11:33:45.090841+00:00",
+    "updated_at": "2026-04-07T11:33:45.090844+00:00",
+    "next_followup_date": "2026-04-07T17:03",
+    "_source_phone": "9780179766"
+  },
+  {
+    "id": "bde0eada-deba-4239-b402-79f4351cd917",
+    "seller_id": "0392f465-6658-4995-a51a-3a2b43cc384f",
+    "client_phone": "8499844467",
+    "client_name": "suman kumar",
+    "property_id": null,
+    "visit_id": null,
+    "status": "new_lead",
+    "is_closed": false,
+    "history": [
+      {
+        "status": "new_lead",
+        "notes": "Loction.punchkula\n3BHK\nFurnished\nbudget.25000\ntimeing.1to2 days",
+        "next_followup_date": "2026-04-07T16:58",
+        "call_duration_mins": 10,
+        "timestamp": "2026-04-07T11:31:14.312101+00:00",
+        "updated_by": "0392f465-6658-4995-a51a-3a2b43cc384f"
+      }
+    ],
+    "client_budget": 25000.0,
+    "client_requirements": "3BHK",
+    "total_followups": 1,
+    "created_at": "2026-04-07T11:31:14.312121+00:00",
+    "updated_at": "2026-04-07T11:31:14.312125+00:00",
+    "next_followup_date": "2026-04-07T16:58",
+    "_source_phone": "9780179766"
+  },
+  {
+    "id": "e1f4ea61-21f3-41f7-8d86-caf69f52ffbe",
+    "seller_id": "0392f465-6658-4995-a51a-3a2b43cc384f",
+    "client_phone": "887654467",
+    "client_name": "phgtfhggh",
+    "property_id": null,
+    "visit_id": null,
+    "status": "new_lead",
+    "is_closed": false,
+    "history": [
+      {
+        "status": "new_lead",
+        "notes": "jyftyguk;lldc",
+        "next_followup_date": "2026-04-07T16:36",
+        "call_duration_mins": 8,
+        "timestamp": "2026-04-07T11:06:50.399794+00:00",
+        "updated_by": "0392f465-6658-4995-a51a-3a2b43cc384f"
+      }
+    ],
+    "client_budget": 76988.0,
+    "client_requirements": "jhjytt8p[p",
+    "total_followups": 1,
+    "created_at": "2026-04-07T11:06:50.399820+00:00",
+    "updated_at": "2026-04-07T11:06:50.399824+00:00",
+    "next_followup_date": "2026-04-07T16:36",
+    "_source_phone": "9780179766"
+  },
+  {
+    "id": "fccf40ce-1b1e-456d-8445-a283e8b71005",
+    "seller_id": "0392f465-6658-4995-a51a-3a2b43cc384f",
+    "client_phone": "6283058910",
+    "client_name": "Aman",
+    "property_id": null,
+    "visit_id": null,
+    "status": "interested",
+    "is_closed": false,
+    "history": [
+      {
+        "status": "interested",
+        "notes": "2 bhk house for family unfurnished ",
+        "next_followup_date": "2026-04-07T16:39",
+        "call_duration_mins": 3,
+        "timestamp": "2026-04-07T11:05:58.743450+00:00",
+        "updated_by": "0392f465-6658-4995-a51a-3a2b43cc384f"
+      }
+    ],
+    "client_budget": 25000.0,
+    "client_requirements": "2 bhk house",
+    "total_followups": 1,
+    "created_at": "2026-04-07T11:05:58.743467+00:00",
+    "updated_at": "2026-04-07T11:05:58.743470+00:00",
+    "next_followup_date": "2026-04-07T16:39",
+    "_source_phone": "9780179766"
+  },
+  {
+    "id": "a90b0bba-818f-42a0-bf61-5277dfe13335",
+    "seller_id": "0392f465-6658-4995-a51a-3a2b43cc384f",
+    "client_phone": "+91 97927 82607",
+    "client_name": "Pallavi gupta",
+    "property_id": null,
+    "visit_id": null,
+    "status": "interested",
+    "is_closed": false,
+    "history": [
+      {
+        "status": "interested",
+        "notes": "3 Bhk \nBudget 25k \nLocation Zirakpur \nFully furnished \n+ Ac .tv.gas pipe line compulsory",
+        "next_followup_date": "2026-04-05T12:33",
+        "call_duration_mins": 10,
+        "timestamp": "2026-04-05T07:03:56.081691+00:00",
+        "updated_by": "0392f465-6658-4995-a51a-3a2b43cc384f"
+      }
+    ],
+    "client_budget": 25000.0,
+    "client_requirements": "3Bhk ",
+    "total_followups": 1,
+    "created_at": "2026-04-05T07:03:56.081715+00:00",
+    "updated_at": "2026-04-05T07:03:56.081719+00:00",
+    "next_followup_date": "2026-04-05T12:33",
+    "_source_phone": "9780179766"
+  },
+  {
+    "id": "b2678922-2d68-4ae3-85d0-0c0598d07400",
+    "seller_id": "0392f465-6658-4995-a51a-3a2b43cc384f",
+    "client_phone": "7017397673",
+    "client_name": "Benjamin",
+    "property_id": null,
+    "visit_id": null,
+    "status": "interested",
+    "is_closed": false,
+    "history": [
+      {
+        "status": "interested",
+        "notes": "Location:- Zirakpur I require 2 or 3 bhk budget 25 k  ( not a ground floor ) with secured security and with a condition that the premises will be used for residential and Administrative Office  purpose  as it\u2019s a online business no customer will visit the flat .",
+        "next_followup_date": "2026-04-05T11:02",
+        "call_duration_mins": 10,
+        "timestamp": "2026-04-05T05:35:28.049825+00:00",
+        "updated_by": "0392f465-6658-4995-a51a-3a2b43cc384f"
+      }
+    ],
+    "client_budget": 25000.0,
+    "client_requirements": "2Bhk to 3Bhk",
+    "total_followups": 1,
+    "created_at": "2026-04-05T05:35:28.049843+00:00",
+    "updated_at": "2026-04-05T05:35:28.049846+00:00",
+    "next_followup_date": "2026-04-05T11:02",
+    "_source_phone": "9780179766"
+  },
+  {
+    "id": "c7ff6a2a-0098-4d20-aeb5-8299c04098f8",
+    "seller_id": "0392f465-6658-4995-a51a-3a2b43cc384f",
+    "client_phone": "9809877501",
+    "client_name": "Ena",
+    "property_id": null,
+    "visit_id": null,
+    "status": "new_lead",
+    "is_closed": false,
+    "history": [
+      {
+        "status": "new_lead",
+        "notes": "Location:- Ludhiana:- BRS nagar, rishi nagar , ghumar mandir \n3bhk \n20k + non furnished \nFinal with in a week",
+        "next_followup_date": "2026-04-04T18:27",
+        "call_duration_mins": 10,
+        "timestamp": "2026-04-04T12:59:57.091971+00:00",
+        "updated_by": "0392f465-6658-4995-a51a-3a2b43cc384f"
+      }
+    ],
+    "client_budget": 25000.0,
+    "client_requirements": "3Bhk ",
+    "total_followups": 1,
+    "created_at": "2026-04-04T12:59:57.092032+00:00",
+    "updated_at": "2026-04-04T12:59:57.092038+00:00",
+    "next_followup_date": "2026-04-04T18:27",
+    "_source_phone": "9780179766"
+  },
+  {
+    "id": "077f323e-93b1-47cb-a8ca-ddcbf7f320ee",
+    "seller_id": "0392f465-6658-4995-a51a-3a2b43cc384f",
+    "client_phone": "7651868317",
+    "client_name": "Pooja Mishra ",
+    "property_id": null,
+    "visit_id": null,
+    "status": "interested",
+    "is_closed": false,
+    "history": [
+      {
+        "status": "interested",
+        "notes": "Location:- sector 7 road 2 Bhk Budget:- 25k Fully furnished 1to 2 days final",
+        "next_followup_date": "2026-04-04T11:34",
+        "call_duration_mins": 7,
+        "timestamp": "2026-04-04T06:04:20.264847+00:00",
+        "updated_by": "0392f465-6658-4995-a51a-3a2b43cc384f"
+      }
+    ],
+    "client_budget": 25000.0,
+    "client_requirements": "2Bhk",
+    "total_followups": 1,
+    "created_at": "2026-04-04T06:04:20.264868+00:00",
+    "updated_at": "2026-04-04T06:04:20.264872+00:00",
+    "next_followup_date": "2026-04-04T11:34",
+    "_source_phone": "9780179766"
+  },
+  {
+    "id": "2b6ae7af-04f5-4586-873b-4349dea655f2",
+    "seller_id": "0392f465-6658-4995-a51a-3a2b43cc384f",
+    "client_phone": "8868816820",
+    "client_name": "Abhijeet Chaudhary ",
+    "property_id": null,
+    "visit_id": null,
+    "status": "interested",
+    "is_closed": false,
+    "history": [
+      {
+        "status": "contacted",
+        "notes": "Location:- Zirakpur \nBudget:- 20k to 25k \nFurnished or non furnished \n2 to 3 days final ",
+        "next_followup_date": "2026-04-04T11:10",
+        "call_duration_mins": 2,
+        "timestamp": "2026-04-04T05:43:41.983551+00:00",
+        "updated_by": "0392f465-6658-4995-a51a-3a2b43cc384f"
+      },
+      {
+        "status": "interested",
+        "notes": "Location:- Zirakpur 2Bhk to 3Bhk Budget:- 20k to 25k furnished and non furnished",
+        "next_followup_date": "2026-04-04T11:10",
+        "call_duration_mins": 2,
+        "timestamp": "2026-04-04T05:51:59.987703+00:00",
+        "updated_by": "0392f465-6658-4995-a51a-3a2b43cc384f"
+      }
+    ],
+    "client_budget": 25000.0,
+    "client_requirements": "2Bhk to 3bhk ",
+    "total_followups": 2,
+    "created_at": "2026-04-04T05:43:41.983668+00:00",
+    "updated_at": "2026-04-04T05:51:59.987791+00:00",
+    "next_followup_date": "2026-04-04T11:10",
+    "_source_phone": "9780179766"
+  },
+  {
+    "id": "884cd4b9-c421-4cba-9c97-f9e7662576df",
+    "seller_id": "0392f465-6658-4995-a51a-3a2b43cc384f",
+    "client_phone": "76968 16988",
+    "client_name": "Amit Arora ",
+    "property_id": null,
+    "visit_id": null,
+    "status": "interested",
+    "is_closed": false,
+    "history": [
+      {
+        "status": "interested",
+        "notes": "3Bhk \nLocation:- Zirakpur vip road \nBudget:- 25000\n",
+        "next_followup_date": "2026-04-03T16:48",
+        "call_duration_mins": 10,
+        "timestamp": "2026-04-03T11:20:23.984239+00:00",
+        "updated_by": "0392f465-6658-4995-a51a-3a2b43cc384f"
+      }
+    ],
+    "client_budget": 25000.0,
+    "client_requirements": "3 Bhk ",
+    "total_followups": 1,
+    "created_at": "2026-04-03T11:20:23.984259+00:00",
+    "updated_at": "2026-04-03T11:20:23.984262+00:00",
+    "next_followup_date": "2026-04-03T16:48",
+    "_source_phone": "9780179766"
+  },
+  {
+    "id": "f2a4a1e3-8755-45e4-ac8e-0322b48caa4a",
+    "seller_id": "0392f465-6658-4995-a51a-3a2b43cc384f",
+    "client_phone": "9911779932",
+    "client_name": "Housing user ",
+    "property_id": null,
+    "visit_id": null,
+    "status": "interested",
+    "is_closed": false,
+    "history": [
+      {
+        "status": "interested",
+        "notes": "Location :- ludhiana 2Bhk 3Bhk Furnished or non furnished Budget :- 50000 Visit :- Monday or Tuesday Timing after :- 4:30",
+        "next_followup_date": "",
+        "call_duration_mins": 10,
+        "timestamp": "2026-04-03T10:16:52.041595+00:00",
+        "updated_by": "0392f465-6658-4995-a51a-3a2b43cc384f"
+      }
+    ],
+    "client_budget": 50000.0,
+    "client_requirements": "2Bhk to 3Bhk  furnished or non furnished ",
+    "total_followups": 1,
+    "created_at": "2026-04-03T10:16:52.041609+00:00",
+    "updated_at": "2026-04-03T10:16:52.041611+00:00",
+    "next_followup_date": "",
+    "_source_phone": "9780179766"
+  }
+]
