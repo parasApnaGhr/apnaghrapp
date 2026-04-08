@@ -363,7 +363,7 @@ Shared by: {current_user['name']} (ApnaGhr Partner)"""
         status: Optional[str] = None,
         current_user: dict = Depends(get_current_user)
     ):
-        """Get all referrals by this seller"""
+        """Get all referrals by this seller - OPTIMIZED"""
         if current_user.get('role') != 'seller':
             raise HTTPException(status_code=403, detail="Seller access required")
         
@@ -376,28 +376,47 @@ Shared by: {current_user['name']} (ApnaGhr Partner)"""
             {"_id": 0}
         ).sort("created_at", -1).limit(100).to_list(100)
         
-        # Enrich with property and client details
+        if not referrals:
+            return referrals
+        
+        # Batch collect all IDs
+        property_ids = set()
+        client_ids = set()
         for ref in referrals:
-            # Get property info
-            prop = await db.properties.find_one(
-                {"id": ref.get("property_id")},
-                {"_id": 0, "title": 1, "area_name": 1, "city": 1, "rent": 1, "bhk": 1, "images": 1}
-            )
-            ref["property"] = prop
-            
-            # Get client info if converted
+            if ref.get("property_id"):
+                property_ids.add(ref["property_id"])
             if ref.get("client_id"):
-                client = await db.users.find_one(
-                    {"id": ref["client_id"]},
-                    {"_id": 0, "name": 1, "phone": 1}
-                )
-                ref["client"] = client
+                client_ids.add(ref["client_id"])
+        
+        # Batch fetch properties
+        prop_map = {}
+        if property_ids:
+            props = await db.properties.find(
+                {"id": {"$in": list(property_ids)}},
+                {"_id": 0, "id": 1, "title": 1, "area_name": 1, "city": 1, "rent": 1, "bhk": 1, "images": 1}
+            ).to_list(None)
+            prop_map = {p["id"]: p for p in props}
+        
+        # Batch fetch clients
+        client_map = {}
+        if client_ids:
+            clients = await db.users.find(
+                {"id": {"$in": list(client_ids)}},
+                {"_id": 0, "id": 1, "name": 1, "phone": 1}
+            ).to_list(None)
+            client_map = {c["id"]: c for c in clients}
+        
+        # Enrich referrals
+        for ref in referrals:
+            ref["property"] = prop_map.get(ref.get("property_id"))
+            if ref.get("client_id"):
+                ref["client"] = client_map.get(ref["client_id"])
         
         return referrals
     
     @api_router.get("/seller/visits")
     async def get_seller_client_visits(current_user: dict = Depends(get_current_user)):
-        """Get visits made by clients referred by this seller"""
+        """Get visits made by clients referred by this seller - OPTIMIZED"""
         if current_user.get('role') != 'seller':
             raise HTTPException(status_code=403, detail="Seller access required")
         
@@ -409,30 +428,45 @@ Shared by: {current_user['name']} (ApnaGhr Partner)"""
             {"_id": 0}
         ).sort("created_at", -1).limit(50).to_list(50)
         
-        # Enrich with client, rider, and property details
+        if not visits:
+            return visits
+        
+        # Batch collect all IDs
+        user_ids = set()
+        property_ids = set()
         for visit in visits:
-            # Get customer info
-            customer = await db.users.find_one(
-                {"id": visit.get("customer_id")},
-                {"_id": 0, "name": 1, "phone": 1}
-            )
-            visit["customer"] = customer
-            
-            # Get rider info (for tracking)
+            if visit.get("customer_id"):
+                user_ids.add(visit["customer_id"])
             if visit.get("rider_id"):
-                rider = await db.users.find_one(
-                    {"id": visit["rider_id"]},
-                    {"_id": 0, "id": 1, "name": 1, "is_online": 1, "current_lat": 1, "current_lng": 1}
-                )
-                visit["rider"] = rider
-            
-            # Get properties
+                user_ids.add(visit["rider_id"])
             if visit.get("property_ids"):
-                properties = await db.properties.find(
-                    {"id": {"$in": visit["property_ids"]}},
-                    {"_id": 0, "id": 1, "title": 1, "area_name": 1, "city": 1, "rent": 1}
-                ).to_list(10)
-                visit["properties"] = properties
+                property_ids.update(visit["property_ids"])
+        
+        # Batch fetch users
+        user_map = {}
+        if user_ids:
+            users = await db.users.find(
+                {"id": {"$in": list(user_ids)}},
+                {"_id": 0, "id": 1, "name": 1, "phone": 1, "is_online": 1, "current_lat": 1, "current_lng": 1}
+            ).to_list(None)
+            user_map = {u["id"]: u for u in users}
+        
+        # Batch fetch properties
+        prop_map = {}
+        if property_ids:
+            props = await db.properties.find(
+                {"id": {"$in": list(property_ids)}},
+                {"_id": 0, "id": 1, "title": 1, "area_name": 1, "city": 1, "rent": 1}
+            ).to_list(None)
+            prop_map = {p["id"]: p for p in props}
+        
+        # Enrich visits
+        for visit in visits:
+            visit["customer"] = user_map.get(visit.get("customer_id"))
+            if visit.get("rider_id"):
+                visit["rider"] = user_map.get(visit["rider_id"])
+            if visit.get("property_ids"):
+                visit["properties"] = [prop_map.get(pid) for pid in visit["property_ids"] if prop_map.get(pid)]
         
         return visits
     
@@ -547,7 +581,7 @@ Shared by: {current_user['name']} (ApnaGhr Partner)"""
     
     @api_router.get("/seller/commissions")
     async def get_seller_commissions(current_user: dict = Depends(get_current_user)):
-        """Get commission history for seller"""
+        """Get commission history for seller - OPTIMIZED"""
         if current_user.get('role') != 'seller':
             raise HTTPException(status_code=403, detail="Seller access required")
         
@@ -556,13 +590,18 @@ Shared by: {current_user['name']} (ApnaGhr Partner)"""
             {"_id": 0}
         ).sort("created_at", -1).limit(100).to_list(100)
         
-        # Enrich with property details
-        for comm in commissions:
-            prop = await db.properties.find_one(
-                {"id": comm.get("property_id")},
-                {"_id": 0, "title": 1, "area_name": 1, "city": 1}
-            )
-            comm["property"] = prop
+        # Batch fetch all properties
+        if commissions:
+            property_ids = list(set(c.get("property_id") for c in commissions if c.get("property_id")))
+            if property_ids:
+                props = await db.properties.find(
+                    {"id": {"$in": property_ids}},
+                    {"_id": 0, "id": 1, "title": 1, "area_name": 1, "city": 1}
+                ).to_list(None)
+                prop_map = {p["id"]: p for p in props}
+                
+                for comm in commissions:
+                    comm["property"] = prop_map.get(comm.get("property_id"))
         
         wallet = await db.seller_wallets.find_one(
             {"seller_id": current_user['id']},

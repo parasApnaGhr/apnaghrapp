@@ -4707,19 +4707,30 @@ async def get_live_rider_locations(current_user: dict = Depends(get_current_user
         {"_id": 0, "password": 0}
     ).to_list(100)
     
-    # Get active visits for each rider
+    if not riders:
+        return riders
+    
+    # Batch fetch active visits and tasks
+    rider_ids = [r['id'] for r in riders]
+    
+    # Get all active visits in one query
+    active_visits = await db.visit_bookings.find(
+        {"rider_id": {"$in": rider_ids}, "status": {"$nin": ["completed", "cancelled", "pending"]}},
+        {"_id": 0}
+    ).to_list(None)
+    visit_map = {v['rider_id']: v for v in active_visits}
+    
+    # Get all active tasks in one query
+    active_tasks = await db.tolet_tasks.find(
+        {"rider_id": {"$in": rider_ids}, "status": "in_progress"},
+        {"_id": 0}
+    ).to_list(None)
+    task_map = {t['rider_id']: t for t in active_tasks}
+    
+    # Enrich riders
     for rider in riders:
-        active_visit = await db.visit_bookings.find_one(
-            {"rider_id": rider['id'], "status": {"$nin": ["completed", "cancelled", "pending"]}},
-            {"_id": 0}
-        )
-        rider['active_visit'] = active_visit
-        
-        active_task = await db.tolet_tasks.find_one(
-            {"rider_id": rider['id'], "status": "in_progress"},
-            {"_id": 0}
-        )
-        rider['active_task'] = active_task
+        rider['active_visit'] = visit_map.get(rider['id'])
+        rider['active_task'] = task_map.get(rider['id'])
     
     return riders
 
@@ -5146,19 +5157,44 @@ async def seed_default_accounts():
     
     # Create database indexes for faster queries
     try:
+        # User indexes
         await db.users.create_index("phone", unique=True)
         await db.users.create_index("id")
         await db.users.create_index("role")
+        await db.users.create_index([("role", 1), ("is_online", 1)])  # For online riders query
+        
+        # Property indexes
         await db.properties.create_index("id")
         await db.properties.create_index("city")
         await db.properties.create_index("status")
         await db.properties.create_index([("city", 1), ("status", 1)])
+        
+        # Seller activity indexes
         await db.seller_daily_activity.create_index([("seller_id", 1), ("date", 1)])
         await db.seller_daily_activity.create_index("date")
+        
+        # Visit booking indexes
         await db.visit_bookings.create_index("customer_id")
         await db.visit_bookings.create_index("rider_id")
         await db.visit_bookings.create_index("status")
+        await db.visit_bookings.create_index("referred_by")  # For seller referral queries
+        await db.visit_bookings.create_index([("rider_id", 1), ("status", 1)])  # For active visit queries
+        
+        # Seller referral/followup indexes
         await db.seller_client_referrals.create_index([("seller_id", 1), ("verification_status", 1)])
+        await db.seller_referrals.create_index("seller_id")
+        await db.seller_followups.create_index("seller_id")
+        await db.seller_followups.create_index([("seller_id", 1), ("is_closed", 1)])
+        await db.seller_followups.create_index([("seller_id", 1), ("status", 1)])
+        
+        # Tolet tasks indexes
+        await db.tolet_tasks.create_index("rider_id")
+        await db.tolet_tasks.create_index([("rider_id", 1), ("status", 1)])
+        
+        # Wallet indexes
+        await db.seller_wallets.create_index("seller_id")
+        await db.rider_wallets.create_index("rider_id")
+        
         logger.info("Database indexes created/verified")
     except Exception as e:
         logger.warning(f"Index creation warning: {e}")
