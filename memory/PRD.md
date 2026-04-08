@@ -23,6 +23,48 @@ ApnaGhr Visit Platform is a production-ready multi-role rental property platform
 
 ## Latest Updates (April 8, 2026)
 
+### 🆕 Seller Pending Report Fix - COMPLETED ✅
+
+**Problem Solved:**
+- Sellers with duplicate daily activity records were seeing stuck "Pending Report" modals
+- Modal wouldn't close even after submitting the report
+
+**Solution Implemented:**
+- Fixed `check-daily-status` to check if ANY record has `logout_report_submitted: true` before showing pending modal
+- Added "Skip (Apply -100 penalty)" button for users to dismiss pending reports
+- Changed `update_one` to `update_many` for pending report submission
+
+**Files Changed:**
+- `/app/backend/routes/seller_performance.py`
+- `/app/frontend/src/components/DailyEndModal.jsx`
+
+### 🆕 Code Refactoring Progress - IN PROGRESS
+
+**Auth Module Extracted:**
+- Created `/app/backend/routes/auth.py` (354 lines)
+- Contains: login, register, password reset, OTP, terms acceptance
+- Integrated with server.py via `/api/auth` prefix
+
+**Current Module Structure:**
+| Module | Lines | Description |
+|--------|-------|-------------|
+| server.py | 5,188 | Main app (still large, needs more extraction) |
+| seller.py | 1,314 | Seller referral & followup system |
+| seller_performance.py | 1,136 | Daily tracking, scores, leaderboard |
+| builder.py | 627 | Builder projects |
+| tracking.py | 606 | GPS & real-time tracking |
+| advertising.py | 605 | Ads & campaigns |
+| inventory_access.py | 462 | Inventory team management |
+| seller_leads.py | 459 | Seller lead management |
+| seller_verification.py | 447 | 24-hour verification rule |
+| packers.py | 371 | Packers & movers |
+| auth.py | 354 | Authentication (NEW) |
+| ai_validation.py | 352 | AI property validation |
+| chatbot.py | 349 | AI chatbot |
+| leads.py | 247 | Lead management |
+
+**Total Modularized:** ~7,330 lines in routes/
+
 ### 🆕 MongoDB Atlas Migration - COMPLETED ✅
 
 **Problem Solved:**
