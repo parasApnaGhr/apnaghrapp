@@ -44,6 +44,8 @@ Each query to Atlas has ~100-300ms network latency. With N+1 patterns:
 | `/api/seller/visits` | ~3s | 0.5s | Batch fetch users/properties |
 | `/api/seller/commissions` | ~1s | 0.2s | Batch fetch properties |
 | `/api/admin/riders/online` | ~2s | 0.3s | Batch fetch active visits/tasks |
+| `/api/admin/properties` | 1.4s | 0.09s | Pagination + field projection |
+| `/api/seller/dashboard` | 1.7s | 0.15s | Single aggregation for stats |
 
 ## Database Indexes Added
 

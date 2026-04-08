@@ -4738,13 +4738,38 @@ async def get_live_rider_locations(current_user: dict = Depends(get_current_user
 # ============ PROPERTY ANALYTICS & STATUS ============
 
 @api_router.get("/admin/properties")
-async def get_all_admin_properties(current_user: dict = Depends(get_current_user)):
-    """Get all properties for admin inventory"""
+async def get_all_admin_properties(
+    limit: int = 200,
+    skip: int = 0,
+    status: Optional[str] = None,
+    city: Optional[str] = None,
+    current_user: dict = Depends(get_current_user)
+):
+    """Get all properties for admin inventory with pagination"""
     if current_user['role'] not in ['admin', 'inventory_admin', 'support_admin']:
         raise HTTPException(status_code=403, detail="Admin access required")
     
-    properties = await db.properties.find({}, {"_id": 0}).sort("created_at", -1).to_list(1000)
-    return properties
+    query = {}
+    if status:
+        query["status"] = status
+    if city:
+        query["city"] = {"$regex": city, "$options": "i"}
+    
+    # Only fetch essential fields for list view
+    properties = await db.properties.find(
+        query,
+        {"_id": 0, "id": 1, "title": 1, "area_name": 1, "city": 1, "rent": 1, "bhk": 1, 
+         "status": 1, "is_hot": 1, "visit_count": 1, "images": {"$slice": 1}, "created_at": 1}
+    ).sort("created_at", -1).skip(skip).limit(limit).to_list(limit)
+    
+    total = await db.properties.count_documents(query)
+    
+    return {
+        "properties": properties,
+        "total": total,
+        "limit": limit,
+        "skip": skip
+    }
 
 
 @api_router.get("/admin/server-files")

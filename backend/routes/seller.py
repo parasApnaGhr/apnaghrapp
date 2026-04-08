@@ -216,7 +216,7 @@ def setup_seller_routes(api_router, db, get_current_user, bcrypt_module):
     
     @api_router.get("/seller/dashboard")
     async def get_seller_dashboard(current_user: dict = Depends(get_current_user)):
-        """Get seller dashboard with stats"""
+        """Get seller dashboard with stats - OPTIMIZED"""
         if current_user.get('role') != 'seller':
             raise HTTPException(status_code=403, detail="Seller access required")
         
@@ -225,16 +225,18 @@ def setup_seller_routes(api_router, db, get_current_user, bcrypt_module):
         
         seller_id = current_user['id']
         
-        # Get referral stats
-        total_referrals = await db.seller_referrals.count_documents({"seller_id": seller_id})
-        converted_referrals = await db.seller_referrals.count_documents({
-            "seller_id": seller_id,
-            "status": {"$in": ["booked", "visited", "deal_closed"]}
-        })
-        closed_deals = await db.seller_referrals.count_documents({
-            "seller_id": seller_id,
-            "status": "deal_closed"
-        })
+        # Get all stats in single aggregation
+        stats_pipeline = [
+            {"$match": {"seller_id": seller_id}},
+            {"$group": {
+                "_id": None,
+                "total_referrals": {"$sum": 1},
+                "converted_referrals": {"$sum": {"$cond": [{"$in": ["$status", ["booked", "visited", "deal_closed"]]}, 1, 0]}},
+                "closed_deals": {"$sum": {"$cond": [{"$eq": ["$status", "deal_closed"]}, 1, 0]}}
+            }}
+        ]
+        stats_result = await db.seller_referrals.aggregate(stats_pipeline).to_list(1)
+        stats = stats_result[0] if stats_result else {"total_referrals": 0, "converted_referrals": 0, "closed_deals": 0}
         
         # Get wallet
         wallet = await db.seller_wallets.find_one({"seller_id": seller_id}, {"_id": 0})
@@ -251,11 +253,14 @@ def setup_seller_routes(api_router, db, get_current_user, bcrypt_module):
             "status": {"$in": ["rider_assigned", "pickup_started", "at_customer", "navigating", "at_property"]}
         }, {"_id": 0}).to_list(20)
         
+        total_referrals = stats.get("total_referrals", 0)
+        converted_referrals = stats.get("converted_referrals", 0)
+        
         return {
             "stats": {
                 "total_referrals": total_referrals,
                 "converted_referrals": converted_referrals,
-                "closed_deals": closed_deals,
+                "closed_deals": stats.get("closed_deals", 0),
                 "conversion_rate": round((converted_referrals / total_referrals * 100) if total_referrals > 0 else 0, 1)
             },
             "wallet": wallet,
