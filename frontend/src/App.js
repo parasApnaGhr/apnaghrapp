@@ -64,7 +64,12 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
 const AppRoutes = () => {
   const { user } = useAuth();
 
-  const getRedirectPath = (role) => {
+  const getRedirectPath = (role, redirectParam = null) => {
+    // If redirect param exists and user is customer/advertiser/builder, use it
+    if (redirectParam && ['customer', 'advertiser', 'builder'].includes(role)) {
+      return redirectParam;
+    }
+    
     if (role === 'customer' || role === 'advertiser') {
       return '/customer';
     } else if (role === 'builder') {
@@ -79,9 +84,29 @@ const AppRoutes = () => {
     return '/customer'; // Default fallback
   };
 
+  // Component to handle login redirect with query params
+  const LoginRedirectHandler = () => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const redirectParam = searchParams.get('redirect');
+    const currentPath = window.location.pathname;
+    
+    if (user) {
+      // If we're already at a customer property page (meaning redirect already happened), don't redirect again
+      if (currentPath.startsWith('/customer/property/')) {
+        return <Navigate to={currentPath} replace />;
+      }
+      
+      const targetPath = getRedirectPath(user.role, redirectParam);
+      return <Navigate to={targetPath} replace />;
+    }
+    return <Login />;
+  };
+
   return (
     <Routes>
       <Route path="/" element={user ? <Navigate to={getRedirectPath(user.role)} replace /> : <Login />} />
+      {/* Login route with redirect support for property sharing flow */}
+      <Route path="/login" element={<LoginRedirectHandler />} />
 
       {/* PUBLIC ROUTES */}
       <Route path="/property/:id" element={<PublicPropertyDetail />} />

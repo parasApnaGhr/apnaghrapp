@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Home, User, Phone, Mail, Lock, ChevronRight, Eye, EyeOff, KeyRound, ArrowLeft, Briefcase, FileText } from 'lucide-react';
 import api, { sellerAPI, authAPI } from '../utils/api';
@@ -34,6 +34,10 @@ const Login = () => {
   const [pendingUser, setPendingUser] = useState(null); // Store logged in user pending terms
   const { login, register } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  
+  // Get redirect URL from query params (for property sharing flow)
+  const redirectUrl = searchParams.get('redirect');
 
   const validatePhone = (phone) => {
     const phoneRegex = /^[6-9]\d{9}$/;
@@ -44,8 +48,15 @@ const Login = () => {
     return password.length >= 6;
   };
 
-  // Navigate user after login based on role
+  // Navigate user after login based on role or redirect URL
   const navigateAfterLogin = (user) => {
+    // If there's a redirect URL (from property sharing flow), use it for customers
+    if (redirectUrl && (user.role === 'customer' || user.role === 'advertiser' || user.role === 'builder')) {
+      navigate(redirectUrl);
+      return;
+    }
+    
+    // Default role-based navigation
     if (user.role === 'customer' || user.role === 'advertiser' || user.role === 'builder') {
       navigate('/customer');
     } else if (user.role === 'rider') {

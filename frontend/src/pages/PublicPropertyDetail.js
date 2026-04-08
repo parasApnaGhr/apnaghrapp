@@ -130,14 +130,16 @@ const PublicPropertyDetail = () => {
               
               <div className="space-y-3">
                 <button
-                  onClick={() => navigate('/')}
+                  onClick={() => navigate(`/login?redirect=/customer/property/${id}${refCode ? `&ref=${refCode}` : ''}`)}
                   className="btn-primary w-full"
+                  data-testid="auth-prompt-signin-button"
                 >
                   Sign In / Register
                 </button>
                 <button
                   onClick={() => setShowAuthPrompt(false)}
                   className="btn-secondary w-full"
+                  data-testid="auth-prompt-continue-button"
                 >
                   Continue Browsing
                 </button>

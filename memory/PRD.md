@@ -19,9 +19,29 @@ ApnaGhr Visit Platform is a production-ready multi-role rental property platform
 - **🆕 Uber-like Customer Tracking** - Track Rider Live button with ETA display
 - **🆕 Complete Seller Tracking + Scoring + Earnings System** (April 2026)
 - **🆕 Access Type Selection & Inventory Mode System** (April 2026)
+- **🆕 Property Sharing Flow with Login Redirect** (April 8, 2026)
 
 
 ## Latest Updates (April 8, 2026)
+
+### 🆕 Property Sharing Flow Fix - COMPLETED ✅
+
+**Problem Solved:**
+- Users clicking shared property links were forced to login immediately, causing lead drop-off
+- After login, users were not redirected back to the property they wanted to view
+
+**Solution Implemented:**
+- Public property page (`/property/:id`) loads without requiring authentication
+- "Book Visit" button shows auth prompt modal with two options:
+  - "Sign In / Register" → Redirects to `/login?redirect=/customer/property/{id}`
+  - "Continue Browsing" → Closes modal, user continues browsing without login
+- After successful login, user is redirected back to the property detail page
+- Fixed race condition in `LoginRedirectHandler` that was overriding the redirect
+
+**Files Changed:**
+- `/app/frontend/src/pages/PublicPropertyDetail.js` - Updated auth modal redirect URL
+- `/app/frontend/src/pages/Login.js` - Added `useSearchParams` to read redirect param
+- `/app/frontend/src/App.js` - Added `/login` route with redirect support, fixed redirect handler
 
 ### 🆕 Seller Pending Report Fix - COMPLETED ✅
 
