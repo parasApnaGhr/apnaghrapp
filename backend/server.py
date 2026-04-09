@@ -4908,11 +4908,12 @@ async def get_all_admin_properties(
     if city:
         query["city"] = {"$regex": city, "$options": "i"}
     
-    # Only fetch essential fields for list view
+    # Only fetch essential fields for list view - include available, verified_owner, premium_listing for stats
     properties = await db.properties.find(
         query,
         {"_id": 0, "id": 1, "title": 1, "area_name": 1, "city": 1, "rent": 1, "bhk": 1, 
-         "status": 1, "is_hot": 1, "visit_count": 1, "images": {"$slice": 1}, "created_at": 1}
+         "status": 1, "is_hot": 1, "visit_count": 1, "images": {"$slice": 1}, "created_at": 1,
+         "available": 1, "verified_owner": 1, "premium_listing": 1, "furnishing": 1, "property_type": 1}
     ).sort("created_at", -1).skip(skip).limit(limit).to_list(limit)
     
     total = await db.properties.count_documents(query)
