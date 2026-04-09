@@ -69,10 +69,13 @@ const InventoryPanel = ({ inventorySession }) => {
     try {
       setLoading(true);
       const response = await api.get('/admin/properties');
-      setProperties(response.data || []);
+      // Handle both old format (array) and new format (object with properties array)
+      const propertiesData = response.data?.properties || response.data || [];
+      setProperties(Array.isArray(propertiesData) ? propertiesData : []);
     } catch (error) {
       console.error('Error loading properties:', error);
       toast.error('Failed to load properties');
+      setProperties([]);
     } finally {
       setLoading(false);
     }
@@ -131,7 +134,7 @@ const InventoryPanel = ({ inventorySession }) => {
     
     try {
       await propertyAPI.deleteProperty(propertyId);
-      setProperties(properties.filter(p => p.id !== propertyId));
+      setProperties(safeProperties.filter(p => p.id !== propertyId));
       toast.success('Property deleted successfully!');
     } catch (error) {
       toast.error(error.response?.data?.detail || 'Failed to delete property');
@@ -141,7 +144,7 @@ const InventoryPanel = ({ inventorySession }) => {
   const handleToggleAvailability = async (propertyId, currentStatus) => {
     try {
       await propertyAPI.updateProperty(propertyId, !currentStatus);
-      setProperties(properties.map(p => 
+      setProperties(safeProperties.map(p => 
         p.id === propertyId ? { ...p, available: !currentStatus } : p
       ));
       toast.success(`Property marked as ${!currentStatus ? 'available' : 'rented out'}`);
@@ -259,11 +262,14 @@ const InventoryPanel = ({ inventorySession }) => {
     setFormData({ ...formData, video_url: '' });
   };
 
+  // Ensure properties is always an array
+  const safeProperties = Array.isArray(properties) ? properties : [];
+
   // Stats
-  const totalProperties = properties.length;
-  const availableCount = properties.filter(p => p.available).length;
-  const verifiedCount = properties.filter(p => p.verified_owner).length;
-  const premiumCount = properties.filter(p => p.premium_listing).length;
+  const totalProperties = safeProperties.length;
+  const availableCount = safeProperties.filter(p => p.available).length;
+  const verifiedCount = safeProperties.filter(p => p.verified_owner).length;
+  const premiumCount = safeProperties.filter(p => p.premium_listing).length;
 
   // Download inventory sheet as CSV
   const downloadInventorySheet = () => {
@@ -853,7 +859,7 @@ const InventoryPanel = ({ inventorySession }) => {
 
       {/* Property List */}
       <div className="neo-card p-6">
-        <h3 className="font-bold mb-4">Property List ({properties.length})</h3>
+        <h3 className="font-bold mb-4">Property List ({safeProperties.length})</h3>
         
         {loading ? (
           <div className="text-center py-12">
@@ -862,7 +868,7 @@ const InventoryPanel = ({ inventorySession }) => {
             </div>
             <p className="mt-4 text-[#52525B]">Loading properties...</p>
           </div>
-        ) : properties.length === 0 ? (
+        ) : safeProperties.length === 0 ? (
           <div className="text-center py-12">
             <Home className="w-12 h-12 text-[#9CA3AF] mx-auto mb-3" />
             <p className="text-[#52525B]">No properties found</p>
@@ -872,7 +878,7 @@ const InventoryPanel = ({ inventorySession }) => {
           </div>
         ) : (
           <div className="space-y-3">
-            {properties.map((property) => (
+            {safeProperties.map((property) => (
               <motion.div
                 key={property.id}
                 initial={{ opacity: 0, y: 10 }}
