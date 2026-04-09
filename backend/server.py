@@ -4892,7 +4892,7 @@ async def get_live_rider_locations(current_user: dict = Depends(get_current_user
 
 @api_router.get("/admin/properties")
 async def get_all_admin_properties(
-    limit: int = 200,
+    limit: int = 500,
     skip: int = 0,
     status: Optional[str] = None,
     city: Optional[str] = None,
