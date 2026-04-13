@@ -3,9 +3,25 @@
     <head>
         <script>
             // Save native network functions BEFORE Emergent's network-plugin patches them
-            // This allows API calls to bypass the request-router on custom domains
             window.__nativeXHR = window.XMLHttpRequest;
             window.__nativeFetch = window.fetch.bind(window);
+
+            // On custom domains, unregister ALL service workers
+            // Emergent's network-plugin uses a Service Worker to intercept requests
+            // and route them through request-router, which returns 404 on custom domains
+            (function() {
+                var host = window.location.hostname;
+                var isEmergent = host.indexOf('emergent') !== -1 ||
+                                 host === 'localhost' ||
+                                 host === '127.0.0.1';
+                if (!isEmergent && 'serviceWorker' in navigator) {
+                    navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                        registrations.forEach(function(registration) {
+                            registration.unregister();
+                        });
+                    });
+                }
+            })();
         </script>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
