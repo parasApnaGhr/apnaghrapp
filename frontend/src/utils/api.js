@@ -1,5 +1,17 @@
 import axios from 'axios';
 
+// On custom domains (not Emergent preview), restore native XMLHttpRequest
+// to bypass Emergent's network-plugin which routes all calls through request-router
+if (typeof window !== 'undefined' && window.__nativeXHR) {
+  const hostname = window.location.hostname;
+  const isEmergent = hostname.includes('emergent') ||
+                     hostname === 'localhost' ||
+                     hostname === '127.0.0.1';
+  if (!isEmergent) {
+    window.XMLHttpRequest = window.__nativeXHR;
+  }
+}
+
 // Smart API base URL detection:
 // - Explicit env var → use it directly
 // - Emergent preview/localhost → use relative /api (emergent-main.js routes via request router)
