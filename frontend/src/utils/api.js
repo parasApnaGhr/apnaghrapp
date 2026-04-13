@@ -1,8 +1,29 @@
 import axios from 'axios';
 
-// In production, use relative URLs (same domain), in development use env variable
+// Smart API base URL detection:
+// - Explicit env var → use it directly
+// - Emergent preview/localhost → use relative /api (emergent-main.js routes via request router)
+// - Custom domain (e.g. apnaghrapp.in) → use absolute same-origin URL (nginx routes to backend)
+//   This ensures custom domains always map to the current backend automatically after redeploys
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || '';
-const API = BACKEND_URL ? `${BACKEND_URL}/api` : '/api';
+
+const getApiBase = () => {
+  if (BACKEND_URL) return `${BACKEND_URL}/api`;
+  if (typeof window !== 'undefined') {
+    const hostname = window.location.hostname;
+    const isEmergentOrLocal = hostname.includes('emergent') ||
+                               hostname === 'localhost' ||
+                               hostname === '127.0.0.1';
+    if (!isEmergentOrLocal) {
+      // Custom domain — use absolute URL so emergent-main.js doesn't intercept
+      // and nginx routes /api directly to the backend
+      return `${window.location.origin}/api`;
+    }
+  }
+  return '/api';
+};
+
+const API = getApiBase();
 
 // Placeholder images for when uploads are missing
 const PLACEHOLDER_IMAGES = {
