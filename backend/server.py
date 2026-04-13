@@ -199,6 +199,12 @@ mongo_url = (
     os.environ.get('MONGODB_URI') or
     'mongodb://localhost:27017'
 )
+mongo_url = (
+    os.environ.get('MONGO_URL') or
+    os.environ.get('MONGODB_URL') or
+    os.environ.get('MONGODB_URI') or
+    'mongodb://localhost:27017'
+)
 # Add connection pool settings for better performance and reliability
 client = AsyncIOMotorClient(
     mongo_url,
@@ -213,6 +219,7 @@ client = AsyncIOMotorClient(
     waitQueueTimeoutMS=5000,
     heartbeatFrequencyMS=10000
 )
+db = client[os.environ.get('DB_NAME', 'apnaghr_db')]
 db = client[os.environ.get('DB_NAME', 'apnaghr_db')]
 
 # Set database for modular routes
