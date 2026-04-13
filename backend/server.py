@@ -193,7 +193,12 @@ from services.cashfree_service import get_cashfree_service, CashfreePaymentServi
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
-mongo_url = os.environ['MONGO_URL']
+mongo_url = (
+    os.environ.get('MONGO_URL') or
+    os.environ.get('MONGODB_URL') or
+    os.environ.get('MONGODB_URI') or
+    'mongodb://localhost:27017'
+)
 # Add connection pool settings for better performance and reliability
 client = AsyncIOMotorClient(
     mongo_url,
@@ -208,7 +213,7 @@ client = AsyncIOMotorClient(
     waitQueueTimeoutMS=5000,
     heartbeatFrequencyMS=10000
 )
-db = client[os.environ['DB_NAME']]
+db = client[os.environ.get('DB_NAME', 'apnaghr_db')]
 
 # Set database for modular routes
 set_tracking_db(db)
@@ -5286,7 +5291,9 @@ async def create_demo_multi_visit():
 
 # Mount uploads directory for serving files
 # Using /api/uploads to ensure proper routing through Kubernetes ingress
-app.mount("/api/uploads", StaticFiles(directory="/app/uploads"), name="uploads")
+_uploads_dir = Path(os.environ.get('UPLOADS_DIR', '/app/uploads'))
+_uploads_dir.mkdir(parents=True, exist_ok=True)
+app.mount("/api/uploads", StaticFiles(directory=str(_uploads_dir)), name="uploads")
 
 # Add GZip compression for faster responses
 app.add_middleware(GZipMiddleware, minimum_size=500)
