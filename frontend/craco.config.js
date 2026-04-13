@@ -91,7 +91,10 @@ webpackConfig.devServer = (devServerConfig) => {
 };
 
 // Wrap with visual edits (automatically adds babel plugin, dev server, and overlay in dev mode)
-if (isDevServer) {
+// Disabled: the network-plugin intercepts ALL fetch calls and routes them through
+// request-router-7.emergent.host, which returns 404 on custom domains (e.g. apnaghrapp.in)
+// Set ENABLE_VISUAL_EDITS=true to re-enable for Emergent preview editing
+if (isDevServer && process.env.ENABLE_VISUAL_EDITS === 'true') {
   try {
     const { withVisualEdits } = require("@emergentbase/visual-edits/craco");
     webpackConfig = withVisualEdits(webpackConfig);
