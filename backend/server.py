@@ -3336,8 +3336,6 @@ async def get_conversations(current_user: dict = Depends(get_current_user)):
 
 
 # File upload endpoints
-UPLOAD_DIR = Path("/app/uploads")
-UPLOAD_DIR.mkdir(exist_ok=True)
 
 # General file upload - supports any image or video
 # Now uses MongoDB GridFS for permanent storage
@@ -3407,24 +3405,20 @@ async def upload_explainer_video(file: UploadFile = File(...), current_user: dic
     
     if not file.content_type.startswith('video/'):
         raise HTTPException(status_code=400, detail="File must be a video")
-    
-    file_ext = file.filename.split('.')[-1]
-    file_name = f"explainer_video.{file_ext}"
-    file_path = UPLOAD_DIR / file_name
-    
-    async with aiofiles.open(file_path, 'wb') as f:
-        content = await file.read()
-        await f.write(content)
-    
-    video_url = f"/uploads/{file_name}"
-    
+
+    # Store in MongoDB GridFS - survives deployments and container restarts
+    from services.image_storage import get_image_storage
+    storage = await get_image_storage(db)
+    result = await storage.upload_image(file, current_user.get('id'))
+    video_url = result['url']
+
     # Save to settings
     await db.app_settings.update_one(
         {"key": "explainer_video"},
         {"$set": {"key": "explainer_video", "value": video_url}},
         upsert=True
     )
-    
+
     return {"url": video_url, "message": "Explainer video uploaded successfully"}
 
 # App Customization Settings (seasonal themes, banners, etc.)
@@ -5296,9 +5290,8 @@ async def create_demo_multi_visit():
         "status": "pending"
     }
 
-# Mount uploads directory for serving files
-# Using /api/uploads to ensure proper routing through Kubernetes ingress
-_uploads_dir = Path(os.environ.get('UPLOADS_DIR', '/app/uploads'))
+# Mount uploads directory for serving any legacy files stored on disk
+_uploads_dir = Path(os.environ.get('UPLOADS_DIR', str(Path(__file__).parent / 'uploads')))
 _uploads_dir.mkdir(parents=True, exist_ok=True)
 app.mount("/api/uploads", StaticFiles(directory=str(_uploads_dir)), name="uploads")
 

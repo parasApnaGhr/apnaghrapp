@@ -1,0 +1,14 @@
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.env
+.git
+.gitignore
+tests/
+*.md
+seed_data*.json
+backup_*/
+server.py.backup*
+server_new.py
+uploads/

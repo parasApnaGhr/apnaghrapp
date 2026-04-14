@@ -30,10 +30,16 @@ next-env.d.ts
 dist/
 dist
 
-# Environment files (comprehensive coverage)
-
+# Environment and credential files
+.env
+.env.*
+*.env
+credentials.json
 *token.json*
 *credentials.json*
+*.pem
+*.key
+.credentials
 
 # Logs and debug files
 npm-debug.log*
@@ -44,7 +50,6 @@ dump.rdb
 
 # System files
 .DS_Store
-*.pem
 
 # Python
 __pycache__/
@@ -60,6 +65,9 @@ chainlit.md
 
 # Deployment
 .vercel
+
+# Firebase
+frontend/.firebase/
 
 # Data and databases
 agenthub/agents/youtube/db
@@ -77,14 +85,7 @@ agenthub/agents/youtube/db
 .cache/
 
 # Mobile development
-android-sdk/ frontend/node_modules/.cache/default-development/0.pack
-frontend/node_modules/.cache/default-development/0.pack
-frontend/node_modules/.cache/default-development/2.pack
-frontend/node_modules/.cache/default-development/1.pack
-frontend/node_modules/.cache/default-development/7.pack
-frontend/node_modules/.cache/default-development/9.pack
-frontend/node_modules/.cache/default-development/6.pack
-frontend/node_modules/.cache/default-development/6.pack
+android-sdk/
 
 # Sensitive test files
 /app/memory/test_credentials.md
@@ -94,23 +95,3 @@ memory/test_credentials.md
 /uploads/*.mp4
 /uploads/*.mov
 /uploads/*.avi
-frontend/node_modules/.cache/default-development/5.pack
-frontend/node_modules/.cache/default-development/4.pack
-frontend/node_modules/.cache/default-development/8.pack
-frontend/node_modules/.cache/default-development/11.pack
-frontend/node_modules/.cache/default-development/15.pack
-frontend/node_modules/.cache/default-development/10.pack
-frontend/node_modules/.cache/default-development/19.pack
-frontend/node_modules/.cache/default-development/23.pack
-frontend/node_modules/.cache/default-development/12.pack
-frontend/node_modules/.cache/default-development/3.pack
-frontend/node_modules/.cache/default-development/13.pack
--e 
-# Environment and credential files
-.env
-.env.*
-*.env
-credentials.json
-*.pem
-*.key
-.credentials

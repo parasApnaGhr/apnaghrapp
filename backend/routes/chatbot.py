@@ -13,7 +13,7 @@ import re
 from dotenv import load_dotenv
 from openai import AsyncOpenAI
 
-load_dotenv()
+load_dotenv(override=False)
 
 router = APIRouter(prefix="/chatbot", tags=["AI Chatbot"])
 
