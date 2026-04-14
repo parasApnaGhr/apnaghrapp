@@ -1,41 +1,9 @@
 import axios from 'axios';
 
-// On custom domains (not Emergent preview), restore native XMLHttpRequest
-// to bypass Emergent's network-plugin which routes all calls through request-router
-if (typeof window !== 'undefined' && window.__nativeXHR) {
-  const hostname = window.location.hostname;
-  const isEmergent = hostname.includes('emergent') ||
-                     hostname === 'localhost' ||
-                     hostname === '127.0.0.1';
-  if (!isEmergent) {
-    window.XMLHttpRequest = window.__nativeXHR;
-  }
-}
-
-// Smart API base URL detection:
-// - Explicit env var → use it directly
-// - Emergent preview/localhost → use relative /api (emergent-main.js routes via request router)
-// - Custom domain (e.g. apnaghrapp.in) → use absolute same-origin URL (nginx routes to backend)
-//   This ensures custom domains always map to the current backend automatically after redeploys
+// API base URL: set REACT_APP_BACKEND_URL for cross-origin deployments,
+// otherwise defaults to same-origin /api (works when frontend and backend are on the same host)
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || '';
-
-const getApiBase = () => {
-  if (BACKEND_URL) return `${BACKEND_URL}/api`;
-  if (typeof window !== 'undefined') {
-    const hostname = window.location.hostname;
-    const isEmergentOrLocal = hostname.includes('emergent') ||
-                               hostname === 'localhost' ||
-                               hostname === '127.0.0.1';
-    if (!isEmergentOrLocal) {
-      // Custom domain — use absolute URL so emergent-main.js doesn't intercept
-      // and nginx routes /api directly to the backend
-      return `${window.location.origin}/api`;
-    }
-  }
-  return '/api';
-};
-
-const API = getApiBase();
+const API = BACKEND_URL ? `${BACKEND_URL}/api` : '/api';
 
 // Placeholder images for when uploads are missing
 const PLACEHOLDER_IMAGES = {
@@ -44,11 +12,6 @@ const PLACEHOLDER_IMAGES = {
   ad: 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800&q=80',
   default: 'https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=800&q=80'
 };
-
-// Debug log for troubleshooting (only in development)
-if (process.env.NODE_ENV === 'development' && !BACKEND_URL) {
-  console.warn('REACT_APP_BACKEND_URL is not set, using relative URLs');
-}
 
 // Helper to fix image/video URLs - ensures full URL for uploaded files
 // This handles all cases: external URLs, uploaded files, and relative paths

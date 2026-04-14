@@ -628,7 +628,7 @@ const RiderDashboard = () => {
           className="relative overflow-hidden mb-4 rounded-lg"
         >
           <img 
-            src="https://customer-assets.emergentagent.com/job_field-rider-ops/artifacts/0c2eghg4_IMG_7401.jpeg"
+            src="https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?w=800&q=80"
             alt="ApnaGhr Rider"
             className="w-full h-40 object-cover"
           />

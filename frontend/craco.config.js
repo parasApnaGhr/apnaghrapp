@@ -90,7 +90,4 @@ webpackConfig.devServer = (devServerConfig) => {
   return devServerConfig;
 };
 
-// visual-edits removed: its network-plugin intercepts ALL fetch calls and routes them
-// through request-router which returns 404 on custom domains (apnaghrapp.in)
-
 module.exports = webpackConfig;

@@ -488,9 +488,9 @@ async def initiate_advertising_payment(payment_req: AdPaymentRequest, current_us
 # ============ AI AD GENERATION ============
 import base64
 import asyncio
-from emergentintegrations.llm.openai.image_generation import OpenAIImageGeneration
+from openai import AsyncOpenAI
 
-EMERGENT_LLM_KEY = os.environ.get('EMERGENT_LLM_KEY')
+OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY') or os.environ.get('EMERGENT_LLM_KEY')
 
 class AIAdGenerationRequest(BaseModel):
     company_name: str
@@ -507,7 +507,7 @@ class AIAdGenerationRequest(BaseModel):
 async def generate_ai_ad(request: AIAdGenerationRequest, current_user: dict = Depends(get_current_user)):
     """Generate AI-powered advertisement poster/image using OpenAI Image Generation"""
     
-    if not EMERGENT_LLM_KEY:
+    if not OPENAI_API_KEY:
         raise HTTPException(status_code=500, detail="AI generation not configured")
     
     # Build the prompt based on business type and style
@@ -538,20 +538,22 @@ Style: {style_descriptions.get(request.style, 'modern design')}
 The design should be professional, visually appealing, and suitable for advertising in a property rental mobile app. Include the company name prominently. Make it look like a real advertisement poster with high visual impact. No photographic images of real people, use abstract or illustrative elements instead."""
 
     try:
-        image_gen = OpenAIImageGeneration(api_key=EMERGENT_LLM_KEY)
-        
+        client = AsyncOpenAI(api_key=OPENAI_API_KEY)
+
         # Generate the image (this may take up to 60 seconds)
-        images = await image_gen.generate_images(
+        response = await client.images.generate(
             prompt=prompt,
-            model="gpt-image-1",
-            number_of_images=1
+            model="dall-e-3",
+            n=1,
+            size="1024x1024",
+            response_format="b64_json"
         )
-        
-        if not images or len(images) == 0:
+
+        if not response.data or len(response.data) == 0:
             raise HTTPException(status_code=500, detail="No image was generated")
-        
-        # Convert to base64 for frontend
-        image_base64 = base64.b64encode(images[0]).decode('utf-8')
+
+        # Already base64 from b64_json response format
+        image_base64 = response.data[0].b64_json
         
         # Save the generated ad record
         generated_ad = {

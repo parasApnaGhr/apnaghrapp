@@ -349,7 +349,7 @@ const CustomerHome = () => {
       {/* Hero Banner with ApnaGhr Image */}
       <div className="relative h-48 overflow-hidden">
         <img 
-          src="https://customer-assets.emergentagent.com/job_field-rider-ops/artifacts/gnxc4pz6_IMG_7402.jpeg"
+          src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800&q=80"
           alt="ApnaGhr - Find Your Home"
           className="w-full h-full object-cover"
         />

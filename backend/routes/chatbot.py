@@ -1,6 +1,5 @@
 """
 AI Chatbot for Property Assistance with Taste Matching
-Uses Emergent LLM Key for conversational AI
 """
 
 from fastapi import APIRouter, HTTPException, Depends
@@ -12,13 +11,11 @@ import uuid
 import json
 import re
 from dotenv import load_dotenv
+from openai import AsyncOpenAI
 
 load_dotenv()
 
 router = APIRouter(prefix="/chatbot", tags=["AI Chatbot"])
-
-# Import the LLM integration
-from emergentintegrations.llm.chat import LlmChat, UserMessage
 
 # System prompt for property assistant with taste matching
 SYSTEM_PROMPT = """You are ApnaGhr's AI Property Assistant.
@@ -203,44 +200,47 @@ def setup_chatbot_routes(main_router, db_instance, get_current_user_func):
             })
         
         # Initialize LLM chat
-        api_key = os.environ.get("EMERGENT_LLM_KEY")
+        api_key = os.environ.get("OPENAI_API_KEY") or os.environ.get("EMERGENT_LLM_KEY")
         if not api_key:
             raise HTTPException(status_code=500, detail="AI service not configured")
-        
-        chat = LlmChat(
-            api_key=api_key,
-            session_id=f"apnaghr-{session_id}",
-            system_message=SYSTEM_PROMPT
-        ).with_model("openai", "gpt-4o-mini")
-        
-        # Add history to chat
+
+        client = AsyncOpenAI(api_key=api_key)
+
+        # Build messages array with history
+        messages = [{"role": "system", "content": SYSTEM_PROMPT}]
         for msg in history_messages:
-            if msg["role"] == "user":
-                await chat.send_message(UserMessage(text=msg["content"]))
-        
+            messages.append({"role": msg["role"], "content": msg["content"]})
+        messages.append({"role": "user", "content": request.message})
+
         # Send current message
-        user_message = UserMessage(text=request.message)
-        ai_response = await chat.send_message(user_message)
-        
+        completion = await client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=messages
+        )
+        ai_response = completion.choices[0].message.content
+
         # Check if AI wants to search properties
         search_params = extract_search_params(ai_response)
         properties = None
-        
+
         if search_params:
             # Search for matching properties
             properties = await search_properties(db_instance, search_params)
-            
+
             # If we found properties, add them to context and get refined response
             if properties:
                 property_context = "\n\n".join([
                     format_property_for_chat(p) for p in properties[:3]
                 ])
-                
+
                 # Ask AI to present the properties
-                follow_up = UserMessage(
-                    text=f"[SYSTEM: Found {len(properties)} matching properties. Present these to the user naturally:\n{property_context}]"
+                messages.append({"role": "assistant", "content": ai_response})
+                messages.append({"role": "user", "content": f"[SYSTEM: Found {len(properties)} matching properties. Present these to the user naturally:\n{property_context}]"})
+                follow_up = await client.chat.completions.create(
+                    model="gpt-4o-mini",
+                    messages=messages
                 )
-                ai_response = await chat.send_message(follow_up)
+                ai_response = follow_up.choices[0].message.content
         
         # Clean response for display
         clean_ai_response = clean_response(ai_response)

@@ -226,26 +226,24 @@ def generate_issues(
 async def ai_analyze_property(data: PropertyValidationRequest) -> dict:
     """Use AI for enhanced property analysis"""
     try:
-        from emergentintegrations.llm.chat import LlmChat, UserMessage
-        from dotenv import load_dotenv
-        load_dotenv()
-        
-        api_key = os.environ.get('EMERGENT_LLM_KEY')
+        import google.generativeai as genai
+
+        api_key = os.environ.get('GEMINI_API_KEY') or os.environ.get('EMERGENT_LLM_KEY')
         if not api_key:
             return None
-        
-        chat = LlmChat(
-            api_key=api_key,
-            session_id=f"property-validation-{data.title[:20]}",
-            system_message="""You are a real estate listing validator. Analyze property listings and provide:
+
+        genai.configure(api_key=api_key)
+        model = genai.GenerativeModel(
+            model_name="gemini-1.5-flash",
+            system_instruction="""You are a real estate listing validator. Analyze property listings and provide:
 1. Detected property type (apartment/house/villa/studio/pg)
 2. Description quality assessment
 3. Missing important details
 4. Suggestions for improvement
 
 Be concise and return JSON-like structured feedback."""
-        ).with_model("gemini", "gemini-3-flash-preview")
-        
+        )
+
         prompt = f"""Analyze this property listing:
 
 Title: {data.title}
@@ -253,7 +251,7 @@ Description: {data.description}
 Listed Type: {data.property_type or 'Not specified'}
 Amenities: {', '.join(data.amenities) if data.amenities else 'None listed'}
 BHK: {data.bhk or 'Not specified'}
-Rent: ₹{data.rent or 'Not specified'}
+Rent: \u20b9{data.rent or 'Not specified'}
 City: {data.city or 'Not specified'}
 Area: {data.area_name or 'Not specified'}
 
@@ -263,10 +261,8 @@ Provide brief analysis with:
 3. What amenities should be added?
 4. One sentence improved description if current one is poor."""
 
-        user_message = UserMessage(text=prompt)
-        response = await chat.send_message(user_message)
-        
-        return {"ai_feedback": response}
+        response = await model.generate_content_async(prompt)
+        return {"ai_feedback": response.text}
         
     except Exception as e:
         print(f"AI analysis error: {e}")
