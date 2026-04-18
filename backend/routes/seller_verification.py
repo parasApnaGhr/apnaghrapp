@@ -1,3 +1,4 @@
+import certifi
 """
 Seller Client Verification System
 Tracks referred clients, enforces 24-hour verification, and manages account locks
@@ -22,7 +23,7 @@ JWT_ALGORITHM = 'HS256'
 
 # MongoDB connection
 from motor.motor_asyncio import AsyncIOMotorClient
-client = AsyncIOMotorClient(MONGO_URL)
+client = AsyncIOMotorClient(MONGO_URL, tlsCAFile=certifi.where())
 db = client[os.environ.get('DB_NAME', 'apnaghr_visit_db')]
 
 # Constants

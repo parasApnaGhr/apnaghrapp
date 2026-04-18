@@ -1,3 +1,4 @@
+import certifi
 """
 ApnaGhr Visit Platform - Main Server
 Refactored modular architecture with backward compatibility
@@ -48,7 +49,7 @@ async def init_database():
     global db, client
     
     client = AsyncIOMotorClient(
-        MONGO_URL,
+        MONGO_URL, tlsCAFile=certifi.where(),
         maxPoolSize=50,
         minPoolSize=10,
         maxIdleTimeMS=30000,
@@ -142,7 +143,7 @@ app.add_middleware(
 )
 
 # ============ STATIC FILES ============
-UPLOAD_DIR = Path("/app/backend/uploads")
+UPLOAD_DIR = Path(__file__).parent / "uploads"
 UPLOAD_DIR.mkdir(exist_ok=True)
 app.mount("/uploads", StaticFiles(directory=str(UPLOAD_DIR)), name="uploads")
 
@@ -176,11 +177,12 @@ async def health_check():
 
 # Import the original server routes (backward compatibility)
 # This imports ALL existing endpoints from the original server.py
-from server_legacy import api_router, setup_chatbot_routes, setup_seller_routes
+from server import api_router, setup_chatbot_routes, setup_seller_routes
 
 # Setup chatbot and seller routes
 setup_chatbot_routes(api_router, db, get_current_user)
-setup_seller_routes(api_router, db, get_current_user)
+import bcrypt
+setup_seller_routes(api_router, db, get_current_user, bcrypt)
 
 # Include the main API router (all legacy endpoints)
 app.include_router(api_router)

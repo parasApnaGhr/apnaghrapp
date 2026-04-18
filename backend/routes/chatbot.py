@@ -1,3 +1,4 @@
+import certifi
 """
 AI Chatbot for Property Assistance with Taste Matching
 Uses Emergent LLM Key for conversational AI
@@ -18,7 +19,13 @@ load_dotenv()
 router = APIRouter(prefix="/chatbot", tags=["AI Chatbot"])
 
 # Import the LLM integration
-from emergentintegrations.llm.chat import LlmChat, UserMessage
+# Stubbed out due to removal of emergentintegrations
+class UserMessage:
+    def __init__(self, text): self.text = text
+class LlmChat:
+    def __init__(self, *args, **kwargs): pass
+    def with_model(self, *args, **kwargs): return self
+    async def send_message(self, *args, **kwargs): return "Chatbot is temporarily offline due to migration."
 
 # System prompt for property assistant with taste matching
 SYSTEM_PROMPT = """You are ApnaGhr's AI Property Assistant.
@@ -175,7 +182,7 @@ def get_db():
     """Get database instance - imported from main server"""
     from motor.motor_asyncio import AsyncIOMotorClient
     mongo_url = os.environ['MONGO_URL']
-    client = AsyncIOMotorClient(mongo_url)
+    client = AsyncIOMotorClient(mongo_url, tlsCAFile=certifi.where())
     return client[os.environ['DB_NAME']]
 
 

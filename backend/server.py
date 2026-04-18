@@ -1,3 +1,4 @@
+import certifi
 from fastapi import FastAPI, APIRouter, HTTPException, Depends, status, Request, UploadFile, File
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.staticfiles import StaticFiles
@@ -199,15 +200,9 @@ mongo_url = (
     os.environ.get('MONGODB_URI') or
     'mongodb://localhost:27017'
 )
-mongo_url = (
-    os.environ.get('MONGO_URL') or
-    os.environ.get('MONGODB_URL') or
-    os.environ.get('MONGODB_URI') or
-    'mongodb://localhost:27017'
-)
 # Add connection pool settings for better performance and reliability
 client = AsyncIOMotorClient(
-    mongo_url,
+    mongo_url, tlsCAFile=certifi.where(),
     maxPoolSize=100,
     minPoolSize=20,
     maxIdleTimeMS=45000,
@@ -3336,7 +3331,7 @@ async def get_conversations(current_user: dict = Depends(get_current_user)):
 
 
 # File upload endpoints
-UPLOAD_DIR = Path("/app/uploads")
+UPLOAD_DIR = Path(__file__).parent / "uploads"
 UPLOAD_DIR.mkdir(exist_ok=True)
 
 # General file upload - supports any image or video

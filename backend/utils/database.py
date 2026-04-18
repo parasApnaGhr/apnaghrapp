@@ -1,3 +1,4 @@
+import certifi
 """
 Database connection and utilities for ApnaGhr Visit Platform
 Handles MongoDB connection with connection pooling
@@ -33,7 +34,7 @@ async def init_database():
     DB_NAME = os.environ.get('DB_NAME', 'apnaghr_visit_db')
     
     # Connection pooling settings for production
-    _client = AsyncIOMotorClient(
+    _client = AsyncIOMotorClient(tlsCAFile=certifi.where(), 
         MONGO_URL,
         maxPoolSize=50,
         minPoolSize=10,

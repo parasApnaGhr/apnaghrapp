@@ -1,3 +1,4 @@
+import certifi
 """
 Inventory Access Control and Tracking System
 Handles access-type selection, key verification, and inventory user tracking
@@ -40,7 +41,7 @@ PREDEFINED_INVENTORY_USERS = [
 
 # MongoDB connection
 from motor.motor_asyncio import AsyncIOMotorClient
-client = AsyncIOMotorClient(MONGO_URL)
+client = AsyncIOMotorClient(MONGO_URL, tlsCAFile=certifi.where())
 db = client[os.environ.get('DB_NAME', 'apnaghr_visit_db')]
 
 # Pydantic models

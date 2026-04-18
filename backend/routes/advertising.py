@@ -1,3 +1,4 @@
+import certifi
 # Advertising Routes
 from fastapi import APIRouter, HTTPException, Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
@@ -15,7 +16,7 @@ ROOT_DIR = Path(__file__).parent.parent
 load_dotenv(ROOT_DIR / '.env')
 
 mongo_url = os.environ['MONGO_URL']
-client = AsyncIOMotorClient(mongo_url)
+client = AsyncIOMotorClient(mongo_url, tlsCAFile=certifi.where())
 db = client[os.environ['DB_NAME']]
 
 JWT_SECRET = os.environ.get('JWT_SECRET', 'apnaghr-visit-platform-2024')
@@ -488,7 +489,12 @@ async def initiate_advertising_payment(payment_req: AdPaymentRequest, current_us
 # ============ AI AD GENERATION ============
 import base64
 import asyncio
-from emergentintegrations.llm.openai.image_generation import OpenAIImageGeneration
+# Stubbed out due to removal of emergentintegrations
+class OpenAIImageGeneration:
+    def __init__(self, api_key):
+        pass
+    async def generate_images(self, prompt, model, number_of_images):
+        raise Exception("AI Ad Generation is temporarily offline due to migration.")
 
 EMERGENT_LLM_KEY = os.environ.get('EMERGENT_LLM_KEY')
 

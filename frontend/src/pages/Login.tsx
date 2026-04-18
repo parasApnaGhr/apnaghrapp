@@ -1,0 +1,840 @@
+// @ts-nocheck
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useAuth } from '../context/AuthContext';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
+import { toast } from 'sonner';
+import { Home, User, Phone, Mail, Lock, ChevronRight, Eye, EyeOff, KeyRound, ArrowLeft, Briefcase, FileText } from 'lucide-react';
+import api, { sellerAPI, authAPI } from '../utils/api';
+import TermsAcceptanceModal from '../components/TermsAcceptanceModal';
+
+const Login = () => {
+  const [isRegister, setIsRegister] = useState(false);
+  const [isForgotPassword, setIsForgotPassword] = useState(false);
+  const [forgotStep, setForgotStep] = useState(1);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showTermsModal, setShowTermsModal] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [pendingAction, setPendingAction] = useState(null); // 'login' or 'register'
+  const [formData, setFormData] = useState({
+    name: '',
+    phone: '',
+    email: '',
+    password: '',
+    role: 'customer',
+    city: '', // For seller registration
+  });
+  const [forgotData, setForgotData] = useState({
+    phone: '',
+    otp: '',
+    newPassword: '',
+    confirmPassword: '',
+    method: 'sms'
+  });
+  const [loading, setLoading] = useState(false);
+  const [pendingUser, setPendingUser] = useState(null); // Store logged in user pending terms
+  const { login, register } = useAuth();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  
+  // Get redirect URL from query params (for property sharing flow)
+  const redirectUrl = searchParams.get('redirect');
+
+  const validatePhone = (phone) => {
+    const phoneRegex = /^[6-9]\d{9}$/;
+    return phoneRegex.test(phone);
+  };
+
+  const validatePassword = (password) => {
+    return password.length >= 6;
+  };
+
+  // Navigate user after login based on role or redirect URL
+  const navigateAfterLogin = (user) => {
+    // If there's a redirect URL (from property sharing flow), use it for customers
+    if (redirectUrl && (user.role === 'customer' || user.role === 'advertiser' || user.role === 'builder')) {
+      navigate(redirectUrl);
+      return;
+    }
+    
+    // Default role-based navigation
+    if (user.role === 'customer' || user.role === 'advertiser' || user.role === 'builder') {
+      navigate('/customer');
+    } else if (user.role === 'rider') {
+      navigate('/rider');
+    } else if (user.role === 'seller') {
+      navigate('/seller');
+    } else if (['admin', 'support_admin', 'inventory_admin', 'rider_admin'].includes(user.role)) {
+      navigate('/admin');
+    } else {
+      navigate('/customer');
+    }
+  };
+
+  // Handle terms acceptance - save to DATABASE (permanent)
+  const handleTermsAccepted = async () => {
+    try {
+      // Save to database via API
+      await authAPI.acceptTerms({
+        accepted_terms: true,
+        accepted_privacy: true,
+        accepted_anti_circumvention: true
+      });
+      
+      setTermsAccepted(true);
+      setShowTermsModal(false);
+      toast.success('Terms accepted successfully!');
+      
+      // If we have a pending user (from login), navigate them
+      if (pendingUser) {
+        navigateAfterLogin(pendingUser);
+        setPendingUser(null);
+      }
+      
+      // If we had a pending action, complete it
+      if (pendingAction === 'register') {
+        toast.success('Account created! Please login.');
+        setIsRegister(false);
+      }
+      setPendingAction(null);
+    } catch (error) {
+      toast.error('Failed to save terms acceptance. Please try again.');
+      console.error('Terms acceptance error:', error);
+    }
+  };
+
+  const handleTermsDeclined = () => {
+    setShowTermsModal(false);
+    setPendingAction(null);
+    toast.error('You must accept the terms to continue');
+  };
+
+  const processAuthAction = async (action) => {
+    setLoading(true);
+
+    try {
+      if (action === 'register') {
+        // Special handling for seller registration (requires admin approval)
+        if (formData.role === 'seller') {
+          const response = await sellerAPI.register({
+            name: formData.name,
+            phone: formData.phone,
+            email: formData.email,
+            password: formData.password,
+            city: formData.city || '',
+            experience_years: 0
+          });
+          toast.success(response.data.message || 'Registration submitted! Awaiting admin approval.');
+          setIsRegister(false);
+          setFormData({ ...formData, name: '', password: '', city: '' });
+        } else {
+          await register(formData);
+          // After registration, show terms modal before login
+          if (formData.role === 'customer' || formData.role === 'rider') {
+            toast.success('Account created! Please login and accept terms.');
+          } else {
+            toast.success('Account created successfully! Please login.');
+          }
+          setIsRegister(false);
+          setFormData({ ...formData, name: '', password: '' });
+        }
+      } else {
+        // LOGIN - Check terms from database
+        const user = await login(formData.phone, formData.password);
+        toast.success(`Welcome back, ${user.name || 'User'}!`);
+        
+        // Check if user needs to accept terms (from database)
+        const needsTerms = (user.role === 'customer' || user.role === 'rider') && !user.terms_accepted;
+        
+        if (needsTerms) {
+          // Store user and show terms modal
+          setPendingUser(user);
+          setShowTermsModal(true);
+          toast.info('Please accept our terms and conditions to continue.');
+        } else {
+          // Terms already accepted or not required, navigate directly
+          navigateAfterLogin(user);
+        }
+      }
+    } catch (error) {
+      if (error.response?.data?.detail?.includes('pending approval')) {
+        toast.info('Your account is pending admin approval. Please wait.');
+      } else if (error.response?.data?.detail?.includes('suspended')) {
+        toast.error('Your account has been suspended. Contact support.');
+      } else {
+        toast.error(error.response?.data?.detail || 'Something went wrong');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    if (!validatePhone(formData.phone)) {
+      toast.error('Please enter a valid 10-digit Indian mobile number');
+      return;
+    }
+    
+    if (!validatePassword(formData.password)) {
+      toast.error('Password must be at least 6 characters');
+      return;
+    }
+    
+    if (isRegister && !formData.name.trim()) {
+      toast.error('Please enter your full name');
+      return;
+    }
+
+    const action = isRegister ? 'register' : 'login';
+    
+    // Proceed with auth - terms will be checked from database after login
+    processAuthAction(action);
+  };
+
+  const handleForgotPassword = async () => {
+    if (!validatePhone(forgotData.phone)) {
+      toast.error('Please enter a valid 10-digit phone number');
+      return;
+    }
+    
+    setLoading(true);
+    try {
+      const response = await api.post('/auth/forgot-password', {
+        phone: forgotData.phone,
+        method: forgotData.method
+      });
+      
+      if (response.data.dev_mode && response.data.otp_for_testing) {
+        toast.success(
+          <div>
+            <p>OTP sent! (Dev Mode)</p>
+            <p className="text-lg font-bold mt-1">OTP: {response.data.otp_for_testing}</p>
+          </div>,
+          { duration: 15000 }
+        );
+      } else {
+        toast.success(`OTP sent to your ${forgotData.method === 'email' ? 'email' : 'phone'}!`);
+      }
+      
+      setForgotStep(2);
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Failed to send OTP');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleVerifyOTP = async () => {
+    if (forgotData.otp.length !== 6) {
+      toast.error('Please enter a valid 6-digit OTP');
+      return;
+    }
+    
+    setLoading(true);
+    try {
+      await api.post('/auth/verify-otp', {
+        phone: forgotData.phone,
+        otp: forgotData.otp
+      });
+      toast.success('OTP verified!');
+      setForgotStep(3);
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Invalid OTP');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResetPassword = async () => {
+    if (forgotData.newPassword.length < 6) {
+      toast.error('Password must be at least 6 characters');
+      return;
+    }
+    if (forgotData.newPassword !== forgotData.confirmPassword) {
+      toast.error('Passwords do not match');
+      return;
+    }
+    
+    setLoading(true);
+    try {
+      await api.post('/auth/reset-password', {
+        phone: forgotData.phone,
+        otp: forgotData.otp,
+        new_password: forgotData.newPassword
+      });
+      toast.success('Password reset successfully! Please login.');
+      setIsForgotPassword(false);
+      setForgotStep(1);
+      setForgotData({ phone: '', otp: '', newPassword: '', confirmPassword: '', method: 'sms' });
+      setFormData({ ...formData, phone: forgotData.phone, password: '' });
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Failed to reset password');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Note: Rider registration is handled via /join-as-rider onboarding flow
+  const roleOptions = [
+    { value: 'customer', label: 'Find a Home', desc: 'Browse & book visits', icon: Home },
+    { value: 'seller', label: 'Join as Seller', desc: 'Earn ₹500-₹10,000 per deal', icon: Briefcase },
+    { value: 'advertiser', label: 'Advertise', desc: 'Promote your business', icon: Mail },
+    { value: 'builder', label: 'List Properties', desc: 'Builder/Owner account', icon: Home }
+  ];
+
+  return (
+    <div className="min-h-screen flex bg-[#FDFCFB] relative overflow-hidden">
+      {/* Left Side - Earn Money Showcase */}
+      <div className="hidden lg:flex lg:w-1/2 relative bg-gradient-to-br from-[#04473C] via-[#065f4e] to-[#087f5b] overflow-hidden">
+        {/* Background Pattern */}
+        <div className="absolute inset-0">
+          <div className="absolute top-0 left-0 w-full h-full bg-[url('https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1920')] bg-cover bg-center opacity-10" />
+          <div className="absolute top-20 right-20 w-72 h-72 bg-white/10 rounded-full blur-3xl" />
+          <div className="absolute bottom-20 left-20 w-96 h-96 bg-[#C6A87C]/20 rounded-full blur-3xl" />
+        </div>
+        
+        {/* Content */}
+        <div className="relative z-10 flex flex-col justify-center px-12 py-16 text-white">
+          <motion.div
+            initial={{ opacity: 0, x: -30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.2 }}
+          >
+            <span className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full text-sm mb-6">
+              <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+              Now Hiring in 60+ Cities
+            </span>
+            
+            <h1 className="text-4xl lg:text-5xl font-bold mb-4 leading-tight" style={{ fontFamily: 'Playfair Display, serif' }}>
+              Earn Money by<br />
+              <span className="text-[#C6A87C]">Visiting Properties</span>
+            </h1>
+            
+            <p className="text-white/80 text-lg mb-8 max-w-md">
+              Join 500+ riders earning ₹35,000 - ₹75,000 monthly. Flexible hours, instant payments, no experience needed.
+            </p>
+            
+            {/* Stats */}
+            <div className="grid grid-cols-3 gap-6 mb-8">
+              <div className="text-center p-4 bg-white/10 backdrop-blur-sm rounded-xl">
+                <div className="text-3xl font-bold text-[#C6A87C]">₹2000</div>
+                <div className="text-white/70 text-sm">Per Day</div>
+              </div>
+              <div className="text-center p-4 bg-white/10 backdrop-blur-sm rounded-xl">
+                <div className="text-3xl font-bold text-[#C6A87C]">60+</div>
+                <div className="text-white/70 text-sm">Cities</div>
+              </div>
+              <div className="text-center p-4 bg-white/10 backdrop-blur-sm rounded-xl">
+                <div className="text-3xl font-bold text-[#C6A87C]">500+</div>
+                <div className="text-white/70 text-sm">Riders</div>
+              </div>
+            </div>
+            
+            {/* CTA Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Link 
+                to="/join-as-rider"
+                className="flex items-center justify-center gap-2 px-8 py-4 bg-[#C6A87C] text-[#04473C] rounded-xl font-bold text-lg hover:bg-[#d4b78a] transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+              >
+                <Briefcase className="w-5 h-5" />
+                Become a Rider
+              </Link>
+              <Link 
+                to="/earn-money-by-visiting-properties"
+                className="flex items-center justify-center gap-2 px-8 py-4 bg-white/20 backdrop-blur-sm text-white rounded-xl font-medium hover:bg-white/30 transition-all border border-white/30"
+              >
+                Learn More
+                <ChevronRight className="w-5 h-5" />
+              </Link>
+            </div>
+            
+            {/* Testimonial */}
+            <div className="mt-10 p-5 bg-white/10 backdrop-blur-sm rounded-xl border border-white/20">
+              <p className="text-white/90 italic mb-3">"I earn ₹45,000+ monthly with flexible hours. Best decision ever!"</p>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-[#C6A87C] rounded-full flex items-center justify-center font-bold text-[#04473C]">RS</div>
+                <div>
+                  <div className="font-medium">Rajesh Singh</div>
+                  <div className="text-white/60 text-sm">Rider since 2024 • Mohali</div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </div>
+      
+      {/* Right Side - Login Form */}
+      <div className="w-full lg:w-1/2 flex flex-col items-center justify-center p-6 lg:p-12 relative">
+        {/* Mobile Earn Money Banner */}
+        <Link 
+          to="/earn-money-by-visiting-properties"
+          className="lg:hidden w-full max-w-md mb-6 p-4 bg-gradient-to-r from-[#04473C] to-[#065f4e] rounded-xl text-white flex items-center justify-between shadow-lg"
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 bg-[#C6A87C] rounded-full flex items-center justify-center">
+              <Briefcase className="w-6 h-6 text-[#04473C]" />
+            </div>
+            <div>
+              <div className="font-bold">Earn ₹2000/day</div>
+              <div className="text-white/80 text-sm">Become a Rider</div>
+            </div>
+          </div>
+          <ChevronRight className="w-6 h-6" />
+        </Link>
+
+        {/* Background for mobile */}
+        <div className="absolute inset-0 pointer-events-none lg:hidden">
+          <div className="absolute top-0 left-0 w-full h-full bg-[url('https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1920&q=80')] bg-cover bg-center opacity-[0.03]" />
+        </div>
+        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-[#04473C]/5 rounded-full blur-3xl translate-x-1/2 -translate-y-1/2" />
+        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-[#C6A87C]/10 rounded-full blur-3xl -translate-x-1/2 translate-y-1/2" />
+
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="w-full max-w-md relative z-10"
+      >
+        {/* Logo & Branding */}
+        <motion.div 
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="text-center mb-8"
+        >
+          <h1 className="text-4xl tracking-tight mb-2" style={{ fontFamily: 'Playfair Display, serif' }}>
+            Apna<span className="text-[#04473C]">Ghr</span>
+          </h1>
+          {isForgotPassword ? (
+            <p className="text-[#4A4D53] text-sm tracking-wide">Reset your password</p>
+          ) : isRegister ? (
+            <>
+              {formData.role === 'seller' ? (
+                <div className="space-y-1">
+                  <p className="text-[#04473C] font-medium text-sm">Join Our Sales Network</p>
+                  <p className="text-[#4A4D53] text-xs">Earn up to ₹10,000 per deal</p>
+                </div>
+              ) : (
+                <p className="text-[#4A4D53] text-sm">Create your account</p>
+              )}
+            </>
+          ) : (
+            <p className="text-[#4A4D53] text-sm tracking-wide">Premium Property Visits</p>
+          )}
+          <p className="text-[10px] text-[#C6A87C] mt-2 font-medium">Powered by ApnaGhr</p>
+        </motion.div>
+
+        {/* Forgot Password Flow */}
+        <AnimatePresence mode="wait">
+          {isForgotPassword ? (
+            <motion.div
+              key="forgot-password"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              className="bg-white border border-[#E5E1DB] p-8"
+            >
+              <button
+                onClick={() => {
+                  setIsForgotPassword(false);
+                  setForgotStep(1);
+                }}
+                className="flex items-center gap-2 text-[#4A4D53] hover:text-[#04473C] mb-6 text-sm font-medium transition-colors"
+              >
+                <ArrowLeft className="w-4 h-4" strokeWidth={1.5} />
+                Back to Login
+              </button>
+
+              <h2 className="text-xl mb-6 flex items-center gap-3" style={{ fontFamily: 'Playfair Display, serif' }}>
+                <KeyRound className="w-5 h-5 text-[#04473C]" strokeWidth={1.5} />
+                {forgotStep === 1 && 'Forgot Password'}
+                {forgotStep === 2 && 'Enter OTP'}
+                {forgotStep === 3 && 'New Password'}
+              </h2>
+
+              {forgotStep === 1 && (
+                <div className="space-y-5">
+                  <div>
+                    <label className="premium-label">Phone Number</label>
+                    <div className="relative">
+                      <Phone className="w-4 h-4 text-[#4A4D53] absolute left-4 top-1/2 -translate-y-1/2" strokeWidth={1.5} />
+                      <input
+                        type="tel"
+                        value={forgotData.phone}
+                        onChange={(e) => setForgotData({ ...forgotData, phone: e.target.value.replace(/\D/g, '').slice(0, 10) })}
+                        placeholder="Enter your registered phone"
+                        className="premium-input pl-12"
+                        data-testid="forgot-phone-input"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="premium-label">Send OTP via</label>
+                    <div className="flex gap-3">
+                      <button
+                        type="button"
+                        onClick={() => setForgotData({ ...forgotData, method: 'sms' })}
+                        className={`flex-1 p-4 border text-sm font-medium tracking-wide transition-all ${
+                          forgotData.method === 'sms'
+                            ? 'border-[#04473C] bg-[#E6F0EE] text-[#04473C]'
+                            : 'border-[#E5E1DB] hover:border-[#D0C9C0]'
+                        }`}
+                      >
+                        SMS
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setForgotData({ ...forgotData, method: 'email' })}
+                        className={`flex-1 p-4 border text-sm font-medium tracking-wide transition-all ${
+                          forgotData.method === 'email'
+                            ? 'border-[#04473C] bg-[#E6F0EE] text-[#04473C]'
+                            : 'border-[#E5E1DB] hover:border-[#D0C9C0]'
+                        }`}
+                      >
+                        Email
+                      </button>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={handleForgotPassword}
+                    disabled={loading}
+                    className="btn-primary w-full"
+                    data-testid="send-otp-button"
+                  >
+                    {loading ? 'Sending...' : 'Send OTP'}
+                  </button>
+                </div>
+              )}
+
+              {forgotStep === 2 && (
+                <div className="space-y-5">
+                  <p className="text-[#4A4D53] text-sm">
+                    Enter the 6-digit OTP sent to your {forgotData.method === 'sms' ? 'phone' : 'email'}
+                  </p>
+                  <div>
+                    <label className="premium-label">OTP Code</label>
+                    <input
+                      type="text"
+                      value={forgotData.otp}
+                      onChange={(e) => setForgotData({ ...forgotData, otp: e.target.value.replace(/\D/g, '').slice(0, 6) })}
+                      placeholder="000000"
+                      className="premium-input text-center text-2xl tracking-[0.5em]"
+                      maxLength={6}
+                      data-testid="otp-input"
+                    />
+                  </div>
+
+                  <button
+                    onClick={handleVerifyOTP}
+                    disabled={loading}
+                    className="btn-primary w-full"
+                    data-testid="verify-otp-button"
+                  >
+                    {loading ? 'Verifying...' : 'Verify OTP'}
+                  </button>
+
+                  <button
+                    onClick={() => setForgotStep(1)}
+                    className="w-full text-center text-[#04473C] text-sm font-medium hover:underline"
+                  >
+                    Didn't receive OTP? Try again
+                  </button>
+                </div>
+              )}
+
+              {forgotStep === 3 && (
+                <div className="space-y-5">
+                  <div>
+                    <label className="premium-label">New Password</label>
+                    <div className="relative">
+                      <Lock className="w-4 h-4 text-[#4A4D53] absolute left-4 top-1/2 -translate-y-1/2" strokeWidth={1.5} />
+                      <input
+                        type="password"
+                        value={forgotData.newPassword}
+                        onChange={(e) => setForgotData({ ...forgotData, newPassword: e.target.value })}
+                        placeholder="Min 6 characters"
+                        className="premium-input pl-12"
+                        data-testid="new-password-input"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="premium-label">Confirm Password</label>
+                    <div className="relative">
+                      <Lock className="w-4 h-4 text-[#4A4D53] absolute left-4 top-1/2 -translate-y-1/2" strokeWidth={1.5} />
+                      <input
+                        type="password"
+                        value={forgotData.confirmPassword}
+                        onChange={(e) => setForgotData({ ...forgotData, confirmPassword: e.target.value })}
+                        placeholder="Confirm password"
+                        className="premium-input pl-12"
+                        data-testid="confirm-password-input"
+                      />
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={handleResetPassword}
+                    disabled={loading}
+                    className="btn-primary w-full"
+                    data-testid="reset-password-button"
+                  >
+                    {loading ? 'Resetting...' : 'Reset Password'}
+                  </button>
+                </div>
+              )}
+            </motion.div>
+          ) : (
+            <motion.div 
+              key="login-register"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="bg-white border border-[#E5E1DB] p-8"
+            >
+              <h2 className="text-xl mb-6" style={{ fontFamily: 'Playfair Display, serif' }}>
+                {isRegister ? 'Create Account' : 'Welcome Back'}
+              </h2>
+
+              <form onSubmit={handleSubmit} className="space-y-5">
+                {isRegister && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                  >
+                    <label className="premium-label">Full Name</label>
+                    <div className="relative">
+                      <User className="w-4 h-4 text-[#4A4D53] absolute left-4 top-1/2 -translate-y-1/2" strokeWidth={1.5} />
+                      <input
+                        type="text"
+                        data-testid="register-name-input"
+                        value={formData.name}
+                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                        className="premium-input pl-12"
+                        placeholder="Your full name"
+                        required
+                      />
+                    </div>
+                  </motion.div>
+                )}
+
+                <div>
+                  <label className="premium-label">Phone Number</label>
+                  <div className="relative flex items-center border border-[#E5E1DB] bg-white">
+                    <div className="flex items-center gap-1 px-4 py-4 text-[#4A4D53] text-sm font-medium border-r border-[#E5E1DB] bg-[#FDFCFB] shrink-0">
+                      <span>🇮🇳</span>
+                      <span>+91</span>
+                    </div>
+                    <input
+                      type="tel"
+                      inputMode="numeric"
+                      pattern="[0-9]*"
+                      data-testid="login-phone-input"
+                      value={formData.phone}
+                      onChange={(e) => {
+                        // Remove any non-digits and +91 prefix if accidentally pasted
+                        let value = e.target.value.replace(/\D/g, '');
+                        // Remove 91 prefix if user pasted full number
+                        if (value.startsWith('91') && value.length > 10) {
+                          value = value.substring(2);
+                        }
+                        value = value.slice(0, 10);
+                        setFormData({ ...formData, phone: value });
+                      }}
+                      placeholder="Enter mobile number"
+                      className="w-full px-4 py-4 text-[#1A1C20] placeholder:text-[#A8A29E] focus:outline-none border-0"
+                      maxLength={10}
+                      required
+                      autoComplete="tel-national"
+                    />
+                  </div>
+                  {formData.phone && !validatePhone(formData.phone) && (
+                    <p className="text-xs text-[#8F2727] mt-2">Enter valid 10-digit number starting with 6-9</p>
+                  )}
+                </div>
+
+                {isRegister && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                  >
+                    <label className="premium-label">Email (Optional)</label>
+                    <div className="relative">
+                      <Mail className="w-4 h-4 text-[#4A4D53] absolute left-4 top-1/2 -translate-y-1/2" strokeWidth={1.5} />
+                      <input
+                        type="email"
+                        data-testid="register-email-input"
+                        value={formData.email}
+                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                        className="premium-input pl-12"
+                        placeholder="your@email.com"
+                      />
+                    </div>
+                  </motion.div>
+                )}
+
+                {isRegister && formData.role === 'seller' && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                  >
+                    <label className="premium-label">City *</label>
+                    <div className="relative">
+                      <Home className="w-4 h-4 text-[#4A4D53] absolute left-4 top-1/2 -translate-y-1/2" strokeWidth={1.5} />
+                      <input
+                        type="text"
+                        data-testid="register-city-input"
+                        value={formData.city}
+                        onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                        className="premium-input pl-12"
+                        placeholder="Your city (e.g., Mohali, Chandigarh)"
+                        required
+                      />
+                    </div>
+                    <p className="text-xs text-[#C6A87C] mt-2 bg-[#C6A87C]/10 p-2">
+                      Seller accounts require admin approval before activation
+                    </p>
+                  </motion.div>
+                )}
+
+                <div>
+                  <label className="premium-label">Password</label>
+                  <div className="relative">
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      data-testid="login-password-input"
+                      value={formData.password}
+                      onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                      placeholder={isRegister ? "Create a password (min 6 chars)" : "Enter your password"}
+                      className="premium-input pr-12"
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-[#4A4D53] hover:text-[#1A1C20]"
+                    >
+                      {showPassword ? <EyeOff className="w-4 h-4" strokeWidth={1.5} /> : <Eye className="w-4 h-4" strokeWidth={1.5} />}
+                    </button>
+                  </div>
+                  {isRegister && formData.password && !validatePassword(formData.password) && (
+                    <p className="text-xs text-[#8F2727] mt-2">Password must be at least 6 characters</p>
+                  )}
+                </div>
+
+                {isRegister && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                  >
+                    <label className="premium-label">I want to</label>
+                    <div className="grid grid-cols-2 gap-3">
+                      {roleOptions.map((option) => {
+                        const IconComponent = option.icon;
+                        return (
+                          <button
+                            key={option.value}
+                            type="button"
+                            onClick={() => setFormData({ ...formData, role: option.value })}
+                            className={`p-4 border text-left transition-all ${
+                              formData.role === option.value
+                                ? 'border-[#04473C] bg-[#E6F0EE]'
+                                : 'border-[#E5E1DB] hover:border-[#D0C9C0]'
+                            }`}
+                            data-testid={`role-${option.value}`}
+                          >
+                            <IconComponent className={`w-5 h-5 mb-2 ${formData.role === option.value ? 'text-[#04473C]' : 'text-[#4A4D53]'}`} strokeWidth={1.5} />
+                            <div className="font-medium text-sm">{option.label}</div>
+                            <div className="text-xs text-[#4A4D53] mt-1">{option.desc}</div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </motion.div>
+                )}
+
+                <button
+                  type="submit"
+                  data-testid="login-submit-button"
+                  disabled={loading}
+                  className="btn-primary w-full flex items-center justify-center gap-2 mt-6"
+                >
+                  {loading ? (
+                    <span className="inline-block w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  ) : (
+                    <>
+                      {isRegister ? 'Create Account' : 'Sign In'}
+                      <ChevronRight className="w-4 h-4" strokeWidth={1.5} />
+                    </>
+                  )}
+                </button>
+              </form>
+
+              <div className="mt-8 text-center space-y-3">
+                {!isRegister && (
+                  <button
+                    onClick={() => setIsForgotPassword(true)}
+                    className="text-[#4A4D53] hover:text-[#04473C] text-sm transition-colors"
+                    data-testid="forgot-password-link"
+                  >
+                    Forgot Password?
+                  </button>
+                )}
+                <div>
+                  <button
+                    onClick={() => {
+                      setIsRegister(!isRegister);
+                      setFormData({ name: '', phone: '', email: '', password: '', role: 'customer' });
+                    }}
+                    className="text-[#04473C] text-sm font-medium hover:underline"
+                  >
+                    {isRegister ? 'Already have an account? Sign in' : "Don't have an account? Register"}
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Become a Rider CTA */}
+        <div className="mt-8 pt-6 border-t border-[#E5E1DB]">
+          <Link 
+            to="/join-as-rider"
+            className="flex items-center justify-center gap-2 w-full py-3 bg-gradient-to-r from-[#065f4e] to-[#04473C] text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
+            data-testid="become-rider-link"
+          >
+            <Briefcase className="w-5 h-5" />
+            Become a Rider - Earn ₹2000/day
+          </Link>
+          <p className="text-center text-xs text-[#4A4D53] mt-2">
+            No experience needed • Flexible hours • Instant payments
+          </p>
+        </div>
+
+        {/* Terms & Privacy */}
+        <p className="text-center text-xs text-[#4A4D53] mt-6">
+          By continuing, you agree to our{' '}
+          <Link to="/legal" className="text-[#04473C] hover:underline">Terms of Service</Link>
+          {' '}and{' '}
+          <Link to="/legal" className="text-[#04473C] hover:underline">Privacy Policy</Link>
+        </p>
+      </motion.div>
+      </div>
+
+      {/* Terms Acceptance Modal */}
+      <TermsAcceptanceModal
+        isOpen={showTermsModal}
+        onAccept={handleTermsAccepted}
+        onDecline={handleTermsDeclined}
+        userType={formData.role}
+        context={isRegister ? 'registration' : 'login'}
+      />
+    </div>
+  );
+};
+
+export default Login;

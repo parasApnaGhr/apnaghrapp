@@ -226,7 +226,13 @@ def generate_issues(
 async def ai_analyze_property(data: PropertyValidationRequest) -> dict:
     """Use AI for enhanced property analysis"""
     try:
-        from emergentintegrations.llm.chat import LlmChat, UserMessage
+        # Stubbed out due to removal of emergentintegrations
+        class UserMessage:
+            def __init__(self, text): pass
+        class LlmChat:
+            def __init__(self, *args, **kwargs): pass
+            def with_model(self, *args, **kwargs): return self
+            async def send_message(self, *args, **kwargs): return "Validation AI is temporarily offline."
         from dotenv import load_dotenv
         load_dotenv()
         
