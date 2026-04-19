@@ -1,7 +1,7 @@
-# Graph Report - C:\Users\shaur\Documents\apnaghrapp  (2026-04-18)
+# Graph Report - C:\Users\shaur\Documents\apnaghrapp  (2026-04-20)
 
 ## Corpus Check
-- 175 files · ~481,296 words
+- 175 files · ~642,110 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
@@ -982,8 +982,10 @@ _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `CashfreePaymentService` connect `Community 0` to `Community 1`, `Community 18`, `Community 2`?**
   _High betweenness centrality (0.033) - this node is a cross-community bridge._
-- **Why does `UserResponse` connect `Community 1` to `Community 0`?**
-  _High betweenness centrality (0.024) - this node is a cross-community bridge._
+- **Why does `CustomerProfileUpdate` connect `Community 3` to `Community 0`?**
+  _High betweenness centrality (0.028) - this node is a cross-community bridge._
+- **Why does `sleep()` connect `Community 9` to `Community 2`?**
+  _High betweenness centrality (0.026) - this node is a cross-community bridge._
 - **Are the 148 inferred relationships involving `CashfreePaymentService` (e.g. with `CircuitBreaker` and `MongoJSONEncoder`) actually correct?**
   _`CashfreePaymentService` has 148 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 11 inferred relationships involving `sanitize_mongo_doc()` (e.g. with `.get_all_properties()` and `.get_property_by_id()`) actually correct?**
@@ -992,5 +994,3 @@ _Questions this graph is uniquely positioned to answer:_
   _795 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 0` be split into smaller, more focused modules?**
   _Cohesion score 0.01 - nodes in this community are weakly interconnected._
-- **Should `Community 1` be split into smaller, more focused modules?**
-  _Cohesion score 0.03 - nodes in this community are weakly interconnected._
