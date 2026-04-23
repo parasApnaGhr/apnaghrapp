@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Referral Analytics Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "surface-container-low": "#f3f3f4",
+                        "surface-container-high": "#e8e8e8",
+                        "on-secondary-fixed-variant": "#3b3b3b",
+                        "secondary": "#5e5e5e",
+                        "on-primary-container": "#ffffff",
+                        "on-surface": "#1a1c1c",
+                        "on-tertiary-fixed-variant": "#e5e2e1",
+                        "primary": "#000000",
+                        "background": "#f9f9f9",
+                        "secondary-fixed": "#c6c6c6",
+                        "primary-container": "#3b3b3b",
+                        "on-primary-fixed": "#ffffff",
+                        "on-primary": "#e2e2e2",
+                        "secondary-fixed-dim": "#ababab",
+                        "on-tertiary-container": "#ffffff",
+                        "surface-variant": "#e2e2e2",
+                        "on-tertiary": "#e5e2e1",
+                        "surface-tint": "#5e5e5e",
+                        "inverse-primary": "#c6c6c6",
+                        "error": "#ba1a1a",
+                        "primary-fixed": "#5e5e5e",
+                        "surface-container-highest": "#e2e2e2",
+                        "on-error-container": "#410002",
+                        "surface": "#f9f9f9",
+                        "inverse-on-surface": "#f0f1f1",
+                        "tertiary-fixed-dim": "#474746",
+                        "surface-bright": "#f9f9f9",
+                        "on-tertiary-fixed": "#ffffff",
+                        "surface-container": "#eeeeee",
+                        "on-background": "#1a1c1c",
+                        "primary-fixed-dim": "#474747",
+                        "on-error": "#ffffff",
+                        "surface-dim": "#dadada",
+                        "outline": "#777777",
+                        "on-secondary-container": "#1b1b1b",
+                        "on-secondary": "#ffffff",
+                        "secondary-container": "#d4d4d4",
+                        "on-primary-fixed-variant": "#e2e2e2",
+                        "on-secondary-fixed": "#1b1b1b",
+                        "inverse-surface": "#2f3131",
+                        "tertiary-container": "#757474",
+                        "outline-variant": "#c6c6c6",
+                        "on-surface-variant": "#474747",
+                        "error-container": "#ffdad6",
+                        "tertiary": "#3c3b3b",
+                        "surface-container-lowest": "#ffffff",
+                        "tertiary-fixed": "#5f5e5e"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px",
+                        "sm": "0.5rem"
+                    },
+                    fontFamily: {
+                        "headline": ["Inter", "sans-serif"],
+                        "body": ["Inter", "sans-serif"],
+                        "label": ["Inter", "sans-serif"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        /* Kinetic Utilitarianism specific utilities */
+        .text-display-lg {
+            font-size: 3.5rem;
+            font-weight: 700;
+            line-height: 1;
+            letter-spacing: -0.02em;
+        }
+        .text-headline-sm {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        .text-body-lg {
+            font-size: 1rem;
+            font-weight: 400;
+            line-height: 1.6;
+        }
+        .text-label-md {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+        .btn-massive {
+            padding: 1.5rem 3rem;
+            border-radius: 9999px;
+            transition: transform 0.2s ease;
+        }
+        .btn-massive:hover {
+            transform: scale(1.02);
+        }
+        /* Scrollbar hiding for stark look */
+        ::-webkit-scrollbar {
+            width: 0px;
+            background: transparent;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body antialiased flex min-h-screen">
+<!-- JSON SIDENAVBAR (Desktop Only) -->
+<aside class="hidden md:flex flex-col h-screen w-64 border-r-0 bg-zinc-50 dark:bg-zinc-950 text-black dark:text-white p-6 border-r border-zinc-200 dark:border-zinc-800 shrink-0 sticky top-0" style="background-color: var(--color-surface); border-color: var(--color-surface-container-low);">
+<div class="mb-12">
+<h1 class="text-xl font-black text-black dark:text-white mb-2 font-['Inter'] tracking-tighter uppercase">APNAGHR</h1>
+<p class="text-[0.65rem] uppercase tracking-widest text-secondary font-bold">Terminal v2.0</p>
+</div>
+<nav class="flex flex-col gap-2 font-['Inter'] font-bold text-[0.75rem] uppercase tracking-widest">
+<a class="flex items-center gap-4 text-zinc-500 dark:text-zinc-400 px-4 py-2 my-1 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-all scale-102 duration-100" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">map</span> Map
+            </a>
+<a class="flex items-center gap-4 text-zinc-500 dark:text-zinc-400 px-4 py-2 my-1 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-all scale-102 duration-100" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">rate_review</span> Reviews
+            </a>
+<a class="flex items-center gap-4 text-zinc-500 dark:text-zinc-400 px-4 py-2 my-1 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-all scale-102 duration-100" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">calculate</span> Calculator
+            </a>
+<a class="flex items-center gap-4 bg-black dark:bg-white text-white dark:text-black rounded-full px-4 py-2 my-1 scale-102 duration-100" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">analytics</span> Analytics
+            </a>
+<a class="flex items-center gap-4 text-zinc-500 dark:text-zinc-400 px-4 py-2 my-1 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-all scale-102 duration-100" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">payments</span> Earnings
+            </a>
+<a class="flex items-center gap-4 text-zinc-500 dark:text-zinc-400 px-4 py-2 my-1 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-all scale-102 duration-100" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">wb_sunny</span> Heatmap
+            </a>
+</nav>
+<div class="mt-auto">
+<button class="w-full bg-primary text-on-primary rounded-full py-4 text-[0.75rem] font-bold uppercase tracking-widest hover:scale-[1.02] transition-transform">
+                New Analysis
+            </button>
+</div>
+</aside>
+<!-- MAIN CONTENT CANVAS -->
+<main class="flex-1 flex flex-col w-full min-w-0 bg-surface">
+<!-- JSON TOPAPPBAR (Mobile/Hybrid Context) -->
+<header class="md:hidden flex justify-between items-center px-8 h-20 w-full docked full-width top-0 border-b-0 bg-white dark:bg-black text-black dark:text-white font-['Inter'] font-bold tracking-tighter uppercase sticky z-40 shadow-none border-b border-surface-container-low" style="background-color: var(--color-surface);">
+<div class="text-2xl font-black tracking-tighter text-black dark:text-white">APNAGHR</div>
+<nav class="hidden md:flex items-center gap-8">
+<a class="text-zinc-400 dark:text-zinc-600 hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-all scale-102 active:scale-98 transition-transform px-4 py-2" href="#">Maps</a>
+<a class="text-black dark:text-white border-b-2 border-black dark:border-white pb-1 scale-102 active:scale-98 transition-transform px-4 py-2" href="#">Analytics</a>
+<a class="text-zinc-400 dark:text-zinc-600 hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-all scale-102 active:scale-98 transition-transform px-4 py-2" href="#">Earnings</a>
+</nav>
+<div class="flex items-center gap-4">
+<button class="hover:bg-zinc-100 dark:hover:bg-zinc-900 p-2 rounded-full transition-all">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="hover:bg-zinc-100 dark:hover:bg-zinc-900 p-2 rounded-full transition-all">
+<span class="material-symbols-outlined">account_circle</span>
+</button>
+</div>
+</header>
+<!-- DASHBOARD CANVAS -->
+<div class="p-6 md:p-16 lg:p-24 flex flex-col gap-16 md:gap-32 w-full max-w-[1600px] mx-auto pb-32 md:pb-24">
+<!-- Structural Authority Header -->
+<section class="flex flex-col md:flex-row md:justify-between md:items-end gap-8">
+<div class="flex flex-col gap-2">
+<span class="text-label-md text-secondary">Terminal / Performance</span>
+<h1 class="text-display-lg text-primary uppercase break-words">Referral<br/>Analytics</h1>
+</div>
+<div class="flex gap-4">
+<button class="bg-surface-container-low text-primary rounded-full px-8 py-4 text-label-md hover:bg-surface-container-highest transition-colors">
+                        Date Range
+                    </button>
+<button class="bg-primary text-on-primary rounded-full px-12 py-4 text-label-md transition-transform hover:scale-[1.02]">
+                        Export PDF
+                    </button>
+</div>
+</section>
+<!-- Monolithic Metrics Grid -->
+<section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
+<!-- Metric Block 1 -->
+<div class="bg-surface-container-low rounded-sm p-8 flex flex-col justify-between aspect-square md:aspect-auto md:min-h-[240px]">
+<div class="flex justify-between items-start">
+<span class="text-label-md text-secondary">Total Impressions</span>
+<span class="material-symbols-outlined text-secondary">visibility</span>
+</div>
+<div class="flex flex-col mt-auto">
+<span class="text-[4rem] md:text-[5rem] font-bold leading-none tracking-[-0.03em] text-primary">2.4M</span>
+<span class="text-body-lg text-secondary mt-2">+14% vs last month</span>
+</div>
+</div>
+<!-- Metric Block 2 -->
+<div class="bg-surface-container-low rounded-sm p-8 flex flex-col justify-between aspect-square md:aspect-auto md:min-h-[240px]">
+<div class="flex justify-between items-start">
+<span class="text-label-md text-secondary">Total Clicks</span>
+<span class="material-symbols-outlined text-secondary">ads_click</span>
+</div>
+<div class="flex flex-col mt-auto">
+<span class="text-[4rem] md:text-[5rem] font-bold leading-none tracking-[-0.03em] text-primary">84k</span>
+<span class="text-body-lg text-secondary mt-2">+8.2% vs last month</span>
+</div>
+</div>
+<!-- Metric Block 3 -->
+<div class="bg-surface-container-low rounded-sm p-8 flex flex-col justify-between aspect-square md:aspect-auto md:min-h-[240px] bg-primary text-on-primary">
+<div class="flex justify-between items-start">
+<span class="text-label-md text-on-primary opacity-70">Conversions</span>
+<span class="material-symbols-outlined text-on-primary opacity-70">flag</span>
+</div>
+<div class="flex flex-col mt-auto">
+<span class="text-[4rem] md:text-[5rem] font-bold leading-none tracking-[-0.03em]">3,102</span>
+<span class="text-body-lg opacity-70 mt-2">Booked views</span>
+</div>
+</div>
+<!-- Metric Block 4 -->
+<div class="bg-surface-container-low rounded-sm p-8 flex flex-col justify-between aspect-square md:aspect-auto md:min-h-[240px]">
+<div class="flex justify-between items-start">
+<span class="text-label-md text-secondary">Active Links</span>
+<span class="material-symbols-outlined text-secondary">link</span>
+</div>
+<div class="flex flex-col mt-auto">
+<span class="text-[4rem] md:text-[5rem] font-bold leading-none tracking-[-0.03em] text-primary">14</span>
+<span class="text-body-lg text-secondary mt-2">Across 3 platforms</span>
+</div>
+</div>
+</section>
+<!-- Abstract Data Visualization Area -->
+<section class="flex flex-col gap-8">
+<h2 class="text-headline-sm text-primary">Traffic Velocity</h2>
+<div class="w-full h-[400px] bg-surface-container-low rounded-sm relative overflow-hidden flex items-end px-8 pt-16 pb-0 gap-2 md:gap-4">
+<!-- Stark structural bars mimicking a chart -->
+<div class="w-full bg-primary h-[20%] transition-all hover:opacity-80 relative group">
+<span class="absolute -top-8 left-0 text-label-md opacity-0 group-hover:opacity-100 transition-opacity">Mon</span>
+</div>
+<div class="w-full bg-primary h-[35%] transition-all hover:opacity-80"></div>
+<div class="w-full bg-primary h-[15%] transition-all hover:opacity-80"></div>
+<div class="w-full bg-primary h-[60%] transition-all hover:opacity-80"></div>
+<div class="w-full bg-primary h-[85%] transition-all hover:opacity-80"></div>
+<div class="w-full bg-primary h-[45%] transition-all hover:opacity-80"></div>
+<div class="w-full bg-surface-container-highest border border-outline-variant h-[100%] transition-all hover:opacity-80 relative group flex items-start p-2">
+<span class="text-label-md text-primary rotate-90 origin-top-left translate-x-4">Today Focus</span>
+</div>
+</div>
+</section>
+<!-- Transactional List: Property Links -->
+<section class="flex flex-col gap-8">
+<div class="flex justify-between items-end border-b border-outline-variant pb-4">
+<h2 class="text-headline-sm text-primary">Link Register</h2>
+<span class="text-label-md text-secondary hidden md:block">Sorted by Volume</span>
+</div>
+<div class="flex flex-col w-full">
+<!-- List Header -->
+<div class="hidden md:flex w-full py-4 text-label-md text-secondary border-b border-outline-variant/50">
+<div class="w-1/3">Path</div>
+<div class="w-1/6 text-right">Imp</div>
+<div class="w-1/6 text-right">Clk</div>
+<div class="w-1/6 text-right">Cnv</div>
+<div class="w-1/6 text-right">Status</div>
+</div>
+<!-- Row 1 -->
+<div class="flex flex-col md:flex-row w-full py-6 md:py-8 border-b border-outline-variant group hover:bg-surface-container-lowest transition-colors px-4 md:px-0 -mx-4 md:mx-0">
+<div class="w-full md:w-1/3 flex items-center gap-4 mb-4 md:mb-0">
+<span class="material-symbols-outlined text-secondary">link</span>
+<span class="text-body-lg font-bold text-primary truncate">/ref/villa-nova-44</span>
+</div>
+<div class="w-full md:w-2/3 flex justify-between md:justify-end items-center text-body-lg">
+<div class="w-1/4 md:w-1/4 text-left md:text-right text-secondary"><span class="md:hidden text-label-md block mb-1">Imp</span>1.2M</div>
+<div class="w-1/4 md:w-1/4 text-left md:text-right text-secondary"><span class="md:hidden text-label-md block mb-1">Clk</span>42k</div>
+<div class="w-1/4 md:w-1/4 text-left md:text-right text-primary font-bold"><span class="md:hidden text-label-md block mb-1">Cnv</span>1,804</div>
+<div class="w-1/4 md:w-1/4 text-right flex justify-end">
+<span class="bg-surface-container-highest text-primary px-3 py-1 text-[10px] uppercase font-bold tracking-widest rounded-sm border border-outline/20">Live</span>
+</div>
+</div>
+</div>
+<!-- Row 2 -->
+<div class="flex flex-col md:flex-row w-full py-6 md:py-8 border-b border-outline-variant group hover:bg-surface-container-lowest transition-colors px-4 md:px-0 -mx-4 md:mx-0">
+<div class="w-full md:w-1/3 flex items-center gap-4 mb-4 md:mb-0">
+<span class="material-symbols-outlined text-secondary">link</span>
+<span class="text-body-lg font-bold text-primary truncate">/ref/downtown-loft-b</span>
+</div>
+<div class="w-full md:w-2/3 flex justify-between md:justify-end items-center text-body-lg">
+<div class="w-1/4 md:w-1/4 text-left md:text-right text-secondary"><span class="md:hidden text-label-md block mb-1">Imp</span>850k</div>
+<div class="w-1/4 md:w-1/4 text-left md:text-right text-secondary"><span class="md:hidden text-label-md block mb-1">Clk</span>28k</div>
+<div class="w-1/4 md:w-1/4 text-left md:text-right text-primary font-bold"><span class="md:hidden text-label-md block mb-1">Cnv</span>950</div>
+<div class="w-1/4 md:w-1/4 text-right flex justify-end">
+<span class="bg-surface-container-highest text-primary px-3 py-1 text-[10px] uppercase font-bold tracking-widest rounded-sm border border-outline/20">Live</span>
+</div>
+</div>
+</div>
+<!-- Row 3 -->
+<div class="flex flex-col md:flex-row w-full py-6 md:py-8 border-b border-outline-variant group hover:bg-surface-container-lowest transition-colors px-4 md:px-0 -mx-4 md:mx-0 opacity-50">
+<div class="w-full md:w-1/3 flex items-center gap-4 mb-4 md:mb-0">
+<span class="material-symbols-outlined text-secondary">link_off</span>
+<span class="text-body-lg font-bold text-primary truncate line-through">/ref/summer-estate</span>
+</div>
+<div class="w-full md:w-2/3 flex justify-between md:justify-end items-center text-body-lg">
+<div class="w-1/4 md:w-1/4 text-left md:text-right text-secondary"><span class="md:hidden text-label-md block mb-1">Imp</span>350k</div>
+<div class="w-1/4 md:w-1/4 text-left md:text-right text-secondary"><span class="md:hidden text-label-md block mb-1">Clk</span>14k</div>
+<div class="w-1/4 md:w-1/4 text-left md:text-right text-secondary font-bold"><span class="md:hidden text-label-md block mb-1">Cnv</span>348</div>
+<div class="w-1/4 md:w-1/4 text-right flex justify-end">
+<span class="text-secondary px-3 py-1 text-[10px] uppercase font-bold tracking-widest">Archived</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+</main>
+<!-- JSON BOTTOMNAVBAR (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full flex justify-around items-center px-4 py-2 pb-safe bg-white/80 dark:bg-black/80 backdrop-blur-xl z-50 border-t border-zinc-200 dark:border-zinc-800" style="background-color: rgba(255,255,255,0.9); border-color: var(--color-surface-container-low);">
+<a class="flex flex-col items-center justify-center text-zinc-400 dark:text-zinc-600 p-3 hover:opacity-80 scale-105 active:scale-95 transition-all" href="#">
+<span class="material-symbols-outlined mb-1">explore</span>
+<span class="font-['Inter'] font-bold text-[10px] uppercase">Explore</span>
+</a>
+<a class="flex flex-col items-center justify-center text-zinc-400 dark:text-zinc-600 p-3 hover:opacity-80 scale-105 active:scale-95 transition-all" href="#">
+<span class="material-symbols-outlined mb-1">calculate</span>
+<span class="font-['Inter'] font-bold text-[10px] uppercase">Calc</span>
+</a>
+<!-- Active Item: Trends logically maps closest to Analytics in this context if exact word missing, but checking instructions, use intent fallback. -->
+<a class="flex flex-col items-center justify-center bg-black dark:bg-white text-white dark:text-black rounded-full p-3 hover:opacity-80 scale-105 active:scale-95 transition-all px-6" href="#">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">trending_up</span>
+<span class="font-['Inter'] font-bold text-[10px] uppercase">Trends</span>
+</a>
+<a class="flex flex-col items-center justify-center text-zinc-400 dark:text-zinc-600 p-3 hover:opacity-80 scale-105 active:scale-95 transition-all" href="#">
+<span class="material-symbols-outlined mb-1">notifications</span>
+<span class="font-['Inter'] font-bold text-[10px] uppercase">Alerts</span>
+</a>
+</nav>
+</body></html>

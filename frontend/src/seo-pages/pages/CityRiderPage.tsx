@@ -91,13 +91,13 @@ const CityRiderPage = () => {
           <div className="max-w-7xl mx-auto px-4 py-4">
             <div className="flex items-center justify-between">
               <Link to="/" className="flex items-center gap-2">
-                <Home className="w-6 h-6 text-[#04473C]" />
-                <span className="font-bold text-xl text-[#04473C]">ApnaGhr</span>
+                <Home className="w-6 h-6 text-[var(--stitch-ink)]" />
+                <span className="font-bold text-xl text-[var(--stitch-ink)]">ApnaGhr</span>
               </Link>
               
               <Link
                 to="/join-as-rider"
-                className="px-6 py-2 bg-[#04473C] text-white rounded-lg font-medium hover:bg-[#033530]"
+                className="px-6 py-2 bg-[var(--stitch-ink)] text-white rounded-lg font-medium hover:bg-[var(--stitch-ink)]"
               >
                 Apply Now
               </Link>
@@ -106,7 +106,7 @@ const CityRiderPage = () => {
         </header>
 
         {/* Hero Section */}
-        <section className="relative bg-gradient-to-br from-[#04473C] via-[#065f4e] to-[#087f5b] text-white overflow-hidden">
+        <section className="relative bg-gradient-to-br from-[var(--stitch-ink)] via-[var(--stitch-ink)] to-[#087f5b] text-white overflow-hidden">
           <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1920')] opacity-10 bg-cover bg-center" />
           
           <div className="relative max-w-7xl mx-auto px-4 py-16 md:py-24">
@@ -159,19 +159,19 @@ const CityRiderPage = () => {
           <div className="max-w-7xl mx-auto px-4">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
               <div>
-                <div className="text-3xl font-bold text-[#04473C]">{cityData.activeRiders}+</div>
+                <div className="text-3xl font-bold text-[var(--stitch-ink)]">{cityData.activeRiders}+</div>
                 <div className="text-gray-600">Riders in {cityData.name}</div>
               </div>
               <div>
-                <div className="text-3xl font-bold text-[#04473C]">{cityData.avgEarnings}</div>
+                <div className="text-3xl font-bold text-[var(--stitch-ink)]">{cityData.avgEarnings}</div>
                 <div className="text-gray-600">Avg. Monthly Earnings</div>
               </div>
               <div>
-                <div className="text-3xl font-bold text-[#04473C]">500+</div>
+                <div className="text-3xl font-bold text-[var(--stitch-ink)]">500+</div>
                 <div className="text-gray-600">Properties in {cityData.name}</div>
               </div>
               <div>
-                <div className="text-3xl font-bold text-[#04473C]">24 hrs</div>
+                <div className="text-3xl font-bold text-[var(--stitch-ink)]">24 hrs</div>
                 <div className="text-gray-600">Verification Time</div>
               </div>
             </div>
@@ -190,7 +190,7 @@ const CityRiderPage = () => {
             <div className="grid md:grid-cols-4 gap-6">
               {HOW_IT_WORKS.map((step) => (
                 <div key={step.step} className="bg-white rounded-2xl p-6 border border-gray-200 text-center">
-                  <div className="w-12 h-12 bg-[#04473C] text-white rounded-full flex items-center justify-center font-bold text-xl mx-auto mb-4">
+                  <div className="w-12 h-12 bg-[var(--stitch-ink)] text-white rounded-full flex items-center justify-center font-bold text-xl mx-auto mb-4">
                     {step.step}
                   </div>
                   <h3 className="text-lg font-bold text-gray-900 mb-2">{step.title}</h3>
@@ -263,11 +263,11 @@ const CityRiderPage = () => {
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600">Daily</span>
-                      <span className="font-bold text-[#04473C]">{tier.dailyEarnings}</span>
+                      <span className="font-bold text-[var(--stitch-ink)]">{tier.dailyEarnings}</span>
                     </div>
                     <div className="flex justify-between pt-3 border-t">
                       <span className="text-gray-600">Monthly</span>
-                      <span className="font-bold text-xl text-[#04473C]">{tier.monthlyEarnings}</span>
+                      <span className="font-bold text-xl text-[var(--stitch-ink)]">{tier.monthlyEarnings}</span>
                     </div>
                   </div>
                 </div>
@@ -305,7 +305,7 @@ const CityRiderPage = () => {
                     ))}
                   </div>
                   <p className="text-gray-700 italic mb-4">"{testimonial.quote}"</p>
-                  <div className="flex items-center gap-2 text-[#04473C] font-bold">
+                  <div className="flex items-center gap-2 text-[var(--stitch-ink)] font-bold">
                     <Wallet className="w-5 h-5" />
                     {testimonial.earnings}
                   </div>
@@ -329,7 +329,7 @@ const CityRiderPage = () => {
                 <Link
                   key={city.slug}
                   to={`/become-property-rider/${city.slug}`}
-                  className="px-4 py-2 bg-white border border-gray-200 rounded-full hover:border-[#04473C] hover:bg-[#04473C]/5 transition-colors"
+                  className="px-4 py-2 bg-white border border-gray-200 rounded-full hover:border-[var(--stitch-ink)] hover:bg-[var(--stitch-ink)]/5 transition-colors"
                 >
                   {city.name}
                 </Link>

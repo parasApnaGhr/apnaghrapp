@@ -1,840 +1,552 @@
 // @ts-nocheck
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { useAuth } from '../context/AuthContext';
-import { useNavigate, Link, useSearchParams } from 'react-router-dom';
-import { toast } from 'sonner';
-import { Home, User, Phone, Mail, Lock, ChevronRight, Eye, EyeOff, KeyRound, ArrowLeft, Briefcase, FileText } from 'lucide-react';
-import api, { sellerAPI, authAPI } from '../utils/api';
-import TermsAcceptanceModal from '../components/TermsAcceptanceModal';
+import React, { useMemo, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { ArrowLeft, Briefcase, ChevronRight, Eye, EyeOff, KeyRound, Lock, Mail, Phone, User } from "lucide-react";
+import { toast } from "sonner";
+import { useAuth } from "../context/AuthContext";
+import api, { authAPI, sellerAPI } from "../utils/api";
+import TermsAcceptanceModal from "../components/TermsAcceptanceModal";
+import {
+  StitchButton,
+  StitchCard,
+  StitchInput,
+  StitchSectionHeader,
+  StitchShell,
+} from "../stitch/components/StitchPrimitives";
+import { getGreeting } from "../stitch/utils";
 
-const Login = () => {
+const baseForm = {
+  name: "",
+  phone: "",
+  email: "",
+  password: "",
+  role: "customer",
+  city: "",
+};
+
+const baseForgot = {
+  phone: "",
+  otp: "",
+  newPassword: "",
+  confirmPassword: "",
+  method: "sms",
+};
+
+const roleOptions = [
+  { value: "customer", label: "Find a home", detail: "Book guided visits" },
+  { value: "seller", label: "Join as seller", detail: "Share properties and earn" },
+  { value: "advertiser", label: "Advertise", detail: "Promote your business" },
+  { value: "builder", label: "Builder", detail: "List and manage inventory" },
+];
+
+export default function Login() {
   const [isRegister, setIsRegister] = useState(false);
-  const [isForgotPassword, setIsForgotPassword] = useState(false);
-  const [forgotStep, setForgotStep] = useState(1);
   const [showPassword, setShowPassword] = useState(false);
-  const [showTermsModal, setShowTermsModal] = useState(false);
-  const [termsAccepted, setTermsAccepted] = useState(false);
-  const [pendingAction, setPendingAction] = useState(null); // 'login' or 'register'
-  const [formData, setFormData] = useState({
-    name: '',
-    phone: '',
-    email: '',
-    password: '',
-    role: 'customer',
-    city: '', // For seller registration
-  });
-  const [forgotData, setForgotData] = useState({
-    phone: '',
-    otp: '',
-    newPassword: '',
-    confirmPassword: '',
-    method: 'sms'
-  });
   const [loading, setLoading] = useState(false);
-  const [pendingUser, setPendingUser] = useState(null); // Store logged in user pending terms
+  const [forgotMode, setForgotMode] = useState(false);
+  const [forgotStep, setForgotStep] = useState(1);
+  const [formData, setFormData] = useState(baseForm);
+  const [forgotData, setForgotData] = useState(baseForgot);
+  const [pendingUser, setPendingUser] = useState(null);
+  const [showTermsModal, setShowTermsModal] = useState(false);
+  const [searchParams] = useSearchParams();
+
   const { login, register } = useAuth();
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  
-  // Get redirect URL from query params (for property sharing flow)
-  const redirectUrl = searchParams.get('redirect');
 
-  const validatePhone = (phone) => {
-    const phoneRegex = /^[6-9]\d{9}$/;
-    return phoneRegex.test(phone);
+  const redirectUrl = searchParams.get("redirect");
+  const greeting = useMemo(() => getGreeting(), []);
+
+  const validatePhone = (phone: string) => /^[6-9]\d{9}$/.test(phone);
+  const validatePassword = (password: string) => password.length >= 6;
+
+  const normalizePhone = (value: string) => {
+    let clean = value.replace(/\D/g, "");
+    if (clean.startsWith("91") && clean.length > 10) clean = clean.slice(2);
+    return clean.slice(0, 10);
   };
 
-  const validatePassword = (password) => {
-    return password.length >= 6;
-  };
-
-  // Navigate user after login based on role or redirect URL
-  const navigateAfterLogin = (user) => {
-    // If there's a redirect URL (from property sharing flow), use it for customers
-    if (redirectUrl && (user.role === 'customer' || user.role === 'advertiser' || user.role === 'builder')) {
+  const navigateAfterLogin = (user: any) => {
+    if (redirectUrl && ["customer", "advertiser", "builder"].includes(user.role)) {
       navigate(redirectUrl);
       return;
     }
-    
-    // Default role-based navigation
-    if (user.role === 'customer' || user.role === 'advertiser' || user.role === 'builder') {
-      navigate('/customer');
-    } else if (user.role === 'rider') {
-      navigate('/rider');
-    } else if (user.role === 'seller') {
-      navigate('/seller');
-    } else if (['admin', 'support_admin', 'inventory_admin', 'rider_admin'].includes(user.role)) {
-      navigate('/admin');
-    } else {
-      navigate('/customer');
-    }
+
+    if (user.role === "rider") navigate("/rider");
+    else if (user.role === "seller") navigate("/seller");
+    else if (["admin", "support_admin", "inventory_admin", "rider_admin"].includes(user.role)) navigate("/admin");
+    else if (user.role === "builder") navigate("/builder");
+    else navigate("/customer");
   };
 
-  // Handle terms acceptance - save to DATABASE (permanent)
   const handleTermsAccepted = async () => {
     try {
-      // Save to database via API
       await authAPI.acceptTerms({
         accepted_terms: true,
         accepted_privacy: true,
-        accepted_anti_circumvention: true
+        accepted_anti_circumvention: true,
       });
-      
-      setTermsAccepted(true);
       setShowTermsModal(false);
-      toast.success('Terms accepted successfully!');
-      
-      // If we have a pending user (from login), navigate them
       if (pendingUser) {
         navigateAfterLogin(pendingUser);
         setPendingUser(null);
       }
-      
-      // If we had a pending action, complete it
-      if (pendingAction === 'register') {
-        toast.success('Account created! Please login.');
-        setIsRegister(false);
-      }
-      setPendingAction(null);
-    } catch (error) {
-      toast.error('Failed to save terms acceptance. Please try again.');
-      console.error('Terms acceptance error:', error);
+      toast.success("Terms accepted.");
+    } catch {
+      toast.error("Failed to save terms acceptance.");
     }
   };
 
-  const handleTermsDeclined = () => {
-    setShowTermsModal(false);
-    setPendingAction(null);
-    toast.error('You must accept the terms to continue');
-  };
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
 
-  const processAuthAction = async (action) => {
+    if (!validatePhone(formData.phone)) {
+      toast.error("Enter a valid 10-digit Indian mobile number.");
+      return;
+    }
+
+    if (!validatePassword(formData.password)) {
+      toast.error("Password must be at least 6 characters.");
+      return;
+    }
+
+    if (isRegister && !formData.name.trim()) {
+      toast.error("Full name is required.");
+      return;
+    }
+
     setLoading(true);
-
     try {
-      if (action === 'register') {
-        // Special handling for seller registration (requires admin approval)
-        if (formData.role === 'seller') {
+      if (isRegister) {
+        if (formData.role === "seller") {
           const response = await sellerAPI.register({
             name: formData.name,
             phone: formData.phone,
             email: formData.email,
             password: formData.password,
-            city: formData.city || '',
-            experience_years: 0
+            city: formData.city || "",
+            experience_years: 0,
           });
-          toast.success(response.data.message || 'Registration submitted! Awaiting admin approval.');
-          setIsRegister(false);
-          setFormData({ ...formData, name: '', password: '', city: '' });
+          toast.success(response.data.message || "Seller registration submitted for approval.");
         } else {
           await register(formData);
-          // After registration, show terms modal before login
-          if (formData.role === 'customer' || formData.role === 'rider') {
-            toast.success('Account created! Please login and accept terms.');
-          } else {
-            toast.success('Account created successfully! Please login.');
-          }
-          setIsRegister(false);
-          setFormData({ ...formData, name: '', password: '' });
+          toast.success("Account created. Sign in to continue.");
         }
-      } else {
-        // LOGIN - Check terms from database
-        const user = await login(formData.phone, formData.password);
-        toast.success(`Welcome back, ${user.name || 'User'}!`);
-        
-        // Check if user needs to accept terms (from database)
-        const needsTerms = (user.role === 'customer' || user.role === 'rider') && !user.terms_accepted;
-        
-        if (needsTerms) {
-          // Store user and show terms modal
-          setPendingUser(user);
-          setShowTermsModal(true);
-          toast.info('Please accept our terms and conditions to continue.');
-        } else {
-          // Terms already accepted or not required, navigate directly
-          navigateAfterLogin(user);
-        }
+        setFormData(baseForm);
+        setIsRegister(false);
+        return;
       }
-    } catch (error) {
-      if (error.response?.data?.detail?.includes('pending approval')) {
-        toast.info('Your account is pending admin approval. Please wait.');
-      } else if (error.response?.data?.detail?.includes('suspended')) {
-        toast.error('Your account has been suspended. Contact support.');
-      } else {
-        toast.error(error.response?.data?.detail || 'Something went wrong');
+
+      const user = await login(formData.phone, formData.password);
+      if ((user.role === "customer" || user.role === "rider") && !user.terms_accepted) {
+        setPendingUser(user);
+        setShowTermsModal(true);
+        toast.info("Accept terms to continue.");
+        return;
       }
+
+      navigateAfterLogin(user);
+      toast.success(`Welcome back, ${user.name || "User"}.`);
+    } catch (error: any) {
+      toast.error(error.response?.data?.detail || "Authentication failed.");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    if (!validatePhone(formData.phone)) {
-      toast.error('Please enter a valid 10-digit Indian mobile number');
-      return;
-    }
-    
-    if (!validatePassword(formData.password)) {
-      toast.error('Password must be at least 6 characters');
-      return;
-    }
-    
-    if (isRegister && !formData.name.trim()) {
-      toast.error('Please enter your full name');
-      return;
-    }
-
-    const action = isRegister ? 'register' : 'login';
-    
-    // Proceed with auth - terms will be checked from database after login
-    processAuthAction(action);
-  };
-
-  const handleForgotPassword = async () => {
+  const requestOtp = async () => {
     if (!validatePhone(forgotData.phone)) {
-      toast.error('Please enter a valid 10-digit phone number');
+      toast.error("Enter a valid phone number.");
       return;
     }
-    
+
     setLoading(true);
     try {
-      const response = await api.post('/auth/forgot-password', {
+      const response = await api.post("/auth/forgot-password", {
         phone: forgotData.phone,
-        method: forgotData.method
+        method: forgotData.method,
       });
-      
-      if (response.data.dev_mode && response.data.otp_for_testing) {
-        toast.success(
-          <div>
-            <p>OTP sent! (Dev Mode)</p>
-            <p className="text-lg font-bold mt-1">OTP: {response.data.otp_for_testing}</p>
-          </div>,
-          { duration: 15000 }
-        );
+      if (response.data?.otp_for_testing) {
+        toast.success(`OTP sent. Dev OTP: ${response.data.otp_for_testing}`);
       } else {
-        toast.success(`OTP sent to your ${forgotData.method === 'email' ? 'email' : 'phone'}!`);
+        toast.success("OTP sent.");
       }
-      
       setForgotStep(2);
-    } catch (error) {
-      toast.error(error.response?.data?.detail || 'Failed to send OTP');
+    } catch (error: any) {
+      toast.error(error.response?.data?.detail || "Failed to send OTP.");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleVerifyOTP = async () => {
-    if (forgotData.otp.length !== 6) {
-      toast.error('Please enter a valid 6-digit OTP');
-      return;
-    }
-    
+  const verifyOtp = async () => {
     setLoading(true);
     try {
-      await api.post('/auth/verify-otp', {
-        phone: forgotData.phone,
-        otp: forgotData.otp
-      });
-      toast.success('OTP verified!');
-      setForgotStep(3);
-    } catch (error) {
-      toast.error(error.response?.data?.detail || 'Invalid OTP');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleResetPassword = async () => {
-    if (forgotData.newPassword.length < 6) {
-      toast.error('Password must be at least 6 characters');
-      return;
-    }
-    if (forgotData.newPassword !== forgotData.confirmPassword) {
-      toast.error('Passwords do not match');
-      return;
-    }
-    
-    setLoading(true);
-    try {
-      await api.post('/auth/reset-password', {
+      await api.post("/auth/verify-otp", {
         phone: forgotData.phone,
         otp: forgotData.otp,
-        new_password: forgotData.newPassword
       });
-      toast.success('Password reset successfully! Please login.');
-      setIsForgotPassword(false);
-      setForgotStep(1);
-      setForgotData({ phone: '', otp: '', newPassword: '', confirmPassword: '', method: 'sms' });
-      setFormData({ ...formData, phone: forgotData.phone, password: '' });
-    } catch (error) {
-      toast.error(error.response?.data?.detail || 'Failed to reset password');
+      toast.success("OTP verified.");
+      setForgotStep(3);
+    } catch (error: any) {
+      toast.error(error.response?.data?.detail || "OTP verification failed.");
     } finally {
       setLoading(false);
     }
   };
 
-  // Note: Rider registration is handled via /join-as-rider onboarding flow
-  const roleOptions = [
-    { value: 'customer', label: 'Find a Home', desc: 'Browse & book visits', icon: Home },
-    { value: 'seller', label: 'Join as Seller', desc: 'Earn ₹500-₹10,000 per deal', icon: Briefcase },
-    { value: 'advertiser', label: 'Advertise', desc: 'Promote your business', icon: Mail },
-    { value: 'builder', label: 'List Properties', desc: 'Builder/Owner account', icon: Home }
+  const resetPassword = async () => {
+    if (!validatePassword(forgotData.newPassword)) {
+      toast.error("Password must be at least 6 characters.");
+      return;
+    }
+
+    if (forgotData.newPassword !== forgotData.confirmPassword) {
+      toast.error("Passwords do not match.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await api.post("/auth/reset-password", {
+        phone: forgotData.phone,
+        otp: forgotData.otp,
+        new_password: forgotData.newPassword,
+      });
+      toast.success("Password reset. Sign in with the new password.");
+      setForgotMode(false);
+      setForgotStep(1);
+      setForgotData(baseForgot);
+      setFormData((current) => ({ ...current, phone: forgotData.phone, password: "" }));
+    } catch (error: any) {
+      toast.error(error.response?.data?.detail || "Failed to reset password.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const heroStats = [
+    { label: "Cities", value: "60+" },
+    { label: "Riders", value: "500+" },
+    { label: "Daily potential", value: "₹2000" },
   ];
 
   return (
-    <div className="min-h-screen flex bg-[#FDFCFB] relative overflow-hidden">
-      {/* Left Side - Earn Money Showcase */}
-      <div className="hidden lg:flex lg:w-1/2 relative bg-gradient-to-br from-[#04473C] via-[#065f4e] to-[#087f5b] overflow-hidden">
-        {/* Background Pattern */}
-        <div className="absolute inset-0">
-          <div className="absolute top-0 left-0 w-full h-full bg-[url('https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1920')] bg-cover bg-center opacity-10" />
-          <div className="absolute top-20 right-20 w-72 h-72 bg-white/10 rounded-full blur-3xl" />
-          <div className="absolute bottom-20 left-20 w-96 h-96 bg-[#C6A87C]/20 rounded-full blur-3xl" />
-        </div>
-        
-        {/* Content */}
-        <div className="relative z-10 flex flex-col justify-center px-12 py-16 text-white">
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.2 }}
-          >
-            <span className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full text-sm mb-6">
-              <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-              Now Hiring in 60+ Cities
-            </span>
-            
-            <h1 className="text-4xl lg:text-5xl font-bold mb-4 leading-tight" style={{ fontFamily: 'Playfair Display, serif' }}>
-              Earn Money by<br />
-              <span className="text-[#C6A87C]">Visiting Properties</span>
-            </h1>
-            
-            <p className="text-white/80 text-lg mb-8 max-w-md">
-              Join 500+ riders earning ₹35,000 - ₹75,000 monthly. Flexible hours, instant payments, no experience needed.
-            </p>
-            
-            {/* Stats */}
-            <div className="grid grid-cols-3 gap-6 mb-8">
-              <div className="text-center p-4 bg-white/10 backdrop-blur-sm rounded-xl">
-                <div className="text-3xl font-bold text-[#C6A87C]">₹2000</div>
-                <div className="text-white/70 text-sm">Per Day</div>
-              </div>
-              <div className="text-center p-4 bg-white/10 backdrop-blur-sm rounded-xl">
-                <div className="text-3xl font-bold text-[#C6A87C]">60+</div>
-                <div className="text-white/70 text-sm">Cities</div>
-              </div>
-              <div className="text-center p-4 bg-white/10 backdrop-blur-sm rounded-xl">
-                <div className="text-3xl font-bold text-[#C6A87C]">500+</div>
-                <div className="text-white/70 text-sm">Riders</div>
-              </div>
-            </div>
-            
-            {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Link 
-                to="/join-as-rider"
-                className="flex items-center justify-center gap-2 px-8 py-4 bg-[#C6A87C] text-[#04473C] rounded-xl font-bold text-lg hover:bg-[#d4b78a] transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-1"
-              >
-                <Briefcase className="w-5 h-5" />
-                Become a Rider
-              </Link>
-              <Link 
-                to="/earn-money-by-visiting-properties"
-                className="flex items-center justify-center gap-2 px-8 py-4 bg-white/20 backdrop-blur-sm text-white rounded-xl font-medium hover:bg-white/30 transition-all border border-white/30"
-              >
-                Learn More
-                <ChevronRight className="w-5 h-5" />
-              </Link>
-            </div>
-            
-            {/* Testimonial */}
-            <div className="mt-10 p-5 bg-white/10 backdrop-blur-sm rounded-xl border border-white/20">
-              <p className="text-white/90 italic mb-3">"I earn ₹45,000+ monthly with flexible hours. Best decision ever!"</p>
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-[#C6A87C] rounded-full flex items-center justify-center font-bold text-[#04473C]">RS</div>
-                <div>
-                  <div className="font-medium">Rajesh Singh</div>
-                  <div className="text-white/60 text-sm">Rider since 2024 • Mohali</div>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-        </div>
-      </div>
-      
-      {/* Right Side - Login Form */}
-      <div className="w-full lg:w-1/2 flex flex-col items-center justify-center p-6 lg:p-12 relative">
-        {/* Mobile Earn Money Banner */}
-        <Link 
-          to="/earn-money-by-visiting-properties"
-          className="lg:hidden w-full max-w-md mb-6 p-4 bg-gradient-to-r from-[#04473C] to-[#065f4e] rounded-xl text-white flex items-center justify-between shadow-lg"
-        >
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-[#C6A87C] rounded-full flex items-center justify-center">
-              <Briefcase className="w-6 h-6 text-[#04473C]" />
-            </div>
-            <div>
-              <div className="font-bold">Earn ₹2000/day</div>
-              <div className="text-white/80 text-sm">Become a Rider</div>
-            </div>
+    <>
+      <StitchShell
+        title={forgotMode ? "Recover Access" : isRegister ? "Create Account" : "Sign In"}
+        eyebrow={greeting}
+        actions={
+          <div className="flex gap-2">
+            <Link to="/join-as-rider" className="stitch-button stitch-button-secondary">
+              Become a Rider
+            </Link>
+            <Link to="/earn-money-by-visiting-properties" className="stitch-button stitch-button-ghost">
+              Learn more
+            </Link>
           </div>
-          <ChevronRight className="w-6 h-6" />
-        </Link>
-
-        {/* Background for mobile */}
-        <div className="absolute inset-0 pointer-events-none lg:hidden">
-          <div className="absolute top-0 left-0 w-full h-full bg-[url('https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1920&q=80')] bg-cover bg-center opacity-[0.03]" />
-        </div>
-        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-[#04473C]/5 rounded-full blur-3xl translate-x-1/2 -translate-y-1/2" />
-        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-[#C6A87C]/10 rounded-full blur-3xl -translate-x-1/2 translate-y-1/2" />
-
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-md relative z-10"
+        }
       >
-        {/* Logo & Branding */}
-        <motion.div 
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="text-center mb-8"
-        >
-          <h1 className="text-4xl tracking-tight mb-2" style={{ fontFamily: 'Playfair Display, serif' }}>
-            Apna<span className="text-[#04473C]">Ghr</span>
-          </h1>
-          {isForgotPassword ? (
-            <p className="text-[#4A4D53] text-sm tracking-wide">Reset your password</p>
-          ) : isRegister ? (
-            <>
-              {formData.role === 'seller' ? (
-                <div className="space-y-1">
-                  <p className="text-[#04473C] font-medium text-sm">Join Our Sales Network</p>
-                  <p className="text-[#4A4D53] text-xs">Earn up to ₹10,000 per deal</p>
+        <div className="grid gap-5 xl:grid-cols-[1.1fr_0.9fr]">
+          <StitchCard className="grid gap-6 overflow-hidden p-6 md:grid-cols-[1.2fr_0.8fr] md:p-8">
+            <div className="flex flex-col justify-between gap-8">
+              <div className="space-y-3">
+                <p className="stitch-eyebrow">Property visit platform</p>
+                <h2 className="font-headline text-4xl font-black uppercase leading-none tracking-[-0.08em] md:text-6xl">
+                  Find your
+                  <br />
+                  next move
+                  <br />
+                  faster.
+                </h2>
+              </div>
+              <div className="grid gap-4 sm:grid-cols-3">
+                {heroStats.map((stat) => (
+                  <div key={stat.label} className="rounded-[24px] border border-[var(--stitch-line)] bg-[var(--stitch-soft)] p-4">
+                    <p className="text-3xl font-black tracking-[-0.06em]">{stat.value}</p>
+                    <p className="mt-1 text-xs uppercase tracking-[0.18em] text-[var(--stitch-muted)]">{stat.label}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="grid gap-4">
+              <div className="relative overflow-hidden rounded-[28px] border border-[var(--stitch-line)] bg-black p-5 text-white">
+                <p className="stitch-eyebrow !text-white/60">Live ops</p>
+                <p className="mt-2 text-2xl font-black uppercase tracking-[-0.04em]">Seller approvals. rider ops. visit tracking.</p>
+                <div className="mt-6 h-44 rounded-[20px] bg-[url('https://images.unsplash.com/photo-1484154218962-a197022b5858?w=1200&q=80')] bg-cover bg-center grayscale" />
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="rounded-[24px] border border-[var(--stitch-line)] bg-white p-4">
+                  <p className="stitch-eyebrow">Role aware</p>
+                  <p className="mt-2 text-sm text-[var(--stitch-muted)]">Role-based sign in.</p>
                 </div>
+                <div className="rounded-[24px] border border-[var(--stitch-line)] bg-white p-4">
+                  <p className="stitch-eyebrow">Resilient</p>
+                  <p className="mt-2 text-sm text-[var(--stitch-muted)]">OTP, terms, and approvals stay connected.</p>
+                </div>
+              </div>
+            </div>
+          </StitchCard>
+
+          <StitchCard className="p-6 md:p-8">
+            <AnimatePresence mode="wait">
+              {forgotMode ? (
+                <motion.div
+                  key={`forgot-${forgotStep}`}
+                  initial={{ opacity: 0, x: 16 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -16 }}
+                  className="space-y-6"
+                >
+                  <button
+                    onClick={() => {
+                      setForgotMode(false);
+                      setForgotStep(1);
+                    }}
+                    className="flex items-center gap-2 text-sm text-[var(--stitch-muted)]"
+                  >
+                    <ArrowLeft className="h-4 w-4" />
+                    Back to sign in
+                  </button>
+
+                  <StitchSectionHeader
+                    eyebrow="Recovery"
+                    title={forgotStep === 1 ? "Request OTP" : forgotStep === 2 ? "Verify code" : "Set new password"}
+                  />
+
+                  {forgotStep === 1 ? (
+                    <div className="space-y-4">
+                      <div>
+                        <label className="text-xs font-bold uppercase tracking-[0.16em]">Phone number</label>
+                        <div className="relative">
+                          <Phone className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--stitch-muted)]" />
+                          <StitchInput
+                            value={forgotData.phone}
+                            onChange={(event) => setForgotData((current) => ({ ...current, phone: normalizePhone(event.target.value) }))}
+                            placeholder="Enter registered mobile number"
+                            className="pl-11"
+                          />
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        {["sms", "email"].map((method) => (
+                          <button
+                            key={method}
+                            type="button"
+                            onClick={() => setForgotData((current) => ({ ...current, method }))}
+                            className={`rounded-[22px] border px-4 py-3 text-sm font-bold uppercase tracking-[0.16em] ${
+                              forgotData.method === method
+                                ? "border-black bg-black text-white"
+                                : "border-[var(--stitch-line)] bg-white"
+                            }`}
+                          >
+                            {method}
+                          </button>
+                        ))}
+                      </div>
+                      <StitchButton onClick={requestOtp} disabled={loading} className="w-full">
+                        <KeyRound className="h-4 w-4" />
+                        {loading ? "Sending" : "Send OTP"}
+                      </StitchButton>
+                    </div>
+                  ) : null}
+
+                  {forgotStep === 2 ? (
+                    <div className="space-y-4">
+                      <div>
+                        <label className="text-xs font-bold uppercase tracking-[0.16em]">OTP</label>
+                        <StitchInput
+                          value={forgotData.otp}
+                          onChange={(event) => setForgotData((current) => ({ ...current, otp: event.target.value.replace(/\D/g, "").slice(0, 6) }))}
+                          placeholder="000000"
+                          className="text-center text-2xl tracking-[0.5em]"
+                        />
+                      </div>
+                      <StitchButton onClick={verifyOtp} disabled={loading} className="w-full">
+                        {loading ? "Verifying" : "Verify OTP"}
+                      </StitchButton>
+                    </div>
+                  ) : null}
+
+                  {forgotStep === 3 ? (
+                    <div className="space-y-4">
+                      <div>
+                        <label className="text-xs font-bold uppercase tracking-[0.16em]">New password</label>
+                        <StitchInput
+                          type="password"
+                          value={forgotData.newPassword}
+                          onChange={(event) => setForgotData((current) => ({ ...current, newPassword: event.target.value }))}
+                          placeholder="Minimum 6 characters"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-xs font-bold uppercase tracking-[0.16em]">Confirm password</label>
+                        <StitchInput
+                          type="password"
+                          value={forgotData.confirmPassword}
+                          onChange={(event) => setForgotData((current) => ({ ...current, confirmPassword: event.target.value }))}
+                          placeholder="Repeat new password"
+                        />
+                      </div>
+                      <StitchButton onClick={resetPassword} disabled={loading} className="w-full">
+                        {loading ? "Saving" : "Reset password"}
+                      </StitchButton>
+                    </div>
+                  ) : null}
+                </motion.div>
               ) : (
-                <p className="text-[#4A4D53] text-sm">Create your account</p>
-              )}
-            </>
-          ) : (
-            <p className="text-[#4A4D53] text-sm tracking-wide">Premium Property Visits</p>
-          )}
-          <p className="text-[10px] text-[#C6A87C] mt-2 font-medium">Powered by ApnaGhr</p>
-        </motion.div>
+                <motion.form
+                  key={isRegister ? "register" : "login"}
+                  initial={{ opacity: 0, x: 16 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -16 }}
+                  onSubmit={handleSubmit}
+                  className="space-y-5"
+                >
+                  <StitchSectionHeader
+                    eyebrow={isRegister ? "Registration" : "Access"}
+                    title={isRegister ? "Create your workspace" : "Sign in to continue"}
+                  />
 
-        {/* Forgot Password Flow */}
-        <AnimatePresence mode="wait">
-          {isForgotPassword ? (
-            <motion.div
-              key="forgot-password"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              className="bg-white border border-[#E5E1DB] p-8"
-            >
-              <button
-                onClick={() => {
-                  setIsForgotPassword(false);
-                  setForgotStep(1);
-                }}
-                className="flex items-center gap-2 text-[#4A4D53] hover:text-[#04473C] mb-6 text-sm font-medium transition-colors"
-              >
-                <ArrowLeft className="w-4 h-4" strokeWidth={1.5} />
-                Back to Login
-              </button>
-
-              <h2 className="text-xl mb-6 flex items-center gap-3" style={{ fontFamily: 'Playfair Display, serif' }}>
-                <KeyRound className="w-5 h-5 text-[#04473C]" strokeWidth={1.5} />
-                {forgotStep === 1 && 'Forgot Password'}
-                {forgotStep === 2 && 'Enter OTP'}
-                {forgotStep === 3 && 'New Password'}
-              </h2>
-
-              {forgotStep === 1 && (
-                <div className="space-y-5">
-                  <div>
-                    <label className="premium-label">Phone Number</label>
-                    <div className="relative">
-                      <Phone className="w-4 h-4 text-[#4A4D53] absolute left-4 top-1/2 -translate-y-1/2" strokeWidth={1.5} />
-                      <input
-                        type="tel"
-                        value={forgotData.phone}
-                        onChange={(e) => setForgotData({ ...forgotData, phone: e.target.value.replace(/\D/g, '').slice(0, 10) })}
-                        placeholder="Enter your registered phone"
-                        className="premium-input pl-12"
-                        data-testid="forgot-phone-input"
-                      />
+                  {isRegister ? (
+                    <div>
+                      <label className="text-xs font-bold uppercase tracking-[0.16em]">Full name</label>
+                      <div className="relative">
+                        <User className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--stitch-muted)]" />
+                        <StitchInput
+                          value={formData.name}
+                          onChange={(event) => setFormData((current) => ({ ...current, name: event.target.value }))}
+                          placeholder="Your full name"
+                          className="pl-11"
+                        />
+                      </div>
                     </div>
-                  </div>
+                  ) : null}
 
                   <div>
-                    <label className="premium-label">Send OTP via</label>
-                    <div className="flex gap-3">
-                      <button
-                        type="button"
-                        onClick={() => setForgotData({ ...forgotData, method: 'sms' })}
-                        className={`flex-1 p-4 border text-sm font-medium tracking-wide transition-all ${
-                          forgotData.method === 'sms'
-                            ? 'border-[#04473C] bg-[#E6F0EE] text-[#04473C]'
-                            : 'border-[#E5E1DB] hover:border-[#D0C9C0]'
-                        }`}
-                      >
-                        SMS
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setForgotData({ ...forgotData, method: 'email' })}
-                        className={`flex-1 p-4 border text-sm font-medium tracking-wide transition-all ${
-                          forgotData.method === 'email'
-                            ? 'border-[#04473C] bg-[#E6F0EE] text-[#04473C]'
-                            : 'border-[#E5E1DB] hover:border-[#D0C9C0]'
-                        }`}
-                      >
-                        Email
-                      </button>
-                    </div>
-                  </div>
-
-                  <button
-                    onClick={handleForgotPassword}
-                    disabled={loading}
-                    className="btn-primary w-full"
-                    data-testid="send-otp-button"
-                  >
-                    {loading ? 'Sending...' : 'Send OTP'}
-                  </button>
-                </div>
-              )}
-
-              {forgotStep === 2 && (
-                <div className="space-y-5">
-                  <p className="text-[#4A4D53] text-sm">
-                    Enter the 6-digit OTP sent to your {forgotData.method === 'sms' ? 'phone' : 'email'}
-                  </p>
-                  <div>
-                    <label className="premium-label">OTP Code</label>
-                    <input
-                      type="text"
-                      value={forgotData.otp}
-                      onChange={(e) => setForgotData({ ...forgotData, otp: e.target.value.replace(/\D/g, '').slice(0, 6) })}
-                      placeholder="000000"
-                      className="premium-input text-center text-2xl tracking-[0.5em]"
-                      maxLength={6}
-                      data-testid="otp-input"
-                    />
-                  </div>
-
-                  <button
-                    onClick={handleVerifyOTP}
-                    disabled={loading}
-                    className="btn-primary w-full"
-                    data-testid="verify-otp-button"
-                  >
-                    {loading ? 'Verifying...' : 'Verify OTP'}
-                  </button>
-
-                  <button
-                    onClick={() => setForgotStep(1)}
-                    className="w-full text-center text-[#04473C] text-sm font-medium hover:underline"
-                  >
-                    Didn't receive OTP? Try again
-                  </button>
-                </div>
-              )}
-
-              {forgotStep === 3 && (
-                <div className="space-y-5">
-                  <div>
-                    <label className="premium-label">New Password</label>
+                    <label className="text-xs font-bold uppercase tracking-[0.16em]">Phone number</label>
                     <div className="relative">
-                      <Lock className="w-4 h-4 text-[#4A4D53] absolute left-4 top-1/2 -translate-y-1/2" strokeWidth={1.5} />
-                      <input
-                        type="password"
-                        value={forgotData.newPassword}
-                        onChange={(e) => setForgotData({ ...forgotData, newPassword: e.target.value })}
-                        placeholder="Min 6 characters"
-                        className="premium-input pl-12"
-                        data-testid="new-password-input"
+                      <Phone className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--stitch-muted)]" />
+                      <StitchInput
+                        value={formData.phone}
+                        onChange={(event) => setFormData((current) => ({ ...current, phone: normalizePhone(event.target.value) }))}
+                        placeholder="Enter mobile number"
+                        className="pl-11"
                       />
                     </div>
                   </div>
 
-                  <div>
-                    <label className="premium-label">Confirm Password</label>
-                    <div className="relative">
-                      <Lock className="w-4 h-4 text-[#4A4D53] absolute left-4 top-1/2 -translate-y-1/2" strokeWidth={1.5} />
-                      <input
-                        type="password"
-                        value={forgotData.confirmPassword}
-                        onChange={(e) => setForgotData({ ...forgotData, confirmPassword: e.target.value })}
-                        placeholder="Confirm password"
-                        className="premium-input pl-12"
-                        data-testid="confirm-password-input"
-                      />
+                  {isRegister ? (
+                    <div>
+                      <label className="text-xs font-bold uppercase tracking-[0.16em]">Email</label>
+                      <div className="relative">
+                        <Mail className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--stitch-muted)]" />
+                        <StitchInput
+                          value={formData.email}
+                          onChange={(event) => setFormData((current) => ({ ...current, email: event.target.value }))}
+                          placeholder="Optional email"
+                          className="pl-11"
+                        />
+                      </div>
                     </div>
-                  </div>
+                  ) : null}
 
-                  <button
-                    onClick={handleResetPassword}
-                    disabled={loading}
-                    className="btn-primary w-full"
-                    data-testid="reset-password-button"
-                  >
-                    {loading ? 'Resetting...' : 'Reset Password'}
-                  </button>
-                </div>
-              )}
-            </motion.div>
-          ) : (
-            <motion.div 
-              key="login-register"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              className="bg-white border border-[#E5E1DB] p-8"
-            >
-              <h2 className="text-xl mb-6" style={{ fontFamily: 'Playfair Display, serif' }}>
-                {isRegister ? 'Create Account' : 'Welcome Back'}
-              </h2>
-
-              <form onSubmit={handleSubmit} className="space-y-5">
-                {isRegister && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                  >
-                    <label className="premium-label">Full Name</label>
-                    <div className="relative">
-                      <User className="w-4 h-4 text-[#4A4D53] absolute left-4 top-1/2 -translate-y-1/2" strokeWidth={1.5} />
-                      <input
-                        type="text"
-                        data-testid="register-name-input"
-                        value={formData.name}
-                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                        className="premium-input pl-12"
-                        placeholder="Your full name"
-                        required
-                      />
-                    </div>
-                  </motion.div>
-                )}
-
-                <div>
-                  <label className="premium-label">Phone Number</label>
-                  <div className="relative flex items-center border border-[#E5E1DB] bg-white">
-                    <div className="flex items-center gap-1 px-4 py-4 text-[#4A4D53] text-sm font-medium border-r border-[#E5E1DB] bg-[#FDFCFB] shrink-0">
-                      <span>🇮🇳</span>
-                      <span>+91</span>
-                    </div>
-                    <input
-                      type="tel"
-                      inputMode="numeric"
-                      pattern="[0-9]*"
-                      data-testid="login-phone-input"
-                      value={formData.phone}
-                      onChange={(e) => {
-                        // Remove any non-digits and +91 prefix if accidentally pasted
-                        let value = e.target.value.replace(/\D/g, '');
-                        // Remove 91 prefix if user pasted full number
-                        if (value.startsWith('91') && value.length > 10) {
-                          value = value.substring(2);
-                        }
-                        value = value.slice(0, 10);
-                        setFormData({ ...formData, phone: value });
-                      }}
-                      placeholder="Enter mobile number"
-                      className="w-full px-4 py-4 text-[#1A1C20] placeholder:text-[#A8A29E] focus:outline-none border-0"
-                      maxLength={10}
-                      required
-                      autoComplete="tel-national"
-                    />
-                  </div>
-                  {formData.phone && !validatePhone(formData.phone) && (
-                    <p className="text-xs text-[#8F2727] mt-2">Enter valid 10-digit number starting with 6-9</p>
-                  )}
-                </div>
-
-                {isRegister && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                  >
-                    <label className="premium-label">Email (Optional)</label>
-                    <div className="relative">
-                      <Mail className="w-4 h-4 text-[#4A4D53] absolute left-4 top-1/2 -translate-y-1/2" strokeWidth={1.5} />
-                      <input
-                        type="email"
-                        data-testid="register-email-input"
-                        value={formData.email}
-                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                        className="premium-input pl-12"
-                        placeholder="your@email.com"
-                      />
-                    </div>
-                  </motion.div>
-                )}
-
-                {isRegister && formData.role === 'seller' && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                  >
-                    <label className="premium-label">City *</label>
-                    <div className="relative">
-                      <Home className="w-4 h-4 text-[#4A4D53] absolute left-4 top-1/2 -translate-y-1/2" strokeWidth={1.5} />
-                      <input
-                        type="text"
-                        data-testid="register-city-input"
-                        value={formData.city}
-                        onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                        className="premium-input pl-12"
-                        placeholder="Your city (e.g., Mohali, Chandigarh)"
-                        required
-                      />
-                    </div>
-                    <p className="text-xs text-[#C6A87C] mt-2 bg-[#C6A87C]/10 p-2">
-                      Seller accounts require admin approval before activation
-                    </p>
-                  </motion.div>
-                )}
-
-                <div>
-                  <label className="premium-label">Password</label>
-                  <div className="relative">
-                    <input
-                      type={showPassword ? "text" : "password"}
-                      data-testid="login-password-input"
-                      value={formData.password}
-                      onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                      placeholder={isRegister ? "Create a password (min 6 chars)" : "Enter your password"}
-                      className="premium-input pr-12"
-                      required
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-[#4A4D53] hover:text-[#1A1C20]"
-                    >
-                      {showPassword ? <EyeOff className="w-4 h-4" strokeWidth={1.5} /> : <Eye className="w-4 h-4" strokeWidth={1.5} />}
-                    </button>
-                  </div>
-                  {isRegister && formData.password && !validatePassword(formData.password) && (
-                    <p className="text-xs text-[#8F2727] mt-2">Password must be at least 6 characters</p>
-                  )}
-                </div>
-
-                {isRegister && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                  >
-                    <label className="premium-label">I want to</label>
-                    <div className="grid grid-cols-2 gap-3">
-                      {roleOptions.map((option) => {
-                        const IconComponent = option.icon;
-                        return (
+                  {isRegister ? (
+                    <div>
+                      <label className="text-xs font-bold uppercase tracking-[0.16em]">Role</label>
+                      <div className="grid gap-3 sm:grid-cols-2">
+                        {roleOptions.map((option) => (
                           <button
                             key={option.value}
                             type="button"
-                            onClick={() => setFormData({ ...formData, role: option.value })}
-                            className={`p-4 border text-left transition-all ${
-                              formData.role === option.value
-                                ? 'border-[#04473C] bg-[#E6F0EE]'
-                                : 'border-[#E5E1DB] hover:border-[#D0C9C0]'
+                            onClick={() => setFormData((current) => ({ ...current, role: option.value }))}
+                            className={`rounded-[24px] border p-4 text-left transition ${
+                              formData.role === option.value ? "border-black bg-black text-white" : "border-[var(--stitch-line)] bg-white"
                             }`}
-                            data-testid={`role-${option.value}`}
                           >
-                            <IconComponent className={`w-5 h-5 mb-2 ${formData.role === option.value ? 'text-[#04473C]' : 'text-[#4A4D53]'}`} strokeWidth={1.5} />
-                            <div className="font-medium text-sm">{option.label}</div>
-                            <div className="text-xs text-[#4A4D53] mt-1">{option.desc}</div>
+                            <p className="text-sm font-black uppercase tracking-[0.12em]">{option.label}</p>
+                            <p className={`mt-2 text-xs ${formData.role === option.value ? "text-white/70" : "text-[var(--stitch-muted)]"}`}>{option.detail}</p>
                           </button>
-                        );
-                      })}
+                        ))}
+                      </div>
                     </div>
-                  </motion.div>
-                )}
+                  ) : null}
 
-                <button
-                  type="submit"
-                  data-testid="login-submit-button"
-                  disabled={loading}
-                  className="btn-primary w-full flex items-center justify-center gap-2 mt-6"
-                >
-                  {loading ? (
-                    <span className="inline-block w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  ) : (
-                    <>
-                      {isRegister ? 'Create Account' : 'Sign In'}
-                      <ChevronRight className="w-4 h-4" strokeWidth={1.5} />
-                    </>
-                  )}
-                </button>
-              </form>
+                  {isRegister && formData.role === "seller" ? (
+                    <div>
+                      <label className="text-xs font-bold uppercase tracking-[0.16em]">Seller city</label>
+                      <StitchInput
+                        value={formData.city}
+                        onChange={(event) => setFormData((current) => ({ ...current, city: event.target.value }))}
+                        placeholder="City used for seller approval"
+                      />
+                    </div>
+                  ) : null}
 
-              <div className="mt-8 text-center space-y-3">
-                {!isRegister && (
-                  <button
-                    onClick={() => setIsForgotPassword(true)}
-                    className="text-[#4A4D53] hover:text-[#04473C] text-sm transition-colors"
-                    data-testid="forgot-password-link"
-                  >
-                    Forgot Password?
-                  </button>
-                )}
-                <div>
-                  <button
-                    onClick={() => {
-                      setIsRegister(!isRegister);
-                      setFormData({ name: '', phone: '', email: '', password: '', role: 'customer' });
-                    }}
-                    className="text-[#04473C] text-sm font-medium hover:underline"
-                  >
-                    {isRegister ? 'Already have an account? Sign in' : "Don't have an account? Register"}
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+                  <div>
+                    <label className="text-xs font-bold uppercase tracking-[0.16em]">Password</label>
+                    <div className="relative">
+                      <Lock className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--stitch-muted)]" />
+                      <StitchInput
+                        type={showPassword ? "text" : "password"}
+                        value={formData.password}
+                        onChange={(event) => setFormData((current) => ({ ...current, password: event.target.value }))}
+                        placeholder={isRegister ? "Create a password" : "Enter your password"}
+                        className="pl-11 pr-12"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword((current) => !current)}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-[var(--stitch-muted)]"
+                      >
+                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </button>
+                    </div>
+                  </div>
 
-        {/* Become a Rider CTA */}
-        <div className="mt-8 pt-6 border-t border-[#E5E1DB]">
-          <Link 
-            to="/join-as-rider"
-            className="flex items-center justify-center gap-2 w-full py-3 bg-gradient-to-r from-[#065f4e] to-[#04473C] text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
-            data-testid="become-rider-link"
-          >
-            <Briefcase className="w-5 h-5" />
-            Become a Rider - Earn ₹2000/day
-          </Link>
-          <p className="text-center text-xs text-[#4A4D53] mt-2">
-            No experience needed • Flexible hours • Instant payments
-          </p>
+                  <StitchButton type="submit" disabled={loading} className="w-full">
+                    {loading ? "Working" : isRegister ? "Create account" : "Sign in"}
+                    <ChevronRight className="h-4 w-4" />
+                  </StitchButton>
+
+                  <div className="flex flex-col gap-3 border-t border-[var(--stitch-line)] pt-4 text-sm text-[var(--stitch-muted)]">
+                    {!isRegister ? (
+                      <button type="button" onClick={() => setForgotMode(true)} className="text-left">
+                        Forgot password?
+                      </button>
+                    ) : null}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsRegister((current) => !current);
+                        setFormData(baseForm);
+                      }}
+                      className="text-left font-semibold text-[var(--stitch-ink)]"
+                    >
+                      {isRegister ? "Already have an account? Sign in" : "Need an account? Register"}
+                    </button>
+                    <p>
+                      By continuing you agree to the <Link to="/legal" className="font-semibold text-[var(--stitch-ink)]">terms and privacy policy</Link>.
+                    </p>
+                  </div>
+                </motion.form>
+              )}
+            </AnimatePresence>
+          </StitchCard>
         </div>
+      </StitchShell>
 
-        {/* Terms & Privacy */}
-        <p className="text-center text-xs text-[#4A4D53] mt-6">
-          By continuing, you agree to our{' '}
-          <Link to="/legal" className="text-[#04473C] hover:underline">Terms of Service</Link>
-          {' '}and{' '}
-          <Link to="/legal" className="text-[#04473C] hover:underline">Privacy Policy</Link>
-        </p>
-      </motion.div>
-      </div>
-
-      {/* Terms Acceptance Modal */}
       <TermsAcceptanceModal
         isOpen={showTermsModal}
         onAccept={handleTermsAccepted}
-        onDecline={handleTermsDeclined}
+        onDecline={() => {
+          setShowTermsModal(false);
+          toast.error("You must accept the terms to continue.");
+        }}
         userType={formData.role}
-        context={isRegister ? 'registration' : 'login'}
+        context={isRegister ? "registration" : "login"}
       />
-    </div>
+    </>
   );
-};
-
-export default Login;
+}

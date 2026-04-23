@@ -148,7 +148,7 @@ const ClientVerificationModal = ({ isOpen, onComplete, onClose }) => {
                 <AlertTriangle className="w-6 h-6" />
               </div>
               <div>
-                <h2 className="text-xl font-semibold" style={{ fontFamily: 'Playfair Display, serif' }}>
+                <h2 className="text-xl font-semibold" >
                   Client Verification Required
                 </h2>
                 <p className="text-white/80 text-sm">
@@ -183,24 +183,24 @@ const ClientVerificationModal = ({ isOpen, onComplete, onClose }) => {
             ) : currentClient ? (
               <div className="space-y-4">
                 {/* Client Info Card */}
-                <div className="bg-[#F8F7F5] rounded-lg p-4">
+                <div className="bg-[var(--stitch-soft)] rounded-lg p-4">
                   <div className="flex items-start gap-3">
-                    <div className="w-10 h-10 rounded-full bg-[#04473C] flex items-center justify-center flex-shrink-0">
+                    <div className="w-10 h-10 rounded-full bg-[var(--stitch-ink)] flex items-center justify-center flex-shrink-0">
                       <User className="w-5 h-5 text-white" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-[#1A1C20]">{currentClient.client_name}</h3>
-                      <div className="flex items-center gap-2 text-sm text-[#4A4D53] mt-1">
+                      <h3 className="font-semibold text-[var(--stitch-ink)]">{currentClient.client_name}</h3>
+                      <div className="flex items-center gap-2 text-sm text-[var(--stitch-muted)] mt-1">
                         <Phone className="w-3.5 h-3.5" />
                         {currentClient.client_phone}
                       </div>
                       {currentClient.property_title && (
-                        <div className="flex items-center gap-2 text-sm text-[#4A4D53] mt-1">
+                        <div className="flex items-center gap-2 text-sm text-[var(--stitch-muted)] mt-1">
                           <Home className="w-3.5 h-3.5" />
                           {currentClient.property_title}
                         </div>
                       )}
-                      <div className="flex items-center gap-2 text-xs text-[#4A4D53] mt-2">
+                      <div className="flex items-center gap-2 text-xs text-[var(--stitch-muted)] mt-2">
                         <Calendar className="w-3.5 h-3.5" />
                         Referred: {formatDate(currentClient.referred_at)}
                       </div>
@@ -210,7 +210,7 @@ const ClientVerificationModal = ({ isOpen, onComplete, onClose }) => {
 
                 {/* Status Selection */}
                 <div>
-                  <label className="block text-sm font-medium text-[#1A1C20] mb-3">
+                  <label className="block text-sm font-medium text-[var(--stitch-ink)] mb-3">
                     What's the status of this client?
                   </label>
                   
@@ -221,7 +221,7 @@ const ClientVerificationModal = ({ isOpen, onComplete, onClose }) => {
                       className={`w-full p-3 rounded-lg border-2 transition-all flex items-center gap-3 text-left ${
                         selectedStatus === 'closed_won'
                           ? 'border-green-500 bg-green-50'
-                          : 'border-[#E5E1DB] hover:border-green-300'
+                          : 'border-[var(--stitch-line)] hover:border-green-300'
                       }`}
                     >
                       <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
@@ -232,8 +232,8 @@ const ClientVerificationModal = ({ isOpen, onComplete, onClose }) => {
                         }`} />
                       </div>
                       <div>
-                        <p className="font-medium text-[#1A1C20]">Closed Won</p>
-                        <p className="text-xs text-[#4A4D53]">Deal successful - Client converted</p>
+                        <p className="font-medium text-[var(--stitch-ink)]">Closed Won</p>
+                        <p className="text-xs text-[var(--stitch-muted)]">Deal successful - Client converted</p>
                       </div>
                     </button>
 
@@ -243,7 +243,7 @@ const ClientVerificationModal = ({ isOpen, onComplete, onClose }) => {
                       className={`w-full p-3 rounded-lg border-2 transition-all flex items-center gap-3 text-left ${
                         selectedStatus === 'closed_lost'
                           ? 'border-red-500 bg-red-50'
-                          : 'border-[#E5E1DB] hover:border-red-300'
+                          : 'border-[var(--stitch-line)] hover:border-red-300'
                       }`}
                     >
                       <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
@@ -254,8 +254,8 @@ const ClientVerificationModal = ({ isOpen, onComplete, onClose }) => {
                         }`} />
                       </div>
                       <div>
-                        <p className="font-medium text-[#1A1C20]">Closed Lost</p>
-                        <p className="text-xs text-[#4A4D53]">Client not interested / Deal lost</p>
+                        <p className="font-medium text-[var(--stitch-ink)]">Closed Lost</p>
+                        <p className="text-xs text-[var(--stitch-muted)]">Client not interested / Deal lost</p>
                       </div>
                     </button>
 
@@ -265,7 +265,7 @@ const ClientVerificationModal = ({ isOpen, onComplete, onClose }) => {
                       className={`w-full p-3 rounded-lg border-2 transition-all flex items-center gap-3 text-left ${
                         selectedStatus === 'in_progress'
                           ? 'border-blue-500 bg-blue-50'
-                          : 'border-[#E5E1DB] hover:border-blue-300'
+                          : 'border-[var(--stitch-line)] hover:border-blue-300'
                       }`}
                     >
                       <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
@@ -276,8 +276,8 @@ const ClientVerificationModal = ({ isOpen, onComplete, onClose }) => {
                         }`} />
                       </div>
                       <div>
-                        <p className="font-medium text-[#1A1C20]">Still in Progress</p>
-                        <p className="text-xs text-[#4A4D53]">Following up - Not decided yet</p>
+                        <p className="font-medium text-[var(--stitch-ink)]">Still in Progress</p>
+                        <p className="text-xs text-[var(--stitch-muted)]">Following up - Not decided yet</p>
                       </div>
                     </button>
                   </div>
@@ -290,7 +290,7 @@ const ClientVerificationModal = ({ isOpen, onComplete, onClose }) => {
                     animate={{ opacity: 1, height: 'auto' }}
                     className="space-y-2"
                   >
-                    <label className="block text-sm font-medium text-[#1A1C20]">
+                    <label className="block text-sm font-medium text-[var(--stitch-ink)]">
                       <MessageSquare className="w-4 h-4 inline mr-1" />
                       Tell us in a few words (required)
                     </label>
@@ -299,7 +299,7 @@ const ClientVerificationModal = ({ isOpen, onComplete, onClose }) => {
                       onChange={(e) => setNotes(e.target.value)}
                       placeholder="E.g., Client wants to visit next week, waiting for budget confirmation..."
                       rows={2}
-                      className="w-full px-3 py-2 border border-[#E5E1DB] rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm resize-none"
+                      className="w-full px-3 py-2 border border-[var(--stitch-line)] rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm resize-none"
                     />
                   </motion.div>
                 )}
@@ -322,7 +322,7 @@ const ClientVerificationModal = ({ isOpen, onComplete, onClose }) => {
                 <button
                   onClick={handleVerify}
                   disabled={!selectedStatus || submitting}
-                  className="w-full py-3 bg-gradient-to-r from-[#04473C] to-[#065F4E] text-white rounded-lg font-medium hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  className="w-full py-3 bg-gradient-to-r from-[var(--stitch-ink)] to-[var(--stitch-ink)] text-white rounded-lg font-medium hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                   {submitting ? (
                     <>
@@ -340,8 +340,8 @@ const ClientVerificationModal = ({ isOpen, onComplete, onClose }) => {
             ) : (
               <div className="text-center py-8">
                 <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-3" />
-                <p className="text-[#1A1C20] font-medium">All verifications complete!</p>
-                <p className="text-sm text-[#4A4D53]">Share feature is now unlocked</p>
+                <p className="text-[var(--stitch-ink)] font-medium">All verifications complete!</p>
+                <p className="text-sm text-[var(--stitch-muted)]">Share feature is now unlocked</p>
               </div>
             )}
           </div>

@@ -124,7 +124,7 @@ const PromotionsPanel = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="w-8 h-8 border-2 border-[#04473C] border-t-transparent rounded-full animate-spin"></div>
+        <div className="w-8 h-8 border border-[var(--stitch-line)] border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
   }
@@ -132,7 +132,7 @@ const PromotionsPanel = () => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold" style={{ fontFamily: 'Playfair Display, serif' }}>
+        <h2 className="text-2xl font-bold" >
           Promotions & Offers Management
         </h2>
         <motion.button
@@ -140,7 +140,7 @@ const PromotionsPanel = () => {
           disabled={saving}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          className="btn-primary flex items-center gap-2"
+          className="stitch-button flex items-center gap-2"
         >
           {saving ? (
             <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -155,19 +155,19 @@ const PromotionsPanel = () => {
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-white border border-[#E5E1DB] p-6"
+        className="bg-white border border-[var(--stitch-line)] p-6"
       >
         <div className="flex items-center gap-3 mb-6">
-          <div className="w-12 h-12 bg-[#04473C] flex items-center justify-center">
+          <div className="w-12 h-12 bg-[var(--stitch-ink)] flex items-center justify-center">
             <Bike className="w-6 h-6 text-white" />
           </div>
           <div className="flex-1">
             <h3 className="font-bold text-lg">Rider Incentives</h3>
-            <p className="text-sm text-[#4A4D53]">Set bonuses and commissions for field riders</p>
+            <p className="text-sm text-[var(--stitch-muted)]">Set bonuses and commissions for field riders</p>
           </div>
           <label className="flex items-center gap-2 cursor-pointer">
             <div className={`w-12 h-7 rounded-full transition-colors relative ${
-              promotions.rider_promotion_active ? 'bg-[#04473C]' : 'bg-[#E5E1DB]'
+              promotions.rider_promotion_active ? 'bg-[var(--stitch-ink)]' : 'bg-[var(--stitch-line)]'
             }`}>
               <input
                 type="checkbox"
@@ -187,17 +187,17 @@ const PromotionsPanel = () => {
           <div>
             <label className="block text-sm font-medium mb-1">Extra Bonus Per Visit (₹)</label>
             <div className="relative">
-              <IndianRupee className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#4A4D53]" />
+              <IndianRupee className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--stitch-muted)]" />
               <input
                 type="number"
                 min="0"
                 value={promotions.rider_per_visit_bonus}
                 onChange={(e) => setPromotions({ ...promotions, rider_per_visit_bonus: parseInt(e.target.value) || 0 })}
-                className="premium-input pl-9"
+                className="stitch-input pl-9"
                 placeholder="0"
               />
             </div>
-            <p className="text-xs text-[#4A4D53] mt-1">Added to base ₹150/visit</p>
+            <p className="text-xs text-[var(--stitch-muted)] mt-1">Added to base ₹150/visit</p>
           </div>
 
           <div>
@@ -207,22 +207,22 @@ const PromotionsPanel = () => {
               min="1"
               value={promotions.rider_bonus_after_visits}
               onChange={(e) => setPromotions({ ...promotions, rider_bonus_after_visits: parseInt(e.target.value) || 10 })}
-              className="premium-input"
+              className="stitch-input"
               placeholder="10"
             />
-            <p className="text-xs text-[#4A4D53] mt-1">Milestone visits count</p>
+            <p className="text-xs text-[var(--stitch-muted)] mt-1">Milestone visits count</p>
           </div>
 
           <div>
             <label className="block text-sm font-medium mb-1">Milestone Bonus (₹)</label>
             <div className="relative">
-              <IndianRupee className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#4A4D53]" />
+              <IndianRupee className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--stitch-muted)]" />
               <input
                 type="number"
                 min="0"
                 value={promotions.rider_bonus_amount}
                 onChange={(e) => setPromotions({ ...promotions, rider_bonus_amount: parseInt(e.target.value) || 0 })}
-                className="premium-input pl-9"
+                className="stitch-input pl-9"
                 placeholder="500"
               />
             </div>
@@ -231,17 +231,17 @@ const PromotionsPanel = () => {
           <div>
             <label className="block text-sm font-medium mb-1">Referral Bonus (₹)</label>
             <div className="relative">
-              <IndianRupee className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#4A4D53]" />
+              <IndianRupee className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--stitch-muted)]" />
               <input
                 type="number"
                 min="0"
                 value={promotions.rider_referral_bonus}
                 onChange={(e) => setPromotions({ ...promotions, rider_referral_bonus: parseInt(e.target.value) || 0 })}
-                className="premium-input pl-9"
+                className="stitch-input pl-9"
                 placeholder="200"
               />
             </div>
-            <p className="text-xs text-[#4A4D53] mt-1">Per referred rider</p>
+            <p className="text-xs text-[var(--stitch-muted)] mt-1">Per referred rider</p>
           </div>
         </div>
 
@@ -251,7 +251,7 @@ const PromotionsPanel = () => {
             type="text"
             value={promotions.rider_promotion_message}
             onChange={(e) => setPromotions({ ...promotions, rider_promotion_message: e.target.value })}
-            className="premium-input"
+            className="stitch-input"
             placeholder="e.g., Complete 20 visits this week and earn ₹1000 bonus!"
           />
         </div>
@@ -262,19 +262,19 @@ const PromotionsPanel = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className="bg-white border border-[#E5E1DB] p-6"
+        className="bg-white border border-[var(--stitch-line)] p-6"
       >
         <div className="flex items-center gap-3 mb-6">
-          <div className="w-12 h-12 bg-[#C6A87C] flex items-center justify-center">
+          <div className="w-12 h-12 bg-[var(--stitch-muted)] flex items-center justify-center">
             <Store className="w-6 h-6 text-white" />
           </div>
           <div className="flex-1">
             <h3 className="font-bold text-lg">Seller (Calling Agent) Incentives</h3>
-            <p className="text-sm text-[#4A4D53]">Set commissions and bonuses for sellers</p>
+            <p className="text-sm text-[var(--stitch-muted)]">Set commissions and bonuses for sellers</p>
           </div>
           <label className="flex items-center gap-2 cursor-pointer">
             <div className={`w-12 h-7 rounded-full transition-colors relative ${
-              promotions.seller_promotion_active ? 'bg-[#C6A87C]' : 'bg-[#E5E1DB]'
+              promotions.seller_promotion_active ? 'bg-[var(--stitch-muted)]' : 'bg-[var(--stitch-line)]'
             }`}>
               <input
                 type="checkbox"
@@ -294,50 +294,50 @@ const PromotionsPanel = () => {
           <div>
             <label className="block text-sm font-medium mb-1">Commission Rate (%)</label>
             <div className="relative">
-              <Percent className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#4A4D53]" />
+              <Percent className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--stitch-muted)]" />
               <input
                 type="number"
                 min="0"
                 max="50"
                 value={promotions.seller_commission_percent}
                 onChange={(e) => setPromotions({ ...promotions, seller_commission_percent: parseInt(e.target.value) || 0 })}
-                className="premium-input pl-9"
+                className="stitch-input pl-9"
                 placeholder="5"
               />
             </div>
-            <p className="text-xs text-[#4A4D53] mt-1">% of deal brokerage</p>
+            <p className="text-xs text-[var(--stitch-muted)] mt-1">% of deal brokerage</p>
           </div>
 
           <div>
             <label className="block text-sm font-medium mb-1">First Deal Bonus (₹)</label>
             <div className="relative">
-              <IndianRupee className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#4A4D53]" />
+              <IndianRupee className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--stitch-muted)]" />
               <input
                 type="number"
                 min="0"
                 value={promotions.seller_bonus_on_first_deal}
                 onChange={(e) => setPromotions({ ...promotions, seller_bonus_on_first_deal: parseInt(e.target.value) || 0 })}
-                className="premium-input pl-9"
+                className="stitch-input pl-9"
                 placeholder="1000"
               />
             </div>
-            <p className="text-xs text-[#4A4D53] mt-1">One-time bonus</p>
+            <p className="text-xs text-[var(--stitch-muted)] mt-1">One-time bonus</p>
           </div>
 
           <div>
             <label className="block text-sm font-medium mb-1">Referral Bonus (₹)</label>
             <div className="relative">
-              <IndianRupee className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#4A4D53]" />
+              <IndianRupee className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--stitch-muted)]" />
               <input
                 type="number"
                 min="0"
                 value={promotions.seller_referral_bonus}
                 onChange={(e) => setPromotions({ ...promotions, seller_referral_bonus: parseInt(e.target.value) || 0 })}
-                className="premium-input pl-9"
+                className="stitch-input pl-9"
                 placeholder="300"
               />
             </div>
-            <p className="text-xs text-[#4A4D53] mt-1">Per referred seller</p>
+            <p className="text-xs text-[var(--stitch-muted)] mt-1">Per referred seller</p>
           </div>
         </div>
 
@@ -347,7 +347,7 @@ const PromotionsPanel = () => {
             type="text"
             value={promotions.seller_promotion_message}
             onChange={(e) => setPromotions({ ...promotions, seller_promotion_message: e.target.value })}
-            className="premium-input"
+            className="stitch-input"
             placeholder="e.g., Close 5 deals this month and get 2% extra commission!"
           />
         </div>
@@ -358,19 +358,19 @@ const PromotionsPanel = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
-        className="bg-white border border-[#E5E1DB] p-6"
+        className="bg-white border border-[var(--stitch-line)] p-6"
       >
         <div className="flex items-center gap-3 mb-6">
-          <div className="w-12 h-12 bg-[#E07A5F] flex items-center justify-center">
+          <div className="w-12 h-12 bg-[var(--stitch-ink)] flex items-center justify-center">
             <Users className="w-6 h-6 text-white" />
           </div>
           <div className="flex-1">
             <h3 className="font-bold text-lg">Customer Offers</h3>
-            <p className="text-sm text-[#4A4D53]">Set discounts and credits for customers</p>
+            <p className="text-sm text-[var(--stitch-muted)]">Set discounts and credits for customers</p>
           </div>
           <label className="flex items-center gap-2 cursor-pointer">
             <div className={`w-12 h-7 rounded-full transition-colors relative ${
-              promotions.customer_promotion_active ? 'bg-[#E07A5F]' : 'bg-[#E5E1DB]'
+              promotions.customer_promotion_active ? 'bg-[var(--stitch-ink)]' : 'bg-[var(--stitch-line)]'
             }`}>
               <input
                 type="checkbox"
@@ -390,51 +390,51 @@ const PromotionsPanel = () => {
           <div>
             <label className="block text-sm font-medium mb-1">First Visit Discount (%)</label>
             <div className="relative">
-              <Percent className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#4A4D53]" />
+              <Percent className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--stitch-muted)]" />
               <input
                 type="number"
                 min="0"
                 max="50"
                 value={promotions.customer_first_visit_discount}
                 onChange={(e) => setPromotions({ ...promotions, customer_first_visit_discount: parseInt(e.target.value) || 0 })}
-                className="premium-input pl-9"
+                className="stitch-input pl-9"
                 placeholder="10"
               />
             </div>
-            <p className="text-xs text-[#4A4D53] mt-1">New customer discount</p>
+            <p className="text-xs text-[var(--stitch-muted)] mt-1">New customer discount</p>
           </div>
 
           <div>
             <label className="block text-sm font-medium mb-1">Referral Credit (₹)</label>
             <div className="relative">
-              <IndianRupee className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#4A4D53]" />
+              <IndianRupee className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--stitch-muted)]" />
               <input
                 type="number"
                 min="0"
                 value={promotions.customer_referral_credit}
                 onChange={(e) => setPromotions({ ...promotions, customer_referral_credit: parseInt(e.target.value) || 0 })}
-                className="premium-input pl-9"
+                className="stitch-input pl-9"
                 placeholder="100"
               />
             </div>
-            <p className="text-xs text-[#4A4D53] mt-1">Per referred customer</p>
+            <p className="text-xs text-[var(--stitch-muted)] mt-1">Per referred customer</p>
           </div>
 
           <div>
             <label className="block text-sm font-medium mb-1">Loyalty Discount (%)</label>
             <div className="relative">
-              <Percent className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#4A4D53]" />
+              <Percent className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--stitch-muted)]" />
               <input
                 type="number"
                 min="0"
                 max="30"
                 value={promotions.customer_loyalty_discount}
                 onChange={(e) => setPromotions({ ...promotions, customer_loyalty_discount: parseInt(e.target.value) || 0 })}
-                className="premium-input pl-9"
+                className="stitch-input pl-9"
                 placeholder="5"
               />
             </div>
-            <p className="text-xs text-[#4A4D53] mt-1">After 3+ bookings</p>
+            <p className="text-xs text-[var(--stitch-muted)] mt-1">After 3+ bookings</p>
           </div>
         </div>
 
@@ -444,7 +444,7 @@ const PromotionsPanel = () => {
             type="text"
             value={promotions.customer_promotion_message}
             onChange={(e) => setPromotions({ ...promotions, customer_promotion_message: e.target.value })}
-            className="premium-input"
+            className="stitch-input"
             placeholder="e.g., Refer a friend and get ₹100 credit on your next booking!"
           />
         </div>
@@ -455,23 +455,23 @@ const PromotionsPanel = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
-        className="bg-white border border-[#E5E1DB] p-6"
+        className="bg-white border border-[var(--stitch-line)] p-6"
       >
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-gradient-to-br from-[#04473C] to-[#C6A87C] flex items-center justify-center">
+            <div className="w-12 h-12 bg-gradient-to-br from-[var(--stitch-ink)] to-[var(--stitch-muted)] flex items-center justify-center">
               <Gift className="w-6 h-6 text-white" />
             </div>
             <div>
               <h3 className="font-bold text-lg">Custom Promo Codes</h3>
-              <p className="text-sm text-[#4A4D53]">Create special offer codes for campaigns</p>
+              <p className="text-sm text-[var(--stitch-muted)]">Create special offer codes for campaigns</p>
             </div>
           </div>
           <motion.button
             onClick={() => setShowAddOffer(true)}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            className="btn-secondary flex items-center gap-2"
+            className="stitch-button stitch-button-secondary flex items-center gap-2"
           >
             <Plus className="w-4 h-4" />
             Add Code
@@ -483,11 +483,11 @@ const PromotionsPanel = () => {
           <motion.div
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
-            className="bg-[#F5F3F0] p-4 mb-4 border border-[#E5E1DB]"
+            className="bg-[var(--stitch-soft)] p-4 mb-4 border border-[var(--stitch-line)]"
           >
             <div className="flex items-center justify-between mb-4">
               <h4 className="font-medium">New Promo Code</h4>
-              <button onClick={() => setShowAddOffer(false)} className="p-1 hover:bg-[#E5E1DB] rounded">
+              <button onClick={() => setShowAddOffer(false)} className="p-1 hover:bg-[var(--stitch-line)] rounded">
                 <X className="w-4 h-4" />
               </button>
             </div>
@@ -498,7 +498,7 @@ const PromotionsPanel = () => {
                 <select
                   value={newOffer.target}
                   onChange={(e) => setNewOffer({ ...newOffer, target: e.target.value })}
-                  className="premium-input"
+                  className="stitch-input"
                 >
                   <option value="customer">Customers</option>
                   <option value="rider">Riders</option>
@@ -513,7 +513,7 @@ const PromotionsPanel = () => {
                   type="text"
                   value={newOffer.code}
                   onChange={(e) => setNewOffer({ ...newOffer, code: e.target.value.toUpperCase() })}
-                  className="premium-input uppercase"
+                  className="stitch-input uppercase"
                   placeholder="HOLI2026"
                 />
               </div>
@@ -523,7 +523,7 @@ const PromotionsPanel = () => {
                 <select
                   value={newOffer.discount_type}
                   onChange={(e) => setNewOffer({ ...newOffer, discount_type: e.target.value })}
-                  className="premium-input"
+                  className="stitch-input"
                 >
                   <option value="percent">Percentage (%)</option>
                   <option value="flat">Flat Amount (₹)</option>
@@ -537,7 +537,7 @@ const PromotionsPanel = () => {
                   min="0"
                   value={newOffer.discount_value}
                   onChange={(e) => setNewOffer({ ...newOffer, discount_value: parseInt(e.target.value) || 0 })}
-                  className="premium-input"
+                  className="stitch-input"
                   placeholder="10"
                 />
               </div>
@@ -550,7 +550,7 @@ const PromotionsPanel = () => {
                   type="text"
                   value={newOffer.title}
                   onChange={(e) => setNewOffer({ ...newOffer, title: e.target.value })}
-                  className="premium-input"
+                  className="stitch-input"
                   placeholder="Holi Special Discount"
                 />
               </div>
@@ -561,7 +561,7 @@ const PromotionsPanel = () => {
                   type="date"
                   value={newOffer.valid_until}
                   onChange={(e) => setNewOffer({ ...newOffer, valid_until: e.target.value })}
-                  className="premium-input"
+                  className="stitch-input"
                 />
               </div>
             </div>
@@ -572,7 +572,7 @@ const PromotionsPanel = () => {
                 type="text"
                 value={newOffer.description}
                 onChange={(e) => setNewOffer({ ...newOffer, description: e.target.value })}
-                className="premium-input"
+                className="stitch-input"
                 placeholder="Get 10% off on your first visit booking!"
               />
             </div>
@@ -581,7 +581,7 @@ const PromotionsPanel = () => {
               onClick={handleAddCustomOffer}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className="btn-primary flex items-center gap-2"
+              className="stitch-button flex items-center gap-2"
             >
               <Plus className="w-4 h-4" />
               Add Promo Code
@@ -596,18 +596,18 @@ const PromotionsPanel = () => {
               <div 
                 key={offer.id} 
                 className={`flex items-center justify-between p-4 border ${
-                  offer.active ? 'border-[#04473C] bg-[#E6F0EE]' : 'border-[#E5E1DB] bg-[#F5F3F0]'
+                  offer.active ? 'border-[var(--stitch-ink)] bg-[var(--stitch-soft)]' : 'border-[var(--stitch-line)] bg-[var(--stitch-soft)]'
                 }`}
               >
                 <div className="flex items-center gap-4">
                   <div className={`px-3 py-1 font-mono font-bold text-sm ${
-                    offer.active ? 'bg-[#04473C] text-white' : 'bg-[#E5E1DB] text-[#4A4D53]'
+                    offer.active ? 'bg-[var(--stitch-ink)] text-white' : 'bg-[var(--stitch-line)] text-[var(--stitch-muted)]'
                   }`}>
                     {offer.code}
                   </div>
                   <div>
                     <p className="font-medium">{offer.title}</p>
-                    <p className="text-sm text-[#4A4D53]">
+                    <p className="text-sm text-[var(--stitch-muted)]">
                       {offer.discount_type === 'percent' ? `${offer.discount_value}% off` : `₹${offer.discount_value} off`}
                       {' • '}
                       {offer.target === 'all' ? 'Everyone' : `${offer.target.charAt(0).toUpperCase() + offer.target.slice(1)}s`}
@@ -620,8 +620,8 @@ const PromotionsPanel = () => {
                     onClick={() => toggleOfferStatus(offer.id)}
                     className={`px-3 py-1 text-sm font-medium transition-colors ${
                       offer.active 
-                        ? 'bg-[#04473C] text-white hover:bg-[#033430]' 
-                        : 'bg-[#E5E1DB] text-[#4A4D53] hover:bg-[#D0C9C0]'
+                        ? 'bg-[var(--stitch-ink)] text-white hover:bg-[#033430]' 
+                        : 'bg-[var(--stitch-line)] text-[var(--stitch-muted)] hover:bg-[var(--stitch-muted)]'
                     }`}
                   >
                     {offer.active ? 'Active' : 'Inactive'}
@@ -637,7 +637,7 @@ const PromotionsPanel = () => {
             ))}
           </div>
         ) : (
-          <div className="text-center py-8 text-[#4A4D53]">
+          <div className="text-center py-8 text-[var(--stitch-muted)]">
             <Gift className="w-12 h-12 mx-auto mb-2 opacity-30" />
             <p>No custom promo codes yet</p>
             <p className="text-sm">Create your first promo code above</p>
@@ -646,11 +646,11 @@ const PromotionsPanel = () => {
       </motion.div>
 
       {/* Info Box */}
-      <div className="bg-[#E6F0EE] border border-[#04473C]/20 p-4 flex items-start gap-3">
-        <AlertCircle className="w-5 h-5 text-[#04473C] flex-shrink-0 mt-0.5" />
+      <div className="bg-[var(--stitch-soft)] border border-[var(--stitch-ink)]/20 p-4 flex items-start gap-3">
+        <AlertCircle className="w-5 h-5 text-[var(--stitch-ink)] flex-shrink-0 mt-0.5" />
         <div className="text-sm">
-          <p className="font-medium text-[#04473C]">How Promotions Work:</p>
-          <ul className="text-[#4A4D53] mt-1 space-y-1">
+          <p className="font-medium text-[var(--stitch-ink)]">How Promotions Work:</p>
+          <ul className="text-[var(--stitch-muted)] mt-1 space-y-1">
             <li>• <strong>Rider Incentives:</strong> Displayed in Rider Dashboard earnings section</li>
             <li>• <strong>Seller Incentives:</strong> Applied to commission calculations and shown in Seller Dashboard</li>
             <li>• <strong>Customer Offers:</strong> Applied at checkout when promo codes are entered</li>

@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Property Map View</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container-low": "#f3f3f4",
+                    "surface-container-high": "#e8e8e8",
+                    "on-secondary-fixed-variant": "#3b3b3b",
+                    "secondary": "#5e5e5e",
+                    "on-primary-container": "#ffffff",
+                    "on-surface": "#1a1c1c",
+                    "on-tertiary-fixed-variant": "#e5e2e1",
+                    "primary": "#000000",
+                    "background": "#f9f9f9",
+                    "secondary-fixed": "#c6c6c6",
+                    "primary-container": "#3b3b3b",
+                    "on-primary-fixed": "#ffffff",
+                    "on-primary": "#e2e2e2",
+                    "secondary-fixed-dim": "#ababab",
+                    "on-tertiary-container": "#ffffff",
+                    "surface-variant": "#e2e2e2",
+                    "on-tertiary": "#e5e2e1",
+                    "surface-tint": "#5e5e5e",
+                    "inverse-primary": "#c6c6c6",
+                    "error": "#ba1a1a",
+                    "primary-fixed": "#5e5e5e",
+                    "surface-container-highest": "#e2e2e2",
+                    "on-error-container": "#410002",
+                    "surface": "#f9f9f9",
+                    "inverse-on-surface": "#f0f1f1",
+                    "tertiary-fixed-dim": "#474746",
+                    "surface-bright": "#f9f9f9",
+                    "on-tertiary-fixed": "#ffffff",
+                    "surface-container": "#eeeeee",
+                    "on-background": "#1a1c1c",
+                    "primary-fixed-dim": "#474747",
+                    "on-error": "#ffffff",
+                    "surface-dim": "#dadada",
+                    "outline": "#777777",
+                    "on-secondary-container": "#1b1b1b",
+                    "on-secondary": "#ffffff",
+                    "secondary-container": "#d4d4d4",
+                    "on-primary-fixed-variant": "#e2e2e2",
+                    "on-secondary-fixed": "#1b1b1b",
+                    "inverse-surface": "#2f3131",
+                    "tertiary-container": "#757474",
+                    "outline-variant": "#c6c6c6",
+                    "on-surface-variant": "#474747",
+                    "error-container": "#ffdad6",
+                    "tertiary": "#3c3b3b",
+                    "surface-container-lowest": "#ffffff",
+                    "tertiary-fixed": "#5f5e5e"
+            },
+            "borderRadius": {
+                    "DEFAULT": "1rem",
+                    "lg": "2rem",
+                    "xl": "3rem",
+                    "full": "9999px"
+            },
+            "spacing": {},
+            "fontFamily": {
+                    "headline": ["Inter"],
+                    "body": ["Inter"],
+                    "label": ["Inter"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 1; }
+    </style>
+</head>
+<body class="bg-surface h-screen w-full overflow-hidden flex flex-col antialiased">
+<!-- TopAppBar (Desktop) -->
+<nav class="hidden md:flex justify-between items-center px-8 h-20 w-full bg-white z-50 docked top-0 border-b-0">
+<div class="text-2xl font-black tracking-tighter text-black uppercase font-headline">APNAGHR</div>
+<div class="flex space-x-8">
+<a class="font-['Inter'] font-bold tracking-tighter uppercase text-black border-b-2 border-black pb-1 hover:bg-zinc-100 transition-all px-2" href="#">Maps</a>
+<a class="font-['Inter'] font-bold tracking-tighter uppercase text-zinc-400 hover:bg-zinc-100 transition-all px-2" href="#">Analytics</a>
+<a class="font-['Inter'] font-bold tracking-tighter uppercase text-zinc-400 hover:bg-zinc-100 transition-all px-2" href="#">Earnings</a>
+</div>
+<div class="flex space-x-6 text-black">
+<button class="scale-102 active:scale-98 transition-transform hover:bg-zinc-100 p-2 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="scale-102 active:scale-98 transition-transform hover:bg-zinc-100 p-2 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+</button>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-1 w-full flex flex-col md:flex-row relative overflow-hidden bg-surface-container-highest">
+<!-- Map Canvas (Desaturated) -->
+<div class="flex-1 relative w-full h-full bg-surface-container-highest z-0">
+<img alt="Map View" class="w-full h-full object-cover grayscale contrast-[1.3] brightness-110 opacity-70" data-alt="High contrast monochromatic satellite map view of an urban city grid with sharp street lines and minimal topographical details" data-location="Chicago City Grid" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD1GTfMHbRU-YNFXE1UtKLzW_7i26-mwRQ6wbqRLC0YeDTlnuFBJkOxNg1iOEKYUCIaYPm4Lh5cF6387b5euleXCiFZ3G5EBK76RKwZU3Q7co-E9YH6D0HBAIPhPgUgLOVR2shnPAPHvWcoo6JafC4tY6rkrJz1BpvsKQrDu4GaMH5EYxvjAH4xMhbun77wjfCscWY4WRs8Ri4w90bSYx5ZAT7hLThgYrr_3ccn_qCCJRqpa1biPpj5AnvMMogufsyJk_SFgiIV5dCD"/>
+<!-- Map Pins (Monolithic Primitives) -->
+<button class="absolute top-[25%] left-[30%] w-12 h-12 bg-primary text-on-primary rounded-full flex items-center justify-center font-bold text-sm shadow-none scale-100 hover:scale-[1.05] transition-transform">
+                14
+            </button>
+<button class="absolute top-[45%] left-[55%] w-16 h-16 bg-primary text-on-primary rounded-full flex items-center justify-center font-bold text-lg shadow-none scale-100 hover:scale-[1.05] transition-transform ring-4 ring-surface-container-lowest">
+                82
+            </button>
+<button class="absolute top-[60%] left-[20%] w-12 h-12 bg-primary text-on-primary rounded-full flex items-center justify-center font-bold text-sm shadow-none scale-100 hover:scale-[1.05] transition-transform">
+                03
+            </button>
+</div>
+<!-- Details Side Panel (Shadowless Stacking, Neo-Brutalist) -->
+<aside class="absolute bottom-0 md:bottom-auto md:relative right-0 w-full md:w-[480px] h-[665px] md:h-full bg-surface-container-lowest z-20 flex flex-col overflow-y-auto border-t md:border-t-0 md:border-l border-outline-variant/30">
+<!-- Property Image Hero -->
+<div class="w-full h-64 md:h-80 bg-surface-container-low relative flex-shrink-0">
+<img alt="Property Exterior" class="w-full h-full object-cover grayscale-[0.5] contrast-125" data-alt="Stark modern residential building exterior featuring sharp geometric lines, concrete textures, and dark framed windows under overcast lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB1Dbt4E7ZzgqhFPiBiroXy0j2z8ovA2-Hcf3q4HwWVQFX5ylPJs8pSakf4xAgGWwofjN1KxWrDKiD95-ttA0pFZMFkR6iuF5MBdej1CiND7lH-32tjuq70Gh8vmr-JHVsa_LWj29imzNVN44JipoVtlSIGFwC2rlvcIqXD4oaIqjj5dJMD1ipLSdziurGI0qoogcJRpJU9tHiDgOp66iPS8NzPWklkGBXGb_wa1B9Ybenvj21uUzYzCbVjzdepLaZUjebP86KLdHau"/>
+<div class="absolute top-6 left-6 bg-primary text-on-primary px-3 py-1 text-[10px] font-bold uppercase tracking-widest">
+                    Verified Asset
+                </div>
+</div>
+<!-- Property Data -->
+<div class="p-8 md:p-10 flex flex-col flex-1 bg-surface-container-lowest">
+<div class="flex justify-between items-start mb-6">
+<div>
+<div class="text-5xl font-black tracking-tighter text-primary leading-none mb-2">$4.2M</div>
+<h1 class="text-lg font-bold text-primary font-headline">849 W. Kinzie St.<br/><span class="text-secondary font-semibold text-sm">Fulton Market District</span></h1>
+</div>
+<button class="w-12 h-12 rounded-full border border-outline-variant flex items-center justify-center text-primary hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined text-xl" data-icon="bookmark">bookmark</span>
+</button>
+</div>
+<hr class="border-t border-outline-variant/50 w-full my-8"/>
+<!-- Specs Grid -->
+<div class="grid grid-cols-2 gap-4 mb-10">
+<div class="bg-surface-container-low p-5 rounded-sm">
+<div class="text-[10px] font-bold text-secondary uppercase tracking-widest mb-2">Footprint</div>
+<div class="text-2xl font-black text-primary">4,200<span class="text-sm font-bold text-secondary ml-1">SQFT</span></div>
+</div>
+<div class="bg-surface-container-low p-5 rounded-sm">
+<div class="text-[10px] font-bold text-secondary uppercase tracking-widest mb-2">Zoning</div>
+<div class="text-2xl font-black text-primary">DX-7</div>
+</div>
+<div class="bg-surface-container-low p-5 rounded-sm">
+<div class="text-[10px] font-bold text-secondary uppercase tracking-widest mb-2">Cap Rate</div>
+<div class="text-2xl font-black text-primary">6.4<span class="text-sm font-bold text-secondary ml-1">%</span></div>
+</div>
+<div class="bg-surface-container-low p-5 rounded-sm">
+<div class="text-[10px] font-bold text-secondary uppercase tracking-widest mb-2">Year Built</div>
+<div class="text-2xl font-black text-primary">2019</div>
+</div>
+</div>
+<p class="text-base text-on-surface leading-relaxed font-body mb-10">
+                    High-yield commercial asset positioned in a high-density transit corridor. Structure features monolithic poured concrete slab construction, floor-to-ceiling tempered glass partitions, and industrial-grade mechanical systems. Current occupancy stabilized at 94%.
+                </p>
+<!-- Massive Solid Button -->
+<button class="mt-auto w-full py-6 px-8 bg-primary text-on-primary rounded-full font-bold uppercase tracking-widest text-sm hover:scale-[1.02] transition-transform flex items-center justify-center gap-3">
+                    Initiate Underwriting
+                    <span class="material-symbols-outlined text-sm" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</aside>
+</main>
+<!-- BottomNavBar (Mobile) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full flex justify-around items-center px-4 py-2 pb-safe bg-white/80 backdrop-blur-xl z-50 border-t border-zinc-200">
+<!-- Active Nav Item -->
+<a class="flex flex-col items-center justify-center bg-black text-white rounded-full p-3 w-16 h-16 scale-105 transition-all" href="#">
+<span class="material-symbols-outlined text-2xl mb-1" data-icon="explore">explore</span>
+<span class="font-['Inter'] font-bold text-[10px] uppercase">Explore</span>
+</a>
+<!-- Inactive Nav Items -->
+<a class="flex flex-col items-center justify-center text-zinc-400 p-3 hover:opacity-80 transition-all" href="#">
+<span class="material-symbols-outlined text-2xl mb-1" data-icon="calculate">calculate</span>
+<span class="font-['Inter'] font-bold text-[10px] uppercase">Calc</span>
+</a>
+<a class="flex flex-col items-center justify-center text-zinc-400 p-3 hover:opacity-80 transition-all" href="#">
+<span class="material-symbols-outlined text-2xl mb-1" data-icon="trending_up">trending_up</span>
+<span class="font-['Inter'] font-bold text-[10px] uppercase">Trends</span>
+</a>
+<a class="flex flex-col items-center justify-center text-zinc-400 p-3 hover:opacity-80 transition-all" href="#">
+<span class="material-symbols-outlined text-2xl mb-1" data-icon="notifications">notifications</span>
+<span class="font-['Inter'] font-bold text-[10px] uppercase">Alerts</span>
+</a>
+</nav>
+</body></html>

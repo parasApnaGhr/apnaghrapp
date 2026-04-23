@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Analytics &amp; Reporting Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary-fixed-dim": "#ababab",
+                        "surface-container-high": "#e8e8e8",
+                        "outline-variant": "#c6c6c6",
+                        "primary-fixed": "#5e5e5e",
+                        "on-secondary-fixed-variant": "#3b3b3b",
+                        "surface-container": "#eeeeee",
+                        "on-primary-fixed": "#ffffff",
+                        "inverse-primary": "#c6c6c6",
+                        "primary": "#000000",
+                        "surface-variant": "#e2e2e2",
+                        "tertiary-fixed": "#5f5e5e",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary-container": "#d4d4d4",
+                        "surface-container-highest": "#e2e2e2",
+                        "on-secondary-container": "#1b1b1b",
+                        "on-error-container": "#410002",
+                        "secondary-fixed": "#c6c6c6",
+                        "on-secondary": "#ffffff",
+                        "on-tertiary-fixed-variant": "#e5e2e1",
+                        "primary-container": "#3b3b3b",
+                        "error-container": "#ffdad6",
+                        "surface-dim": "#dadada",
+                        "secondary": "#5e5e5e",
+                        "surface-container-low": "#f3f3f4",
+                        "surface": "#f9f9f9",
+                        "on-secondary-fixed": "#1b1b1b",
+                        "tertiary-fixed-dim": "#474746",
+                        "surface-bright": "#f9f9f9",
+                        "on-primary-fixed-variant": "#e2e2e2",
+                        "surface-tint": "#5e5e5e",
+                        "primary-fixed-dim": "#474747",
+                        "on-tertiary-fixed": "#ffffff",
+                        "on-surface": "#1a1c1c",
+                        "on-primary-container": "#ffffff",
+                        "tertiary-container": "#757474",
+                        "error": "#ba1a1a",
+                        "on-primary": "#e2e2e2",
+                        "on-tertiary-container": "#ffffff",
+                        "on-surface-variant": "#474747",
+                        "on-background": "#1a1c1c",
+                        "on-tertiary": "#e5e2e1",
+                        "inverse-surface": "#2f3131",
+                        "tertiary": "#3c3b3b",
+                        "outline": "#777777",
+                        "on-error": "#ffffff",
+                        "inverse-on-surface": "#f0f1f1",
+                        "background": "#f9f9f9"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {},
+                    "fontFamily": {
+                        "headline": ["Inter"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; background-color: theme('colors.surface'); color: theme('colors.on-surface'); }
+        h1, h2, h3, .hook { letter-spacing: -0.02em; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .material-symbols-outlined.fill { font-variation-settings: 'FILL' 1; }
+    </style>
+</head>
+<body class="flex flex-col md:flex-row min-h-screen">
+<!-- SideNavBar (Web Only) -->
+<nav class="hidden md:flex h-screen w-72 flex-col fixed left-0 top-0 border-r border-outline-variant bg-[#F3F3F4] dark:bg-zinc-900 tonal-shift-bg flex flex-col p-6 gap-8 z-50">
+<div class="flex flex-col gap-2">
+<span class="text-lg font-black text-black dark:text-white uppercase tracking-tighter">CONTROL</span>
+<span class="font-['Inter'] text-sm font-bold uppercase tracking-widest text-secondary">v1.0.4-STABLE</span>
+<div class="flex items-center gap-3 mt-4">
+<img alt="System Administrator" class="w-10 h-10 rounded-full" data-alt="avatar of a system administrator in black and white minimalistic style" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBAC2FTxT8atMr1YoObrbJHePiQ_Ztsl2WK251GR5ozRZJNNEdecE-YZ0e2sGOzAGz_t2on-0nSrgmIsHwoQ7685_n0dujb7CkxUCZEH6TlVLdzT28qX0z3BGmjTcorB30StVil-kRIno4U2TylspikK065r3crhXIKp84CeRsNn1_za2vT2aqwMvLxSNl6RwEoflDq5OmQzV8JsA-VDaybikdyeyJAoBk5VrqPcZBQNgH8xJA4I4fjEJUSFHZcGVXdpuaAOzDZtefb"/>
+<span class="text-sm font-bold">System Administrator</span>
+</div>
+</div>
+<button class="bg-primary text-on-primary rounded-full px-6 py-3 font-bold hover:scale-[1.02] transition-transform flex items-center justify-center w-full">
+            Add New Property
+        </button>
+<div class="flex flex-col flex-1 gap-2 mt-4">
+<a class="text-zinc-500 dark:text-zinc-400 px-6 py-3 my-1 flex items-center gap-4 hover:bg-zinc-200 dark:hover:bg-zinc-800 rounded-full transition-all" href="#">
+<span class="material-symbols-outlined">radar</span>
+<span class="font-['Inter'] text-sm font-bold uppercase tracking-widest">Live Tracking</span>
+</a>
+<a class="text-zinc-500 dark:text-zinc-400 px-6 py-3 my-1 flex items-center gap-4 hover:bg-zinc-200 dark:hover:bg-zinc-800 rounded-full transition-all" href="#">
+<span class="material-symbols-outlined">add_business</span>
+<span class="font-['Inter'] text-sm font-bold uppercase tracking-widest">Property Manager</span>
+</a>
+<a class="bg-black dark:bg-white text-white dark:text-black rounded-full px-6 py-3 my-1 flex items-center gap-4" href="#">
+<span class="material-symbols-outlined fill">analytics</span>
+<span class="font-['Inter'] text-sm font-bold uppercase tracking-widest">Analytics</span>
+</a>
+<a class="text-zinc-500 dark:text-zinc-400 px-6 py-3 my-1 flex items-center gap-4 hover:bg-zinc-200 dark:hover:bg-zinc-800 rounded-full transition-all" href="#">
+<span class="material-symbols-outlined">task_alt</span>
+<span class="font-['Inter'] text-sm font-bold uppercase tracking-widest">Approval Queues</span>
+</a>
+<a class="text-zinc-500 dark:text-zinc-400 px-6 py-3 my-1 flex items-center gap-4 hover:bg-zinc-200 dark:hover:bg-zinc-800 rounded-full transition-all" href="#">
+<span class="material-symbols-outlined">group_add</span>
+<span class="font-['Inter'] text-sm font-bold uppercase tracking-widest">Lead Management</span>
+</a>
+<a class="text-zinc-500 dark:text-zinc-400 px-6 py-3 my-1 flex items-center gap-4 hover:bg-zinc-200 dark:hover:bg-zinc-800 rounded-full transition-all" href="#">
+<span class="material-symbols-outlined">style</span>
+<span class="font-['Inter'] text-sm font-bold uppercase tracking-widest">Design System</span>
+</a>
+<a class="text-zinc-500 dark:text-zinc-400 px-6 py-3 my-1 flex items-center gap-4 hover:bg-zinc-200 dark:hover:bg-zinc-800 rounded-full transition-all" href="#">
+<span class="material-symbols-outlined">terminal</span>
+<span class="font-['Inter'] text-sm font-bold uppercase tracking-widest">Global Logs</span>
+</a>
+</div>
+<div class="flex flex-col gap-2 mt-auto border-t border-outline-variant pt-6">
+<a class="text-zinc-500 dark:text-zinc-400 px-6 py-3 flex items-center gap-4 hover:bg-zinc-200 dark:hover:bg-zinc-800 rounded-full transition-all" href="#">
+<span class="material-symbols-outlined">help_center</span>
+<span class="font-['Inter'] text-sm font-bold uppercase tracking-widest">Help Center</span>
+</a>
+<a class="text-zinc-500 dark:text-zinc-400 px-6 py-3 flex items-center gap-4 hover:bg-zinc-200 dark:hover:bg-zinc-800 rounded-full transition-all" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-['Inter'] text-sm font-bold uppercase tracking-widest">Settings</span>
+</a>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="flex-1 w-full md:ml-72 bg-surface min-h-screen">
+<!-- TopNavBar (Mobile overrides + Dashboard Header) -->
+<header class="flex justify-between items-center w-full px-8 h-16 bg-[#F9F9F9] dark:bg-zinc-950 docked full-width top-0 z-50 shadow-none border-b border-zinc-200 dark:border-zinc-800 md:hidden">
+<div class="text-xl font-black tracking-tighter text-black dark:text-white uppercase font-['Inter']">UTILITY // CORE</div>
+<div class="flex gap-4">
+<button class="hover:text-black dark:hover:text-white transition-colors duration-200 text-zinc-400 dark:text-zinc-600 active:scale-95 active:opacity-80"><span class="material-symbols-outlined">notifications</span></button>
+<button class="hover:text-black dark:hover:text-white transition-colors duration-200 text-zinc-400 dark:text-zinc-600 active:scale-95 active:opacity-80"><span class="material-symbols-outlined">account_circle</span></button>
+</div>
+</header>
+<div class="p-8 md:p-16 max-w-[1600px] mx-auto flex flex-col gap-16">
+<!-- Header Section -->
+<section class="flex flex-col md:flex-row justify-between items-start md:items-end gap-8">
+<div>
+<h1 class="text-5xl md:text-[3.5rem] font-bold leading-none tracking-[-0.02em] text-primary">Analytics Engine</h1>
+<p class="text-lg md:text-xl text-on-surface-variant mt-4 max-w-2xl leading-relaxed">Real-time performance metrics, conversion funnels, and structural data points for Q3 operations.</p>
+</div>
+<div class="flex gap-4 w-full md:w-auto">
+<button class="flex-1 md:flex-none px-8 py-4 bg-surface-container-low text-primary font-bold rounded-sm border border-outline/20 hover:bg-surface-container-highest transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined">calendar_month</span>
+                        Q3 2023
+                    </button>
+<button class="flex-1 md:flex-none px-8 py-4 bg-primary text-on-primary font-bold rounded-full hover:scale-[1.02] transition-transform flex items-center justify-center gap-2">
+<span class="material-symbols-outlined">download</span>
+                        Export Report
+                    </button>
+</div>
+</section>
+<!-- Key Metrics Grid -->
+<section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-px bg-outline-variant">
+<!-- Metric 1 -->
+<div class="bg-surface-container-lowest p-8 flex flex-col gap-4">
+<span class="text-xs font-bold uppercase tracking-widest text-secondary">Total Inquiries</span>
+<div class="flex items-baseline gap-2">
+<h2 class="text-4xl font-bold tracking-tight text-primary">14,209</h2>
+<span class="text-sm font-bold text-primary flex items-center"><span class="material-symbols-outlined text-sm">arrow_upward</span> 12%</span>
+</div>
+</div>
+<!-- Metric 2 -->
+<div class="bg-surface-container-lowest p-8 flex flex-col gap-4">
+<span class="text-xs font-bold uppercase tracking-widest text-secondary">Qualified Leads</span>
+<div class="flex items-baseline gap-2">
+<h2 class="text-4xl font-bold tracking-tight text-primary">3,842</h2>
+<span class="text-sm font-bold text-primary flex items-center"><span class="material-symbols-outlined text-sm">arrow_upward</span> 8%</span>
+</div>
+</div>
+<!-- Metric 3 -->
+<div class="bg-surface-container-lowest p-8 flex flex-col gap-4">
+<span class="text-xs font-bold uppercase tracking-widest text-secondary">Conversion Rate</span>
+<div class="flex items-baseline gap-2">
+<h2 class="text-4xl font-bold tracking-tight text-primary">4.2%</h2>
+<span class="text-sm font-bold text-outline flex items-center"><span class="material-symbols-outlined text-sm">arrow_downward</span> 0.5%</span>
+</div>
+</div>
+<!-- Metric 4 -->
+<div class="bg-surface-container-lowest p-8 flex flex-col gap-4">
+<span class="text-xs font-bold uppercase tracking-widest text-secondary">Revenue Pipeline</span>
+<div class="flex items-baseline gap-2">
+<h2 class="text-4xl font-bold tracking-tight text-primary">$4.2M</h2>
+<span class="text-sm font-bold text-primary flex items-center"><span class="material-symbols-outlined text-sm">arrow_upward</span> 21%</span>
+</div>
+</div>
+</section>
+<!-- Main Data Visualizations -->
+<section class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+<!-- Lead Growth Chart (Span 2) -->
+<div class="lg:col-span-2 bg-surface-container-lowest flex flex-col gap-8 p-8 md:p-12">
+<div class="flex justify-between items-start">
+<div>
+<h3 class="text-2xl font-bold text-primary">Acquisition Velocity</h3>
+<p class="text-sm text-secondary mt-2">Daily lead generation across all active regions.</p>
+</div>
+<button class="p-2 hover:bg-surface-container-low rounded-sm transition-colors text-primary"><span class="material-symbols-outlined">more_horiz</span></button>
+</div>
+<!-- Abstract Chart Representation -->
+<div class="relative h-64 w-full flex items-end justify-between pt-8">
+<!-- Y-Axis Labels -->
+<div class="absolute left-0 top-0 bottom-0 flex flex-col justify-between text-xs font-bold text-outline pr-4 z-10 w-12 text-right">
+<span>10k</span>
+<span>7.5k</span>
+<span>5k</span>
+<span>2.5k</span>
+<span>0</span>
+</div>
+<!-- Grid Lines -->
+<div class="absolute inset-0 left-12 flex flex-col justify-between pointer-events-none">
+<div class="w-full h-px bg-outline-variant/30"></div>
+<div class="w-full h-px bg-outline-variant/30"></div>
+<div class="w-full h-px bg-outline-variant/30"></div>
+<div class="w-full h-px bg-outline-variant/30"></div>
+<div class="w-full h-px bg-primary"></div>
+</div>
+<!-- Data Area (Placeholder for line chart) -->
+<div class="absolute inset-0 left-12 bottom-0 flex items-end">
+<div class="w-full h-[60%] bg-surface-container-highest flex items-end">
+<!-- Abstract Line/Area -->
+<svg class="w-full h-full" preserveaspectratio="none" viewbox="0 0 100 100">
+<path d="M0,100 L0,60 L20,40 L40,70 L60,30 L80,50 L100,10 L100,100 Z" fill="#E2E2E2"></path>
+<path d="M0,60 L20,40 L40,70 L60,30 L80,50 L100,10" fill="none" stroke="#000000" stroke-width="2" vector-effect="non-scaling-stroke"></path>
+</svg>
+</div>
+</div>
+<!-- X-Axis Labels -->
+<div class="absolute -bottom-8 left-12 right-0 flex justify-between text-xs font-bold text-outline">
+<span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+</div>
+</div>
+</div>
+<!-- Conversion Funnel -->
+<div class="bg-surface-container-lowest flex flex-col gap-8 p-8 md:p-12">
+<div class="flex justify-between items-start">
+<h3 class="text-2xl font-bold text-primary">Conversion Pipeline</h3>
+<span class="material-symbols-outlined text-primary">filter_alt</span>
+</div>
+<div class="flex flex-col gap-6 w-full">
+<!-- Funnel Step 1 -->
+<div class="flex flex-col gap-2">
+<div class="flex justify-between text-sm font-bold">
+<span>Total Views</span>
+<span>145,200</span>
+</div>
+<div class="w-full h-12 bg-primary flex items-center justify-end px-4">
+<span class="text-on-primary text-xs font-bold">100%</span>
+</div>
+</div>
+<!-- Funnel Step 2 -->
+<div class="flex flex-col gap-2">
+<div class="flex justify-between text-sm font-bold">
+<span>Inquiries</span>
+<span>14,209</span>
+</div>
+<div class="w-[45%] h-12 bg-primary-container flex items-center justify-end px-4">
+<span class="text-on-primary text-xs font-bold">9.8%</span>
+</div>
+</div>
+<!-- Funnel Step 3 -->
+<div class="flex flex-col gap-2">
+<div class="flex justify-between text-sm font-bold">
+<span>Property Visits</span>
+<span>3,842</span>
+</div>
+<div class="w-[15%] h-12 bg-surface-tint flex items-center justify-end px-2">
+<span class="text-on-primary text-xs font-bold">2.6%</span>
+</div>
+</div>
+<!-- Funnel Step 4 -->
+<div class="flex flex-col gap-2">
+<div class="flex justify-between text-sm font-bold">
+<span>Closures</span>
+<span>840</span>
+</div>
+<div class="w-[5%] h-12 bg-outline flex items-center justify-center">
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Regional Performance & Reports -->
+<section class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+<!-- Regional Breakdown -->
+<div class="bg-surface-container-lowest p-8 md:p-12 flex flex-col gap-8">
+<h3 class="text-2xl font-bold text-primary">Regional Performance</h3>
+<div class="flex flex-col">
+<!-- Region Item -->
+<div class="flex items-center justify-between py-4 border-b border-outline-variant">
+<div class="flex items-center gap-4">
+<div class="w-2 h-2 bg-primary rounded-full"></div>
+<span class="font-bold text-primary">North America</span>
+</div>
+<div class="flex items-center gap-8">
+<span class="text-sm font-bold">4,200 leads</span>
+<div class="w-32 h-2 bg-surface-container-high rounded-sm overflow-hidden">
+<div class="w-[80%] h-full bg-primary"></div>
+</div>
+</div>
+</div>
+<!-- Region Item -->
+<div class="flex items-center justify-between py-4 border-b border-outline-variant">
+<div class="flex items-center gap-4">
+<div class="w-2 h-2 bg-primary-container rounded-full"></div>
+<span class="font-bold text-primary">Europe</span>
+</div>
+<div class="flex items-center gap-8">
+<span class="text-sm font-bold">2,850 leads</span>
+<div class="w-32 h-2 bg-surface-container-high rounded-sm overflow-hidden">
+<div class="w-[55%] h-full bg-primary-container"></div>
+</div>
+</div>
+</div>
+<!-- Region Item -->
+<div class="flex items-center justify-between py-4 border-b border-outline-variant">
+<div class="flex items-center gap-4">
+<div class="w-2 h-2 bg-surface-tint rounded-full"></div>
+<span class="font-bold text-primary">Asia Pacific</span>
+</div>
+<div class="flex items-center gap-8">
+<span class="text-sm font-bold">1,100 leads</span>
+<div class="w-32 h-2 bg-surface-container-high rounded-sm overflow-hidden">
+<div class="w-[30%] h-full bg-surface-tint"></div>
+</div>
+</div>
+</div>
+<!-- Region Item -->
+<div class="flex items-center justify-between py-4">
+<div class="flex items-center gap-4">
+<div class="w-2 h-2 bg-outline rounded-full"></div>
+<span class="font-bold text-primary">Latin America</span>
+</div>
+<div class="flex items-center gap-8">
+<span class="text-sm font-bold">450 leads</span>
+<div class="w-32 h-2 bg-surface-container-high rounded-sm overflow-hidden">
+<div class="w-[10%] h-full bg-outline"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Downloadable Reports -->
+<div class="bg-surface-container-lowest p-8 md:p-12 flex flex-col gap-8">
+<div class="flex justify-between items-center">
+<h3 class="text-2xl font-bold text-primary">Generated Reports</h3>
+<button class="text-sm font-bold text-primary uppercase tracking-widest hover:underline">View All</button>
+</div>
+<div class="flex flex-col gap-4">
+<!-- Report Card -->
+<div class="flex items-center justify-between p-6 bg-surface-container-low hover:bg-surface-container-highest transition-colors cursor-pointer group">
+<div class="flex items-center gap-6">
+<div class="w-12 h-12 bg-primary flex items-center justify-center rounded-sm text-on-primary group-hover:scale-105 transition-transform">
+<span class="material-symbols-outlined">picture_as_pdf</span>
+</div>
+<div class="flex flex-col">
+<span class="font-bold text-primary">Q3 Executive Summary</span>
+<span class="text-xs text-secondary mt-1">Generated Oct 1, 2023 • 2.4 MB</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors">download</span>
+</div>
+<!-- Report Card -->
+<div class="flex items-center justify-between p-6 bg-surface-container-low hover:bg-surface-container-highest transition-colors cursor-pointer group">
+<div class="flex items-center gap-6">
+<div class="w-12 h-12 bg-primary flex items-center justify-center rounded-sm text-on-primary group-hover:scale-105 transition-transform">
+<span class="material-symbols-outlined">table_view</span>
+</div>
+<div class="flex flex-col">
+<span class="font-bold text-primary">Raw Lead Data (CSV)</span>
+<span class="text-xs text-secondary mt-1">Generated Sep 30, 2023 • 15.1 MB</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors">download</span>
+</div>
+<!-- Report Card -->
+<div class="flex items-center justify-between p-6 bg-surface-container-low hover:bg-surface-container-highest transition-colors cursor-pointer group">
+<div class="flex items-center gap-6">
+<div class="w-12 h-12 bg-primary flex items-center justify-center rounded-sm text-on-primary group-hover:scale-105 transition-transform">
+<span class="material-symbols-outlined">picture_as_pdf</span>
+</div>
+<div class="flex flex-col">
+<span class="font-bold text-primary">Regional Breakdown</span>
+<span class="text-xs text-secondary mt-1">Generated Sep 28, 2023 • 1.1 MB</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors">download</span>
+</div>
+</div>
+</div>
+</section>
+</div>
+</main>
+</body></html>

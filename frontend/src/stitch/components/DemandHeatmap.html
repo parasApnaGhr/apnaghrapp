@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Admin Demand Heatmap - APNAGHR</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-container-low": "#f3f3f4",
+                      "surface-container-high": "#e8e8e8",
+                      "on-secondary-fixed-variant": "#3b3b3b",
+                      "secondary": "#5e5e5e",
+                      "on-primary-container": "#ffffff",
+                      "on-surface": "#1a1c1c",
+                      "on-tertiary-fixed-variant": "#e5e2e1",
+                      "primary": "#000000",
+                      "background": "#f9f9f9",
+                      "secondary-fixed": "#c6c6c6",
+                      "primary-container": "#3b3b3b",
+                      "on-primary-fixed": "#ffffff",
+                      "on-primary": "#e2e2e2",
+                      "secondary-fixed-dim": "#ababab",
+                      "on-tertiary-container": "#ffffff",
+                      "surface-variant": "#e2e2e2",
+                      "on-tertiary": "#e5e2e1",
+                      "surface-tint": "#5e5e5e",
+                      "inverse-primary": "#c6c6c6",
+                      "error": "#ba1a1a",
+                      "primary-fixed": "#5e5e5e",
+                      "surface-container-highest": "#e2e2e2",
+                      "on-error-container": "#410002",
+                      "surface": "#f9f9f9",
+                      "inverse-on-surface": "#f0f1f1",
+                      "tertiary-fixed-dim": "#474746",
+                      "surface-bright": "#f9f9f9",
+                      "on-tertiary-fixed": "#ffffff",
+                      "surface-container": "#eeeeee",
+                      "on-background": "#1a1c1c",
+                      "primary-fixed-dim": "#474747",
+                      "on-error": "#ffffff",
+                      "surface-dim": "#dadada",
+                      "outline": "#777777",
+                      "on-secondary-container": "#1b1b1b",
+                      "on-secondary": "#ffffff",
+                      "secondary-container": "#d4d4d4",
+                      "on-primary-fixed-variant": "#e2e2e2",
+                      "on-secondary-fixed": "#1b1b1b",
+                      "inverse-surface": "#2f3131",
+                      "tertiary-container": "#757474",
+                      "outline-variant": "#c6c6c6",
+                      "on-surface-variant": "#474747",
+                      "error-container": "#ffdad6",
+                      "tertiary": "#3c3b3b",
+                      "surface-container-lowest": "#ffffff",
+                      "tertiary-fixed": "#5f5e5e"
+              },
+              "borderRadius": {
+                      "DEFAULT": "1rem",
+                      "lg": "2rem",
+                      "xl": "3rem",
+                      "full": "9999px"
+              },
+              "spacing": {},
+              "fontFamily": {
+                      "headline": [
+                              "Inter"
+                      ],
+                      "body": [
+                              "Inter"
+                      ],
+                      "label": [
+                              "Inter"
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+      </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex">
+<!-- SideNavBar (WEB) -->
+<nav class="hidden md:flex flex-col bg-zinc-50 dark:bg-zinc-950 h-screen w-64 border-r-0 p-6 border-r border-zinc-200 dark:border-zinc-800 shrink-0">
+<div class="text-xl font-black text-black dark:text-white mb-8">APNAGHR</div>
+<div class="flex-grow flex flex-col font-['Inter'] font-bold text-[0.75rem] uppercase tracking-widest text-black dark:text-white">
+<a class="flex items-center px-4 py-2 my-1 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-all scale-102 duration-100" href="#">
+<span class="material-symbols-outlined mr-4" data-icon="map">map</span>
+                Map
+            </a>
+<a class="flex items-center px-4 py-2 my-1 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-all scale-102 duration-100" href="#">
+<span class="material-symbols-outlined mr-4" data-icon="rate_review">rate_review</span>
+                Reviews
+            </a>
+<a class="flex items-center px-4 py-2 my-1 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-all scale-102 duration-100" href="#">
+<span class="material-symbols-outlined mr-4" data-icon="calculate">calculate</span>
+                Calculator
+            </a>
+<a class="flex items-center px-4 py-2 my-1 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-all scale-102 duration-100" href="#">
+<span class="material-symbols-outlined mr-4" data-icon="analytics">analytics</span>
+                Analytics
+            </a>
+<a class="flex items-center px-4 py-2 my-1 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-all scale-102 duration-100" href="#">
+<span class="material-symbols-outlined mr-4" data-icon="payments">payments</span>
+                Earnings
+            </a>
+<!-- Active Tab -->
+<a class="flex items-center bg-black dark:bg-white text-white dark:text-black rounded-full px-4 py-2 my-1 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-all scale-102 duration-100" href="#">
+<span class="material-symbols-outlined mr-4" data-icon="wb_sunny">wb_sunny</span>
+                Heatmap
+            </a>
+</div>
+<div class="mt-auto">
+<button class="w-full bg-primary text-on-primary rounded-full py-4 px-6 font-bold uppercase text-[0.75rem] tracking-widest hover:scale-[1.02] transition-transform">
+                New Analysis
+            </button>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col min-w-0 overflow-hidden relative">
+<!-- TopAppBar (MOBILE) -->
+<header class="md:hidden flex justify-between items-center px-8 h-20 w-full bg-white dark:bg-black docked full-width top-0 border-b-0 bg-zinc-100 dark:bg-zinc-900 z-40">
+<div class="text-2xl font-black tracking-tighter text-black dark:text-white">APNAGHR</div>
+<div class="flex items-center gap-4 text-black dark:text-white">
+<button class="hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-all scale-102 active:scale-98 transition-transform p-2 rounded-full">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-all scale-102 active:scale-98 transition-transform p-2 rounded-full">
+<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+</button>
+</div>
+</header>
+<!-- Map Container -->
+<div class="flex-1 relative w-full h-full bg-surface-container-highest">
+<!-- Simulated Desaturated Map Image -->
+<div class="absolute inset-0 w-full h-full bg-cover bg-center grayscale opacity-80 mix-blend-multiply" data-alt="Minimalist, desaturated urban street map showing city blocks and roads from a top-down perspective, high contrast monochrome aesthetic." data-location="New York" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDlzIoYAfHOPIKoiiYLger5PfwBBl3Z88qEZU760dlXxwW_Zfakl8pWPlTxFFEmXBh1Gn3O1i4SvSfShQZyaLn36waN7fzR_GEcnBYfKsimwMP6FKUs1-PDZmXteb2VMjd65euG7avugXcl_LdZD3bOOusHVt90dm2CfvaItOhk-kR0eQcjGQnbsC22tlC2NVjv82RSJIhQil8XaCGeDdwyqo2_a21HBi-DuKRONCO-kAtWQEjCQ-uLQCE1K-nX71CTTQG2UtZ14NPH');">
+</div>
+<!-- Heatmap Overlays (Data Points) -->
+<!-- High Density Cluster 1 -->
+<div class="absolute top-[30%] left-[40%] w-64 h-64 bg-primary/20 rounded-full blur-3xl pointer-events-none"></div>
+<div class="absolute top-[35%] left-[45%] w-32 h-32 bg-primary/40 rounded-full blur-2xl pointer-events-none"></div>
+<div class="absolute top-[40%] left-[48%] w-12 h-12 bg-primary rounded-full flex items-center justify-center text-on-primary font-bold shadow-none border-[4px] border-surface-container-highest">
+<span class="material-symbols-outlined text-sm" data-icon="local_fire_department">local_fire_department</span>
+</div>
+<!-- Medium Density Cluster 2 -->
+<div class="absolute top-[60%] left-[70%] w-48 h-48 bg-primary-container/20 rounded-full blur-3xl pointer-events-none"></div>
+<div class="absolute top-[65%] left-[72%] w-10 h-10 bg-primary-container rounded-full flex items-center justify-center text-on-primary-container font-bold border-[3px] border-surface-container-highest">
+<span class="text-xs">84</span>
+</div>
+<!-- Low Density Cluster 3 -->
+<div class="absolute top-[20%] left-[80%] w-8 h-8 bg-surface-tint rounded-full flex items-center justify-center text-on-primary border-[2px] border-surface-container-highest">
+<span class="text-[10px]">12</span>
+</div>
+<!-- Floating Control Panel (Asymmetric Placement) -->
+<div class="absolute top-8 left-8 md:top-12 md:left-12 bg-surface p-8 w-80 flex flex-col gap-8 z-10 border-0 outline outline-1 outline-outline-variant/20">
+<div>
+<h1 class="font-headline font-bold text-3xl tracking-tighter text-primary mb-2">Demand Heatmap</h1>
+<p class="font-body text-sm text-on-surface-variant leading-relaxed">Real-time booking density visualization. High contrast zones indicate surge pricing potential.</p>
+</div>
+<div class="flex flex-col gap-4">
+<div class="flex flex-col gap-1">
+<label class="font-label text-[0.75rem] font-bold uppercase tracking-widest text-secondary">Timeframe</label>
+<div class="flex gap-2">
+<button class="flex-1 bg-primary text-on-primary rounded-sm py-2 text-xs font-bold uppercase tracking-wider">Live</button>
+<button class="flex-1 bg-surface-container-low text-on-surface rounded-sm py-2 text-xs font-bold uppercase tracking-wider hover:bg-surface-container-high transition-colors">24H</button>
+<button class="flex-1 bg-surface-container-low text-on-surface rounded-sm py-2 text-xs font-bold uppercase tracking-wider hover:bg-surface-container-high transition-colors">7D</button>
+</div>
+</div>
+<div class="h-px bg-outline-variant/30 w-full my-2"></div>
+<div class="flex flex-col gap-1">
+<label class="font-label text-[0.75rem] font-bold uppercase tracking-widest text-secondary">Metrics</label>
+<div class="flex items-center justify-between p-3 bg-surface-container-low rounded-sm">
+<span class="font-body text-sm font-semibold">Total Requests</span>
+<span class="font-headline font-bold text-lg">4,209</span>
+</div>
+<div class="flex items-center justify-between p-3 bg-surface-container-low rounded-sm">
+<span class="font-body text-sm font-semibold">Surge Areas</span>
+<span class="font-headline font-bold text-lg text-primary">12</span>
+</div>
+</div>
+</div>
+<button class="w-full bg-primary text-on-primary rounded-full py-4 px-6 font-bold uppercase text-[0.75rem] tracking-widest hover:scale-[1.02] transition-transform flex justify-center items-center gap-2">
+<span class="material-symbols-outlined text-sm" data-icon="refresh">refresh</span>
+                    Sync Data
+                </button>
+</div>
+<!-- Legend (Bottom Right) -->
+<div class="absolute bottom-24 right-8 md:bottom-8 md:right-8 bg-surface p-4 flex gap-6 z-10 border-0 outline outline-1 outline-outline-variant/20">
+<div class="flex items-center gap-3">
+<div class="w-4 h-4 rounded-full bg-primary"></div>
+<span class="font-label text-xs font-bold uppercase tracking-wider text-on-surface">Surge</span>
+</div>
+<div class="flex items-center gap-3">
+<div class="w-4 h-4 rounded-full bg-primary-container"></div>
+<span class="font-label text-xs font-bold uppercase tracking-wider text-on-surface">High</span>
+</div>
+<div class="flex items-center gap-3">
+<div class="w-4 h-4 rounded-full bg-surface-tint"></div>
+<span class="font-label text-xs font-bold uppercase tracking-wider text-on-surface">Base</span>
+</div>
+</div>
+</div>
+<!-- BottomNavBar (MOBILE) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full flex justify-around items-center px-4 py-2 pb-safe bg-white/80 dark:bg-black/80 backdrop-blur-xl border-t border-zinc-200 dark:border-zinc-800 z-50">
+<a class="flex flex-col items-center justify-center text-zinc-400 dark:text-zinc-600 p-3 hover:opacity-80 scale-105 active:scale-95 transition-all" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="explore">explore</span>
+<span class="font-['Inter'] font-bold text-[10px] uppercase">Explore</span>
+</a>
+<a class="flex flex-col items-center justify-center text-zinc-400 dark:text-zinc-600 p-3 hover:opacity-80 scale-105 active:scale-95 transition-all" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="calculate">calculate</span>
+<span class="font-['Inter'] font-bold text-[10px] uppercase">Calc</span>
+</a>
+<!-- Active Tab Intent Match -->
+<a class="flex flex-col items-center justify-center bg-black dark:bg-white text-white dark:text-black rounded-full p-3 hover:opacity-80 scale-105 active:scale-95 transition-all" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="trending_up">trending_up</span>
+<span class="font-['Inter'] font-bold text-[10px] uppercase">Trends</span>
+</a>
+<a class="flex flex-col items-center justify-center text-zinc-400 dark:text-zinc-600 p-3 hover:opacity-80 scale-105 active:scale-95 transition-all" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="notifications">notifications</span>
+<span class="font-['Inter'] font-bold text-[10px] uppercase">Alerts</span>
+</a>
+</nav>
+</main>
+</body></html>

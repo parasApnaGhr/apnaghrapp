@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ApnaGhr - Rider Onboarding</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-tertiary": "#e5e2e1",
+                    "on-surface": "#1a1c1c",
+                    "on-tertiary-container": "#ffffff",
+                    "surface-dim": "#dadada",
+                    "surface-tint": "#5e5e5e",
+                    "on-tertiary-fixed-variant": "#e5e2e1",
+                    "error": "#ba1a1a",
+                    "secondary": "#5e5e5e",
+                    "primary-container": "#3b3b3b",
+                    "on-secondary-fixed-variant": "#3b3b3b",
+                    "tertiary-container": "#757474",
+                    "secondary-fixed-dim": "#ababab",
+                    "error-container": "#ffdad6",
+                    "outline": "#777777",
+                    "surface-container": "#eeeeee",
+                    "on-secondary-container": "#1b1b1b",
+                    "secondary-fixed": "#c6c6c6",
+                    "on-error": "#ffffff",
+                    "inverse-primary": "#c6c6c6",
+                    "tertiary-fixed-dim": "#474746",
+                    "background": "#f9f9f9",
+                    "on-surface-variant": "#474747",
+                    "outline-variant": "#c6c6c6",
+                    "inverse-on-surface": "#f0f1f1",
+                    "on-error-container": "#410002",
+                    "on-primary-fixed": "#ffffff",
+                    "tertiary": "#3c3b3b",
+                    "surface-variant": "#e2e2e2",
+                    "surface-container-highest": "#e2e2e2",
+                    "on-primary": "#e2e2e2",
+                    "surface-container-lowest": "#ffffff",
+                    "secondary-container": "#d4d4d4",
+                    "inverse-surface": "#2f3131",
+                    "on-secondary": "#ffffff",
+                    "on-background": "#1a1c1c",
+                    "primary-fixed": "#5e5e5e",
+                    "surface-bright": "#f9f9f9",
+                    "surface-container-low": "#f3f3f4",
+                    "primary-fixed-dim": "#474747",
+                    "on-primary-container": "#ffffff",
+                    "surface": "#f9f9f9",
+                    "primary": "#000000",
+                    "on-secondary-fixed": "#1b1b1b",
+                    "on-primary-fixed-variant": "#e2e2e2",
+                    "tertiary-fixed": "#5f5e5e",
+                    "surface-container-high": "#e8e8e8",
+                    "on-tertiary-fixed": "#ffffff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "1rem",
+                    "lg": "2rem",
+                    "xl": "3rem",
+                    "full": "9999px"
+            },
+            "spacing": {},
+            "fontFamily": {
+                    "headline": ["Inter"],
+                    "body": ["Inter"],
+                    "label": ["Inter"]
+            }
+          },
+        },
+      }
+    </script>
+<style type="text/tailwindcss">
+        @layer utilities {
+            .no-scrollbar::-webkit-scrollbar {
+                display: none;
+            }
+            .no-scrollbar {
+                -ms-overflow-style: none;
+                scrollbar-width: none;
+            }
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body min-h-screen flex flex-col antialiased">
+<!-- TopAppBar -->
+<header class="w-full top-0 sticky bg-[#F9F9F9] dark:bg-[#000000] border-b border-[#C6C6C6] dark:border-[#3B3B3B] z-50">
+<div class="flex justify-between items-center px-8 py-6 w-full max-w-[1440px] mx-auto">
+<div class="flex items-center gap-6">
+<div class="text-2xl font-black tracking-tighter text-[#000000] dark:text-[#F9F9F9]">
+                    APNAGHR
+                </div>
+</div>
+<nav class="hidden md:flex gap-8 items-center">
+<a class="font-['Inter'] font-bold tracking-[-0.02em] text-[#777777] dark:text-[#E2E2E2] hover:bg-[#E2E2E2] dark:hover:bg-[#3B3B3B] transition-all px-4 py-2 rounded scale-102 active:scale-98" href="#">Support</a>
+<a class="font-['Inter'] font-bold tracking-[-0.02em] text-[#777777] dark:text-[#E2E2E2] hover:bg-[#E2E2E2] dark:hover:bg-[#3B3B3B] transition-all px-4 py-2 rounded scale-102 active:scale-98" href="#">Cities</a>
+<a class="font-['Inter'] font-bold tracking-[-0.02em] text-[#777777] dark:text-[#E2E2E2] hover:bg-[#E2E2E2] dark:hover:bg-[#3B3B3B] transition-all px-4 py-2 rounded scale-102 active:scale-98" href="#">Partners</a>
+</nav>
+<div class="flex items-center gap-4">
+<button class="font-['Inter'] font-bold tracking-[-0.02em] text-[#000000] dark:text-[#F9F9F9] hover:bg-[#E2E2E2] dark:hover:bg-[#3B3B3B] transition-all scale-102 active:scale-98 px-4 py-2 rounded">
+                    Join Now
+                </button>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow w-full max-w-3xl mx-auto px-6 py-12 md:py-24">
+<!-- Progress Indicator -->
+<div class="mb-16">
+<div class="flex items-center justify-between text-label-md font-bold text-outline uppercase tracking-wider mb-4">
+<span>Step 1 of 6</span>
+<span>Basic Details</span>
+</div>
+<div class="w-full bg-surface-container-low h-2 rounded-full overflow-hidden">
+<div class="bg-primary h-full w-1/6"></div>
+</div>
+</div>
+<!-- Form Header -->
+<div class="mb-16">
+<h1 class="text-[3.5rem] font-bold leading-tight tracking-[-0.02em] text-primary mb-4">
+                Rider Onboarding
+            </h1>
+<p class="text-body-lg text-on-surface-variant leading-relaxed">
+                Enter your basic details to begin the verification process. Ensure all information matches your official documents.
+            </p>
+</div>
+<!-- Form Container -->
+<form class="space-y-12">
+<!-- Full Name -->
+<div class="space-y-2">
+<label class="block text-label-md font-bold text-on-surface uppercase tracking-wider" for="fullName">Full Name</label>
+<input class="w-full bg-surface-container-low text-on-surface text-body-lg rounded-sm border-0 border-b-2 border-transparent focus:border-primary focus:ring-0 px-4 py-4 transition-colors placeholder:text-outline" id="fullName" name="fullName" placeholder="As per official ID" type="text"/>
+</div>
+<!-- Mobile & WhatsApp Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<!-- Mobile -->
+<div class="space-y-2">
+<label class="block text-label-md font-bold text-on-surface uppercase tracking-wider" for="mobile">Mobile Number</label>
+<div class="flex bg-surface-container-low rounded-sm">
+<span class="flex items-center justify-center px-4 text-on-surface-variant text-body-lg border-r border-outline-variant font-bold">
+                            +91
+                        </span>
+<input class="w-full bg-transparent text-on-surface text-body-lg border-0 border-b-2 border-transparent focus:border-primary focus:ring-0 px-4 py-4 transition-colors placeholder:text-outline" id="mobile" name="mobile" placeholder="10-digit number" type="tel"/>
+</div>
+</div>
+<!-- WhatsApp -->
+<div class="space-y-2">
+<div class="flex items-center justify-between">
+<label class="block text-label-md font-bold text-on-surface uppercase tracking-wider" for="whatsapp">WhatsApp Number</label>
+<label class="flex items-center gap-2 cursor-pointer">
+<input class="form-checkbox h-4 w-4 text-primary border-outline-variant rounded-sm focus:ring-primary focus:ring-offset-surface" type="checkbox"/>
+<span class="text-label-md text-on-surface-variant uppercase">Same as Mobile</span>
+</label>
+</div>
+<div class="flex bg-surface-container-low rounded-sm">
+<span class="flex items-center justify-center px-4 text-on-surface-variant text-body-lg border-r border-outline-variant font-bold">
+                            +91
+                        </span>
+<input class="w-full bg-transparent text-on-surface text-body-lg border-0 border-b-2 border-transparent focus:border-primary focus:ring-0 px-4 py-4 transition-colors placeholder:text-outline" id="whatsapp" name="whatsapp" placeholder="10-digit number" type="tel"/>
+</div>
+</div>
+</div>
+<hr class="border-t border-outline-variant my-8"/>
+<!-- Location Section -->
+<div class="space-y-8">
+<h2 class="text-headline-sm font-semibold text-primary">Operating Location</h2>
+<!-- City Dropdown -->
+<div class="space-y-2 relative">
+<label class="block text-label-md font-bold text-on-surface uppercase tracking-wider" for="city">City</label>
+<div class="relative">
+<input class="w-full bg-surface-container-low text-on-surface text-body-lg rounded-sm border-0 border-b-2 border-transparent focus:border-primary focus:ring-0 px-4 py-4 pl-12 transition-colors placeholder:text-outline" id="city" name="city" placeholder="Search your city" type="text"/>
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline">search</span>
+</div>
+</div>
+<!-- Areas Multi-select -->
+<div class="space-y-4">
+<label class="block text-label-md font-bold text-on-surface uppercase tracking-wider">Preferred Areas</label>
+<div class="p-6 bg-surface-container-low rounded-sm border-b-2 border-transparent">
+<div class="flex flex-wrap gap-3">
+<!-- Pill Active -->
+<button class="px-4 py-2 bg-primary text-on-primary rounded-full text-label-md font-bold uppercase tracking-wider flex items-center gap-2" type="button">
+                                Downtown
+                                <span class="material-symbols-outlined text-[16px]">close</span>
+</button>
+<!-- Pill Active -->
+<button class="px-4 py-2 bg-primary text-on-primary rounded-full text-label-md font-bold uppercase tracking-wider flex items-center gap-2" type="button">
+                                North District
+                                <span class="material-symbols-outlined text-[16px]">close</span>
+</button>
+<!-- Pill Inactive -->
+<button class="px-4 py-2 bg-surface-container border border-outline text-on-surface rounded-full text-label-md font-bold uppercase tracking-wider hover:bg-surface-variant transition-colors" type="button">
+                                + Add Area
+                            </button>
+</div>
+</div>
+<p class="text-[0.75rem] text-outline">Select up to 3 preferred operational areas.</p>
+</div>
+</div>
+<!-- Action Button -->
+<div class="pt-12">
+<button class="w-full bg-primary text-on-primary rounded-full py-6 px-12 text-headline-sm font-bold hover:scale-102 active:scale-98 transition-transform flex items-center justify-between group" type="button">
+<span>Continue to Vehicle Details</span>
+<span class="material-symbols-outlined group-hover:translate-x-2 transition-transform">arrow_forward</span>
+</button>
+</div>
+</form>
+</main>
+<!-- Footer -->
+<footer class="w-full border-t border-[#C6C6C6] dark:border-[#3B3B3B] bg-[#F3F3F4] dark:bg-[#000000] mt-auto">
+<div class="flex flex-col md:flex-row justify-between items-center px-8 py-12 w-full max-w-[1440px] mx-auto gap-8">
+<div class="text-lg font-black text-[#000000] dark:text-[#F9F9F9]">
+                APNAGHR
+            </div>
+<div class="font-['Inter'] text-[0.75rem] font-bold uppercase tracking-widest text-[#777777] dark:text-[#E2E2E2] text-center">
+                © 2024 APNAGHR. KINETIC UTILITARIANISM IN HOUSING.
+            </div>
+<nav class="flex flex-wrap justify-center gap-6">
+<a class="font-['Inter'] text-[0.75rem] font-bold uppercase tracking-widest text-[#777777] dark:text-[#E2E2E2] hover:text-[#000000] dark:hover:text-[#F9F9F9] transition-colors" href="#">Privacy</a>
+<a class="font-['Inter'] text-[0.75rem] font-bold uppercase tracking-widest text-[#777777] dark:text-[#E2E2E2] hover:text-[#000000] dark:hover:text-[#F9F9F9] transition-colors" href="#">Terms</a>
+<a class="font-['Inter'] text-[0.75rem] font-bold uppercase tracking-widest text-[#777777] dark:text-[#E2E2E2] hover:text-[#000000] dark:hover:text-[#F9F9F9] transition-colors" href="#">Logistics</a>
+<a class="font-['Inter'] text-[0.75rem] font-bold uppercase tracking-widest text-[#777777] dark:text-[#E2E2E2] hover:text-[#000000] dark:hover:text-[#F9F9F9] transition-colors" href="#">Careers</a>
+</nav>
+</div>
+</footer>
+</body></html>

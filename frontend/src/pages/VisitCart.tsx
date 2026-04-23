@@ -1,618 +1,393 @@
 // @ts-nocheck
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import { paymentAPI, getMediaUrl, authAPI } from '../utils/api';
-import { initiateCashfreePayment } from '../utils/cashfree';
-import { 
-  ArrowLeft, Trash2, MapPin, Home, Calendar, Clock, 
-  ShoppingCart, CreditCard, Check, ChevronRight, AlertTriangle, FileText, Shield
-} from 'lucide-react';
-import { toast } from 'sonner';
-import TermsAcceptanceModal from '../components/TermsAcceptanceModal';
+import React, { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { ArrowLeft, Calendar, Check, Clock, MapPin, ShoppingCart, Trash2 } from "lucide-react";
+import { toast } from "sonner";
+import { useAuth } from "../context/AuthContext";
+import { authAPI, paymentAPI } from "../utils/api";
+import { initiateCashfreePayment } from "../utils/cashfree";
+import TermsAcceptanceModal from "../components/TermsAcceptanceModal";
+import {
+  StitchButton,
+  StitchCard,
+  StitchInput,
+  StitchLoadingPage,
+  StitchSectionHeader,
+  StitchShell,
+} from "../stitch/components/StitchPrimitives";
+import { formatCurrency, normalizeProperty } from "../stitch/utils";
 
-const VisitCart = () => {
+const packages = [
+  { id: "single_visit", visits: 1, price: 200, validity: "3 days" },
+  { id: "three_visits", visits: 3, price: 350, validity: "7 days" },
+  { id: "five_visits", visits: 5, price: 500, validity: "10 days" },
+];
+
+export default function VisitCart() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  
-  const [cart, setCart] = useState(() => {
-    const saved = localStorage.getItem('visitCart');
-    return saved ? JSON.parse(saved) : [];
-  });
-  
+  const [cart, setCart] = useState<any[]>(() => JSON.parse(localStorage.getItem("visitCart") || "[]"));
   const [bookingData, setBookingData] = useState({
-    scheduled_date: '',
-    scheduled_time: '',
-    pickup_location: '',
+    scheduled_date: "",
+    scheduled_time: "",
+    pickup_location: "",
     pickup_lat: null,
-    pickup_lng: null
+    pickup_lng: null,
   });
-  
-  const [loading, setLoading] = useState(false);
-  const [selectedPackage, setSelectedPackage] = useState(null);
+  const [selectedPackage, setSelectedPackage] = useState<string | null>(null);
   const [termsAccepted, setTermsAccepted] = useState(false);
-  const [showTermsModal, setShowTermsModal] = useState(false);
   const [checkingTerms, setCheckingTerms] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [showTermsModal, setShowTermsModal] = useState(false);
   const [gettingLocation, setGettingLocation] = useState(false);
 
-  // Check terms status from database on mount
+  const normalizedCart = useMemo(() => cart.map(normalizeProperty), [cart]);
+  const selectedPkg = packages.find((item) => item.id === selectedPackage);
+
   useEffect(() => {
-    const checkTermsStatus = async () => {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    setBookingData((current) => ({
+      ...current,
+      scheduled_date: tomorrow.toISOString().split("T")[0],
+    }));
+  }, []);
+
+  useEffect(() => {
+    if (cart.length === 1) setSelectedPackage("single_visit");
+    else if (cart.length > 1 && cart.length <= 3) setSelectedPackage("three_visits");
+    else if (cart.length > 3) setSelectedPackage("five_visits");
+  }, [cart.length]);
+
+  useEffect(() => {
+    const checkTerms = async () => {
       try {
-        // Check from user object first (comes from login response)
         if (user?.terms_accepted) {
           setTermsAccepted(true);
-          setCheckingTerms(false);
           return;
         }
-        
-        // Otherwise check via API
         const response = await authAPI.getTermsStatus();
-        setTermsAccepted(response.data.terms_accepted || false);
-      } catch (error) {
-        console.error('Error checking terms status:', error);
+        setTermsAccepted(Boolean(response.data?.terms_accepted));
+      } catch {
         setTermsAccepted(false);
       } finally {
         setCheckingTerms(false);
       }
     };
-    
-    if (user) {
-      checkTermsStatus();
-    } else {
-      setCheckingTerms(false);
-    }
+
+    if (user) checkTerms();
+    else setCheckingTerms(false);
   }, [user]);
 
-  useEffect(() => {
-    localStorage.setItem('visitCart', JSON.stringify(cart));
-  }, [cart]);
-
-  useEffect(() => {
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    setBookingData(prev => ({
-      ...prev,
-      scheduled_date: tomorrow.toISOString().split('T')[0]
-    }));
-  }, []);
-
-  useEffect(() => {
-    if (cart.length === 1) {
-      setSelectedPackage('single_visit');
-    } else if (cart.length <= 3) {
-      setSelectedPackage('three_visits');
-    } else {
-      setSelectedPackage('five_visits');
-    }
-  }, [cart.length]);
-
-  const removeFromCart = (propertyId) => {
-    const newCart = cart.filter(item => item.id !== propertyId);
-    setCart(newCart);
-    toast.success('Property removed from cart');
+  const persistCart = (nextCart: any[]) => {
+    setCart(nextCart);
+    localStorage.setItem("visitCart", JSON.stringify(nextCart));
   };
 
-  const clearCart = () => {
-    setCart([]);
-    localStorage.removeItem('visitCart');
-    toast.success('Cart cleared');
+  const removeFromCart = (propertyId: string) => {
+    persistCart(cart.filter((item) => item.id !== propertyId));
+    toast.success("Removed from cart.");
   };
 
-  // Get current location for pickup
-  const getCurrentLocation = () => {
+  const useCurrentLocation = () => {
     if (!navigator.geolocation) {
-      toast.error('Geolocation is not supported by your browser');
+      toast.error("Geolocation is not supported in this browser.");
       return;
     }
 
     setGettingLocation(true);
     navigator.geolocation.getCurrentPosition(
-      async (position) => {
+      (position) => {
         const { latitude, longitude } = position.coords;
-        
-        // Reverse geocode to get address
-        try {
-          const response = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
-          );
-          const data = await response.json();
-          const address = data.display_name || `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
-          
-          setBookingData(prev => ({
-            ...prev,
-            pickup_location: address,
-            pickup_lat: latitude,
-            pickup_lng: longitude
-          }));
-          toast.success('Location captured successfully!');
-        } catch (error) {
-          // If reverse geocoding fails, use coordinates
-          setBookingData(prev => ({
-            ...prev,
-            pickup_location: `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`,
-            pickup_lat: latitude,
-            pickup_lng: longitude
-          }));
-          toast.success('Location coordinates captured');
-        }
+        setBookingData((current) => ({
+          ...current,
+          pickup_location: `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`,
+          pickup_lat: latitude,
+          pickup_lng: longitude,
+        }));
         setGettingLocation(false);
+        toast.success("Current location captured.");
       },
-      (error) => {
+      () => {
         setGettingLocation(false);
-        switch (error.code) {
-          case error.PERMISSION_DENIED:
-            toast.error('Please allow location access to use this feature');
-            break;
-          case error.POSITION_UNAVAILABLE:
-            toast.error('Location information unavailable');
-            break;
-          case error.TIMEOUT:
-            toast.error('Location request timed out');
-            break;
-          default:
-            toast.error('Unable to get your location');
-        }
+        toast.error("Failed to capture current location.");
       },
-      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+      { enableHighAccuracy: true, timeout: 10000 }
     );
   };
 
-  const packages = [
-    { id: 'single_visit', visits: 1, price: 200, validity: '3 days', popular: false },
-    { id: 'three_visits', visits: 3, price: 350, validity: '7 days', popular: true },
-    { id: 'five_visits', visits: 5, price: 500, validity: '10 days', popular: false }
-  ];
-
-  const handlePayAndBook = async () => {
-    if (cart.length === 0) {
-      toast.error('Add properties to your cart first');
+  const handleCheckout = async () => {
+    if (!cart.length) {
+      toast.error("Cart is empty.");
       return;
     }
-    
     if (!selectedPackage) {
-      toast.error('Please select a visit package');
+      toast.error("Select a package first.");
       return;
     }
-
     if (!bookingData.scheduled_date || !bookingData.scheduled_time || !bookingData.pickup_location) {
-      toast.error('Please fill in all booking details');
+      toast.error("Fill schedule and pickup details before continuing.");
       return;
     }
-
     if (!termsAccepted) {
       setShowTermsModal(true);
       return;
     }
 
-    // Store booking data and proceed to payment
-
-    localStorage.setItem('pendingVisitBooking', JSON.stringify({
-      property_ids: cart.map(p => p.id),
-      ...bookingData
-    }));
+    localStorage.setItem(
+      "pendingVisitBooking",
+      JSON.stringify({
+        property_ids: cart.map((item) => item.id),
+        ...bookingData,
+      })
+    );
 
     setLoading(true);
     try {
       const originUrl = window.location.origin;
       const response = await paymentAPI.createCheckout(selectedPackage, originUrl, null);
-      
-      // Use Cashfree SDK for payment
-      const paymentSessionId = response.data.payment_session_id;
       const returnUrl = `${originUrl}/payment-success?order_id=${response.data.order_id}`;
-      
-      if (paymentSessionId) {
-        // Try Cashfree SDK first
-        try {
-          await initiateCashfreePayment(paymentSessionId, returnUrl);
-        } catch (sdkError) {
-          console.warn('Cashfree SDK error, falling back to redirect:', sdkError);
-          // Fallback to direct redirect if SDK fails
-          if (response.data.checkout_url) {
-            window.location.href = response.data.checkout_url;
-          } else {
-            throw new Error('Payment initialization failed');
-          }
-        }
+      if (response.data.payment_session_id) {
+        await initiateCashfreePayment(response.data.payment_session_id, returnUrl);
       } else if (response.data.checkout_url) {
-        // Fallback to checkout URL
         window.location.href = response.data.checkout_url;
       } else {
-        throw new Error('No payment session received');
+        throw new Error("Checkout session missing");
       }
-    } catch (error) {
-      toast.error(error.response?.data?.detail || error.message || 'Failed to create payment');
+    } catch (error: any) {
+      toast.error(error.response?.data?.detail || error.message || "Checkout failed.");
       setLoading(false);
     }
   };
 
-  const estimatedMinutes = cart.length > 0 ? cart.length * 15 + (cart.length - 1) * 20 + 30 : 0;
-  const hours = Math.floor(estimatedMinutes / 60);
-  const mins = estimatedMinutes % 60;
-  const estimatedDuration = hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
+  if (checkingTerms) {
+    return <StitchLoadingPage label="Checking account terms acceptance and preparing the booking shell." />;
+  }
 
-  const selectedPkg = packages.find(p => p.id === selectedPackage);
+  const estimatedMinutes = normalizedCart.length ? normalizedCart.length * 15 + Math.max(normalizedCart.length - 1, 0) * 20 + 30 : 0;
 
   return (
-    <div className="min-h-screen bg-[#FDFCFB] pb-32">
-      {/* Premium Header */}
-      <header className="glass-header sticky top-0 z-50">
-        <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => navigate('/customer')}
-              className="p-2 hover:bg-[#F5F3F0] transition-colors"
-              data-testid="back-button"
-            >
-              <ArrowLeft className="w-5 h-5 text-[#1A1C20]" strokeWidth={1.5} />
-            </button>
-            <div>
-              <h1 className="text-xl font-medium" style={{ fontFamily: 'Playfair Display, serif' }}>Visit Cart</h1>
-              <p className="text-sm text-[#4A4D53]">{cart.length} properties selected</p>
-            </div>
+    <>
+      <StitchShell
+        title="Logistics"
+        eyebrow="Checkout"
+        actions={
+          <button onClick={() => navigate("/customer")} className="stitch-button stitch-button-secondary">
+            <ArrowLeft className="h-4 w-4" />
+            Back to discovery
+          </button>
+        }
+      >
+        {!normalizedCart.length ? (
+          <div className="flex min-h-[400px] flex-col items-center justify-center border border-dashed border-[var(--stitch-line-strong)] bg-white p-12 text-center">
+            <ShoppingCart className="mx-auto h-12 w-12 text-[var(--stitch-muted)]" />
+            <h2 className="mt-6 text-2xl font-black uppercase tracking-[-0.03em]">Your cart is empty</h2>
+            <p className="mt-2 text-sm text-[var(--stitch-muted)]">Target at least one property to initialize the logistics flow.</p>
+            <StitchButton onClick={() => navigate("/customer")} className="mt-8">
+              Explore inventory
+            </StitchButton>
           </div>
-          
-          {cart.length > 0 && (
-            <button
-              onClick={clearCart}
-              className="text-[#8F2727] text-sm font-medium hover:underline"
-              data-testid="clear-cart-button"
-            >
-              Clear All
-            </button>
-          )}
-        </div>
-      </header>
-
-      <main className="max-w-4xl mx-auto px-6 py-8">
-        {cart.length === 0 ? (
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center py-20"
-          >
-            <div className="w-20 h-20 mx-auto mb-6 bg-[#F5F3F0] flex items-center justify-center">
-              <ShoppingCart className="w-10 h-10 text-[#D0C9C0]" strokeWidth={1} />
-            </div>
-            <h2 className="text-xl mb-2" style={{ fontFamily: 'Playfair Display, serif' }}>Your cart is empty</h2>
-            <p className="text-[#4A4D53] mb-6">Add properties to schedule visits</p>
-            <button 
-              onClick={() => navigate('/customer')} 
-              className="btn-primary"
-              data-testid="browse-properties-button"
-            >
-              Browse Properties
-            </button>
-          </motion.div>
         ) : (
-          <>
-            {/* Cart Items */}
-            <div className="space-y-4 mb-8">
-              {cart.map((property, index) => (
-                <motion.div
-                  key={property.id}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                  className="bg-white border border-[#E5E1DB] p-5 flex gap-4"
-                  data-testid={`cart-item-${property.id}`}
-                >
-                  <div className="w-10 h-10 bg-[#04473C] text-white flex items-center justify-center font-medium flex-shrink-0">
-                    {index + 1}
-                  </div>
-                  
-                  <div className="flex-1 min-w-0">
-                    <div className="flex gap-4">
-                      {property.images?.[0] ? (
-                        <img 
-                          src={getMediaUrl(property.images[0])} 
-                          alt="" 
-                          className="w-20 h-20 object-cover flex-shrink-0"
-                          onError={(e) => {
-                            e.target.onerror = null;
-                            e.target.src = 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80';
-                          }}
-                        />
-                      ) : (
-                        <div className="w-20 h-20 bg-[#F5F3F0] flex items-center justify-center flex-shrink-0">
-                          <Home className="w-8 h-8 text-[#D0C9C0]" strokeWidth={1} />
-                        </div>
-                      )}
-                      
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-medium truncate text-[#1A1C20]">{property.title}</h3>
-                        <p className="text-sm text-[#4A4D53]">
-                          {property.bhk} BHK · {property.furnishing}
-                        </p>
-                        <p className="text-sm text-[#4A4D53] flex items-center gap-1 mt-1">
-                          <MapPin className="w-3 h-3" strokeWidth={1.5} />
-                          {property.area_name}
-                        </p>
-                        <p className="price-display text-lg mt-2">
-                          <span className="price-currency text-sm">₹</span>
-                          {property.rent?.toLocaleString('en-IN')}
-                          <span className="text-[#4A4D53] text-sm font-normal">/mo</span>
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <button
-                    onClick={() => removeFromCart(property.id)}
-                    className="p-2 text-[#8F2727] hover:bg-red-50 self-start"
-                    data-testid={`remove-${property.id}`}
-                  >
-                    <Trash2 className="w-5 h-5" strokeWidth={1.5} />
-                  </button>
-                </motion.div>
-              ))}
-            </div>
-
-            {/* Visit Summary */}
-            <div className="bg-[#E6F0EE] border border-[#04473C]/20 p-6 mb-8">
-              <h3 className="text-sm font-medium tracking-wide uppercase text-[#04473C] mb-4">Visit Summary</h3>
-              <div className="space-y-3 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-[#4A4D53]">Properties</span>
-                  <span className="font-medium text-[#1A1C20]">{cart.length}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-[#4A4D53]">Est. Duration</span>
-                  <span className="font-medium text-[#1A1C20]">{estimatedDuration}</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Visit Packages */}
-            <div className="bg-white border border-[#E5E1DB] p-6 mb-8">
-              <h3 className="text-lg mb-2 flex items-center gap-2" style={{ fontFamily: 'Playfair Display, serif' }}>
-                <CreditCard className="w-5 h-5 text-[#04473C]" strokeWidth={1.5} />
-                Select Visit Package
-              </h3>
-              <p className="text-sm text-[#4A4D53] mb-6">
-                Payment required before booking visits
-              </p>
-              
-              <div className="space-y-3">
-                {packages.map((pkg) => (
-                  <button
-                    key={pkg.id}
-                    onClick={() => setSelectedPackage(pkg.id)}
-                    disabled={pkg.visits < cart.length}
-                    className={`w-full p-5 border text-left transition-all relative ${
-                      selectedPackage === pkg.id
-                        ? 'border-[#04473C] bg-[#E6F0EE]'
-                        : pkg.visits < cart.length
-                          ? 'border-[#E5E1DB] bg-[#F5F3F0] opacity-50 cursor-not-allowed'
-                          : 'border-[#E5E1DB] hover:border-[#D0C9C0]'
-                    }`}
-                    data-testid={`package-${pkg.id}`}
-                  >
-                    {pkg.popular && (
-                      <span className="absolute -top-3 right-4 premium-badge">Popular</span>
-                    )}
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-4">
-                        <div className={`w-5 h-5 border flex items-center justify-center ${
-                          selectedPackage === pkg.id 
-                            ? 'border-[#04473C] bg-[#04473C]' 
-                            : 'border-[#D0C9C0]'
-                        }`}>
-                          {selectedPackage === pkg.id && <Check className="w-3 h-3 text-white" strokeWidth={2} />}
+          <div className="flex flex-col gap-16 lg:flex-row lg:items-start">
+            <div className="flex-grow space-y-20">
+              <section>
+                <h2 className="font-headline text-2xl font-black uppercase tracking-[-0.04em] text-black">Target Assets</h2>
+                <div className="mt-8 border-t border-[var(--stitch-line)]">
+                  {normalizedCart.map((property) => (
+                    <div key={property.id} className="flex items-center justify-between border-b border-[var(--stitch-line)] py-6 group">
+                      <div className="flex items-center gap-6">
+                        <div className="h-20 w-20 overflow-hidden bg-[var(--stitch-soft)]">
+                          <img src={property.image} alt={property.title} className="h-full w-full object-cover grayscale transition duration-500 group-hover:grayscale-0" />
                         </div>
                         <div>
-                          <span className="font-medium text-[#1A1C20]">{pkg.visits} Visit{pkg.visits > 1 ? 's' : ''}</span>
-                          <span className="text-sm text-[#4A4D53] ml-2">· Valid for {pkg.validity}</span>
+                          <h3 className="text-lg font-black uppercase tracking-[-0.02em]">{property.title}</h3>
+                          <p className="mt-1 flex items-center gap-1 text-sm text-[var(--stitch-muted)]">
+                            <MapPin className="h-3.5 w-3.5" />
+                            {property.location}
+                          </p>
                         </div>
                       </div>
-                      <div className="text-right">
-                        <span className="price-display text-xl">
-                          <span className="price-currency text-sm">₹</span>{pkg.price}
-                        </span>
-                        {pkg.visits > 1 && (
-                          <p className="text-xs text-[#4A4D53]">₹{Math.round(pkg.price / pkg.visits)}/visit</p>
-                        )}
-                      </div>
+                      <button 
+                        onClick={() => removeFromCart(property.id)}
+                        className="p-2 text-[var(--stitch-muted)] transition hover:text-black"
+                      >
+                        <Trash2 className="h-5 w-5" />
+                      </button>
                     </div>
-                    {pkg.visits < cart.length && (
-                      <p className="text-xs text-[#8F2727] mt-2">
-                        Not enough visits for {cart.length} properties
-                      </p>
-                    )}
-                  </button>
-                ))}
-              </div>
-            </div>
+                  ))}
+                </div>
+              </section>
 
-            {/* Booking Details Form */}
-            <div className="bg-white border border-[#E5E1DB] p-6 mb-8">
-              <h3 className="text-lg mb-6" style={{ fontFamily: 'Playfair Display, serif' }}>Schedule Your Visit</h3>
-              
-              <div className="space-y-5">
-                <div>
-                  <label className="premium-label flex items-center gap-2">
-                    <Calendar className="w-4 h-4" strokeWidth={1.5} />
-                    Visit Date
-                  </label>
-                  <input
-                    type="date"
-                    value={bookingData.scheduled_date}
-                    onChange={(e) => setBookingData(prev => ({ ...prev, scheduled_date: e.target.value }))}
-                    min={new Date().toISOString().split('T')[0]}
-                    className="premium-input"
-                    data-testid="scheduled-date-input"
-                  />
-                </div>
-                
-                <div>
-                  <label className="premium-label flex items-center gap-2">
-                    <Clock className="w-4 h-4" strokeWidth={1.5} />
-                    Preferred Time
-                  </label>
-                  <select
-                    value={bookingData.scheduled_time}
-                    onChange={(e) => setBookingData(prev => ({ ...prev, scheduled_time: e.target.value }))}
-                    className="premium-input"
-                    data-testid="scheduled-time-input"
-                  >
-                    <option value="">Select a time</option>
-                    <option value="09:00 AM">09:00 AM</option>
-                    <option value="10:00 AM">10:00 AM</option>
-                    <option value="11:00 AM">11:00 AM</option>
-                    <option value="12:00 PM">12:00 PM</option>
-                    <option value="02:00 PM">02:00 PM</option>
-                    <option value="03:00 PM">03:00 PM</option>
-                    <option value="04:00 PM">04:00 PM</option>
-                    <option value="05:00 PM">05:00 PM</option>
-                  </select>
-                </div>
-                
-                <div>
-                  <label className="premium-label flex items-center gap-2">
-                    <MapPin className="w-4 h-4" strokeWidth={1.5} />
-                    Pickup Location
-                  </label>
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      value={bookingData.pickup_location}
-                      onChange={(e) => setBookingData(prev => ({ ...prev, pickup_location: e.target.value, pickup_lat: null, pickup_lng: null }))}
-                      placeholder="Where should we pick you up?"
-                      className="premium-input flex-1"
-                      data-testid="pickup-location-input"
-                    />
-                    <button
-                      type="button"
-                      onClick={getCurrentLocation}
-                      disabled={gettingLocation}
-                      className="px-4 py-2 bg-[#04473C] text-white text-sm font-medium hover:bg-[#033530] transition-colors flex items-center gap-2 whitespace-nowrap disabled:opacity-50"
-                      data-testid="use-location-button"
-                    >
-                      {gettingLocation ? (
-                        <>
-                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                          Getting...
-                        </>
-                      ) : (
-                        <>
-                          <MapPin className="w-4 h-4" />
-                          Use Current
-                        </>
-                      )}
-                    </button>
-                  </div>
-                  {bookingData.pickup_lat && bookingData.pickup_lng && (
-                    <p className="text-xs text-green-600 mt-1 flex items-center gap-1">
-                      <Check className="w-3 h-3" /> GPS coordinates captured
-                    </p>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Terms Acceptance Section */}
-            <div className="bg-white border border-[#E5E1DB] p-6 mb-8">
-              <h3 className="text-lg mb-4 flex items-center gap-2" style={{ fontFamily: 'Playfair Display, serif' }}>
-                <Shield className="w-5 h-5 text-[#04473C]" strokeWidth={1.5} />
-                Legal Agreement
-              </h3>
-              
-              {termsAccepted ? (
-                <div className="flex items-center gap-3 p-4 bg-[#E6F0EE] border border-[#04473C]/20 rounded-lg">
-                  <div className="w-8 h-8 bg-[#04473C] rounded-full flex items-center justify-center">
-                    <Check className="w-4 h-4 text-white" strokeWidth={2} />
-                  </div>
-                  <div>
-                    <p className="font-medium text-[#04473C]">Terms & Conditions Accepted</p>
-                    <p className="text-sm text-[#4A4D53]">You agreed to anti-circumvention and privacy policies</p>
-                  </div>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg">
-                    <div className="flex items-start gap-3">
-                      <AlertTriangle className="w-5 h-5 text-amber-600 mt-0.5" />
-                      <div>
-                        <p className="font-medium text-amber-800">Action Required</p>
-                        <p className="text-sm text-amber-700 mt-1">
-                          You must accept our Terms & Conditions including the <strong>Anti-Circumvention Policy</strong> before proceeding with payment.
+              <section>
+                <h2 className="font-headline text-2xl font-black uppercase tracking-[-0.04em] text-black">Visit Allocation</h2>
+                <div className="mt-8 grid gap-6 md:grid-cols-3">
+                  {packages.map((pkg) => {
+                    const disabled = pkg.visits < normalizedCart.length;
+                    const isSelected = selectedPackage === pkg.id;
+                    return (
+                      <button
+                        key={pkg.id}
+                        disabled={disabled}
+                        onClick={() => setSelectedPackage(pkg.id)}
+                        className={`relative flex flex-col p-8 transition-all ${
+                          isSelected 
+                            ? "bg-black text-white ring-4 ring-black ring-offset-4" 
+                            : disabled 
+                              ? "bg-[var(--stitch-soft)] opacity-40 grayscale" 
+                              : "bg-white border border-[var(--stitch-line)] hover:border-black"
+                        }`}
+                      >
+                        <p className={`text-[10px] font-black uppercase tracking-widest ${isSelected ? "text-white/60" : "text-[var(--stitch-muted)]"}`}>
+                          {pkg.visits === 1 ? "Base" : pkg.visits === 3 ? "Optimal" : "Maximum"}
                         </p>
-                      </div>
-                    </div>
+                        <div className="mt-4">
+                          <p className="text-3xl font-black tracking-tighter">{pkg.visits} VISIT{pkg.visits > 1 ? "S" : ""}</p>
+                          <p className={`mt-2 text-xs uppercase tracking-widest ${isSelected ? "text-white/60" : "text-[var(--stitch-muted)]"}`}>
+                            Valid {pkg.validity}
+                          </p>
+                        </div>
+                        <div className="mt-10 flex items-baseline justify-between border-t border-current pt-6">
+                          <span className="text-[10px] font-black">TOTAL</span>
+                          <span className="text-2xl font-black">₹{pkg.price}</span>
+                        </div>
+                        {isSelected && (
+                          <div className="absolute top-4 right-4">
+                            <Check className="h-5 w-5" />
+                          </div>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              </section>
+
+              <section>
+                <h2 className="font-headline text-2xl font-black uppercase tracking-[-0.04em] text-black">Deployment Parameters</h2>
+                <div className="mt-8 grid gap-10 md:grid-cols-2">
+                  <div className="space-y-3">
+                    <label className="stitch-eyebrow">Execution Date</label>
+                    <input
+                      type="date"
+                      min={new Date().toISOString().split("T")[0]}
+                      value={bookingData.scheduled_date}
+                      onChange={(event) => setBookingData((current) => ({ ...current, scheduled_date: event.target.value }))}
+                      className="w-full border-0 border-b-2 border-transparent bg-[var(--stitch-soft)] p-5 text-lg font-black transition-colors focus:border-black focus:ring-0"
+                    />
                   </div>
-                  
+                  <div className="space-y-3">
+                    <label className="stitch-eyebrow">Time Window</label>
+                    <select
+                      value={bookingData.scheduled_time}
+                      onChange={(event) => setBookingData((current) => ({ ...current, scheduled_time: event.target.value }))}
+                      className="w-full border-0 border-b-2 border-transparent bg-[var(--stitch-soft)] p-5 text-lg font-black transition-colors focus:border-black focus:ring-0 appearance-none"
+                    >
+                      <option value="">Select Slot</option>
+                      {["09:00 AM", "10:00 AM", "11:00 AM", "12:00 PM", "02:00 PM", "03:00 PM", "04:00 PM", "05:00 PM"].map((time) => (
+                        <option key={time} value={time}>{time}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="space-y-3 md:col-span-2">
+                    <div className="flex items-end justify-between">
+                      <label className="stitch-eyebrow">Extraction Point</label>
+                      <button onClick={useCurrentLocation} disabled={gettingLocation} className="text-[10px] font-black uppercase tracking-widest text-black hover:underline">
+                        {gettingLocation ? "Locating..." : "Use Current GPS"}
+                      </button>
+                    </div>
+                    <input
+                      value={bookingData.pickup_location}
+                      onChange={(event) =>
+                        setBookingData((current) => ({
+                          ...current,
+                          pickup_location: event.target.value,
+                          pickup_lat: null,
+                          pickup_lng: null,
+                        }))
+                      }
+                      placeholder="Enter full address or building name"
+                      className="w-full border-0 border-b-2 border-transparent bg-[var(--stitch-soft)] p-5 text-lg font-black transition-colors focus:border-black focus:ring-0"
+                    />
+                  </div>
+                </div>
+              </section>
+            </div>
+
+            <aside className="w-full lg:sticky lg:top-32 lg:w-96">
+              <div className="border border-[var(--stitch-line-strong)] bg-white p-8">
+                <h2 className="font-headline text-xl font-black uppercase tracking-[-0.04em] text-black">Summary</h2>
+                <div className="mt-8 space-y-4 border-b border-[var(--stitch-line)] pb-8">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-[var(--stitch-muted)]">Asset Allocation ({normalizedCart.length})</span>
+                    <span className="font-black">₹{selectedPkg?.price || 0}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-[var(--stitch-muted)]">Logistics Surcharge</span>
+                    <span className="font-black">₹0</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-[var(--stitch-muted)]">Estimated Duration</span>
+                    <span className="font-black">{estimatedMinutes} min</span>
+                  </div>
+                </div>
+                
+                <div className="mt-8 flex items-baseline justify-between pb-12">
+                  <span className="text-[10px] font-black uppercase tracking-widest">Authorization Total</span>
+                  <span className="text-4xl font-black tracking-tighter">₹{selectedPkg?.price || 0}</span>
+                </div>
+
+                <div className="space-y-6">
+                  <label className="flex cursor-pointer items-start gap-4">
+                    <input 
+                      type="checkbox" 
+                      checked={termsAccepted} 
+                      onChange={() => !user?.terms_accepted && setShowTermsModal(true)}
+                      className="mt-1 h-5 w-5 border-2 border-black text-black focus:ring-0" 
+                    />
+                    <span className="text-xs leading-relaxed text-[var(--stitch-muted)]">
+                      I confirm the logistics parameters and agree to the <span className="font-black text-black underline">Terms of Engagement</span> and <span className="font-black text-black underline">Cancellation Policy</span>.
+                    </span>
+                  </label>
+
                   <button
-                    onClick={() => setShowTermsModal(true)}
-                    className="w-full p-4 border-2 border-dashed border-[#04473C] bg-[#E6F0EE]/50 text-[#04473C] font-medium flex items-center justify-center gap-2 hover:bg-[#E6F0EE] transition-colors"
-                    data-testid="view-terms-button"
+                    onClick={handleCheckout}
+                    disabled={loading || !selectedPackage || !termsAccepted}
+                    className="flex w-full items-center justify-center gap-4 bg-black py-6 text-sm font-black uppercase tracking-widest text-white transition-all hover:bg-black/90 active:scale-95 disabled:opacity-30"
                   >
-                    <FileText className="w-5 h-5" strokeWidth={1.5} />
-                    View & Accept Terms
+                    {loading ? "Initializing..." : "Initialize Payment"}
+                    <ArrowLeft className="h-4 w-4 rotate-180" />
                   </button>
+                  
+                  <div className="flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-widest text-[var(--stitch-muted)]">
+                    <Lock className="h-3 w-3" />
+                    256-Bit Encrypted Channel
+                  </div>
                 </div>
-              )}
-            </div>
-
-            {/* Pay & Book Button - Fixed Bottom */}
-            <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-[#E5E1DB] p-4 z-40">
-              <div className="max-w-4xl mx-auto flex items-center justify-between">
-                <div>
-                  <p className="text-xs text-[#4A4D53] uppercase tracking-wide">Total Payment</p>
-                  <p className="price-display text-2xl">
-                    <span className="price-currency text-base">₹</span>
-                    {selectedPkg?.price || 0}
-                  </p>
-                </div>
-                <button
-                  onClick={handlePayAndBook}
-                  disabled={loading || !selectedPackage || cart.length === 0 || !termsAccepted}
-                  className="btn-primary flex items-center gap-2 disabled:opacity-50"
-                  data-testid="pay-and-book-button"
-                >
-                  {loading ? (
-                    <span className="inline-block w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  ) : (
-                    <>
-                      Pay & Book
-                      <ChevronRight className="w-5 h-5" strokeWidth={1.5} />
-                    </>
-                  )}
-                </button>
               </div>
-            </div>
-          </>
+            </aside>
+          </div>
         )}
-      </main>
+      </StitchShell>
 
-      {/* Terms Acceptance Modal */}
       <TermsAcceptanceModal
         isOpen={showTermsModal}
         onAccept={async () => {
           try {
-            // Save to database permanently
             await authAPI.acceptTerms({
               accepted_terms: true,
               accepted_privacy: true,
-              accepted_anti_circumvention: true
+              accepted_anti_circumvention: true,
             });
             setTermsAccepted(true);
             setShowTermsModal(false);
-            toast.success('Terms accepted! You can now proceed with payment.');
-          } catch (error) {
-            toast.error('Failed to save terms acceptance. Please try again.');
-            console.error('Terms acceptance error:', error);
+            toast.success("Terms accepted.");
+          } catch {
+            toast.error("Failed to save terms acceptance.");
           }
         }}
-        onDecline={() => {
-          setShowTermsModal(false);
-          toast.error('You must accept terms to book visits');
-        }}
+        onDecline={() => setShowTermsModal(false)}
         userType="customer"
         context="booking"
       />
-    </div>
+    </>
   );
-};
-
-export default VisitCart;
+}

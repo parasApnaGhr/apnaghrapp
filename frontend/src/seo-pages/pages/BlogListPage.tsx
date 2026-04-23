@@ -36,19 +36,19 @@ const BlogListPage = () => {
           <div className="max-w-7xl mx-auto px-4 py-4">
             <div className="flex items-center justify-between">
               <Link to="/" className="flex items-center gap-2">
-                <Home className="w-6 h-6 text-[#04473C]" />
-                <span className="font-bold text-xl text-[#04473C]">ApnaGhr</span>
+                <Home className="w-6 h-6 text-[var(--stitch-ink)]" />
+                <span className="font-bold text-xl text-[var(--stitch-ink)]">ApnaGhr</span>
               </Link>
               
               <nav className="hidden md:flex items-center gap-6">
-                <Link to="/rent/flats-in-mohali" className="text-gray-600 hover:text-[#04473C]">Rent</Link>
-                <Link to="/buy/flats-in-mohali" className="text-gray-600 hover:text-[#04473C]">Buy</Link>
-                <Link to="/blogs" className="text-[#04473C] font-medium">Blog</Link>
+                <Link to="/rent/flats-in-mohali" className="text-gray-600 hover:text-[var(--stitch-ink)]">Rent</Link>
+                <Link to="/buy/flats-in-mohali" className="text-gray-600 hover:text-[var(--stitch-ink)]">Buy</Link>
+                <Link to="/blogs" className="text-[var(--stitch-ink)] font-medium">Blog</Link>
               </nav>
 
               <Link
                 to="/"
-                className="px-4 py-2 bg-[#04473C] text-white rounded-lg text-sm font-medium hover:bg-[#033530]"
+                className="px-4 py-2 bg-[var(--stitch-ink)] text-white rounded-lg text-sm font-medium hover:bg-[var(--stitch-ink)]"
               >
                 Book Visit
               </Link>
@@ -57,7 +57,7 @@ const BlogListPage = () => {
         </header>
 
         {/* Hero Section */}
-        <section className="bg-gradient-to-br from-[#04473C] to-[#065f4e] text-white py-16">
+        <section className="bg-gradient-to-br from-[var(--stitch-ink)] to-[var(--stitch-ink)] text-white py-16">
           <div className="max-w-7xl mx-auto px-4 text-center">
             <h1 className="text-4xl md:text-5xl font-bold mb-4">
               ApnaGhr Real Estate Blog
@@ -88,7 +88,7 @@ const BlogListPage = () => {
                 onClick={() => setSelectedCategory(null)}
                 className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
                   !selectedCategory 
-                    ? 'bg-[#04473C] text-white' 
+                    ? 'bg-[var(--stitch-ink)] text-white' 
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
@@ -100,7 +100,7 @@ const BlogListPage = () => {
                   onClick={() => setSelectedCategory(cat.slug)}
                   className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
                     selectedCategory === cat.slug 
-                      ? 'bg-[#04473C] text-white' 
+                      ? 'bg-[var(--stitch-ink)] text-white' 
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
                 >
@@ -132,10 +132,10 @@ const BlogListPage = () => {
                       />
                     </div>
                     <div className="p-6">
-                      <span className="inline-block px-3 py-1 bg-[#04473C]/10 text-[#04473C] rounded-full text-sm font-medium mb-3">
+                      <span className="inline-block px-3 py-1 bg-[var(--stitch-ink)]/10 text-[var(--stitch-ink)] rounded-full text-sm font-medium mb-3">
                         {BLOG_CATEGORIES.find(c => c.slug === blog.category)?.name}
                       </span>
-                      <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-[#04473C] transition-colors">
+                      <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-[var(--stitch-ink)] transition-colors">
                         {blog.title}
                       </h3>
                       <p className="text-gray-600 line-clamp-2 mb-4">{blog.excerpt}</p>
@@ -154,7 +154,7 @@ const BlogListPage = () => {
                             {blog.readTime}
                           </span>
                         </div>
-                        <ArrowRight className="w-5 h-5 text-[#04473C] group-hover:translate-x-1 transition-transform" />
+                        <ArrowRight className="w-5 h-5 text-[var(--stitch-ink)] group-hover:translate-x-1 transition-transform" />
                       </div>
                     </div>
                   </Link>
@@ -200,7 +200,7 @@ const BlogListPage = () => {
                         <span className="text-xs text-gray-500">{blog.readTime}</span>
                       </div>
                       <Link to={`/blogs/${blog.slug}`}>
-                        <h3 className="font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-[#04473C] transition-colors">
+                        <h3 className="font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-[var(--stitch-ink)] transition-colors">
                           {blog.title}
                         </h3>
                       </Link>
@@ -215,7 +215,7 @@ const BlogListPage = () => {
                         </span>
                         <Link 
                           to={`/blogs/${blog.slug}`}
-                          className="text-[#04473C] text-sm font-medium flex items-center gap-1 hover:underline"
+                          className="text-[var(--stitch-ink)] text-sm font-medium flex items-center gap-1 hover:underline"
                         >
                           Read More <ChevronRight className="w-4 h-4" />
                         </Link>
@@ -231,7 +231,7 @@ const BlogListPage = () => {
                 <p className="text-gray-600 mb-6">Try adjusting your search or filter</p>
                 <button
                   onClick={() => { setSelectedCategory(null); setSearchQuery(''); }}
-                  className="px-6 py-3 bg-[#04473C] text-white rounded-lg font-medium hover:bg-[#033530]"
+                  className="px-6 py-3 bg-[var(--stitch-ink)] text-white rounded-lg font-medium hover:bg-[var(--stitch-ink)]"
                 >
                   View All Articles
                 </button>
@@ -240,7 +240,7 @@ const BlogListPage = () => {
           </section>
 
           {/* Newsletter CTA */}
-          <section className="mt-16 bg-gradient-to-r from-[#04473C] to-[#065f4e] rounded-2xl p-8 md:p-12 text-white">
+          <section className="mt-16 bg-gradient-to-r from-[var(--stitch-ink)] to-[var(--stitch-ink)] rounded-2xl p-8 md:p-12 text-white">
             <div className="max-w-2xl mx-auto text-center">
               <h2 className="text-2xl md:text-3xl font-bold mb-4">
                 Stay Updated with Real Estate Insights
@@ -254,7 +254,7 @@ const BlogListPage = () => {
                   placeholder="Enter your email"
                   className="flex-1 px-4 py-3 rounded-lg text-gray-900 focus:outline-none"
                 />
-                <button className="px-6 py-3 bg-white text-[#04473C] rounded-lg font-bold hover:bg-gray-100 transition-colors">
+                <button className="px-6 py-3 bg-white text-[var(--stitch-ink)] rounded-lg font-bold hover:bg-gray-100 transition-colors">
                   Subscribe
                 </button>
               </div>

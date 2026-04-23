@@ -59,7 +59,7 @@ const VisitApprovalPanel = () => {
   };
 
   if (loading) {
-    return <div className="flex justify-center py-12"><div className="w-8 h-8 border-4 border-[#E07A5F] border-t-transparent rounded-full animate-spin"></div></div>;
+    return <div className="flex justify-center py-12"><div className="w-8 h-8 border-4 border-[var(--stitch-ink)] border-t-transparent rounded-full animate-spin"></div></div>;
   }
 
   return (
@@ -74,21 +74,21 @@ const VisitApprovalPanel = () => {
       </h2>
 
       {visits.length === 0 ? (
-        <div className="text-center py-12 bg-white rounded-xl border border-[#E5E3D8]">
-          <CheckCircle className="w-12 h-12 text-[#2A9D8F] mx-auto mb-3" />
-          <p className="text-[#4A626C]">All visits have been reviewed!</p>
+        <div className="text-center py-12 bg-white rounded-xl border border-[var(--stitch-line)]">
+          <CheckCircle className="w-12 h-12 text-[var(--stitch-ink)] mx-auto mb-3" />
+          <p className="text-[var(--stitch-muted)]">All visits have been reviewed!</p>
         </div>
       ) : (
         <div className="space-y-4">
           {visits.map(visit => (
-            <div key={visit.id} className="bg-white rounded-xl border border-[#E5E3D8] overflow-hidden">
-              <div className="p-4 border-b border-[#E5E3D8]">
+            <div key={visit.id} className="bg-white rounded-xl border border-[var(--stitch-line)] overflow-hidden">
+              <div className="p-4 border-b border-[var(--stitch-line)]">
                 <div className="flex items-start justify-between">
                   <div>
                     <h3 className="font-bold text-lg">
                       Visit - {visit.property_ids?.length || 1} Properties
                     </h3>
-                    <p className="text-sm text-[#4A626C]">
+                    <p className="text-sm text-[var(--stitch-muted)]">
                       {visit.scheduled_date} • Completed {visit.visit_end_time ? new Date(visit.visit_end_time).toLocaleTimeString() : 'N/A'}
                     </p>
                   </div>
@@ -101,14 +101,14 @@ const VisitApprovalPanel = () => {
               <div className="p-4">
                 <div className="grid grid-cols-2 gap-4 mb-4">
                   <div className="bg-[#F3F2EB] rounded-lg p-3">
-                    <p className="text-xs text-[#4A626C] mb-1">Customer</p>
+                    <p className="text-xs text-[var(--stitch-muted)] mb-1">Customer</p>
                     <p className="font-medium">{visit.customer?.name}</p>
-                    <p className="text-sm text-[#4A626C]">{visit.customer?.phone}</p>
+                    <p className="text-sm text-[var(--stitch-muted)]">{visit.customer?.phone}</p>
                   </div>
                   <div className="bg-[#F3F2EB] rounded-lg p-3">
-                    <p className="text-xs text-[#4A626C] mb-1">Rider</p>
+                    <p className="text-xs text-[var(--stitch-muted)] mb-1">Rider</p>
                     <p className="font-medium">{visit.rider?.name}</p>
-                    <p className="text-sm text-[#4A626C]">{visit.rider?.phone}</p>
+                    <p className="text-sm text-[var(--stitch-muted)]">{visit.rider?.phone}</p>
                   </div>
                 </div>
 
@@ -117,15 +117,15 @@ const VisitApprovalPanel = () => {
                   <p className="text-sm font-medium mb-2">Properties Visited:</p>
                   <div className="space-y-2">
                     {visit.properties?.map((prop, idx) => (
-                      <div key={prop.id} className="flex items-center gap-3 bg-[#F0FDF9] rounded-lg p-2">
-                        <div className="w-6 h-6 bg-[#2A9D8F] text-white rounded-full flex items-center justify-center text-xs font-bold">
+                      <div key={prop.id} className="flex items-center gap-3 bg-[var(--stitch-soft)] rounded-lg p-2">
+                        <div className="w-6 h-6 bg-[var(--stitch-ink)] text-white rounded-full flex items-center justify-center text-xs font-bold">
                           {idx + 1}
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium truncate">{prop.title}</p>
-                          <p className="text-xs text-[#4A626C]">{prop.area_name}</p>
+                          <p className="text-xs text-[var(--stitch-muted)]">{prop.area_name}</p>
                         </div>
-                        <CheckCircle className="w-5 h-5 text-[#2A9D8F]" />
+                        <CheckCircle className="w-5 h-5 text-[var(--stitch-ink)]" />
                       </div>
                     ))}
                   </div>
@@ -167,16 +167,16 @@ const VisitApprovalPanel = () => {
                 </div>
 
                 {/* Earnings */}
-                <div className="bg-[#FFF5F2] rounded-lg p-3 mb-4 flex items-center justify-between">
+                <div className="bg-[var(--stitch-soft)] rounded-lg p-3 mb-4 flex items-center justify-between">
                   <span className="text-sm">Rider Earnings (Pending)</span>
-                  <span className="text-xl font-bold text-[#E07A5F]">₹{visit.total_earnings || 0}</span>
+                  <span className="text-xl font-bold text-[var(--stitch-ink)]">₹{visit.total_earnings || 0}</span>
                 </div>
 
                 {/* Actions */}
                 <div className="flex gap-3">
                   <button
                     onClick={() => setSelectedVisit(visit)}
-                    className="btn-secondary flex-1 flex items-center justify-center gap-2"
+                    className="stitch-button stitch-button-secondary flex-1 flex items-center justify-center gap-2"
                     data-testid={`review-visit-${visit.id}`}
                   >
                     <Eye className="w-4 h-4" />
@@ -207,27 +207,27 @@ const VisitApprovalPanel = () => {
               <div className="space-y-4 mb-6">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <p className="text-sm text-[#4A626C]">Customer</p>
+                    <p className="text-sm text-[var(--stitch-muted)]">Customer</p>
                     <p className="font-medium">{selectedVisit.customer?.name}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-[#4A626C]">Rider</p>
+                    <p className="text-sm text-[var(--stitch-muted)]">Rider</p>
                     <p className="font-medium">{selectedVisit.rider?.name}</p>
                   </div>
                 </div>
 
                 <div>
-                  <p className="text-sm text-[#4A626C] mb-2">Properties ({selectedVisit.properties?.length})</p>
+                  <p className="text-sm text-[var(--stitch-muted)] mb-2">Properties ({selectedVisit.properties?.length})</p>
                   {selectedVisit.properties?.map((prop, idx) => (
                     <div key={prop.id} className="p-2 bg-[#F3F2EB] rounded-lg mb-2">
                       <p className="font-medium">{idx + 1}. {prop.title}</p>
-                      <p className="text-sm text-[#4A626C]">{prop.exact_address}</p>
+                      <p className="text-sm text-[var(--stitch-muted)]">{prop.exact_address}</p>
                     </div>
                   ))}
                 </div>
 
                 <div>
-                  <p className="text-sm text-[#4A626C] mb-2">Verification Checklist</p>
+                  <p className="text-sm text-[var(--stitch-muted)] mb-2">Verification Checklist</p>
                   <div className="space-y-2">
                     <label className="flex items-center gap-2">
                       <input type="checkbox" className="rounded" defaultChecked={!!selectedVisit.visit_proof_selfie} />
@@ -248,9 +248,9 @@ const VisitApprovalPanel = () => {
                   </div>
                 </div>
 
-                <div className="bg-[#FFF5F2] rounded-lg p-4">
-                  <p className="text-sm text-[#4A626C] mb-1">Earnings to Credit</p>
-                  <p className="text-2xl font-bold text-[#E07A5F]">₹{selectedVisit.total_earnings || 0}</p>
+                <div className="bg-[var(--stitch-soft)] rounded-lg p-4">
+                  <p className="text-sm text-[var(--stitch-muted)] mb-1">Earnings to Credit</p>
+                  <p className="text-2xl font-bold text-[var(--stitch-ink)]">₹{selectedVisit.total_earnings || 0}</p>
                 </div>
 
                 <div>
@@ -266,7 +266,7 @@ const VisitApprovalPanel = () => {
               </div>
 
               <div className="flex gap-3">
-                <button onClick={() => { setSelectedVisit(null); setRejectionReason(''); }} className="btn-secondary flex-1">
+                <button onClick={() => { setSelectedVisit(null); setRejectionReason(''); }} className="stitch-button stitch-button-secondary flex-1">
                   Cancel
                 </button>
                 <button

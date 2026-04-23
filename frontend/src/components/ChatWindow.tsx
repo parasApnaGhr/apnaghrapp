@@ -52,12 +52,12 @@ const ChatWindow = ({ otherUserId, otherUserName, onClose }) => {
   };
 
   return (
-    <div className="fixed bottom-4 right-4 w-96 h-[500px] bg-white rounded-xl border border-[#E5E3D8] shadow-xl flex flex-col z-50">
+    <div className="fixed bottom-4 right-4 w-96 h-[500px] bg-white rounded-xl border border-[var(--stitch-line)] shadow-xl flex flex-col z-50">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-[#E5E3D8]">
+      <div className="flex items-center justify-between p-4 border-b border-[var(--stitch-line)]">
         <div>
           <h3 className="font-bold">{otherUserName}</h3>
-          <p className="text-xs text-[#4A626C]">Online</p>
+          <p className="text-xs text-[var(--stitch-muted)]">Online</p>
         </div>
         <button
           onClick={onClose}
@@ -73,13 +73,13 @@ const ChatWindow = ({ otherUserId, otherUserName, onClose }) => {
         {loading ? (
           <div className="flex items-center justify-center h-full">
             <div className="text-center">
-              <div className="w-8 h-8 border-4 border-[#E07A5F] border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
-              <p className="text-sm text-[#4A626C]">Loading...</p>
+              <div className="w-8 h-8 border-4 border-[var(--stitch-ink)] border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
+              <p className="text-sm text-[var(--stitch-muted)]">Loading...</p>
             </div>
           </div>
         ) : messages.length === 0 ? (
           <div className="flex items-center justify-center h-full">
-            <p className="text-sm text-[#4A626C]">No messages yet</p>
+            <p className="text-sm text-[var(--stitch-muted)]">No messages yet</p>
           </div>
         ) : (
           messages.map((msg, idx) => {
@@ -92,8 +92,8 @@ const ChatWindow = ({ otherUserId, otherUserName, onClose }) => {
                 <div
                   className={`max-w-[70%] rounded-lg p-3 ${
                     isCurrentUser
-                      ? 'bg-[#E07A5F] text-white'
-                      : 'bg-[#F3F2EB] text-[#264653]'
+                      ? 'bg-[var(--stitch-ink)] text-white'
+                      : 'bg-[#F3F2EB] text-[var(--stitch-ink)]'
                   }`}
                 >
                   <p className="text-sm">{msg.message}</p>
@@ -112,7 +112,7 @@ const ChatWindow = ({ otherUserId, otherUserName, onClose }) => {
       </div>
 
       {/* Input */}
-      <form onSubmit={handleSend} className="p-4 border-t border-[#E5E3D8]">
+      <form onSubmit={handleSend} className="p-4 border-t border-[var(--stitch-line)]">
         <div className="flex gap-2">
           <input
             type="text"
@@ -124,7 +124,7 @@ const ChatWindow = ({ otherUserId, otherUserName, onClose }) => {
           />
           <button
             type="submit"
-            className="btn-primary px-4 py-2"
+            className="stitch-button px-4 py-2"
             data-testid="send-message"
           >
             <Send className="w-4 h-4" />

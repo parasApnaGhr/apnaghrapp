@@ -1,13 +1,23 @@
 // @ts-nocheck
-import React, { useState, useEffect, useCallback } from 'react';
-import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { useAuth } from '../context/AuthContext';
-import { getMediaUrl } from '../utils/api';
-import { ArrowLeft, MapPin, Bed, Sofa, Home, Calendar, Play, X, ChevronLeft, ChevronRight, ZoomIn, User, Phone, Share2 } from 'lucide-react';
-import { toast } from 'sonner';
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { ArrowLeft, BedDouble, Calendar, ChevronLeft, ChevronRight, Copy, Home, MapPin, Share2, Sofa, User2, ZoomIn } from "lucide-react";
+import { toast } from "sonner";
+import { getMediaUrl } from "../utils/api";
+import { useAuth } from "../context/AuthContext";
+import {
+  StitchButton,
+  StitchCard,
+  StitchLoadingPage,
+  StitchModal,
+  StitchSectionHeader,
+  StitchShell,
+} from "../stitch/components/StitchPrimitives";
+import { formatCurrency, normalizeProperty } from "../stitch/utils";
 
-const PublicPropertyDetail = () => {
+const API_URL = import.meta.env.VITE_BACKEND_URL || "";
+
+export default function PublicPropertyDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -17,21 +27,20 @@ const PublicPropertyDetail = () => {
   const [selectedImage, setSelectedImage] = useState(0);
   const [showLightbox, setShowLightbox] = useState(false);
   const [showAuthPrompt, setShowAuthPrompt] = useState(false);
-  
-  // Get referral code from URL if present
-  const refCode = searchParams.get('ref');
+
+  const refCode = searchParams.get("ref");
+  const customerRedirect = `/customer/property/${id}${refCode ? `?ref=${refCode}` : ""}`;
 
   const loadProperty = useCallback(async () => {
+    setLoading(true);
     try {
-      // Use public endpoint that doesn't require auth
-      const API_URL = import.meta.env.VITE_BACKEND_URL || '';
       const response = await fetch(`${API_URL}/api/public/property/${id}`);
-      if (!response.ok) throw new Error('Property not found');
+      if (!response.ok) throw new Error("Property not found");
       const data = await response.json();
       setProperty(data);
     } catch (error) {
-      console.error('Failed to load property:', error);
-      toast.error('Failed to load property');
+      console.error("Failed to load property:", error);
+      toast.error("Failed to load property");
     } finally {
       setLoading(false);
     }
@@ -41,394 +50,323 @@ const PublicPropertyDetail = () => {
     loadProperty();
   }, [loadProperty]);
 
+  const normalized = useMemo(() => (property ? normalizeProperty(property) : null), [property]);
+  const imageUrls = useMemo(
+    () => (Array.isArray(property?.images) ? property.images.map((image) => getMediaUrl(image, "property")) : []),
+    [property]
+  );
+  const activeImage = imageUrls[selectedImage] || normalized?.image;
+
   const handleBookVisit = () => {
     if (!user) {
-      // Show auth prompt - store the intended action
       setShowAuthPrompt(true);
-      // Store property and referral in localStorage for after login
-      localStorage.setItem('pendingBookProperty', JSON.stringify({
-        propertyId: id,
-        refCode: refCode
-      }));
-    } else {
-      // User is logged in, navigate to booking
-      navigate(`/customer/property/${id}${refCode ? `?ref=${refCode}` : ''}`);
+      localStorage.setItem(
+        "pendingBookProperty",
+        JSON.stringify({
+          propertyId: id,
+          refCode,
+        })
+      );
+      return;
     }
+
+    navigate(customerRedirect);
   };
 
   const handleShare = async () => {
-    const shareUrl = `${window.location.origin}/property/${id}`;
-    
+    const shareUrl = `${window.location.origin}/property/${id}${refCode ? `?ref=${refCode}` : ""}`;
+
     if (navigator.share) {
       try {
         await navigator.share({
-          title: property?.title || 'Property on ApnaGhr',
-          text: `Check out this ${property?.bhk} BHK in ${property?.area_name} for ₹${property?.rent?.toLocaleString()}/month on ApnaGhr`,
-          url: shareUrl
+          title: normalized?.title || "Property on ApnaGhr",
+          text: normalized ? `${normalized.bhk || ""} BHK in ${normalized.location}`.trim() : "Property on ApnaGhr",
+          url: shareUrl,
         });
-      } catch (error) {
-        // User cancelled or error
-        copyToClipboard(shareUrl);
+        return;
+      } catch {
+        // fall through to clipboard
       }
-    } else {
-      copyToClipboard(shareUrl);
     }
+
+    await navigator.clipboard.writeText(shareUrl);
+    toast.success("Link copied");
   };
 
-  const copyToClipboard = (text) => {
-    navigator.clipboard.writeText(text);
-    toast.success('Link copied to clipboard!');
+  const stepImage = (direction) => {
+    if (!imageUrls.length) return;
+    setSelectedImage((current) => (current + direction + imageUrls.length) % imageUrls.length);
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-[#FDFCFB]">
-        <div className="text-center">
-          <div className="w-12 h-12 border-2 border-[#04473C] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-[#4A4D53] text-sm">Loading property...</p>
-        </div>
-      </div>
-    );
+    return <StitchLoadingPage label="Loading property" />;
   }
 
-  if (!property) {
+  if (!property || !normalized) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#FDFCFB]">
-        <div className="text-center">
-          <Home className="w-12 h-12 text-[#D0C9C0] mx-auto mb-4" strokeWidth={1} />
-          <p className="text-[#4A4D53]">Property not found</p>
-          <button 
-            onClick={() => navigate('/')} 
-            className="mt-4 btn-primary"
-          >
-            Go to Home
+      <StitchShell
+        title="Property"
+        actions={
+          <button onClick={() => navigate("/")} className="stitch-button stitch-button-secondary">
+            <ArrowLeft className="h-4 w-4" />
+            Back
           </button>
-        </div>
-      </div>
+        }
+        compact
+      >
+        <StitchCard className="p-8 text-center">
+          <Home className="mx-auto h-10 w-10 text-[var(--stitch-muted)]" />
+          <p className="mt-4 text-sm text-[var(--stitch-muted)]">Property not found.</p>
+        </StitchCard>
+      </StitchShell>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#FDFCFB] pb-32">
-      {/* Auth Prompt Modal */}
-      {showAuthPrompt && (
-        <div className="fixed inset-0 z-[100] bg-black/60 flex items-center justify-center p-4">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="bg-white p-8 max-w-md w-full"
-          >
-            <div className="text-center">
-              <div className="w-16 h-16 bg-[#E6F0EE] mx-auto mb-4 flex items-center justify-center">
-                <User className="w-8 h-8 text-[#04473C]" />
-              </div>
-              <h3 className="text-xl mb-2" style={{ fontFamily: 'Playfair Display, serif' }}>
-                Sign in to Book Visit
-              </h3>
-              <p className="text-[#4A4D53] text-sm mb-6">
-                Create an account or sign in to book a visit to this property
-              </p>
-              
-              <div className="space-y-3">
-                <button
-                  onClick={() => navigate(`/login?redirect=/customer/property/${id}${refCode ? `&ref=${refCode}` : ''}`)}
-                  className="btn-primary w-full"
-                  data-testid="auth-prompt-signin-button"
-                >
-                  Sign In / Register
-                </button>
-                <button
-                  onClick={() => setShowAuthPrompt(false)}
-                  className="btn-secondary w-full"
-                  data-testid="auth-prompt-continue-button"
-                >
-                  Continue Browsing
-                </button>
-              </div>
-            </div>
-          </motion.div>
-        </div>
-      )}
-
-      {/* Image Lightbox Modal */}
-      {showLightbox && property?.images && (
-        <div 
-          className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center"
-          onClick={() => setShowLightbox(false)}
-        >
-          <button 
-            className="absolute top-4 right-4 p-3 bg-white/10 hover:bg-white/20 transition-colors"
-            onClick={() => setShowLightbox(false)}
-          >
-            <X className="w-6 h-6 text-white" strokeWidth={1.5} />
-          </button>
-          
-          {property.images.length > 1 && (
-            <>
-              <button 
-                className="absolute left-4 p-3 bg-white/10 hover:bg-white/20 transition-colors"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setSelectedImage((prev) => (prev - 1 + property.images.length) % property.images.length);
-                }}
-              >
-                <ChevronLeft className="w-8 h-8 text-white" strokeWidth={1.5} />
-              </button>
-              <button 
-                className="absolute right-4 p-3 bg-white/10 hover:bg-white/20 transition-colors"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setSelectedImage((prev) => (prev + 1) % property.images.length);
-                }}
-              >
-                <ChevronRight className="w-8 h-8 text-white" strokeWidth={1.5} />
-              </button>
-            </>
-          )}
-          
-          <img
-            src={getMediaUrl(property.images[selectedImage])}
-            alt={property.title}
-            className="max-w-[90vw] max-h-[85vh] object-contain"
-            onClick={(e) => e.stopPropagation()}
-            onError={(e) => {
-              e.target.onerror = null;
-              e.target.src = 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80';
-            }}
-          />
-          
-          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
-            {property.images.map((_, idx) => (
-              <button
-                key={idx}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setSelectedImage(idx);
-                }}
-                className={`w-2 h-2 rounded-full transition-all ${
-                  idx === selectedImage ? 'bg-white w-6' : 'bg-white/50'
-                }`}
-              />
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Header */}
-      <header className="glass-header sticky top-0 z-50">
-        <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => navigate('/')}
-              className="p-2 hover:bg-[#F5F3F0] transition-colors"
-            >
-              <ArrowLeft className="w-5 h-5 text-[#1A1C20]" strokeWidth={1.5} />
+    <>
+      <StitchShell
+        title="Property"
+        eyebrow="Public listing"
+        actions={
+          <>
+            <button onClick={() => navigate("/")} className="stitch-button stitch-button-secondary">
+              <ArrowLeft className="h-4 w-4" />
+              Back
             </button>
-            <div>
-              <h1 className="text-xl tracking-tight" style={{ fontFamily: 'Playfair Display, serif' }}>
-                Apna<span className="text-[#04473C]">Ghr</span>
-              </h1>
-              <p className="text-[10px] text-[#C6A87C] font-medium">Premium Property Visits</p>
-            </div>
-          </div>
-          
-          <button
-            onClick={handleShare}
-            className="p-3 border border-[#E5E1DB] hover:border-[#04473C] transition-colors"
-          >
-            <Share2 className="w-5 h-5 text-[#1A1C20]" strokeWidth={1.5} />
-          </button>
-        </div>
-      </header>
-
-      <main className="max-w-4xl mx-auto px-6 py-8">
-        {/* Image Gallery */}
-        <motion.div 
-          className="mb-8"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
-          <div 
-            className="relative aspect-[16/10] bg-[#F5F3F0] overflow-hidden mb-4 cursor-pointer group"
-            onClick={() => property?.images?.length > 0 && setShowLightbox(true)}
-          >
-            {property.images && property.images[selectedImage] ? (
-              <>
-                <img
-                  src={getMediaUrl(property.images[selectedImage])}
-                  alt={property.title}
-                  className="w-full h-full object-cover transition-transform group-hover:scale-105"
-                  onError={(e) => {
-                    e.target.onerror = null;
-                    e.target.src = 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80';
-                  }}
-                />
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
-                  <ZoomIn className="w-10 h-10 text-white" strokeWidth={1.5} />
+            <button onClick={handleShare} className="stitch-button stitch-button-ghost">
+              <Share2 className="h-4 w-4" />
+              Share
+            </button>
+          </>
+        }
+      >
+        <div className="grid gap-6 xl:grid-cols-[1.35fr_0.65fr]">
+          <div className="space-y-6">
+            <StitchCard className="overflow-hidden p-3 md:p-4">
+              <div
+                className="group relative aspect-[16/10] overflow-hidden rounded-[28px] bg-[var(--stitch-soft)]"
+                onClick={() => imageUrls.length > 0 && setShowLightbox(true)}
+              >
+                <img src={activeImage} alt={normalized.title} className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-black/5 to-transparent" />
+                <div className="absolute left-4 top-4 flex flex-wrap gap-2">
+                  {normalized.hot ? <span className="rounded-full bg-black px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-white">Hot</span> : null}
+                  {normalized.verified ? <span className="rounded-full bg-white px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em]">Verified</span> : null}
                 </div>
-              </>
-            ) : (
-              <div className="flex items-center justify-center h-full">
-                <Home className="w-16 h-16 text-[#D0C9C0]" strokeWidth={1} />
+                <div className="absolute bottom-4 right-4 flex items-center gap-2 rounded-full bg-black/70 px-3 py-2 text-[11px] font-bold uppercase tracking-[0.16em] text-white">
+                  <ZoomIn className="h-3.5 w-3.5" />
+                  {imageUrls.length || 1}
+                </div>
               </div>
-            )}
-            
-            {/* Badges */}
-            <div className="absolute top-4 left-4 flex gap-2">
-              {property.is_hot && (
-                <span className="premium-badge">Hot</span>
-              )}
-              {property.verified_owner && (
-                <span className="verified-badge">Verified</span>
-              )}
-            </div>
 
-            {/* Image counter */}
-            {property.images && property.images.length > 1 && (
-              <div className="absolute bottom-4 right-4 bg-black/60 text-white text-sm px-3 py-1">
-                {selectedImage + 1} / {property.images.length}
+              {imageUrls.length > 1 ? (
+                <div className="mt-4 flex gap-3 overflow-x-auto pb-1">
+                  {imageUrls.map((image, index) => (
+                    <button
+                      key={image + index}
+                      onClick={() => setSelectedImage(index)}
+                      className={`h-20 w-24 flex-none overflow-hidden rounded-[20px] border transition ${
+                        index === selectedImage ? "border-black shadow-[0_0_0_1px_rgba(0,0,0,0.85)]" : "border-[var(--stitch-line)] opacity-70"
+                      }`}
+                    >
+                      <img src={image} alt={`${normalized.title} ${index + 1}`} className="h-full w-full object-cover" />
+                    </button>
+                  ))}
+                </div>
+              ) : null}
+            </StitchCard>
+
+            <StitchCard className="p-6 md:p-8">
+              <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                <div className="space-y-3">
+                  <div>
+                    <h2 className="font-headline text-3xl font-black uppercase tracking-[-0.05em] md:text-5xl">{normalized.title}</h2>
+                    <div className="mt-3 flex items-center gap-2 text-sm text-[var(--stitch-muted)]">
+                      <MapPin className="h-4 w-4" />
+                      <span>{normalized.location}</span>
+                    </div>
+                  </div>
+                  <div className="inline-flex rounded-[24px] bg-black px-5 py-4 text-white">
+                    <div>
+                      <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-white/55">Rent</p>
+                      <p className="mt-2 text-3xl font-black tracking-[-0.05em]">Rs {formatCurrency(normalized.rent)}</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="grid w-full gap-3 sm:grid-cols-3 md:max-w-[440px]">
+                  <div className="rounded-[26px] border border-[var(--stitch-line)] bg-[var(--stitch-soft)] p-4">
+                    <BedDouble className="h-5 w-5" />
+                    <p className="mt-4 text-2xl font-black">{normalized.bhk || "-"}</p>
+                    <p className="mt-1 text-xs font-bold uppercase tracking-[0.16em] text-[var(--stitch-muted)]">BHK</p>
+                  </div>
+                  <div className="rounded-[26px] border border-[var(--stitch-line)] bg-[var(--stitch-soft)] p-4">
+                    <Sofa className="h-5 w-5" />
+                    <p className="mt-4 text-lg font-black">{normalized.furnishing}</p>
+                    <p className="mt-1 text-xs font-bold uppercase tracking-[0.16em] text-[var(--stitch-muted)]">Furnishing</p>
+                  </div>
+                  <div className="rounded-[26px] border border-[var(--stitch-line)] bg-[var(--stitch-soft)] p-4">
+                    <Home className="h-5 w-5" />
+                    <p className="mt-4 text-lg font-black">{normalized.propertyType}</p>
+                    <p className="mt-1 text-xs font-bold uppercase tracking-[0.16em] text-[var(--stitch-muted)]">Type</p>
+                  </div>
+                </div>
               </div>
-            )}
+            </StitchCard>
+
+            {normalized.description ? (
+              <StitchCard className="p-6 md:p-8">
+                <StitchSectionHeader title="Overview" />
+                <p className="mt-5 text-sm leading-7 text-[var(--stitch-muted)] md:text-base">{normalized.description}</p>
+              </StitchCard>
+            ) : null}
+
+            {normalized.amenities.length > 0 ? (
+              <StitchCard className="p-6 md:p-8">
+                <StitchSectionHeader title="Amenities" />
+                <div className="mt-5 flex flex-wrap gap-3">
+                  {normalized.amenities.map((amenity) => (
+                    <span key={amenity} className="rounded-full border border-[var(--stitch-line)] bg-[var(--stitch-soft)] px-4 py-2 text-xs font-bold uppercase tracking-[0.16em]">
+                      {amenity}
+                    </span>
+                  ))}
+                </div>
+              </StitchCard>
+            ) : null}
+
+            {property.video_url ? (
+              <StitchCard className="p-6 md:p-8">
+                <StitchSectionHeader title="Video" />
+                <div className="mt-5 overflow-hidden rounded-[28px] bg-black">
+                  <video
+                    src={getMediaUrl(property.video_url)}
+                    controls
+                    className="aspect-video w-full"
+                    poster={activeImage}
+                  />
+                </div>
+              </StitchCard>
+            ) : null}
           </div>
 
-          {/* Thumbnail strip */}
-          {property.images && property.images.length > 1 && (
-            <div className="flex gap-2 overflow-x-auto pb-2">
-              {property.images.map((img, idx) => (
+          <div className="space-y-6 xl:sticky xl:top-28 xl:self-start">
+            <StitchCard className="p-6">
+              <StitchSectionHeader eyebrow="Visit" title="Book this property" />
+              <div className="mt-6 space-y-4">
+                <div className="rounded-[26px] bg-black p-5 text-white">
+                  <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-white/55">Shared listing</p>
+                  <p className="mt-3 text-2xl font-black uppercase tracking-[-0.04em]">Continue to schedule</p>
+                </div>
+                <StitchButton onClick={handleBookVisit} className="w-full justify-center">
+                  <Calendar className="h-4 w-4" />
+                  Book Visit
+                </StitchButton>
+              </div>
+            </StitchCard>
+
+            <StitchCard className="p-6">
+              <StitchSectionHeader eyebrow="Location" title="Exact address is locked" />
+              <div className="mt-5 overflow-hidden rounded-[28px] border border-[var(--stitch-line)] bg-[linear-gradient(135deg,rgba(0,0,0,0.08),rgba(0,0,0,0.02))] p-6">
+                <div className="grid gap-2 opacity-60">
+                  <div className="h-14 rounded-[18px] border border-dashed border-[var(--stitch-line-strong)]" />
+                  <div className="grid grid-cols-3 gap-2">
+                    <div className="h-20 rounded-[18px] border border-dashed border-[var(--stitch-line)]" />
+                    <div className="h-20 rounded-[18px] border border-dashed border-[var(--stitch-line)]" />
+                    <div className="h-20 rounded-[18px] border border-dashed border-[var(--stitch-line)]" />
+                  </div>
+                </div>
+                <div className="mt-6 rounded-[24px] bg-white/85 p-5 backdrop-blur">
+                  <p className="text-xs font-bold uppercase tracking-[0.18em] text-[var(--stitch-muted)]">Area</p>
+                  <p className="mt-2 text-xl font-black uppercase tracking-[-0.04em]">{normalized.location}</p>
+                </div>
+              </div>
+            </StitchCard>
+          </div>
+        </div>
+      </StitchShell>
+
+      <StitchModal open={showAuthPrompt}>
+        <div className="space-y-6">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="stitch-eyebrow">Sign in required</p>
+              <h3 className="font-headline text-3xl font-black uppercase tracking-[-0.05em]">Continue to book</h3>
+            </div>
+            <div className="flex h-12 w-12 items-center justify-center rounded-full border border-[var(--stitch-line)] bg-[var(--stitch-soft)]">
+              <User2 className="h-5 w-5" />
+            </div>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <StitchButton
+              onClick={() => navigate(`/login?redirect=${encodeURIComponent(customerRedirect)}`)}
+              className="justify-center"
+            >
+              <Calendar className="h-4 w-4" />
+              Sign in
+            </StitchButton>
+            <button onClick={() => setShowAuthPrompt(false)} className="stitch-button stitch-button-secondary justify-center">
+              Continue browsing
+            </button>
+          </div>
+        </div>
+      </StitchModal>
+
+      <StitchModal open={showLightbox}>
+        <div className="space-y-4">
+          <div className="flex items-center justify-between gap-4">
+            <h3 className="font-headline text-2xl font-black uppercase tracking-[-0.05em]">{normalized.title}</h3>
+            <div className="flex items-center gap-2">
+              <button onClick={() => navigator.clipboard.writeText(window.location.href).then(() => toast.success("Link copied"))} className="stitch-button stitch-button-ghost">
+                <Copy className="h-4 w-4" />
+                Copy link
+              </button>
+              <button onClick={() => setShowLightbox(false)} className="stitch-button stitch-button-secondary">
+                Close
+              </button>
+            </div>
+          </div>
+          <div className="relative overflow-hidden rounded-[28px] bg-[var(--stitch-soft)]">
+            <img src={activeImage} alt={normalized.title} className="max-h-[72vh] w-full object-contain" />
+            {imageUrls.length > 1 ? (
+              <>
+                <button onClick={() => stepImage(-1)} className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full bg-black/70 p-3 text-white">
+                  <ChevronLeft className="h-5 w-5" />
+                </button>
+                <button onClick={() => stepImage(1)} className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full bg-black/70 p-3 text-white">
+                  <ChevronRight className="h-5 w-5" />
+                </button>
+              </>
+            ) : null}
+          </div>
+          {imageUrls.length > 1 ? (
+            <div className="flex gap-3 overflow-x-auto pb-1">
+              {imageUrls.map((image, index) => (
                 <button
-                  key={idx}
-                  onClick={() => setSelectedImage(idx)}
-                  className={`flex-shrink-0 w-20 h-20 overflow-hidden ${
-                    idx === selectedImage ? 'ring-2 ring-[#04473C]' : 'opacity-60 hover:opacity-100'
+                  key={image + index}
+                  onClick={() => setSelectedImage(index)}
+                  className={`h-20 w-24 flex-none overflow-hidden rounded-[20px] border ${
+                    index === selectedImage ? "border-black shadow-[0_0_0_1px_rgba(0,0,0,0.85)]" : "border-[var(--stitch-line)]"
                   }`}
                 >
-                  <img
-                    src={getMediaUrl(img)}
-                    alt={`View ${idx + 1}`}
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      e.target.onerror = null;
-                      e.target.src = 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=200&q=80';
-                    }}
-                  />
+                  <img src={image} alt={`${normalized.title} ${index + 1}`} className="h-full w-full object-cover" />
                 </button>
               ))}
             </div>
-          )}
-        </motion.div>
+          ) : null}
+        </div>
+      </StitchModal>
 
-        {/* Property Info */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-        >
-          <h1 className="text-2xl mb-2" style={{ fontFamily: 'Playfair Display, serif' }}>
-            {property.title}
-          </h1>
-          
-          <div className="flex items-center gap-2 text-[#4A4D53] mb-4">
-            <MapPin className="w-4 h-4" strokeWidth={1.5} />
-            <span>{property.area_name}, {property.city}</span>
+      <div className="fixed bottom-4 left-1/2 z-50 w-[calc(100%-1.5rem)] max-w-xl -translate-x-1/2 md:bottom-6">
+        <div className="stitch-panel flex items-center justify-between gap-4 p-3 md:p-4">
+          <div className="min-w-0">
+            <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[var(--stitch-muted)]">Rent</p>
+            <p className="truncate text-xl font-black tracking-[-0.04em] md:text-2xl">Rs {formatCurrency(normalized.rent)}</p>
           </div>
-
-          {/* Price */}
-          <div className="bg-[#04473C] text-white p-6 mb-6">
-            <p className="text-sm text-white/70 mb-1">Monthly Rent</p>
-            <p className="text-3xl font-medium" style={{ fontFamily: 'Playfair Display, serif' }}>
-              ₹{property.rent?.toLocaleString()}
-              <span className="text-lg font-normal">/month</span>
-            </p>
-          </div>
-
-          {/* Key Details */}
-          <div className="grid grid-cols-3 gap-4 mb-6">
-            <div className="bg-[#F5F3F0] p-4 text-center">
-              <Bed className="w-6 h-6 mx-auto mb-2 text-[#04473C]" strokeWidth={1.5} />
-              <p className="font-medium">{property.bhk} BHK</p>
-              <p className="text-xs text-[#4A4D53]">Bedrooms</p>
-            </div>
-            <div className="bg-[#F5F3F0] p-4 text-center">
-              <Sofa className="w-6 h-6 mx-auto mb-2 text-[#04473C]" strokeWidth={1.5} />
-              <p className="font-medium text-sm">{property.furnishing}</p>
-              <p className="text-xs text-[#4A4D53]">Furnishing</p>
-            </div>
-            <div className="bg-[#F5F3F0] p-4 text-center">
-              <Home className="w-6 h-6 mx-auto mb-2 text-[#04473C]" strokeWidth={1.5} />
-              <p className="font-medium text-sm">{property.property_type}</p>
-              <p className="text-xs text-[#4A4D53]">Type</p>
-            </div>
-          </div>
-
-          {/* Description */}
-          {property.description && (
-            <div className="mb-6">
-              <h3 className="font-medium mb-2">About this property</h3>
-              <p className="text-[#4A4D53] text-sm leading-relaxed">{property.description}</p>
-            </div>
-          )}
-
-          {/* Amenities */}
-          {property.amenities && property.amenities.length > 0 && (
-            <div className="mb-6">
-              <h3 className="font-medium mb-3">Amenities</h3>
-              <div className="flex flex-wrap gap-2">
-                {property.amenities.map((amenity, idx) => (
-                  <span 
-                    key={idx}
-                    className="px-3 py-1.5 bg-[#E6F0EE] text-[#04473C] text-sm"
-                  >
-                    {amenity}
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Video */}
-          {property.video_url && (
-            <div className="mb-6">
-              <h3 className="font-medium mb-3">Property Video</h3>
-              <div className="aspect-video bg-black">
-                <video
-                  src={getMediaUrl(property.video_url)}
-                  controls
-                  className="w-full h-full"
-                  poster={property.images?.[0] ? getMediaUrl(property.images[0]) : undefined}
-                />
-              </div>
-            </div>
-          )}
-        </motion.div>
-      </main>
-
-      {/* Fixed Bottom CTA */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-[#E5E1DB] p-4 z-40">
-        <div className="max-w-4xl mx-auto flex items-center justify-between gap-4">
-          <div>
-            <p className="text-sm text-[#4A4D53]">Starting from</p>
-            <p className="text-xl font-medium text-[#04473C]" style={{ fontFamily: 'Playfair Display, serif' }}>
-              ₹{property.rent?.toLocaleString()}/mo
-            </p>
-          </div>
-          <button
-            onClick={handleBookVisit}
-            className="btn-primary flex items-center gap-2 px-8"
-          >
-            <Calendar className="w-5 h-5" strokeWidth={1.5} />
+          <StitchButton onClick={handleBookVisit} className="shrink-0">
+            <Calendar className="h-4 w-4" />
             Book Visit
-          </button>
+          </StitchButton>
         </div>
       </div>
-
-      {/* Trust Badge */}
-      <div className="fixed bottom-20 left-0 right-0 text-center">
-        <p className="text-[10px] text-[#C6A87C] font-medium">
-          Powered by ApnaGhr • India's Trusted Property Platform
-        </p>
-      </div>
-    </div>
+    </>
   );
-};
-
-export default PublicPropertyDetail;
+}

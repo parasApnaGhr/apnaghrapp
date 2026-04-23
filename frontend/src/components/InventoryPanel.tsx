@@ -324,7 +324,7 @@ const InventoryPanel = ({ inventorySession }) => {
               resetForm();
               setShowAddForm(!showAddForm);
             }}
-            className="btn-primary flex items-center gap-2"
+            className="stitch-button flex items-center gap-2"
             data-testid="add-property-button"
           >
             <Plus className="w-4 h-4" />
@@ -338,7 +338,7 @@ const InventoryPanel = ({ inventorySession }) => {
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-6 bg-gradient-to-r from-[#C6A87C] to-[#B8956C] text-white rounded-xl p-4"
+          className="mb-6 bg-gradient-to-r from-[var(--stitch-muted)] to-[var(--stitch-muted)] text-white rounded-xl p-4"
         >
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-3">
@@ -400,20 +400,20 @@ const InventoryPanel = ({ inventorySession }) => {
       {/* Stats */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-6">
         <div className="stat-card">
-          <p className="text-sm text-[#52525B] mb-1">Total Properties</p>
+          <p className="text-sm text-[var(--stitch-muted)] mb-1">Total Properties</p>
           <p className="text-3xl font-bold" style={{ fontFamily: 'Outfit' }}>{totalProperties}</p>
         </div>
         <div className="stat-card">
-          <p className="text-sm text-[#52525B] mb-1">Available</p>
-          <p className="text-3xl font-bold text-[#4ECDC4]" style={{ fontFamily: 'Outfit' }}>{availableCount}</p>
+          <p className="text-sm text-[var(--stitch-muted)] mb-1">Available</p>
+          <p className="text-3xl font-bold text-[var(--stitch-ink)]" style={{ fontFamily: 'Outfit' }}>{availableCount}</p>
         </div>
         <div className="stat-card">
-          <p className="text-sm text-[#52525B] mb-1">Verified</p>
-          <p className="text-3xl font-bold text-[#FF5A5F]" style={{ fontFamily: 'Outfit' }}>{verifiedCount}</p>
+          <p className="text-sm text-[var(--stitch-muted)] mb-1">Verified</p>
+          <p className="text-3xl font-bold text-[var(--stitch-ink)]" style={{ fontFamily: 'Outfit' }}>{verifiedCount}</p>
         </div>
         <div className="stat-card">
-          <p className="text-sm text-[#52525B] mb-1">Premium</p>
-          <p className="text-3xl font-bold text-[#FFD166]" style={{ fontFamily: 'Outfit' }}>{premiumCount}</p>
+          <p className="text-sm text-[var(--stitch-muted)] mb-1">Premium</p>
+          <p className="text-3xl font-bold text-[var(--stitch-muted)]" style={{ fontFamily: 'Outfit' }}>{premiumCount}</p>
         </div>
       </div>
 
@@ -435,7 +435,7 @@ const InventoryPanel = ({ inventorySession }) => {
           
           <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-bold text-[#111111] mb-1">Title *</label>
+              <label className="block text-sm font-bold text-[var(--stitch-ink)] mb-1">Title *</label>
               <input
                 type="text"
                 data-testid="property-title-input"
@@ -447,7 +447,7 @@ const InventoryPanel = ({ inventorySession }) => {
               />
             </div>
             <div>
-              <label className="block text-sm font-bold text-[#111111] mb-1">Property Type</label>
+              <label className="block text-sm font-bold text-[var(--stitch-ink)] mb-1">Property Type</label>
               <select
                 data-testid="property-type-select"
                 value={formData.property_type}
@@ -462,7 +462,7 @@ const InventoryPanel = ({ inventorySession }) => {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-bold text-[#111111] mb-1">BHK</label>
+              <label className="block text-sm font-bold text-[var(--stitch-ink)] mb-1">BHK</label>
               <select
                 value={formData.bhk}
                 onChange={(e) => setFormData({ ...formData, bhk: parseInt(e.target.value) })}
@@ -475,7 +475,7 @@ const InventoryPanel = ({ inventorySession }) => {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-bold text-[#111111] mb-1">Monthly Rent (₹) *</label>
+              <label className="block text-sm font-bold text-[var(--stitch-ink)] mb-1">Monthly Rent (₹) *</label>
               <input
                 type="number"
                 data-testid="rent-input"
@@ -487,7 +487,7 @@ const InventoryPanel = ({ inventorySession }) => {
               />
             </div>
             <div>
-              <label className="block text-sm font-bold text-[#111111] mb-1">Furnishing</label>
+              <label className="block text-sm font-bold text-[var(--stitch-ink)] mb-1">Furnishing</label>
               <select
                 value={formData.furnishing}
                 onChange={(e) => setFormData({ ...formData, furnishing: e.target.value })}
@@ -499,7 +499,7 @@ const InventoryPanel = ({ inventorySession }) => {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-bold text-[#111111] mb-1">City *</label>
+              <label className="block text-sm font-bold text-[var(--stitch-ink)] mb-1">City *</label>
               <input
                 type="text"
                 value={formData.city}
@@ -510,7 +510,7 @@ const InventoryPanel = ({ inventorySession }) => {
               />
             </div>
             <div>
-              <label className="block text-sm font-bold text-[#111111] mb-1">Area Name *</label>
+              <label className="block text-sm font-bold text-[var(--stitch-ink)] mb-1">Area Name *</label>
               <input
                 type="text"
                 placeholder="e.g., Andheri West"
@@ -521,7 +521,7 @@ const InventoryPanel = ({ inventorySession }) => {
               />
             </div>
             <div className="md:col-span-2">
-              <label className="block text-sm font-bold text-[#111111] mb-1">Exact Address *</label>
+              <label className="block text-sm font-bold text-[var(--stitch-ink)] mb-1">Exact Address *</label>
               <textarea
                 value={formData.exact_address}
                 onChange={(e) => setFormData({ ...formData, exact_address: e.target.value })}
@@ -533,15 +533,15 @@ const InventoryPanel = ({ inventorySession }) => {
             </div>
             
             {/* GPS Coordinates */}
-            <div className="md:col-span-2 bg-[#E6F0EE] p-4 rounded-lg border border-[#04473C]/20">
-              <label className="block text-sm font-bold text-[#111111] mb-2">
+            <div className="md:col-span-2 bg-[var(--stitch-soft)] p-4 rounded-lg border border-[var(--stitch-ink)]/20">
+              <label className="block text-sm font-bold text-[var(--stitch-ink)] mb-2">
                 <MapPin className="w-4 h-4 inline mr-1" />
                 GPS Location (for Rider Navigation)
               </label>
               
               {/* Auto-Geocode from Address */}
-              <div className="mb-4 p-3 bg-white rounded border border-[#04473C]/10">
-                <p className="text-sm font-medium text-[#04473C] mb-2">Option 1: Auto-detect from Address</p>
+              <div className="mb-4 p-3 bg-white rounded border border-[var(--stitch-ink)]/10">
+                <p className="text-sm font-medium text-[var(--stitch-ink)] mb-2">Option 1: Auto-detect from Address</p>
                 <button
                   type="button"
                   onClick={async () => {
@@ -572,20 +572,20 @@ const InventoryPanel = ({ inventorySession }) => {
                       toast.error('Failed to geocode address');
                     }
                   }}
-                  className="w-full py-2 px-4 bg-[#04473C] text-white rounded hover:bg-[#033530] transition-colors flex items-center justify-center gap-2"
+                  className="w-full py-2 px-4 bg-[var(--stitch-ink)] text-white rounded hover:bg-[var(--stitch-ink)] transition-colors flex items-center justify-center gap-2"
                 >
                   <Search className="w-4 h-4" />
                   Get GPS from Address
                 </button>
-                <p className="text-xs text-[#4A4D53] mt-1">
+                <p className="text-xs text-[var(--stitch-muted)] mt-1">
                   Works best with complete address including city name
                 </p>
               </div>
               
               {/* Owner Location Link */}
               {editingProperty && (
-                <div className="mb-4 p-3 bg-white rounded border border-[#04473C]/10">
-                  <p className="text-sm font-medium text-[#04473C] mb-2">Option 2: Send Link to Owner</p>
+                <div className="mb-4 p-3 bg-white rounded border border-[var(--stitch-ink)]/10">
+                  <p className="text-sm font-medium text-[var(--stitch-ink)] mb-2">Option 2: Send Link to Owner</p>
                   <div className="flex gap-2">
                     <input
                       type="text"
@@ -600,20 +600,20 @@ const InventoryPanel = ({ inventorySession }) => {
                         navigator.clipboard.writeText(link);
                         toast.success('Link copied! Send this to property owner');
                       }}
-                      className="px-3 py-2 bg-[#C6A87C] text-white rounded hover:bg-[#b39669] transition-colors"
+                      className="px-3 py-2 bg-[var(--stitch-muted)] text-white rounded hover:bg-[var(--stitch-muted)] transition-colors"
                     >
                       Copy
                     </button>
                   </div>
-                  <p className="text-xs text-[#4A4D53] mt-1">
+                  <p className="text-xs text-[var(--stitch-muted)] mt-1">
                     Owner opens this link on their phone at the property to add GPS location
                   </p>
                 </div>
               )}
               
               {/* Manual Entry */}
-              <div className="p-3 bg-white rounded border border-[#04473C]/10">
-                <p className="text-sm font-medium text-[#04473C] mb-2">Option 3: Manual Entry</p>
+              <div className="p-3 bg-white rounded border border-[var(--stitch-ink)]/10">
+                <p className="text-sm font-medium text-[var(--stitch-ink)] mb-2">Option 3: Manual Entry</p>
                 <div className="grid grid-cols-2 gap-4 mb-2">
                   <div>
                     <input
@@ -655,7 +655,7 @@ const InventoryPanel = ({ inventorySession }) => {
                       toast.error('Geolocation not supported');
                     }
                   }}
-                  className="text-sm text-[#04473C] hover:underline flex items-center gap-1"
+                  className="text-sm text-[var(--stitch-ink)] hover:underline flex items-center gap-1"
                 >
                   <MapPin className="w-3 h-3" /> Use My Current Location
                 </button>
@@ -673,7 +673,7 @@ const InventoryPanel = ({ inventorySession }) => {
             </div>
             
             <div className="md:col-span-2">
-              <label className="block text-sm font-bold text-[#111111] mb-1">Description *</label>
+              <label className="block text-sm font-bold text-[var(--stitch-ink)] mb-1">Description *</label>
               <textarea
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
@@ -686,7 +686,7 @@ const InventoryPanel = ({ inventorySession }) => {
 
             {/* Images Section */}
             <div className="md:col-span-2">
-              <label className="block text-sm font-bold text-[#111111] mb-2">
+              <label className="block text-sm font-bold text-[var(--stitch-ink)] mb-2">
                 <ImageIcon className="w-4 h-4 inline mr-1" />
                 Property Images
               </label>
@@ -699,7 +699,7 @@ const InventoryPanel = ({ inventorySession }) => {
                       <img 
                         src={getMediaUrl(img)} 
                         alt={`Property ${idx + 1}`} 
-                        className="w-24 h-24 object-cover rounded-lg border-2 border-[#111111]"
+                        className="w-24 h-24 object-cover rounded-lg border border-[var(--stitch-line)]"
                         onError={(e) => {
                           e.target.onerror = null;
                           e.target.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 24 24" fill="none" stroke="%239CA3AF" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>';
@@ -708,7 +708,7 @@ const InventoryPanel = ({ inventorySession }) => {
                       <button
                         type="button"
                         onClick={() => removeImage(idx)}
-                        className="absolute -top-2 -right-2 w-6 h-6 bg-[#FF5A5F] text-white rounded-full border-2 border-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                        className="absolute -top-2 -right-2 w-6 h-6 bg-[var(--stitch-ink)] text-white rounded-full border-2 border-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                         title="Remove image"
                       >
                         <X className="w-4 h-4" />
@@ -731,7 +731,7 @@ const InventoryPanel = ({ inventorySession }) => {
 
             {/* Video Section */}
             <div className="md:col-span-2">
-              <label className="block text-sm font-bold text-[#111111] mb-2">
+              <label className="block text-sm font-bold text-[var(--stitch-ink)] mb-2">
                 <Video className="w-4 h-4 inline mr-1" />
                 Property Video Tour (Optional)
               </label>
@@ -740,13 +740,13 @@ const InventoryPanel = ({ inventorySession }) => {
                 <div className="mb-3 relative inline-block">
                   <video 
                     src={getMediaUrl(formData.video_url)} 
-                    className="w-48 h-32 object-cover rounded-lg border-2 border-[#111111]"
+                    className="w-48 h-32 object-cover rounded-lg border border-[var(--stitch-line)]"
                     controls
                   />
                   <button
                     type="button"
                     onClick={removeVideo}
-                    className="absolute -top-2 -right-2 w-6 h-6 bg-[#FF5A5F] text-white rounded-full border-2 border-white flex items-center justify-center"
+                    className="absolute -top-2 -right-2 w-6 h-6 bg-[var(--stitch-ink)] text-white rounded-full border-2 border-white flex items-center justify-center"
                     title="Remove video"
                   >
                     <X className="w-4 h-4" />
@@ -774,7 +774,7 @@ const InventoryPanel = ({ inventorySession }) => {
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-bold text-[#111111] mb-1">Owner Name</label>
+                  <label className="block text-sm font-bold text-[var(--stitch-ink)] mb-1">Owner Name</label>
                   <input
                     type="text"
                     placeholder="Property owner's name"
@@ -785,7 +785,7 @@ const InventoryPanel = ({ inventorySession }) => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-bold text-[#111111] mb-1">Owner Contact Number</label>
+                  <label className="block text-sm font-bold text-[var(--stitch-ink)] mb-1">Owner Contact Number</label>
                   <input
                     type="tel"
                     placeholder="10-digit mobile number"
@@ -802,7 +802,7 @@ const InventoryPanel = ({ inventorySession }) => {
             </div>
 
             <div className="md:col-span-2">
-              <label className="block text-sm font-bold text-[#111111] mb-1">Amenities *</label>
+              <label className="block text-sm font-bold text-[var(--stitch-ink)] mb-1">Amenities *</label>
               <input
                 type="text"
                 placeholder="Parking, Gym, Swimming Pool, Security"
@@ -811,7 +811,7 @@ const InventoryPanel = ({ inventorySession }) => {
                 className="input-field"
                 required
               />
-              <p className="text-xs text-[#52525B] mt-1">Separate with commas (minimum 3 required)</p>
+              <p className="text-xs text-[var(--stitch-muted)] mt-1">Separate with commas (minimum 3 required)</p>
             </div>
 
             {/* AI Property Validator */}
@@ -841,13 +841,13 @@ const InventoryPanel = ({ inventorySession }) => {
             </div>
 
             <div className="md:col-span-2 flex gap-3 pt-4">
-              <button type="submit" className="btn-primary flex-1" disabled={submitting}>
+              <button type="submit" className="stitch-button flex-1" disabled={submitting}>
                 {submitting ? 'Saving...' : editingProperty ? 'Update Property' : 'Add Property'}
               </button>
               <button
                 type="button"
                 onClick={() => { setShowAddForm(false); resetForm(); }}
-                className="btn-secondary"
+                className="stitch-button stitch-button-secondary"
               >
                 Cancel
               </button>
@@ -865,13 +865,13 @@ const InventoryPanel = ({ inventorySession }) => {
             <div className="kinetic-loader mx-auto">
               <span></span><span></span><span></span>
             </div>
-            <p className="mt-4 text-[#52525B]">Loading properties...</p>
+            <p className="mt-4 text-[var(--stitch-muted)]">Loading properties...</p>
           </div>
         ) : safeProperties.length === 0 ? (
           <div className="text-center py-12">
             <Home className="w-12 h-12 text-[#9CA3AF] mx-auto mb-3" />
-            <p className="text-[#52525B]">No properties found</p>
-            <button onClick={() => setShowAddForm(true)} className="btn-secondary mt-4">
+            <p className="text-[var(--stitch-muted)]">No properties found</p>
+            <button onClick={() => setShowAddForm(true)} className="stitch-button stitch-button-secondary mt-4">
               Add First Property
             </button>
           </div>
@@ -882,11 +882,11 @@ const InventoryPanel = ({ inventorySession }) => {
                 key={property.id}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="border-2 border-[#111111] rounded-xl p-4 flex items-center justify-between hover:shadow-[3px_3px_0px_#111111] transition-shadow"
+                className="border border-[var(--stitch-line)] rounded-xl p-4 flex items-center justify-between hover:shadow-[3px_3px_0px_var(--stitch-ink)] transition-shadow"
                 data-testid={`property-${property.id}`}
               >
                 <div className="flex items-center gap-4">
-                  <div className="w-20 h-20 bg-[#F3F4F6] rounded-lg border-2 border-[#111111] overflow-hidden flex-shrink-0">
+                  <div className="w-20 h-20 bg-[#F3F4F6] rounded-lg border border-[var(--stitch-line)] overflow-hidden flex-shrink-0">
                     {property.images?.[0] ? (
                       <img 
                         src={getMediaUrl(property.images[0])} 
@@ -905,10 +905,10 @@ const InventoryPanel = ({ inventorySession }) => {
                   </div>
                   <div>
                     <h4 className="font-bold text-lg">{property.title}</h4>
-                    <p className="text-sm text-[#52525B]">
+                    <p className="text-sm text-[var(--stitch-muted)]">
                       {property.bhk} BHK • {property.furnishing} • {property.area_name}, {property.city}
                     </p>
-                    <p className="text-lg font-bold text-[#FF5A5F]" style={{ fontFamily: 'Outfit' }}>
+                    <p className="text-lg font-bold text-[var(--stitch-ink)]" style={{ fontFamily: 'Outfit' }}>
                       ₹{property.rent?.toLocaleString()}/mo
                     </p>
                     {/* Owner Contact - Admin Only */}
@@ -924,7 +924,7 @@ const InventoryPanel = ({ inventorySession }) => {
                         </span>
                       )}
                       {property.video_url && (
-                        <span className="text-xs bg-[#4ECDC4]/20 text-[#4ECDC4] px-2 py-0.5 rounded">
+                        <span className="text-xs bg-[var(--stitch-ink)]/20 text-[var(--stitch-ink)] px-2 py-0.5 rounded">
                           Video
                         </span>
                       )}
@@ -952,7 +952,7 @@ const InventoryPanel = ({ inventorySession }) => {
                     className="p-2 hover:bg-[#F3F4F6] rounded-lg"
                     title="Edit property"
                   >
-                    <Edit className="w-4 h-4 text-[#52525B]" />
+                    <Edit className="w-4 h-4 text-[var(--stitch-muted)]" />
                   </button>
                   <button 
                     onClick={() => handleDelete(property.id)}
@@ -960,7 +960,7 @@ const InventoryPanel = ({ inventorySession }) => {
                     title="Delete property"
                     data-testid={`delete-property-${property.id}`}
                   >
-                    <Trash2 className="w-4 h-4 text-[#FF5A5F]" />
+                    <Trash2 className="w-4 h-4 text-[var(--stitch-ink)]" />
                   </button>
                 </div>
               </motion.div>

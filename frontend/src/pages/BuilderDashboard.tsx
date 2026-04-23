@@ -11,6 +11,17 @@ import {
   IndianRupee, Filter, Search, BarChart3, Target, Briefcase,
   Home, LogOut, Settings, Star, Upload, X, Save
 } from 'lucide-react';
+import {
+  StitchShell,
+  StitchCard,
+  StitchButton,
+  StitchKpi,
+  StitchSectionHeader,
+  StitchInput,
+  StitchSelect,
+  StitchTextarea,
+  StitchModal,
+} from '../stitch/components/StitchPrimitives';
 
 // EMI Calculator Component
 const EMICalculator = ({ minPrice, maxPrice }) => {
@@ -30,7 +41,7 @@ const EMICalculator = ({ minPrice, maxPrice }) => {
   const totalInterest = totalAmount - principal;
   
   return (
-    <div className="bg-gradient-to-br from-[#04473C] to-[#065f4e] text-white p-6 rounded-xl">
+    <div className="bg-gradient-to-br from-[var(--stitch-ink)] to-[var(--stitch-ink)] text-white p-6 rounded-xl">
       <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
         <Calculator className="w-5 h-5" />
         EMI Calculator
@@ -76,7 +87,7 @@ const EMICalculator = ({ minPrice, maxPrice }) => {
         <div className="border-t border-white/20 pt-4 mt-4">
           <div className="grid grid-cols-3 gap-4 text-center">
             <div>
-              <div className="text-2xl font-bold text-[#C6A87C]">₹{emi.toLocaleString()}</div>
+              <div className="text-2xl font-bold text-[var(--stitch-muted)]">₹{emi.toLocaleString()}</div>
               <div className="text-xs text-white/70">Monthly EMI</div>
             </div>
             <div>
@@ -119,7 +130,7 @@ const ProjectCard = ({ project, onEdit, onViewLeads, onManageEvents }) => {
   return (
     <motion.div
       layout
-      className="bg-white border border-[#E5E1DB] rounded-xl overflow-hidden"
+      className="bg-white border border-[var(--stitch-line)] rounded-xl overflow-hidden"
     >
       {/* Project Header */}
       <div className="p-4">
@@ -128,8 +139,8 @@ const ProjectCard = ({ project, onEdit, onViewLeads, onManageEvents }) => {
             {project.images?.[0] ? (
               <img src={project.images[0]} alt={project.project_name} className="w-24 h-24 object-cover rounded-lg" />
             ) : (
-              <div className="w-24 h-24 bg-[#F5F3F0] rounded-lg flex items-center justify-center">
-                <Building2 className="w-10 h-10 text-[#D0C9C0]" />
+              <div className="w-24 h-24 bg-[var(--stitch-soft)] rounded-lg flex items-center justify-center">
+                <Building2 className="w-10 h-10 text-[var(--stitch-muted)]" />
               </div>
             )}
             <div>
@@ -144,11 +155,11 @@ const ProjectCard = ({ project, onEdit, onViewLeads, onManageEvents }) => {
                 </span>
               </div>
               <h3 className="text-lg font-bold">{project.project_name}</h3>
-              <p className="text-sm text-[#4A4D53] flex items-center gap-1">
+              <p className="text-sm text-[var(--stitch-muted)] flex items-center gap-1">
                 <MapPin className="w-3 h-3" />
                 {project.locality}, {project.city}
               </p>
-              <p className="text-lg font-bold text-[#04473C] mt-1">
+              <p className="text-lg font-bold text-[var(--stitch-ink)] mt-1">
                 ₹{(project.min_price/100000).toFixed(0)}L - ₹{(project.max_price/100000).toFixed(0)}L
               </p>
             </div>
@@ -156,31 +167,31 @@ const ProjectCard = ({ project, onEdit, onViewLeads, onManageEvents }) => {
           
           {/* Analytics */}
           <div className="grid grid-cols-4 gap-4 text-center">
-            <div className="bg-[#F5F3F0] p-3 rounded-lg">
-              <div className="text-xl font-bold text-[#04473C]">{project.total_views || 0}</div>
-              <div className="text-xs text-[#4A4D53]">Views</div>
+            <div className="bg-[var(--stitch-soft)] p-3 rounded-lg">
+              <div className="text-xl font-bold text-[var(--stitch-ink)]">{project.total_views || 0}</div>
+              <div className="text-xs text-[var(--stitch-muted)]">Views</div>
             </div>
-            <div className="bg-[#F5F3F0] p-3 rounded-lg">
+            <div className="bg-[var(--stitch-soft)] p-3 rounded-lg">
               <div className="text-xl font-bold text-blue-600">{project.total_clicks || 0}</div>
-              <div className="text-xs text-[#4A4D53]">Clicks</div>
+              <div className="text-xs text-[var(--stitch-muted)]">Clicks</div>
             </div>
-            <div className="bg-[#F5F3F0] p-3 rounded-lg">
+            <div className="bg-[var(--stitch-soft)] p-3 rounded-lg">
               <div className="text-xl font-bold text-purple-600">{project.total_inquiries || 0}</div>
-              <div className="text-xs text-[#4A4D53]">Inquiries</div>
+              <div className="text-xs text-[var(--stitch-muted)]">Inquiries</div>
             </div>
-            <div className="bg-[#F5F3F0] p-3 rounded-lg">
+            <div className="bg-[var(--stitch-soft)] p-3 rounded-lg">
               <div className="text-xl font-bold text-green-600">{project.total_site_visits || 0}</div>
-              <div className="text-xs text-[#4A4D53]">Site Visits</div>
+              <div className="text-xs text-[var(--stitch-muted)]">Site Visits</div>
             </div>
           </div>
         </div>
         
         {/* Action Buttons */}
-        <div className="flex items-center justify-between mt-4 pt-4 border-t border-[#E5E1DB]">
+        <div className="flex items-center justify-between mt-4 pt-4 border-t border-[var(--stitch-line)]">
           <div className="flex gap-2">
             <button
               onClick={() => onViewLeads(project)}
-              className="flex items-center gap-1 px-3 py-1.5 bg-[#04473C] text-white rounded-lg text-sm hover:bg-[#033530]"
+              className="flex items-center gap-1 px-3 py-1.5 bg-[var(--stitch-ink)] text-white rounded-lg text-sm hover:bg-black"
             >
               <Users className="w-4 h-4" />
               View Leads
@@ -196,7 +207,7 @@ const ProjectCard = ({ project, onEdit, onViewLeads, onManageEvents }) => {
             )}
             <button
               onClick={() => onEdit(project)}
-              className="flex items-center gap-1 px-3 py-1.5 border border-[#E5E1DB] rounded-lg text-sm hover:bg-[#F5F3F0]"
+              className="flex items-center gap-1 px-3 py-1.5 border border-[var(--stitch-line)] rounded-lg text-sm hover:bg-[var(--stitch-soft)]"
             >
               <Edit2 className="w-4 h-4" />
               Edit
@@ -204,7 +215,7 @@ const ProjectCard = ({ project, onEdit, onViewLeads, onManageEvents }) => {
           </div>
           <button
             onClick={() => setExpanded(!expanded)}
-            className="flex items-center gap-1 text-sm text-[#4A4D53] hover:text-[#04473C]"
+            className="flex items-center gap-1 text-sm text-[var(--stitch-muted)] hover:text-[var(--stitch-ink)]"
           >
             {expanded ? 'Less Details' : 'More Details'}
             {expanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
@@ -219,32 +230,32 @@ const ProjectCard = ({ project, onEdit, onViewLeads, onManageEvents }) => {
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            className="border-t border-[#E5E1DB] bg-[#F5F3F0]/50"
+            className="border-t border-[var(--stitch-line)] bg-[var(--stitch-soft)]/50"
           >
             <div className="p-4 grid md:grid-cols-2 gap-6">
               {/* Project Details */}
               <div className="space-y-3">
-                <h4 className="font-bold text-sm text-[#04473C]">Project Details</h4>
+                <h4 className="font-bold text-sm text-[var(--stitch-ink)]">Project Details</h4>
                 <div className="grid grid-cols-2 gap-3 text-sm">
                   <div>
-                    <span className="text-[#4A4D53]">Type:</span>
+                    <span className="text-[var(--stitch-muted)]">Type:</span>
                     <span className="ml-2 font-medium">{project.project_type}</span>
                   </div>
                   <div>
-                    <span className="text-[#4A4D53]">Units:</span>
+                    <span className="text-[var(--stitch-muted)]">Units:</span>
                     <span className="ml-2 font-medium">{project.total_units || 'N/A'}</span>
                   </div>
                   <div>
-                    <span className="text-[#4A4D53]">Price/sqft:</span>
+                    <span className="text-[var(--stitch-muted)]">Price/sqft:</span>
                     <span className="ml-2 font-medium">₹{project.price_per_sqft?.toLocaleString() || 'N/A'}</span>
                   </div>
                   <div>
-                    <span className="text-[#4A4D53]">Possession:</span>
+                    <span className="text-[var(--stitch-muted)]">Possession:</span>
                     <span className="ml-2 font-medium">{project.possession_date || 'N/A'}</span>
                   </div>
                   {project.rera_number && (
                     <div className="col-span-2">
-                      <span className="text-[#4A4D53]">RERA:</span>
+                      <span className="text-[var(--stitch-muted)]">RERA:</span>
                       <span className="ml-2 font-medium">{project.rera_number}</span>
                     </div>
                   )}
@@ -253,10 +264,10 @@ const ProjectCard = ({ project, onEdit, onViewLeads, onManageEvents }) => {
                 {/* Unit Types */}
                 {project.unit_types?.length > 0 && (
                   <div>
-                    <span className="text-[#4A4D53] text-sm">Unit Types:</span>
+                    <span className="text-[var(--stitch-muted)] text-sm">Unit Types:</span>
                     <div className="flex flex-wrap gap-2 mt-1">
                       {project.unit_types.map((type, i) => (
-                        <span key={i} className="px-2 py-1 bg-white border border-[#E5E1DB] rounded text-xs">
+                        <span key={i} className="px-2 py-1 bg-white border border-[var(--stitch-line)] rounded text-xs">
                           {type}
                         </span>
                       ))}
@@ -267,15 +278,15 @@ const ProjectCard = ({ project, onEdit, onViewLeads, onManageEvents }) => {
                 {/* Amenities */}
                 {project.amenities?.length > 0 && (
                   <div>
-                    <span className="text-[#4A4D53] text-sm">Amenities:</span>
+                    <span className="text-[var(--stitch-muted)] text-sm">Amenities:</span>
                     <div className="flex flex-wrap gap-2 mt-1">
                       {project.amenities.slice(0, 6).map((amenity, i) => (
-                        <span key={i} className="px-2 py-1 bg-[#04473C]/10 text-[#04473C] rounded text-xs">
+                        <span key={i} className="px-2 py-1 bg-[var(--stitch-ink)]/10 text-[var(--stitch-ink)] rounded text-xs">
                           {amenity}
                         </span>
                       ))}
                       {project.amenities.length > 6 && (
-                        <span className="px-2 py-1 text-[#4A4D53] text-xs">+{project.amenities.length - 6} more</span>
+                        <span className="px-2 py-1 text-[var(--stitch-muted)] text-xs">+{project.amenities.length - 6} more</span>
                       )}
                     </div>
                   </div>
@@ -379,16 +390,16 @@ const AddProjectModal = ({ isOpen, onClose, onSubmit, editProject }) => {
         animate={{ opacity: 1, scale: 1 }}
         className="bg-white rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto"
       >
-        <div className="sticky top-0 bg-white border-b border-[#E5E1DB] p-4 flex items-center justify-between">
+        <div className="sticky top-0 bg-white border-b border-[var(--stitch-line)] p-4 flex items-center justify-between">
           <h2 className="text-xl font-bold">{editProject ? 'Edit Project' : 'Add New Project'}</h2>
-          <button onClick={onClose} className="p-2 hover:bg-[#F5F3F0] rounded-lg">
+          <button onClick={onClose} className="p-2 hover:bg-[var(--stitch-soft)] rounded-lg">
             <X className="w-5 h-5" />
           </button>
         </div>
         
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
           {/* Phase Selection with Pricing */}
-          <div className="bg-gradient-to-r from-[#04473C] to-[#065f4e] text-white p-4 rounded-xl">
+          <div className="bg-gradient-to-r from-[var(--stitch-ink)] to-[var(--stitch-ink)] text-white p-4 rounded-xl">
             <h3 className="font-bold mb-3">Select Project Phase</h3>
             <div className="grid grid-cols-3 gap-3">
               {[
@@ -401,12 +412,12 @@ const AddProjectModal = ({ isOpen, onClose, onSubmit, editProject }) => {
                   onClick={() => setFormData({ ...formData, phase: option.value })}
                   className={`p-4 rounded-lg cursor-pointer border-2 transition-all ${
                     formData.phase === option.value 
-                      ? 'border-[#C6A87C] bg-white/20' 
+                      ? 'border-[var(--stitch-line)] bg-white/20' 
                       : 'border-white/20 hover:border-white/40'
                   }`}
                 >
                   <div className="font-bold">{option.label}</div>
-                  <div className="text-[#C6A87C] font-bold text-lg">{option.price}</div>
+                  <div className="text-[var(--stitch-muted)] font-bold text-lg">{option.price}</div>
                   <div className="text-xs text-white/70">{option.desc}</div>
                 </div>
               ))}
@@ -421,7 +432,7 @@ const AddProjectModal = ({ isOpen, onClose, onSubmit, editProject }) => {
                 type="text"
                 value={formData.project_name}
                 onChange={(e) => setFormData({ ...formData, project_name: e.target.value })}
-                className="w-full px-4 py-2 border border-[#E5E1DB] rounded-lg focus:ring-2 focus:ring-[#04473C]"
+                className="w-full px-4 py-2 border border-[var(--stitch-line)] rounded-lg focus:ring-2 focus:ring-black"
                 required
               />
             </div>
@@ -430,7 +441,7 @@ const AddProjectModal = ({ isOpen, onClose, onSubmit, editProject }) => {
               <select
                 value={formData.project_type}
                 onChange={(e) => setFormData({ ...formData, project_type: e.target.value })}
-                className="w-full px-4 py-2 border border-[#E5E1DB] rounded-lg focus:ring-2 focus:ring-[#04473C]"
+                className="w-full px-4 py-2 border border-[var(--stitch-line)] rounded-lg focus:ring-2 focus:ring-black"
               >
                 <option value="residential">Residential</option>
                 <option value="commercial">Commercial</option>
@@ -445,7 +456,7 @@ const AddProjectModal = ({ isOpen, onClose, onSubmit, editProject }) => {
             <textarea
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              className="w-full px-4 py-2 border border-[#E5E1DB] rounded-lg focus:ring-2 focus:ring-[#04473C]"
+              className="w-full px-4 py-2 border border-[var(--stitch-line)] rounded-lg focus:ring-2 focus:ring-black"
               rows={3}
               required
             />
@@ -459,7 +470,7 @@ const AddProjectModal = ({ isOpen, onClose, onSubmit, editProject }) => {
                 type="text"
                 value={formData.city}
                 onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                className="w-full px-4 py-2 border border-[#E5E1DB] rounded-lg focus:ring-2 focus:ring-[#04473C]"
+                className="w-full px-4 py-2 border border-[var(--stitch-line)] rounded-lg focus:ring-2 focus:ring-black"
                 required
               />
             </div>
@@ -469,7 +480,7 @@ const AddProjectModal = ({ isOpen, onClose, onSubmit, editProject }) => {
                 type="text"
                 value={formData.locality}
                 onChange={(e) => setFormData({ ...formData, locality: e.target.value })}
-                className="w-full px-4 py-2 border border-[#E5E1DB] rounded-lg focus:ring-2 focus:ring-[#04473C]"
+                className="w-full px-4 py-2 border border-[var(--stitch-line)] rounded-lg focus:ring-2 focus:ring-black"
                 required
               />
             </div>
@@ -479,7 +490,7 @@ const AddProjectModal = ({ isOpen, onClose, onSubmit, editProject }) => {
                 type="text"
                 value={formData.full_address}
                 onChange={(e) => setFormData({ ...formData, full_address: e.target.value })}
-                className="w-full px-4 py-2 border border-[#E5E1DB] rounded-lg focus:ring-2 focus:ring-[#04473C]"
+                className="w-full px-4 py-2 border border-[var(--stitch-line)] rounded-lg focus:ring-2 focus:ring-black"
               />
             </div>
           </div>
@@ -492,7 +503,7 @@ const AddProjectModal = ({ isOpen, onClose, onSubmit, editProject }) => {
                 type="number"
                 value={formData.min_price}
                 onChange={(e) => setFormData({ ...formData, min_price: e.target.value })}
-                className="w-full px-4 py-2 border border-[#E5E1DB] rounded-lg focus:ring-2 focus:ring-[#04473C]"
+                className="w-full px-4 py-2 border border-[var(--stitch-line)] rounded-lg focus:ring-2 focus:ring-black"
               />
             </div>
             <div>
@@ -501,7 +512,7 @@ const AddProjectModal = ({ isOpen, onClose, onSubmit, editProject }) => {
                 type="number"
                 value={formData.max_price}
                 onChange={(e) => setFormData({ ...formData, max_price: e.target.value })}
-                className="w-full px-4 py-2 border border-[#E5E1DB] rounded-lg focus:ring-2 focus:ring-[#04473C]"
+                className="w-full px-4 py-2 border border-[var(--stitch-line)] rounded-lg focus:ring-2 focus:ring-black"
               />
             </div>
             <div>
@@ -510,7 +521,7 @@ const AddProjectModal = ({ isOpen, onClose, onSubmit, editProject }) => {
                 type="number"
                 value={formData.price_per_sqft}
                 onChange={(e) => setFormData({ ...formData, price_per_sqft: e.target.value })}
-                className="w-full px-4 py-2 border border-[#E5E1DB] rounded-lg focus:ring-2 focus:ring-[#04473C]"
+                className="w-full px-4 py-2 border border-[var(--stitch-line)] rounded-lg focus:ring-2 focus:ring-black"
               />
             </div>
             <div>
@@ -519,7 +530,7 @@ const AddProjectModal = ({ isOpen, onClose, onSubmit, editProject }) => {
                 type="number"
                 value={formData.total_units}
                 onChange={(e) => setFormData({ ...formData, total_units: e.target.value })}
-                className="w-full px-4 py-2 border border-[#E5E1DB] rounded-lg focus:ring-2 focus:ring-[#04473C]"
+                className="w-full px-4 py-2 border border-[var(--stitch-line)] rounded-lg focus:ring-2 focus:ring-black"
               />
             </div>
           </div>
@@ -535,7 +546,7 @@ const AddProjectModal = ({ isOpen, onClose, onSubmit, editProject }) => {
                     type="number"
                     value={formData.land_area_acres}
                     onChange={(e) => setFormData({ ...formData, land_area_acres: e.target.value })}
-                    className="w-full px-4 py-2 border border-[#E5E1DB] rounded-lg"
+                    className="w-full px-4 py-2 border border-[var(--stitch-line)] rounded-lg"
                     step="0.1"
                   />
                 </div>
@@ -545,7 +556,7 @@ const AddProjectModal = ({ isOpen, onClose, onSubmit, editProject }) => {
                     type="date"
                     value={formData.expected_clu_date}
                     onChange={(e) => setFormData({ ...formData, expected_clu_date: e.target.value })}
-                    className="w-full px-4 py-2 border border-[#E5E1DB] rounded-lg"
+                    className="w-full px-4 py-2 border border-[var(--stitch-line)] rounded-lg"
                   />
                 </div>
                 <div>
@@ -554,7 +565,7 @@ const AddProjectModal = ({ isOpen, onClose, onSubmit, editProject }) => {
                     type="number"
                     value={formData.investment_start_amount}
                     onChange={(e) => setFormData({ ...formData, investment_start_amount: e.target.value })}
-                    className="w-full px-4 py-2 border border-[#E5E1DB] rounded-lg"
+                    className="w-full px-4 py-2 border border-[var(--stitch-line)] rounded-lg"
                   />
                 </div>
                 <div>
@@ -563,7 +574,7 @@ const AddProjectModal = ({ isOpen, onClose, onSubmit, editProject }) => {
                     type="number"
                     value={formData.expected_returns_percent}
                     onChange={(e) => setFormData({ ...formData, expected_returns_percent: e.target.value })}
-                    className="w-full px-4 py-2 border border-[#E5E1DB] rounded-lg"
+                    className="w-full px-4 py-2 border border-[var(--stitch-line)] rounded-lg"
                     step="0.1"
                   />
                 </div>
@@ -581,7 +592,7 @@ const AddProjectModal = ({ isOpen, onClose, onSubmit, editProject }) => {
                   <select
                     value={formData.clu_status}
                     onChange={(e) => setFormData({ ...formData, clu_status: e.target.value })}
-                    className="w-full px-4 py-2 border border-[#E5E1DB] rounded-lg"
+                    className="w-full px-4 py-2 border border-[var(--stitch-line)] rounded-lg"
                   >
                     <option value="">Select Status</option>
                     <option value="pending">Pending</option>
@@ -595,7 +606,7 @@ const AddProjectModal = ({ isOpen, onClose, onSubmit, editProject }) => {
                     type="text"
                     value={formData.clu_number}
                     onChange={(e) => setFormData({ ...formData, clu_number: e.target.value })}
-                    className="w-full px-4 py-2 border border-[#E5E1DB] rounded-lg"
+                    className="w-full px-4 py-2 border border-[var(--stitch-line)] rounded-lg"
                   />
                 </div>
                 <div>
@@ -604,7 +615,7 @@ const AddProjectModal = ({ isOpen, onClose, onSubmit, editProject }) => {
                     type="number"
                     value={formData.booking_amount}
                     onChange={(e) => setFormData({ ...formData, booking_amount: e.target.value })}
-                    className="w-full px-4 py-2 border border-[#E5E1DB] rounded-lg"
+                    className="w-full px-4 py-2 border border-[var(--stitch-line)] rounded-lg"
                   />
                 </div>
               </div>
@@ -627,8 +638,8 @@ const AddProjectModal = ({ isOpen, onClose, onSubmit, editProject }) => {
                   }}
                   className={`px-3 py-1.5 rounded-lg text-sm border transition-all ${
                     formData.unit_types.includes(type)
-                      ? 'bg-[#04473C] text-white border-[#04473C]'
-                      : 'bg-white border-[#E5E1DB] hover:border-[#04473C]'
+                      ? 'bg-[var(--stitch-ink)] text-white border-black'
+                      : 'bg-white border-[var(--stitch-line)] hover:border-black'
                   }`}
                 >
                   {type}
@@ -653,8 +664,8 @@ const AddProjectModal = ({ isOpen, onClose, onSubmit, editProject }) => {
                   }}
                   className={`px-3 py-1.5 rounded-lg text-sm border transition-all ${
                     formData.amenities.includes(amenity)
-                      ? 'bg-[#04473C] text-white border-[#04473C]'
-                      : 'bg-white border-[#E5E1DB] hover:border-[#04473C]'
+                      ? 'bg-[var(--stitch-ink)] text-white border-black'
+                      : 'bg-white border-[var(--stitch-line)] hover:border-black'
                   }`}
                 >
                   {amenity}
@@ -671,7 +682,7 @@ const AddProjectModal = ({ isOpen, onClose, onSubmit, editProject }) => {
                 type="date"
                 value={formData.possession_date}
                 onChange={(e) => setFormData({ ...formData, possession_date: e.target.value })}
-                className="w-full px-4 py-2 border border-[#E5E1DB] rounded-lg focus:ring-2 focus:ring-[#04473C]"
+                className="w-full px-4 py-2 border border-[var(--stitch-line)] rounded-lg focus:ring-2 focus:ring-black"
               />
             </div>
             <div>
@@ -680,21 +691,21 @@ const AddProjectModal = ({ isOpen, onClose, onSubmit, editProject }) => {
                 type="text"
                 value={formData.rera_number}
                 onChange={(e) => setFormData({ ...formData, rera_number: e.target.value })}
-                className="w-full px-4 py-2 border border-[#E5E1DB] rounded-lg focus:ring-2 focus:ring-[#04473C]"
+                className="w-full px-4 py-2 border border-[var(--stitch-line)] rounded-lg focus:ring-2 focus:ring-black"
               />
             </div>
           </div>
           
           {/* Package Summary */}
-          <div className="bg-[#C6A87C]/20 p-4 rounded-xl border border-[#C6A87C]">
+          <div className="bg-[var(--stitch-ink)]/20 p-4 rounded-xl border border-[var(--stitch-line)]">
             <div className="flex items-center justify-between">
               <div>
-                <h4 className="font-bold text-[#04473C]">Selected Package: {formData.phase.replace(/_/g, ' ').toUpperCase()}</h4>
-                <p className="text-sm text-[#4A4D53]">{packageInfo.description}</p>
+                <h4 className="font-bold text-[var(--stitch-ink)]">Selected Package: {formData.phase.replace(/_/g, ' ').toUpperCase()}</h4>
+                <p className="text-sm text-[var(--stitch-muted)]">{packageInfo.description}</p>
               </div>
               <div className="text-right">
-                <div className="text-2xl font-bold text-[#04473C]">{packageInfo.price}</div>
-                <div className="text-sm text-[#4A4D53]">{packageInfo.period}</div>
+                <div className="text-2xl font-bold text-[var(--stitch-ink)]">{packageInfo.price}</div>
+                <div className="text-sm text-[var(--stitch-muted)]">{packageInfo.period}</div>
               </div>
             </div>
           </div>
@@ -704,14 +715,14 @@ const AddProjectModal = ({ isOpen, onClose, onSubmit, editProject }) => {
             <button
               type="button"
               onClick={onClose}
-              className="px-6 py-2 border border-[#E5E1DB] rounded-lg hover:bg-[#F5F3F0]"
+              className="px-6 py-2 border border-[var(--stitch-line)] rounded-lg hover:bg-[var(--stitch-soft)]"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="px-6 py-2 bg-[#04473C] text-white rounded-lg hover:bg-[#033530] disabled:opacity-50 flex items-center gap-2"
+              className="px-6 py-2 bg-[var(--stitch-ink)] text-white rounded-lg hover:bg-black disabled:opacity-50 flex items-center gap-2"
             >
               {loading ? 'Saving...' : <><Save className="w-4 h-4" /> {editProject ? 'Update Project' : 'Create Project'}</>}
             </button>
@@ -763,56 +774,56 @@ const LeadsModal = ({ isOpen, onClose, project }) => {
         animate={{ opacity: 1, scale: 1 }}
         className="bg-white rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto"
       >
-        <div className="sticky top-0 bg-white border-b border-[#E5E1DB] p-4 flex items-center justify-between">
+        <div className="sticky top-0 bg-white border-b border-[var(--stitch-line)] p-4 flex items-center justify-between">
           <div>
             <h2 className="text-xl font-bold">Project Leads</h2>
-            <p className="text-sm text-[#4A4D53]">{project?.project_name}</p>
+            <p className="text-sm text-[var(--stitch-muted)]">{project?.project_name}</p>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-[#F5F3F0] rounded-lg">
+          <button onClick={onClose} className="p-2 hover:bg-[var(--stitch-soft)] rounded-lg">
             <X className="w-5 h-5" />
           </button>
         </div>
         
         <div className="p-4">
           {loading ? (
-            <div className="text-center py-12 text-[#4A4D53]">Loading leads...</div>
+            <div className="text-center py-12 text-[var(--stitch-muted)]">Loading leads...</div>
           ) : leads.length === 0 ? (
             <div className="text-center py-12">
-              <Users className="w-12 h-12 text-[#D0C9C0] mx-auto mb-3" />
-              <p className="text-[#4A4D53]">No leads yet</p>
-              <p className="text-sm text-[#4A4D53]">Leads will appear here when people inquire about your project</p>
+              <Users className="w-12 h-12 text-[var(--stitch-muted)] mx-auto mb-3" />
+              <p className="text-[var(--stitch-muted)]">No leads yet</p>
+              <p className="text-sm text-[var(--stitch-muted)]">Leads will appear here when people inquire about your project</p>
             </div>
           ) : (
             <div className="space-y-3">
               {leads.map((lead) => (
-                <div key={lead.id} className="bg-[#F5F3F0] p-4 rounded-lg">
+                <div key={lead.id} className="bg-[var(--stitch-soft)] p-4 rounded-lg">
                   <div className="flex items-start justify-between">
                     <div>
                       <div className="font-bold">{lead.name}</div>
-                      <div className="flex items-center gap-4 text-sm text-[#4A4D53]">
-                        <a href={`tel:${lead.phone}`} className="flex items-center gap-1 hover:text-[#04473C]">
+                      <div className="flex items-center gap-4 text-sm text-[var(--stitch-muted)]">
+                        <a href={`tel:${lead.phone}`} className="flex items-center gap-1 hover:text-[var(--stitch-ink)]">
                           <Phone className="w-3 h-3" />
                           {lead.phone}
                         </a>
                         {lead.email && (
-                          <a href={`mailto:${lead.email}`} className="flex items-center gap-1 hover:text-[#04473C]">
+                          <a href={`mailto:${lead.email}`} className="flex items-center gap-1 hover:text-[var(--stitch-ink)]">
                             <Mail className="w-3 h-3" />
                             {lead.email}
                           </a>
                         )}
                       </div>
                       {lead.interested_unit_type && (
-                        <p className="text-sm text-[#4A4D53] mt-1">Interested in: {lead.interested_unit_type}</p>
+                        <p className="text-sm text-[var(--stitch-muted)] mt-1">Interested in: {lead.interested_unit_type}</p>
                       )}
                       {lead.budget_range && (
-                        <p className="text-sm text-[#4A4D53]">Budget: {lead.budget_range}</p>
+                        <p className="text-sm text-[var(--stitch-muted)]">Budget: {lead.budget_range}</p>
                       )}
                     </div>
                     <div className="flex flex-col items-end gap-2">
                       <select
                         value={lead.status}
                         onChange={(e) => updateLeadStatus(lead.id, e.target.value)}
-                        className="px-3 py-1.5 text-sm border border-[#E5E1DB] rounded-lg"
+                        className="px-3 py-1.5 text-sm border border-[var(--stitch-line)] rounded-lg"
                       >
                         <option value="new">New</option>
                         <option value="contacted">Contacted</option>
@@ -822,7 +833,7 @@ const LeadsModal = ({ isOpen, onClose, project }) => {
                         <option value="converted">Converted</option>
                         <option value="lost">Lost</option>
                       </select>
-                      <span className="text-xs text-[#4A4D53]">
+                      <span className="text-xs text-[var(--stitch-muted)]">
                         {new Date(lead.created_at).toLocaleDateString()}
                       </span>
                     </div>
@@ -933,20 +944,20 @@ const EventsModal = ({ isOpen, onClose, project, onEventCreated }) => {
         animate={{ opacity: 1, scale: 1 }}
         className="bg-white rounded-xl max-w-5xl w-full max-h-[90vh] overflow-y-auto"
       >
-        <div className="sticky top-0 bg-white border-b border-[#E5E1DB] p-4 flex items-center justify-between z-10">
+        <div className="sticky top-0 bg-white border-b border-[var(--stitch-line)] p-4 flex items-center justify-between z-10">
           <div>
             <h2 className="text-xl font-bold">Investor Events</h2>
-            <p className="text-sm text-[#4A4D53]">{project?.project_name}</p>
+            <p className="text-sm text-[var(--stitch-muted)]">{project?.project_name}</p>
           </div>
           <div className="flex items-center gap-3">
             <button
               onClick={() => setShowAddEvent(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-[#04473C] text-white rounded-lg hover:bg-[#033530]"
+              className="flex items-center gap-2 px-4 py-2 bg-[var(--stitch-ink)] text-white rounded-lg hover:bg-black"
             >
               <Plus className="w-4 h-4" />
               Create Event
             </button>
-            <button onClick={onClose} className="p-2 hover:bg-[#F5F3F0] rounded-lg">
+            <button onClick={onClose} className="p-2 hover:bg-[var(--stitch-soft)] rounded-lg">
               <X className="w-5 h-5" />
             </button>
           </div>
@@ -974,7 +985,7 @@ const EventsModal = ({ isOpen, onClose, project, onEventCreated }) => {
                     value={eventForm.event_name}
                     onChange={(e) => setEventForm({ ...eventForm, event_name: e.target.value })}
                     placeholder="e.g., Investor Meetup - Mohali"
-                    className="w-full px-4 py-2 border border-[#E5E1DB] rounded-lg"
+                    className="w-full px-4 py-2 border border-[var(--stitch-line)] rounded-lg"
                     required
                   />
                 </div>
@@ -983,7 +994,7 @@ const EventsModal = ({ isOpen, onClose, project, onEventCreated }) => {
                   <select
                     value={eventForm.event_type}
                     onChange={(e) => setEventForm({ ...eventForm, event_type: e.target.value })}
-                    className="w-full px-4 py-2 border border-[#E5E1DB] rounded-lg"
+                    className="w-full px-4 py-2 border border-[var(--stitch-line)] rounded-lg"
                   >
                     <option value="investor_meetup">Investor Meetup</option>
                     <option value="site_visit">Site Visit</option>
@@ -999,7 +1010,7 @@ const EventsModal = ({ isOpen, onClose, project, onEventCreated }) => {
                   value={eventForm.description}
                   onChange={(e) => setEventForm({ ...eventForm, description: e.target.value })}
                   placeholder="Describe the event, what investors can expect..."
-                  className="w-full px-4 py-2 border border-[#E5E1DB] rounded-lg"
+                  className="w-full px-4 py-2 border border-[var(--stitch-line)] rounded-lg"
                   rows={2}
                 />
               </div>
@@ -1012,7 +1023,7 @@ const EventsModal = ({ isOpen, onClose, project, onEventCreated }) => {
                     value={eventForm.city}
                     onChange={(e) => setEventForm({ ...eventForm, city: e.target.value })}
                     placeholder="e.g., Mohali"
-                    className="w-full px-4 py-2 border border-[#E5E1DB] rounded-lg"
+                    className="w-full px-4 py-2 border border-[var(--stitch-line)] rounded-lg"
                     required
                   />
                 </div>
@@ -1023,7 +1034,7 @@ const EventsModal = ({ isOpen, onClose, project, onEventCreated }) => {
                     value={eventForm.venue}
                     onChange={(e) => setEventForm({ ...eventForm, venue: e.target.value })}
                     placeholder="e.g., Hotel Taj, Sector 70"
-                    className="w-full px-4 py-2 border border-[#E5E1DB] rounded-lg"
+                    className="w-full px-4 py-2 border border-[var(--stitch-line)] rounded-lg"
                     required
                   />
                 </div>
@@ -1034,7 +1045,7 @@ const EventsModal = ({ isOpen, onClose, project, onEventCreated }) => {
                     value={eventForm.venue_address}
                     onChange={(e) => setEventForm({ ...eventForm, venue_address: e.target.value })}
                     placeholder="Full venue address"
-                    className="w-full px-4 py-2 border border-[#E5E1DB] rounded-lg"
+                    className="w-full px-4 py-2 border border-[var(--stitch-line)] rounded-lg"
                   />
                 </div>
               </div>
@@ -1046,7 +1057,7 @@ const EventsModal = ({ isOpen, onClose, project, onEventCreated }) => {
                     type="date"
                     value={eventForm.event_date}
                     onChange={(e) => setEventForm({ ...eventForm, event_date: e.target.value })}
-                    className="w-full px-4 py-2 border border-[#E5E1DB] rounded-lg"
+                    className="w-full px-4 py-2 border border-[var(--stitch-line)] rounded-lg"
                     required
                   />
                 </div>
@@ -1056,7 +1067,7 @@ const EventsModal = ({ isOpen, onClose, project, onEventCreated }) => {
                     type="time"
                     value={eventForm.start_time}
                     onChange={(e) => setEventForm({ ...eventForm, start_time: e.target.value })}
-                    className="w-full px-4 py-2 border border-[#E5E1DB] rounded-lg"
+                    className="w-full px-4 py-2 border border-[var(--stitch-line)] rounded-lg"
                   />
                 </div>
                 <div>
@@ -1065,7 +1076,7 @@ const EventsModal = ({ isOpen, onClose, project, onEventCreated }) => {
                     type="time"
                     value={eventForm.end_time}
                     onChange={(e) => setEventForm({ ...eventForm, end_time: e.target.value })}
-                    className="w-full px-4 py-2 border border-[#E5E1DB] rounded-lg"
+                    className="w-full px-4 py-2 border border-[var(--stitch-line)] rounded-lg"
                   />
                 </div>
                 <div>
@@ -1074,7 +1085,7 @@ const EventsModal = ({ isOpen, onClose, project, onEventCreated }) => {
                     type="number"
                     value={eventForm.max_attendees}
                     onChange={(e) => setEventForm({ ...eventForm, max_attendees: parseInt(e.target.value) })}
-                    className="w-full px-4 py-2 border border-[#E5E1DB] rounded-lg"
+                    className="w-full px-4 py-2 border border-[var(--stitch-line)] rounded-lg"
                   />
                 </div>
               </div>
@@ -1083,7 +1094,7 @@ const EventsModal = ({ isOpen, onClose, project, onEventCreated }) => {
                 <button
                   type="button"
                   onClick={() => setShowAddEvent(false)}
-                  className="px-4 py-2 border border-[#E5E1DB] rounded-lg hover:bg-[#F5F3F0]"
+                  className="px-4 py-2 border border-[var(--stitch-line)] rounded-lg hover:bg-[var(--stitch-soft)]"
                 >
                   Cancel
                 </button>
@@ -1100,12 +1111,12 @@ const EventsModal = ({ isOpen, onClose, project, onEventCreated }) => {
           
           {/* Events List */}
           {loading ? (
-            <div className="text-center py-12 text-[#4A4D53]">Loading events...</div>
+            <div className="text-center py-12 text-[var(--stitch-muted)]">Loading events...</div>
           ) : events.length === 0 && !showAddEvent ? (
             <div className="text-center py-12">
-              <Calendar className="w-16 h-16 text-[#D0C9C0] mx-auto mb-4" />
+              <Calendar className="w-16 h-16 text-[var(--stitch-muted)] mx-auto mb-4" />
               <h3 className="text-lg font-bold mb-2">No Events Yet</h3>
-              <p className="text-[#4A4D53] mb-4">Create investor events to attract potential investors</p>
+              <p className="text-[var(--stitch-muted)] mb-4">Create investor events to attract potential investors</p>
               <button
                 onClick={() => setShowAddEvent(true)}
                 className="flex items-center gap-2 px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 mx-auto"
@@ -1117,7 +1128,7 @@ const EventsModal = ({ isOpen, onClose, project, onEventCreated }) => {
           ) : (
             <div className="space-y-4">
               {events.map((event) => (
-                <div key={event.id} className="bg-white border border-[#E5E1DB] rounded-xl overflow-hidden">
+                <div key={event.id} className="bg-white border border-[var(--stitch-line)] rounded-xl overflow-hidden">
                   <div className="p-4">
                     <div className="flex items-start justify-between">
                       <div className="flex gap-4">
@@ -1143,11 +1154,11 @@ const EventsModal = ({ isOpen, onClose, project, onEventCreated }) => {
                             </span>
                           </div>
                           <h3 className="text-lg font-bold">{event.event_name}</h3>
-                          <p className="text-sm text-[#4A4D53] flex items-center gap-1">
+                          <p className="text-sm text-[var(--stitch-muted)] flex items-center gap-1">
                             <MapPin className="w-3 h-3" />
                             {event.venue}, {event.city}
                           </p>
-                          <p className="text-sm text-[#4A4D53] flex items-center gap-1">
+                          <p className="text-sm text-[var(--stitch-muted)] flex items-center gap-1">
                             <Clock className="w-3 h-3" />
                             {event.start_time} - {event.end_time}
                           </p>
@@ -1158,7 +1169,7 @@ const EventsModal = ({ isOpen, onClose, project, onEventCreated }) => {
                         <div className="text-2xl font-bold text-purple-600">
                           {event.registered_count || 0}/{event.max_attendees}
                         </div>
-                        <div className="text-xs text-[#4A4D53]">Registered</div>
+                        <div className="text-xs text-[var(--stitch-muted)]">Registered</div>
                         <button
                           onClick={() => handleViewRegistrations(event)}
                           className="mt-2 flex items-center gap-1 px-3 py-1.5 bg-purple-100 text-purple-700 rounded-lg text-sm hover:bg-purple-200"
@@ -1175,7 +1186,7 @@ const EventsModal = ({ isOpen, onClose, project, onEventCreated }) => {
                     <motion.div
                       initial={{ height: 0, opacity: 0 }}
                       animate={{ height: 'auto', opacity: 1 }}
-                      className="border-t border-[#E5E1DB] bg-[#F5F3F0]/50 p-4"
+                      className="border-t border-[var(--stitch-line)] bg-[var(--stitch-soft)]/50 p-4"
                     >
                       <h4 className="font-bold mb-3 flex items-center gap-2">
                         <Users className="w-4 h-4 text-purple-600" />
@@ -1183,22 +1194,22 @@ const EventsModal = ({ isOpen, onClose, project, onEventCreated }) => {
                       </h4>
                       
                       {loadingRegistrations ? (
-                        <div className="text-center py-4 text-[#4A4D53]">Loading...</div>
+                        <div className="text-center py-4 text-[var(--stitch-muted)]">Loading...</div>
                       ) : registrations.length === 0 ? (
-                        <div className="text-center py-4 text-[#4A4D53]">No registrations yet</div>
+                        <div className="text-center py-4 text-[var(--stitch-muted)]">No registrations yet</div>
                       ) : (
                         <div className="grid md:grid-cols-2 gap-3">
                           {registrations.map((reg) => (
-                            <div key={reg.id} className="bg-white p-3 rounded-lg border border-[#E5E1DB]">
+                            <div key={reg.id} className="bg-white p-3 rounded-lg border border-[var(--stitch-line)]">
                               <div className="flex items-start justify-between">
                                 <div>
                                   <div className="font-medium">{reg.name}</div>
-                                  <a href={`tel:${reg.phone}`} className="text-sm text-[#04473C] hover:underline flex items-center gap-1">
+                                  <a href={`tel:${reg.phone}`} className="text-sm text-[var(--stitch-ink)] hover:underline flex items-center gap-1">
                                     <Phone className="w-3 h-3" />
                                     {reg.phone}
                                   </a>
                                   {reg.investment_capacity && (
-                                    <span className="text-xs text-[#4A4D53] bg-[#F5F3F0] px-2 py-0.5 rounded mt-1 inline-block">
+                                    <span className="text-xs text-[var(--stitch-muted)] bg-[var(--stitch-soft)] px-2 py-0.5 rounded mt-1 inline-block">
                                       Budget: {reg.investment_capacity}
                                     </span>
                                   )}
@@ -1218,7 +1229,7 @@ const EventsModal = ({ isOpen, onClose, project, onEventCreated }) => {
                       
                       <button
                         onClick={() => setSelectedEvent(null)}
-                        className="mt-3 text-sm text-[#4A4D53] hover:text-[#04473C]"
+                        className="mt-3 text-sm text-[var(--stitch-muted)] hover:text-[var(--stitch-ink)]"
                       >
                         Hide Registrations
                       </button>
@@ -1304,33 +1315,34 @@ const BuilderDashboard = () => {
     : projects.filter(p => p.phase === filterPhase);
   
   return (
-    <div className="min-h-screen bg-[#FDFCFB]">
+    <StitchShell title="Builder" eyebrow="Projects" compact>
+    <div className="min-h-screen bg-[var(--stitch-bg)]">
       {/* Header */}
-      <header className="bg-white border-b border-[#E5E1DB] sticky top-0 z-40">
+      <header className="bg-white border-b border-[var(--stitch-line)] sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-[#04473C] rounded-lg flex items-center justify-center">
+              <div className="w-10 h-10 bg-[var(--stitch-ink)] rounded-lg flex items-center justify-center">
                 <Building2 className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-xl font-bold text-[#111111]">Builder Dashboard</h1>
-                <p className="text-sm text-[#4A4D53]">{user?.name || user?.company_name}</p>
+                <h1 className="text-xl font-bold text-[var(--stitch-ink)]">Builder Dashboard</h1>
+                <p className="text-sm text-[var(--stitch-muted)]">{user?.name || user?.company_name}</p>
               </div>
             </div>
             <div className="flex items-center gap-4">
               <button
                 onClick={() => { setEditProject(null); setShowAddModal(true); }}
-                className="flex items-center gap-2 px-4 py-2 bg-[#04473C] text-white rounded-lg hover:bg-[#033530]"
+                className="flex items-center gap-2 px-4 py-2 bg-[var(--stitch-ink)] text-white rounded-lg hover:bg-black"
               >
                 <Plus className="w-4 h-4" />
                 Add Project
               </button>
               <button
                 onClick={logout}
-                className="p-2 hover:bg-[#F5F3F0] rounded-lg"
+                className="p-2 hover:bg-[var(--stitch-soft)] rounded-lg"
               >
-                <LogOut className="w-5 h-5 text-[#4A4D53]" />
+                <LogOut className="w-5 h-5 text-[var(--stitch-muted)]" />
               </button>
             </div>
           </div>
@@ -1341,35 +1353,35 @@ const BuilderDashboard = () => {
         {/* Stats Overview */}
         {stats && (
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-8">
-            <div className="bg-white border border-[#E5E1DB] p-4 rounded-xl">
-              <div className="text-3xl font-bold text-[#04473C]">{stats.projects?.total || 0}</div>
-              <div className="text-sm text-[#4A4D53]">Total Projects</div>
+            <div className="bg-white border border-[var(--stitch-line)] p-4 rounded-xl">
+              <div className="text-3xl font-bold text-[var(--stitch-ink)]">{stats.projects?.total || 0}</div>
+              <div className="text-sm text-[var(--stitch-muted)]">Total Projects</div>
             </div>
-            <div className="bg-white border border-[#E5E1DB] p-4 rounded-xl">
+            <div className="bg-white border border-[var(--stitch-line)] p-4 rounded-xl">
               <div className="text-3xl font-bold text-purple-600">{stats.projects?.pre_pre_launch || 0}</div>
-              <div className="text-sm text-[#4A4D53]">Pre-Pre Launch</div>
+              <div className="text-sm text-[var(--stitch-muted)]">Pre-Pre Launch</div>
             </div>
-            <div className="bg-white border border-[#E5E1DB] p-4 rounded-xl">
+            <div className="bg-white border border-[var(--stitch-line)] p-4 rounded-xl">
               <div className="text-3xl font-bold text-blue-600">{stats.projects?.pre_launch || 0}</div>
-              <div className="text-sm text-[#4A4D53]">Pre-Launch</div>
+              <div className="text-sm text-[var(--stitch-muted)]">Pre-Launch</div>
             </div>
-            <div className="bg-white border border-[#E5E1DB] p-4 rounded-xl">
+            <div className="bg-white border border-[var(--stitch-line)] p-4 rounded-xl">
               <div className="text-3xl font-bold text-green-600">{stats.projects?.launched || 0}</div>
-              <div className="text-sm text-[#4A4D53]">Launched</div>
+              <div className="text-sm text-[var(--stitch-muted)]">Launched</div>
             </div>
-            <div className="bg-white border border-[#E5E1DB] p-4 rounded-xl">
-              <div className="text-3xl font-bold text-[#C6A87C]">{stats.leads?.total || 0}</div>
-              <div className="text-sm text-[#4A4D53]">Total Leads</div>
+            <div className="bg-white border border-[var(--stitch-line)] p-4 rounded-xl">
+              <div className="text-3xl font-bold text-[var(--stitch-muted)]">{stats.leads?.total || 0}</div>
+              <div className="text-sm text-[var(--stitch-muted)]">Total Leads</div>
             </div>
-            <div className="bg-white border border-[#E5E1DB] p-4 rounded-xl">
+            <div className="bg-white border border-[var(--stitch-line)] p-4 rounded-xl">
               <div className="text-3xl font-bold text-orange-600">{stats.analytics?.total_views || 0}</div>
-              <div className="text-sm text-[#4A4D53]">Total Views</div>
+              <div className="text-sm text-[var(--stitch-muted)]">Total Views</div>
             </div>
           </div>
         )}
         
         {/* Pricing Banner */}
-        <div className="bg-gradient-to-r from-[#04473C] to-[#065f4e] text-white p-6 rounded-xl mb-8">
+        <div className="bg-gradient-to-r from-[var(--stitch-ink)] to-[var(--stitch-ink)] text-white p-6 rounded-xl mb-8">
           <h2 className="text-xl font-bold mb-4">Our Packages</h2>
           <div className="grid md:grid-cols-2 gap-6">
             <div className="bg-white/10 backdrop-blur-sm p-4 rounded-lg border border-white/20">
@@ -1401,7 +1413,7 @@ const BuilderDashboard = () => {
         
         {/* Phase Filter */}
         <div className="flex items-center gap-4 mb-6">
-          <span className="text-sm text-[#4A4D53]">Filter by Phase:</span>
+          <span className="text-sm text-[var(--stitch-muted)]">Filter by Phase:</span>
           <div className="flex gap-2">
             {['all', 'pre_pre_launch', 'pre_launch', 'launched'].map((phase) => (
               <button
@@ -1409,8 +1421,8 @@ const BuilderDashboard = () => {
                 onClick={() => setFilterPhase(phase)}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                   filterPhase === phase 
-                    ? 'bg-[#04473C] text-white' 
-                    : 'bg-white border border-[#E5E1DB] hover:border-[#04473C]'
+                    ? 'bg-[var(--stitch-ink)] text-white' 
+                    : 'bg-white border border-[var(--stitch-line)] hover:border-black'
                 }`}
               >
                 {phase === 'all' ? 'All' : phase.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
@@ -1421,15 +1433,15 @@ const BuilderDashboard = () => {
         
         {/* Projects List */}
         {loading ? (
-          <div className="text-center py-12 text-[#4A4D53]">Loading projects...</div>
+          <div className="text-center py-12 text-[var(--stitch-muted)]">Loading projects...</div>
         ) : filteredProjects.length === 0 ? (
-          <div className="bg-white border border-[#E5E1DB] rounded-xl p-12 text-center">
-            <Building2 className="w-16 h-16 text-[#D0C9C0] mx-auto mb-4" />
+          <div className="bg-white border border-[var(--stitch-line)] rounded-xl p-12 text-center">
+            <Building2 className="w-16 h-16 text-[var(--stitch-muted)] mx-auto mb-4" />
             <h3 className="text-xl font-bold mb-2">No Projects Yet</h3>
-            <p className="text-[#4A4D53] mb-6">Add your first project to start generating leads</p>
+            <p className="text-[var(--stitch-muted)] mb-6">Add your first project to start generating leads</p>
             <button
               onClick={() => { setEditProject(null); setShowAddModal(true); }}
-              className="flex items-center gap-2 px-6 py-3 bg-[#04473C] text-white rounded-lg hover:bg-[#033530] mx-auto"
+              className="flex items-center gap-2 px-6 py-3 bg-[var(--stitch-ink)] text-white rounded-lg hover:bg-black mx-auto"
             >
               <Plus className="w-5 h-5" />
               Add Your First Project
@@ -1471,6 +1483,7 @@ const BuilderDashboard = () => {
         onEventCreated={fetchDashboardData}
       />
     </div>
+    </StitchShell>
   );
 };
 

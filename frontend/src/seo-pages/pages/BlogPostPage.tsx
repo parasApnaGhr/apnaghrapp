@@ -35,7 +35,7 @@ const BlogPostPage = () => {
           <p className="text-gray-600 mb-6">The article you're looking for doesn't exist or has been moved.</p>
           <Link
             to="/blogs"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-[#04473C] text-white rounded-lg font-medium hover:bg-[#033530]"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-[var(--stitch-ink)] text-white rounded-lg font-medium hover:bg-[var(--stitch-ink)]"
           >
             <ArrowLeft className="w-5 h-5" />
             Browse All Articles
@@ -65,19 +65,19 @@ const BlogPostPage = () => {
           <div className="max-w-7xl mx-auto px-4 py-4">
             <div className="flex items-center justify-between">
               <Link to="/" className="flex items-center gap-2">
-                <Home className="w-6 h-6 text-[#04473C]" />
-                <span className="font-bold text-xl text-[#04473C]">ApnaGhr</span>
+                <Home className="w-6 h-6 text-[var(--stitch-ink)]" />
+                <span className="font-bold text-xl text-[var(--stitch-ink)]">ApnaGhr</span>
               </Link>
               
               <nav className="hidden md:flex items-center gap-6">
-                <Link to="/rent/flats-in-mohali" className="text-gray-600 hover:text-[#04473C]">Rent</Link>
-                <Link to="/buy/flats-in-mohali" className="text-gray-600 hover:text-[#04473C]">Buy</Link>
-                <Link to="/blogs" className="text-[#04473C] font-medium">Blog</Link>
+                <Link to="/rent/flats-in-mohali" className="text-gray-600 hover:text-[var(--stitch-ink)]">Rent</Link>
+                <Link to="/buy/flats-in-mohali" className="text-gray-600 hover:text-[var(--stitch-ink)]">Buy</Link>
+                <Link to="/blogs" className="text-[var(--stitch-ink)] font-medium">Blog</Link>
               </nav>
 
               <Link
                 to="/"
-                className="px-4 py-2 bg-[#04473C] text-white rounded-lg text-sm font-medium hover:bg-[#033530]"
+                className="px-4 py-2 bg-[var(--stitch-ink)] text-white rounded-lg text-sm font-medium hover:bg-[var(--stitch-ink)]"
               >
                 Book Visit
               </Link>
@@ -89,9 +89,9 @@ const BlogPostPage = () => {
         <div className="bg-white border-b border-gray-100">
           <div className="max-w-4xl mx-auto px-4 py-3">
             <nav className="flex items-center gap-2 text-sm text-gray-600">
-              <Link to="/" className="hover:text-[#04473C]">Home</Link>
+              <Link to="/" className="hover:text-[var(--stitch-ink)]">Home</Link>
               <ChevronRight className="w-4 h-4" />
-              <Link to="/blogs" className="hover:text-[#04473C]">Blog</Link>
+              <Link to="/blogs" className="hover:text-[var(--stitch-ink)]">Blog</Link>
               <ChevronRight className="w-4 h-4" />
               <span className="text-gray-900 line-clamp-1">{blog.title}</span>
             </nav>
@@ -105,7 +105,7 @@ const BlogPostPage = () => {
               {/* Category */}
               <Link
                 to={`/blogs?category=${blog.category}`}
-                className="inline-flex items-center gap-2 px-3 py-1 bg-[#04473C]/10 text-[#04473C] rounded-full text-sm font-medium mb-4 hover:bg-[#04473C]/20 transition-colors"
+                className="inline-flex items-center gap-2 px-3 py-1 bg-[var(--stitch-ink)]/10 text-[var(--stitch-ink)] rounded-full text-sm font-medium mb-4 hover:bg-[var(--stitch-ink)]/20 transition-colors"
               >
                 <Tag className="w-4 h-4" />
                 {category?.name}
@@ -122,7 +122,7 @@ const BlogPostPage = () => {
               {/* Meta Info */}
               <div className="flex flex-wrap items-center gap-4 text-gray-600 mb-6">
                 <div className="flex items-center gap-2" itemProp="author" itemScope itemType="https://schema.org/Organization">
-                  <div className="w-10 h-10 bg-[#04473C] rounded-full flex items-center justify-center">
+                  <div className="w-10 h-10 bg-[var(--stitch-ink)] rounded-full flex items-center justify-center">
                     <User className="w-5 h-5 text-white" />
                   </div>
                   <div>
@@ -198,7 +198,7 @@ const BlogPostPage = () => {
 
             {/* Article Content */}
             <div 
-              className="prose prose-lg max-w-none prose-headings:text-gray-900 prose-p:text-gray-700 prose-a:text-[#04473C] prose-strong:text-gray-900 prose-ul:text-gray-700 prose-ol:text-gray-700 prose-li:text-gray-700"
+              className="prose prose-lg max-w-none prose-headings:text-gray-900 prose-p:text-gray-700 prose-a:text-[var(--stitch-ink)] prose-strong:text-gray-900 prose-ul:text-gray-700 prose-ol:text-gray-700 prose-li:text-gray-700"
               itemProp="articleBody"
             >
               <ReactMarkdown>{blog.content}</ReactMarkdown>
@@ -230,7 +230,7 @@ const BlogPostPage = () => {
           )}
 
           {/* CTA Banner */}
-          <section className="mt-12 bg-gradient-to-r from-[#04473C] to-[#065f4e] rounded-2xl p-6 md:p-8 text-white">
+          <section className="mt-12 bg-gradient-to-r from-[var(--stitch-ink)] to-[var(--stitch-ink)] rounded-2xl p-6 md:p-8 text-white">
             <div className="flex flex-col md:flex-row items-center justify-between gap-4">
               <div>
                 <h2 className="text-xl md:text-2xl font-bold mb-2">
@@ -242,7 +242,7 @@ const BlogPostPage = () => {
               </div>
               <Link
                 to="/"
-                className="px-6 py-3 bg-white text-[#04473C] rounded-xl font-bold hover:bg-gray-100 transition-colors whitespace-nowrap"
+                className="px-6 py-3 bg-white text-[var(--stitch-ink)] rounded-xl font-bold hover:bg-gray-100 transition-colors whitespace-nowrap"
               >
                 Book Property Visit
               </Link>
@@ -269,7 +269,7 @@ const BlogPostPage = () => {
                       />
                     </div>
                     <div className="p-4">
-                      <h3 className="font-semibold text-gray-900 line-clamp-2 group-hover:text-[#04473C] transition-colors">
+                      <h3 className="font-semibold text-gray-900 line-clamp-2 group-hover:text-[var(--stitch-ink)] transition-colors">
                         {relatedBlog.title}
                       </h3>
                       <p className="text-sm text-gray-500 mt-2">{relatedBlog.readTime}</p>
@@ -284,7 +284,7 @@ const BlogPostPage = () => {
           <div className="mt-12 text-center">
             <Link
               to="/blogs"
-              className="inline-flex items-center gap-2 text-[#04473C] font-medium hover:underline"
+              className="inline-flex items-center gap-2 text-[var(--stitch-ink)] font-medium hover:underline"
             >
               <ArrowLeft className="w-5 h-5" />
               Back to All Articles

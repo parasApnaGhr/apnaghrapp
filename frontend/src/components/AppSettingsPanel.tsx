@@ -19,7 +19,7 @@ const AppSettingsPanel = () => {
     seasonal_discount_percent: 0,
     seasonal_active: false,
     homepage_highlight: '',
-    accent_color: '#FF5A5F',
+    accent_color: 'var(--stitch-ink)',
     enable_animations: true,
     show_offers_badge: false
   });
@@ -27,17 +27,17 @@ const AppSettingsPanel = () => {
   const fileInputRef = useRef(null);
 
   const seasonalThemes = [
-    { id: 'none', label: 'No Theme', icon: Settings, color: '#52525B', description: 'Standard platform appearance', defaultBanner: '' },
-    { id: 'holi', label: 'Holi Festival', icon: Palette, color: '#FF5A5F', description: 'Colorful Holi celebrations with splash effects', defaultBanner: '🎨 Happy Holi! Splash into savings - Book visits at special rates!' },
-    { id: 'diwali', label: 'Diwali', icon: Sparkles, color: '#FFD166', description: 'Festive lights and diyas', defaultBanner: '🪔 Diwali Dhamaka! Light up your new home search with festive discounts!' },
-    { id: 'new_year', label: 'New Year', icon: PartyPopper, color: '#4ECDC4', description: 'Celebrate the new year', defaultBanner: '🎉 New Year, New Home! Start 2026 with amazing property deals!' },
-    { id: 'valentine', label: "Valentine's Day", icon: Heart, color: '#FF6B8A', description: 'Love is in the air', defaultBanner: '💕 Fall in love with your dream home this Valentine\'s!' },
-    { id: 'summer', label: 'Summer Sale', icon: Sun, color: '#FFA500', description: 'Hot summer deals', defaultBanner: '☀️ Summer Sale! Hot deals on property visits - Beat the heat!' },
-    { id: 'monsoon', label: 'Monsoon Offers', icon: Flower2, color: '#4ECDC4', description: 'Rainy season specials', defaultBanner: '🌧️ Monsoon Magic! Rainy season discounts on all visits!' },
-    { id: 'christmas', label: 'Christmas', icon: Gift, color: '#E74C3C', description: 'Holiday season magic', defaultBanner: '🎄 Christmas Special! Gift yourself a new home this holiday!' },
-    { id: 'independence', label: 'Independence Day', icon: Star, color: '#FF9933', description: 'Patriotic celebrations', defaultBanner: '🇮🇳 Azadi Sale! Freedom to find your dream home at best prices!' },
-    { id: 'navratri', label: 'Navratri', icon: Crown, color: '#9B59B6', description: 'Nine nights of celebration', defaultBanner: '🙏 Navratri Special! 9 days of divine deals on property visits!' },
-    { id: 'winter', label: 'Winter Warmth', icon: Snowflake, color: '#3498DB', description: 'Cozy winter deals', defaultBanner: '❄️ Winter Warmth! Cozy up to great deals on your new home!' }
+    { id: 'none', label: 'No Theme', icon: Settings, color: 'var(--stitch-muted)', description: 'Standard platform appearance', defaultBanner: '' },
+    { id: 'holi', label: 'Holi Festival', icon: Palette, color: 'var(--stitch-ink)', description: 'Colorful Holi celebrations with splash effects', defaultBanner: '🎨 Happy Holi! Splash into savings - Book visits at special rates!' },
+    { id: 'diwali', label: 'Diwali', icon: Sparkles, color: 'var(--stitch-muted)', description: 'Festive lights and diyas', defaultBanner: '🪔 Diwali Dhamaka! Light up your new home search with festive discounts!' },
+    { id: 'new_year', label: 'New Year', icon: PartyPopper, color: 'var(--stitch-ink)', description: 'Celebrate the new year', defaultBanner: '🎉 New Year, New Home! Start 2026 with amazing property deals!' },
+    { id: 'valentine', label: "Valentine's Day", icon: Heart, color: 'var(--stitch-ink)', description: 'Love is in the air', defaultBanner: '💕 Fall in love with your dream home this Valentine\'s!' },
+    { id: 'summer', label: 'Summer Sale', icon: Sun, color: 'var(--stitch-muted)', description: 'Hot summer deals', defaultBanner: '☀️ Summer Sale! Hot deals on property visits - Beat the heat!' },
+    { id: 'monsoon', label: 'Monsoon Offers', icon: Flower2, color: 'var(--stitch-ink)', description: 'Rainy season specials', defaultBanner: '🌧️ Monsoon Magic! Rainy season discounts on all visits!' },
+    { id: 'christmas', label: 'Christmas', icon: Gift, color: 'var(--stitch-ink)', description: 'Holiday season magic', defaultBanner: '🎄 Christmas Special! Gift yourself a new home this holiday!' },
+    { id: 'independence', label: 'Independence Day', icon: Star, color: 'var(--stitch-muted)', description: 'Patriotic celebrations', defaultBanner: '🇮🇳 Azadi Sale! Freedom to find your dream home at best prices!' },
+    { id: 'navratri', label: 'Navratri', icon: Crown, color: 'var(--stitch-ink)', description: 'Nine nights of celebration', defaultBanner: '🙏 Navratri Special! 9 days of divine deals on property visits!' },
+    { id: 'winter', label: 'Winter Warmth', icon: Snowflake, color: 'var(--stitch-ink)', description: 'Cozy winter deals', defaultBanner: '❄️ Winter Warmth! Cozy up to great deals on your new home!' }
   ];
 
   useEffect(() => {
@@ -135,7 +135,7 @@ const AppSettingsPanel = () => {
       seasonal_theme: themeId,
       seasonal_active: themeId !== 'none',
       seasonal_banner_text: theme?.defaultBanner || '',
-      accent_color: theme?.color || '#FF5A5F'
+      accent_color: theme?.color || 'var(--stitch-ink)'
     }));
   };
 
@@ -149,18 +149,18 @@ const AppSettingsPanel = () => {
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-white rounded-xl border-2 border-[#111111] shadow-[4px_4px_0px_#111111] p-6"
+        className="bg-white rounded-xl border border-[var(--stitch-line)] shadow-[4px_4px_0px_var(--stitch-ink)] p-6"
       >
         <div className="flex items-center gap-3 mb-6">
-          <div className="w-12 h-12 bg-gradient-to-br from-[#FFD166] to-[#FF5A5F] rounded-xl flex items-center justify-center">
+          <div className="w-12 h-12 bg-gradient-to-br from-[var(--stitch-muted)] to-[var(--stitch-ink)] rounded-xl flex items-center justify-center">
             <Sparkles className="w-6 h-6 text-white" />
           </div>
           <div>
             <h3 className="font-bold text-lg">Seasonal Customization</h3>
-            <p className="text-sm text-[#52525B]">Transform the app for festivals & special occasions</p>
+            <p className="text-sm text-[var(--stitch-muted)]">Transform the app for festivals & special occasions</p>
           </div>
           {appSettings.seasonal_active && (
-            <span className="ml-auto px-3 py-1 bg-[#2A9D8F] text-white text-xs font-bold rounded-full animate-pulse">
+            <span className="ml-auto px-3 py-1 bg-[var(--stitch-ink)] text-white text-xs font-bold rounded-full animate-pulse">
               LIVE
             </span>
           )}
@@ -179,8 +179,8 @@ const AppSettingsPanel = () => {
                 whileTap={{ scale: 0.98 }}
                 className={`p-4 rounded-xl border-2 text-left transition-all ${
                   isSelected
-                    ? 'border-[#111111] shadow-[3px_3px_0px_#111111]'
-                    : 'border-[#E5E3D8] hover:border-[#111111]'
+                    ? 'border-[var(--stitch-ink)] shadow-[3px_3px_0px_var(--stitch-ink)]'
+                    : 'border-[var(--stitch-line)] hover:border-[var(--stitch-ink)]'
                 }`}
                 style={{ backgroundColor: isSelected ? `${theme.color}20` : 'white' }}
                 data-testid={`theme-${theme.id}`}
@@ -192,7 +192,7 @@ const AppSettingsPanel = () => {
                   <Icon className="w-5 h-5" style={{ color: theme.color }} />
                 </div>
                 <div className="font-bold text-sm">{theme.label}</div>
-                <div className="text-xs text-[#52525B] mt-1 line-clamp-2">{theme.description}</div>
+                <div className="text-xs text-[var(--stitch-muted)] mt-1 line-clamp-2">{theme.description}</div>
                 {isSelected && (
                   <div className="mt-2 flex items-center gap-1 text-xs font-medium" style={{ color: theme.color }}>
                     <Check className="w-3 h-3" />
@@ -211,7 +211,7 @@ const AppSettingsPanel = () => {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="border-t border-[#E5E3D8] pt-6 space-y-4"
+              className="border-t border-[var(--stitch-line)] pt-6 space-y-4"
             >
               <div className="grid md:grid-cols-2 gap-4">
                 {/* Banner Text */}
@@ -225,7 +225,7 @@ const AppSettingsPanel = () => {
                     value={appSettings.seasonal_banner_text}
                     onChange={(e) => setAppSettings({ ...appSettings, seasonal_banner_text: e.target.value })}
                     placeholder={`e.g., "Happy ${getActiveTheme()?.label || 'Festival'}! Special offers inside"`}
-                    className="w-full px-4 py-3 border-2 border-[#111111] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFD166]"
+                    className="w-full px-4 py-3 border border-[var(--stitch-line)] rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--stitch-muted)]"
                     data-testid="banner-text-input"
                   />
                 </div>
@@ -243,7 +243,7 @@ const AppSettingsPanel = () => {
                     value={appSettings.seasonal_discount_percent}
                     onChange={(e) => setAppSettings({ ...appSettings, seasonal_discount_percent: parseInt(e.target.value) || 0 })}
                     placeholder="e.g., 10"
-                    className="w-full px-4 py-3 border-2 border-[#111111] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFD166]"
+                    className="w-full px-4 py-3 border border-[var(--stitch-line)] rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--stitch-muted)]"
                     data-testid="discount-input"
                   />
                 </div>
@@ -260,7 +260,7 @@ const AppSettingsPanel = () => {
                   value={appSettings.homepage_highlight}
                   onChange={(e) => setAppSettings({ ...appSettings, homepage_highlight: e.target.value })}
                   placeholder="e.g., 'Book visits at just ₹180 this Holi!'"
-                  className="w-full px-4 py-3 border-2 border-[#111111] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFD166]"
+                  className="w-full px-4 py-3 border border-[var(--stitch-line)] rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--stitch-muted)]"
                   data-testid="highlight-input"
                 />
               </div>
@@ -269,7 +269,7 @@ const AppSettingsPanel = () => {
               <div className="flex flex-wrap gap-4">
                 <label className="flex items-center gap-3 cursor-pointer">
                   <div className={`w-12 h-7 rounded-full transition-colors relative ${
-                    appSettings.enable_animations ? 'bg-[#2A9D8F]' : 'bg-[#E5E3D8]'
+                    appSettings.enable_animations ? 'bg-[var(--stitch-ink)]' : 'bg-[var(--stitch-line)]'
                   }`}>
                     <input
                       type="checkbox"
@@ -287,7 +287,7 @@ const AppSettingsPanel = () => {
 
                 <label className="flex items-center gap-3 cursor-pointer">
                   <div className={`w-12 h-7 rounded-full transition-colors relative ${
-                    appSettings.show_offers_badge ? 'bg-[#2A9D8F]' : 'bg-[#E5E3D8]'
+                    appSettings.show_offers_badge ? 'bg-[var(--stitch-ink)]' : 'bg-[var(--stitch-line)]'
                   }`}>
                     <input
                       type="checkbox"
@@ -305,11 +305,11 @@ const AppSettingsPanel = () => {
               </div>
 
               {/* Preview */}
-              <div className="bg-[#FAF9F6] rounded-xl p-4 border border-[#E5E3D8]">
+              <div className="bg-[var(--stitch-soft)] rounded-xl p-4 border border-[var(--stitch-line)]">
                 <p className="text-sm font-bold mb-2">Preview:</p>
                 <div 
                   className="rounded-lg p-4 text-white text-center font-bold"
-                  style={{ backgroundColor: getActiveTheme()?.color || '#FF5A5F' }}
+                  style={{ backgroundColor: getActiveTheme()?.color || 'var(--stitch-ink)' }}
                 >
                   {appSettings.seasonal_banner_text || `🎉 ${getActiveTheme()?.label || 'Festival'} Special - Book Now!`}
                   {appSettings.seasonal_discount_percent > 0 && (
@@ -324,13 +324,13 @@ const AppSettingsPanel = () => {
         </AnimatePresence>
 
         {/* Save Button */}
-        <div className="mt-6 pt-4 border-t border-[#E5E3D8]">
+        <div className="mt-6 pt-4 border-t border-[var(--stitch-line)]">
           <motion.button
             onClick={handleSaveSettings}
             disabled={savingSettings}
             whileHover={{ scale: savingSettings ? 1 : 1.02 }}
             whileTap={{ scale: savingSettings ? 1 : 0.98 }}
-            className="btn-primary w-full flex items-center justify-center gap-2"
+            className="stitch-button w-full flex items-center justify-center gap-2"
             data-testid="save-settings-button"
           >
             {savingSettings ? (
@@ -353,15 +353,15 @@ const AppSettingsPanel = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className="bg-white rounded-xl border-2 border-[#111111] shadow-[4px_4px_0px_#111111] p-6"
+        className="bg-white rounded-xl border border-[var(--stitch-line)] shadow-[4px_4px_0px_var(--stitch-ink)] p-6"
       >
         <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 bg-[#E07A5F]/10 rounded-lg flex items-center justify-center">
-            <Video className="w-5 h-5 text-[#E07A5F]" />
+          <div className="w-10 h-10 bg-[var(--stitch-ink)]/10 rounded-lg flex items-center justify-center">
+            <Video className="w-5 h-5 text-[var(--stitch-ink)]" />
           </div>
           <div>
             <h3 className="font-bold">How It Works Video</h3>
-            <p className="text-sm text-[#4A626C]">This video appears on property detail pages</p>
+            <p className="text-sm text-[var(--stitch-muted)]">This video appears on property detail pages</p>
           </div>
         </div>
 
@@ -380,7 +380,7 @@ const AppSettingsPanel = () => {
             <div className="flex gap-3">
               <button
                 onClick={() => fileInputRef.current?.click()}
-                className="flex-1 btn-secondary flex items-center justify-center gap-2"
+                className="flex-1 stitch-button stitch-button-secondary flex items-center justify-center gap-2"
                 data-testid="replace-video-button"
               >
                 <Upload className="w-4 h-4" />
@@ -396,7 +396,7 @@ const AppSettingsPanel = () => {
               </button>
             </div>
 
-            <div className="flex items-center gap-2 text-sm text-[#2A9D8F]">
+            <div className="flex items-center gap-2 text-sm text-[var(--stitch-ink)]">
               <Check className="w-4 h-4" />
               Video is live and visible to customers
             </div>
@@ -407,8 +407,8 @@ const AppSettingsPanel = () => {
               onClick={() => !uploading && fileInputRef.current?.click()}
               className={`border-2 border-dashed rounded-xl p-12 text-center cursor-pointer transition ${
                 uploading 
-                  ? 'border-[#E07A5F] bg-[#FFF5F2]' 
-                  : 'border-[#E5E3D8] hover:border-[#E07A5F] hover:bg-[#FFF5F2]'
+                  ? 'border-[var(--stitch-ink)] bg-[var(--stitch-soft)]' 
+                  : 'border-[var(--stitch-line)] hover:border-[var(--stitch-ink)] hover:bg-[var(--stitch-soft)]'
               }`}
               data-testid="upload-video-area"
             >
@@ -416,37 +416,37 @@ const AppSettingsPanel = () => {
                 <div>
                   <div className="w-16 h-16 mx-auto mb-4 relative">
                     <svg className="w-full h-full transform -rotate-90">
-                      <circle cx="32" cy="32" r="28" stroke="#E5E3D8" strokeWidth="4" fill="none" />
+                      <circle cx="32" cy="32" r="28" stroke="var(--stitch-line)" strokeWidth="4" fill="none" />
                       <circle
                         cx="32" cy="32" r="28"
-                        stroke="#E07A5F" strokeWidth="4" fill="none"
+                        stroke="var(--stitch-ink)" strokeWidth="4" fill="none"
                         strokeDasharray={`${uploadProgress * 1.76} 176`}
                         strokeLinecap="round"
                       />
                     </svg>
-                    <span className="absolute inset-0 flex items-center justify-center text-sm font-bold text-[#E07A5F]">
+                    <span className="absolute inset-0 flex items-center justify-center text-sm font-bold text-[var(--stitch-ink)]">
                       {uploadProgress}%
                     </span>
                   </div>
-                  <p className="font-medium text-[#264653]">Uploading video...</p>
-                  <p className="text-sm text-[#4A626C] mt-1">Please wait</p>
+                  <p className="font-medium text-[var(--stitch-ink)]">Uploading video...</p>
+                  <p className="text-sm text-[var(--stitch-muted)] mt-1">Please wait</p>
                 </div>
               ) : (
                 <div>
-                  <div className="w-16 h-16 bg-[#E07A5F]/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Upload className="w-8 h-8 text-[#E07A5F]" />
+                  <div className="w-16 h-16 bg-[var(--stitch-ink)]/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Upload className="w-8 h-8 text-[var(--stitch-ink)]" />
                   </div>
-                  <p className="font-medium text-[#264653]">Click to upload explainer video</p>
-                  <p className="text-sm text-[#4A626C] mt-1">MP4, MOV, or WebM • Max 100MB</p>
+                  <p className="font-medium text-[var(--stitch-ink)]">Click to upload explainer video</p>
+                  <p className="text-sm text-[var(--stitch-muted)] mt-1">MP4, MOV, or WebM • Max 100MB</p>
                 </div>
               )}
             </div>
 
-            <div className="bg-[#F0FDF9] rounded-xl p-4 flex items-start gap-3">
-              <AlertCircle className="w-5 h-5 text-[#2A9D8F] flex-shrink-0 mt-0.5" />
+            <div className="bg-[var(--stitch-soft)] rounded-xl p-4 flex items-start gap-3">
+              <AlertCircle className="w-5 h-5 text-[var(--stitch-ink)] flex-shrink-0 mt-0.5" />
               <div className="text-sm">
-                <p className="font-medium text-[#264653]">Video Recommendations:</p>
-                <ul className="text-[#4A626C] mt-1 space-y-1">
+                <p className="font-medium text-[var(--stitch-ink)]">Video Recommendations:</p>
+                <ul className="text-[var(--stitch-muted)] mt-1 space-y-1">
                   <li>• 16:9 aspect ratio (landscape)</li>
                   <li>• 1-2 minutes duration</li>
                   <li>• Explain visit booking, OTP verification, and rider role</li>

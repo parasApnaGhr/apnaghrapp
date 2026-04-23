@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Global Settings &amp; Security</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary-fixed-dim": "#ababab",
+                        "surface-container-high": "#e8e8e8",
+                        "outline-variant": "#c6c6c6",
+                        "primary-fixed": "#5e5e5e",
+                        "on-secondary-fixed-variant": "#3b3b3b",
+                        "surface-container": "#eeeeee",
+                        "on-primary-fixed": "#ffffff",
+                        "inverse-primary": "#c6c6c6",
+                        "primary": "#000000",
+                        "surface-variant": "#e2e2e2",
+                        "tertiary-fixed": "#5f5e5e",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary-container": "#d4d4d4",
+                        "surface-container-highest": "#e2e2e2",
+                        "on-secondary-container": "#1b1b1b",
+                        "on-error-container": "#410002",
+                        "secondary-fixed": "#c6c6c6",
+                        "on-secondary": "#ffffff",
+                        "on-tertiary-fixed-variant": "#e5e2e1",
+                        "primary-container": "#3b3b3b",
+                        "error-container": "#ffdad6",
+                        "surface-dim": "#dadada",
+                        "secondary": "#5e5e5e",
+                        "surface-container-low": "#f3f3f4",
+                        "surface": "#f9f9f9",
+                        "on-secondary-fixed": "#1b1b1b",
+                        "tertiary-fixed-dim": "#474746",
+                        "surface-bright": "#f9f9f9",
+                        "on-primary-fixed-variant": "#e2e2e2",
+                        "surface-tint": "#5e5e5e",
+                        "primary-fixed-dim": "#474747",
+                        "on-tertiary-fixed": "#ffffff",
+                        "on-surface": "#1a1c1c",
+                        "on-primary-container": "#ffffff",
+                        "tertiary-container": "#757474",
+                        "error": "#ba1a1a",
+                        "on-primary": "#e2e2e2",
+                        "on-tertiary-container": "#ffffff",
+                        "on-surface-variant": "#474747",
+                        "on-background": "#1a1c1c",
+                        "on-tertiary": "#e5e2e1",
+                        "inverse-surface": "#2f3131",
+                        "tertiary": "#3c3b3b",
+                        "outline": "#777777",
+                        "on-error": "#ffffff",
+                        "inverse-on-surface": "#f0f1f1",
+                        "background": "#f9f9f9"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {},
+                    "fontFamily": {
+                        "headline": ["Inter"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; background-color: #F9F9F9; color: #1a1c1c; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .fill-icon { font-variation-settings: 'FILL' 1; }
+    </style>
+</head>
+<body class="flex min-h-screen bg-surface overflow-x-hidden">
+<!-- SideNavBar (Desktop) -->
+<aside class="hidden md:flex h-screen w-72 flex-col fixed left-0 top-0 border-r border-zinc-200 dark:border-zinc-800 bg-[#F3F3F4] dark:bg-zinc-900 flex flex-col p-6 gap-8 z-40 shadow-none">
+<!-- Header -->
+<div class="flex flex-col gap-2 mb-8">
+<h1 class="text-lg font-black text-black dark:text-white font-['Inter'] tracking-tighter uppercase">CONTROL</h1>
+<span class="text-xs font-bold text-outline uppercase tracking-widest">v1.0.4-STABLE</span>
+</div>
+<!-- Navigation Links -->
+<nav class="flex-1 flex flex-col gap-2">
+<a class="text-zinc-500 dark:text-zinc-400 px-6 py-3 my-1 flex items-center gap-4 hover:bg-zinc-200 dark:hover:bg-zinc-800 rounded-full transition-all font-['Inter'] text-sm font-bold uppercase tracking-widest" href="#">
+<span class="material-symbols-outlined text-[1.25rem]">radar</span>
+<span>Live Tracking</span>
+</a>
+<a class="text-zinc-500 dark:text-zinc-400 px-6 py-3 my-1 flex items-center gap-4 hover:bg-zinc-200 dark:hover:bg-zinc-800 rounded-full transition-all font-['Inter'] text-sm font-bold uppercase tracking-widest" href="#">
+<span class="material-symbols-outlined text-[1.25rem]">add_business</span>
+<span>Property Manager</span>
+</a>
+<a class="text-zinc-500 dark:text-zinc-400 px-6 py-3 my-1 flex items-center gap-4 hover:bg-zinc-200 dark:hover:bg-zinc-800 rounded-full transition-all font-['Inter'] text-sm font-bold uppercase tracking-widest" href="#">
+<span class="material-symbols-outlined text-[1.25rem]">analytics</span>
+<span>Analytics</span>
+</a>
+<a class="text-zinc-500 dark:text-zinc-400 px-6 py-3 my-1 flex items-center gap-4 hover:bg-zinc-200 dark:hover:bg-zinc-800 rounded-full transition-all font-['Inter'] text-sm font-bold uppercase tracking-widest" href="#">
+<span class="material-symbols-outlined text-[1.25rem]">task_alt</span>
+<span>Approval Queues</span>
+</a>
+<a class="text-zinc-500 dark:text-zinc-400 px-6 py-3 my-1 flex items-center gap-4 hover:bg-zinc-200 dark:hover:bg-zinc-800 rounded-full transition-all font-['Inter'] text-sm font-bold uppercase tracking-widest" href="#">
+<span class="material-symbols-outlined text-[1.25rem]">group_add</span>
+<span>Lead Management</span>
+</a>
+<a class="text-zinc-500 dark:text-zinc-400 px-6 py-3 my-1 flex items-center gap-4 hover:bg-zinc-200 dark:hover:bg-zinc-800 rounded-full transition-all font-['Inter'] text-sm font-bold uppercase tracking-widest" href="#">
+<span class="material-symbols-outlined text-[1.25rem]">style</span>
+<span>Design System</span>
+</a>
+<a class="text-zinc-500 dark:text-zinc-400 px-6 py-3 my-1 flex items-center gap-4 hover:bg-zinc-200 dark:hover:bg-zinc-800 rounded-full transition-all font-['Inter'] text-sm font-bold uppercase tracking-widest" href="#">
+<span class="material-symbols-outlined text-[1.25rem]">terminal</span>
+<span>Global Logs</span>
+</a>
+</nav>
+<!-- CTA -->
+<button class="w-full bg-primary text-on-primary rounded-full px-6 py-4 font-['Inter'] text-sm font-bold uppercase tracking-widest transition-transform duration-200 ease-in-out active:scale-[0.98] flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[1.2rem]">add</span>
+            Add New Property
+        </button>
+<!-- Footer Navigation -->
+<div class="flex flex-col gap-2 mt-4 pt-4 border-t border-outline-variant/30">
+<a class="text-zinc-500 dark:text-zinc-400 px-6 py-3 my-1 flex items-center gap-4 hover:bg-zinc-200 dark:hover:bg-zinc-800 rounded-full transition-all font-['Inter'] text-sm font-bold uppercase tracking-widest" href="#">
+<span class="material-symbols-outlined text-[1.25rem]">help_center</span>
+<span>Help Center</span>
+</a>
+<!-- Active Tab -->
+<a class="bg-black dark:bg-white text-white dark:text-black rounded-full px-6 py-3 my-1 flex items-center gap-4 transition-transform duration-200 ease-in-out active:scale-[0.98] font-['Inter'] text-sm font-bold uppercase tracking-widest" href="#">
+<span class="material-symbols-outlined fill-icon text-[1.25rem]">settings</span>
+<span>Settings</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Wrapper -->
+<div class="flex-1 flex flex-col md:ml-72 min-h-screen relative">
+<!-- TopNavBar (Mobile Header + Desktop Supplementary) -->
+<header class="docked full-width top-0 z-50 flex justify-between items-center w-full px-8 h-16 bg-[#F9F9F9] dark:bg-zinc-950 border-b border-zinc-200 dark:border-zinc-800 shadow-none">
+<div class="flex items-center gap-8">
+<span class="text-xl font-black tracking-tighter text-black dark:text-white uppercase md:hidden">UTILITY // CORE</span>
+<nav class="hidden md:flex gap-8">
+<a class="font-['Inter'] tracking-tighter font-bold uppercase text-zinc-400 dark:text-zinc-600 hover:text-black dark:hover:text-white transition-colors duration-200 text-sm" href="#">Dashboard</a>
+<a class="font-['Inter'] tracking-tighter font-bold uppercase text-zinc-400 dark:text-zinc-600 hover:text-black dark:hover:text-white transition-colors duration-200 text-sm" href="#">Map</a>
+<a class="font-['Inter'] tracking-tighter font-bold uppercase text-black dark:text-white border-b-2 border-black dark:border-white pb-1 transition-colors duration-200 text-sm" href="#">System</a>
+</nav>
+</div>
+<div class="flex items-center gap-6 text-black dark:text-white">
+<button class="hover:text-black dark:hover:text-white transition-colors duration-200">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="hover:text-black dark:hover:text-white transition-colors duration-200">
+<span class="material-symbols-outlined">account_circle</span>
+</button>
+</div>
+</header>
+<!-- Main Canvas -->
+<main class="flex-1 p-8 md:p-16 lg:p-24 max-w-[1200px] w-full mx-auto flex flex-col gap-24">
+<!-- Hero Title -->
+<div class="w-full">
+<h1 class="text-[3.5rem] leading-[1.1] font-bold tracking-[-0.02em] text-primary uppercase font-headline">Global<br/>Configuration</h1>
+<p class="mt-4 text-on-surface-variant font-body text-lg leading-relaxed max-w-xl">Centralized management of identity parameters, notification logic, and security protocols across all operating nodes.</p>
+</div>
+<!-- Section 1: Profile -->
+<section class="flex flex-col xl:flex-row gap-12 xl:gap-24 w-full items-start">
+<div class="w-full xl:w-1/3 shrink-0">
+<h2 class="text-[1.5rem] font-semibold text-primary font-headline uppercase tracking-tight">Identity Parameters</h2>
+<p class="text-on-surface-variant font-body text-sm mt-2 leading-relaxed">Modify your core identifier data. Changes propagate system-wide within 60 seconds.</p>
+</div>
+<div class="w-full xl:w-2/3 bg-surface-container-lowest p-8 md:p-12 flex flex-col gap-8 rounded-sm">
+<div class="flex flex-col md:flex-row gap-8">
+<div class="flex-1 flex flex-col gap-2">
+<label class="font-label text-[0.75rem] font-bold uppercase text-outline tracking-wider">System Username</label>
+<input class="bg-surface-container-low rounded-sm border-0 focus:ring-0 focus:border-b-2 focus:border-primary px-4 py-4 text-body text-on-surface w-full outline-none transition-all" readonly="" type="text" value="administrator_root"/>
+</div>
+<div class="flex-1 flex flex-col gap-2">
+<label class="font-label text-[0.75rem] font-bold uppercase text-outline tracking-wider">Clearance Level</label>
+<input class="bg-surface-container-low rounded-sm border-0 focus:ring-0 focus:border-b-2 focus:border-primary px-4 py-4 text-body text-on-surface w-full outline-none transition-all" readonly="" type="text" value="LEVEL 5 - GLOBAL"/>
+</div>
+</div>
+<div class="flex flex-col gap-2">
+<label class="font-label text-[0.75rem] font-bold uppercase text-outline tracking-wider">Primary Email Address</label>
+<input class="bg-surface-container-low rounded-sm border border-transparent focus:border-b-primary focus:border-b-2 px-4 py-4 text-body text-on-surface w-full outline-none transition-all placeholder:text-outline-variant" type="email" value="admin@control.system.io"/>
+</div>
+<div class="flex flex-col gap-2">
+<label class="font-label text-[0.75rem] font-bold uppercase text-outline tracking-wider">Recovery Phone (SMS)</label>
+<input class="bg-surface-container-low rounded-sm border border-transparent focus:border-b-primary focus:border-b-2 px-4 py-4 text-body text-on-surface w-full outline-none transition-all" type="tel" value="+1 (555) 019-2837"/>
+</div>
+<div class="pt-8 flex justify-end">
+<button class="bg-primary text-on-primary rounded-full px-12 py-5 font-label text-[0.75rem] font-bold uppercase tracking-widest hover:scale-[1.02] transition-transform">
+                            Commit Changes
+                        </button>
+</div>
+</div>
+</section>
+<!-- Divider -->
+<hr class="border-outline-variant/30"/>
+<!-- Section 2: Notifications -->
+<section class="flex flex-col xl:flex-row gap-12 xl:gap-24 w-full items-start">
+<div class="w-full xl:w-1/3 shrink-0">
+<h2 class="text-[1.5rem] font-semibold text-primary font-headline uppercase tracking-tight">Notification Logic</h2>
+<p class="text-on-surface-variant font-body text-sm mt-2 leading-relaxed">Configure automated routing for critical alerts and routine logs across delivery channels.</p>
+</div>
+<div class="w-full xl:w-2/3 bg-surface-container-lowest p-8 md:p-12 flex flex-col rounded-sm">
+<!-- Toggle Row 1 -->
+<div class="flex justify-between items-center py-8 border-b border-outline-variant/50">
+<div class="flex flex-col pr-8">
+<span class="font-headline text-lg font-semibold text-primary">Critical System Outages</span>
+<span class="text-on-surface-variant font-body text-sm mt-1">Bypass DND for Level 5 anomalies. Delivered via SMS and Push.</span>
+</div>
+<button class="relative w-14 h-8 bg-primary rounded-full shrink-0 outline-none hover:scale-[1.05] transition-transform flex items-center px-1">
+<div class="w-6 h-6 bg-surface rounded-full shadow-sm transform translate-x-6 transition-transform"></div>
+</button>
+</div>
+<!-- Toggle Row 2 -->
+<div class="flex justify-between items-center py-8 border-b border-outline-variant/50">
+<div class="flex flex-col pr-8">
+<span class="font-headline text-lg font-semibold text-primary">Daily Audit Digests</span>
+<span class="text-on-surface-variant font-body text-sm mt-1">Aggregated logs from all properties sent via Email at 00:00 UTC.</span>
+</div>
+<button class="relative w-14 h-8 bg-surface-container-highest border border-outline-variant rounded-full shrink-0 outline-none hover:scale-[1.05] transition-transform flex items-center px-1">
+<div class="w-6 h-6 bg-outline rounded-full shadow-sm transform translate-x-0 transition-transform"></div>
+</button>
+</div>
+<!-- Toggle Row 3 -->
+<div class="flex justify-between items-center py-8 border-b border-outline-variant/50">
+<div class="flex flex-col pr-8">
+<span class="font-headline text-lg font-semibold text-primary">New Lead Interception</span>
+<span class="text-on-surface-variant font-body text-sm mt-1">Immediate Push notification upon form submission on external properties.</span>
+</div>
+<button class="relative w-14 h-8 bg-primary rounded-full shrink-0 outline-none hover:scale-[1.05] transition-transform flex items-center px-1">
+<div class="w-6 h-6 bg-surface rounded-full shadow-sm transform translate-x-6 transition-transform"></div>
+</button>
+</div>
+<!-- Toggle Row 4 -->
+<div class="flex justify-between items-center py-8">
+<div class="flex flex-col pr-8">
+<span class="font-headline text-lg font-semibold text-primary">Feature Release Notes</span>
+<span class="text-on-surface-variant font-body text-sm mt-1">Non-critical updates sent weekly via Email.</span>
+</div>
+<button class="relative w-14 h-8 bg-surface-container-highest border border-outline-variant rounded-full shrink-0 outline-none hover:scale-[1.05] transition-transform flex items-center px-1">
+<div class="w-6 h-6 bg-outline rounded-full shadow-sm transform translate-x-0 transition-transform"></div>
+</button>
+</div>
+</div>
+</section>
+<!-- Divider -->
+<hr class="border-outline-variant/30"/>
+<!-- Section 3: Security -->
+<section class="flex flex-col xl:flex-row gap-12 xl:gap-24 w-full items-start mb-24">
+<div class="w-full xl:w-1/3 shrink-0">
+<h2 class="text-[1.5rem] font-semibold text-primary font-headline uppercase tracking-tight">Security Protocols</h2>
+<p class="text-on-surface-variant font-body text-sm mt-2 leading-relaxed">Enforce strict authentication measures and monitor active node connections.</p>
+</div>
+<div class="w-full xl:w-2/3 flex flex-col gap-12">
+<!-- Password Box -->
+<div class="bg-surface-container-lowest p-8 md:p-12 flex flex-col gap-8 rounded-sm">
+<h3 class="font-headline text-lg font-semibold text-primary">Cryptographic Key Update</h3>
+<div class="flex flex-col gap-6">
+<div class="flex flex-col gap-2">
+<label class="font-label text-[0.75rem] font-bold uppercase text-outline tracking-wider">Current Password</label>
+<input class="bg-surface-container-low rounded-sm border border-transparent focus:border-b-primary focus:border-b-2 px-4 py-4 text-body text-on-surface w-full outline-none transition-all placeholder:text-outline-variant/50" placeholder="••••••••••••" type="password"/>
+</div>
+<div class="flex flex-col gap-2">
+<label class="font-label text-[0.75rem] font-bold uppercase text-outline tracking-wider">New Sequence</label>
+<input class="bg-surface-container-low rounded-sm border border-transparent focus:border-b-primary focus:border-b-2 px-4 py-4 text-body text-on-surface w-full outline-none transition-all" type="password"/>
+</div>
+<div class="flex flex-col gap-2">
+<label class="font-label text-[0.75rem] font-bold uppercase text-outline tracking-wider">Verify Sequence</label>
+<input class="bg-surface-container-low rounded-sm border border-transparent focus:border-b-primary focus:border-b-2 px-4 py-4 text-body text-on-surface w-full outline-none transition-all" type="password"/>
+</div>
+</div>
+<div class="pt-4 flex justify-end">
+<button class="bg-primary text-on-primary rounded-full px-12 py-5 font-label text-[0.75rem] font-bold uppercase tracking-widest hover:scale-[1.02] transition-transform">
+                                Execute Rotation
+                            </button>
+</div>
+</div>
+<!-- 2FA Box -->
+<div class="bg-surface-container-lowest p-8 md:p-12 flex flex-col md:flex-row justify-between items-start md:items-center gap-8 rounded-sm">
+<div class="flex flex-col gap-2 max-w-md">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary text-2xl">shield_locked</span>
+<h3 class="font-headline text-lg font-semibold text-primary">Multi-Factor Authentication (MFA)</h3>
+</div>
+<p class="text-on-surface-variant font-body text-sm leading-relaxed mt-2">MFA is currently active. Access requires a time-based token via authenticator app.</p>
+</div>
+<button class="bg-surface-container-highest text-primary border border-outline-variant hover:bg-surface-variant rounded-full px-8 py-5 font-label text-[0.75rem] font-bold uppercase tracking-widest transition-colors whitespace-nowrap">
+                            Configure MFA
+                        </button>
+</div>
+</div>
+</section>
+</main>
+</div>
+</body></html>

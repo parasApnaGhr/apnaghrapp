@@ -1,8 +1,9 @@
 // @ts-nocheck
 import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import { HelmetProvider } from 'react-helmet-async';
+import { AnimatePresence } from 'framer-motion';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Login from './pages/Login';
 import CustomerHome from './pages/CustomerHome';
@@ -38,18 +39,16 @@ import SitemapPage from './seo-pages/pages/SitemapPage';
 import EarnMoneyPage from './seo-pages/pages/EarnMoneyPage';
 import CityRiderPage from './seo-pages/pages/CityRiderPage';
 import Earn2000Page from './seo-pages/pages/Earn2000Page';
+import LandingPage from './pages/LandingPage';
 import ErrorBoundary from './components/ErrorBoundary';
+import { StitchLoadingPage } from './stitch/components/StitchPrimitives';
 import '@/App.css';
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const { user, loading } = useAuth();
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="w-16 h-16 border-4 border-[#E07A5F] border-t-transparent rounded-full animate-spin"></div>
-      </div>
-    );
+    return <StitchLoadingPage label="Checking session and preparing your workspace." />;
   }
 
   if (!user) {
@@ -65,6 +64,7 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
 
 const AppRoutes = () => {
   const { user } = useAuth();
+  const location = useLocation();
 
   const getRedirectPath = (role, redirectParam = null) => {
     // If redirect param exists and user is customer/advertiser/builder, use it
@@ -105,10 +105,11 @@ const AppRoutes = () => {
   };
 
   return (
-    <Routes>
-      <Route path="/" element={user ? <Navigate to={getRedirectPath(user.role)} replace /> : <Login />} />
-      {/* Login route with redirect support for property sharing flow */}
-      <Route path="/login" element={<LoginRedirectHandler />} />
+    <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname}>
+        <Route path="/" element={<LandingPage />} />
+        {/* Login route with redirect support for property sharing flow */}
+        <Route path="/login" element={<LoginRedirectHandler />} />
 
       {/* PUBLIC ROUTES */}
       <Route path="/property/:id" element={<PublicPropertyDetail />} />
@@ -313,8 +314,9 @@ const AppRoutes = () => {
       <Route path="/privacy-policy-builders" element={<PrivacyPolicyPage role="builders" />} />
       <Route path="/privacy-policy-advertisers" element={<PrivacyPolicyPage role="advertisers" />} />
 
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </AnimatePresence>
   );
 };
 

@@ -48,8 +48,8 @@ const MultiVisitRoute = ({
   const getStatusColor = (status) => {
     switch (status) {
       case 'completed': return 'bg-green-500 text-white';
-      case 'current': return 'bg-[#04473C] text-white animate-pulse';
-      default: return 'bg-gray-200 text-gray-500';
+      case 'current': return 'bg-[var(--stitch-ink)] text-white animate-pulse';
+      default: return 'bg-gray-200 text-[var(--stitch-muted)]';
     }
   };
 
@@ -67,7 +67,7 @@ const MultiVisitRoute = ({
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-gradient-to-r from-[#04473C] to-[#065446] text-white rounded-xl p-4"
+          className="bg-gradient-to-r from-[var(--stitch-ink)] to-[var(--stitch-ink)] text-white rounded-xl p-4"
         >
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
@@ -99,7 +99,7 @@ const MultiVisitRoute = ({
             <motion.div
               initial={{ width: 0 }}
               animate={{ width: `${((currentPropertyIndex) / totalProperties) * 100}%` }}
-              className="h-full bg-[#C6A87C]"
+              className="h-full bg-[var(--stitch-muted)]"
               transition={{ duration: 0.5 }}
             />
           </div>
@@ -108,20 +108,20 @@ const MultiVisitRoute = ({
 
       {/* Customer Info */}
       {customer && (
-        <div className="bg-white rounded-lg border border-[#E5E1DB] p-4">
+        <div className="bg-white rounded-lg border border-[var(--stitch-line)] p-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-[#04473C] rounded-full flex items-center justify-center text-white font-medium text-lg">
+              <div className="w-12 h-12 bg-[var(--stitch-ink)] rounded-full flex items-center justify-center text-white font-medium text-lg">
                 {customer.name?.[0] || 'C'}
               </div>
               <div>
-                <p className="font-medium text-[#04473C]">{customer.name}</p>
-                <p className="text-sm text-[#4A4D53]">Customer</p>
+                <p className="font-medium text-[var(--stitch-ink)]">{customer.name}</p>
+                <p className="text-sm text-[var(--stitch-muted)]">Customer</p>
               </div>
             </div>
             <a
               href={`tel:${customer.phone}`}
-              className="w-10 h-10 bg-[#04473C] rounded-full flex items-center justify-center text-white hover:bg-[#033830] transition-colors"
+              className="w-10 h-10 bg-[var(--stitch-ink)] rounded-full flex items-center justify-center text-white hover:bg-[#033830] transition-colors"
             >
               <Phone className="w-5 h-5" />
             </a>
@@ -130,13 +130,13 @@ const MultiVisitRoute = ({
       )}
 
       {/* Route Timeline */}
-      <div className="bg-white rounded-lg border border-[#E5E1DB] overflow-hidden">
-        <div className="p-4 border-b border-[#E5E1DB] flex items-center justify-between">
-          <h3 className="font-semibold text-[#04473C]">Visit Route</h3>
+      <div className="bg-white rounded-lg border border-[var(--stitch-line)] overflow-hidden">
+        <div className="p-4 border-b border-[var(--stitch-line)] flex items-center justify-between">
+          <h3 className="font-semibold text-[var(--stitch-ink)]">Visit Route</h3>
           {onViewMap && (
             <button
               onClick={onViewMap}
-              className="text-sm text-[#04473C] hover:underline flex items-center gap-1"
+              className="text-sm text-[var(--stitch-ink)] hover:underline flex items-center gap-1"
             >
               <Navigation className="w-4 h-4" />
               View Map
@@ -144,7 +144,7 @@ const MultiVisitRoute = ({
           )}
         </div>
 
-        <div className="divide-y divide-[#E5E1DB]">
+        <div className="divide-y divide-[var(--stitch-line)]">
           {orderedProperties.map((property, index) => {
             const status = getPropertyStatus(property.id, index);
             const isExpanded = expandedProperty === property.id;
@@ -154,10 +154,10 @@ const MultiVisitRoute = ({
               <motion.div
                 key={property.id}
                 layout
-                className={`${isCurrent ? 'bg-[#F5F3F0]' : ''}`}
+                className={`${isCurrent ? 'bg-[var(--stitch-soft)]' : ''}`}
               >
                 <div
-                  className="p-4 cursor-pointer hover:bg-[#F5F3F0] transition-colors"
+                  className="p-4 cursor-pointer hover:bg-[var(--stitch-soft)] transition-colors"
                   onClick={() => setExpandedProperty(isExpanded ? null : property.id)}
                 >
                   <div className="flex items-start gap-4">
@@ -181,19 +181,19 @@ const MultiVisitRoute = ({
                     <div className="flex-1">
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="font-medium text-[#04473C]">{property.title}</p>
-                          <div className="flex items-center gap-2 text-sm text-[#4A4D53] mt-1">
+                          <p className="font-medium text-[var(--stitch-ink)]">{property.title}</p>
+                          <div className="flex items-center gap-2 text-sm text-[var(--stitch-muted)] mt-1">
                             <Home className="w-4 h-4" />
                             <span>{property.bhk_type} • {property.furnishing}</span>
                           </div>
                         </div>
-                        <ChevronRight className={`w-5 h-5 text-[#4A4D53] transition-transform ${isExpanded ? 'rotate-90' : ''}`} />
+                        <ChevronRight className={`w-5 h-5 text-[var(--stitch-muted)] transition-transform ${isExpanded ? 'rotate-90' : ''}`} />
                       </div>
 
                       {/* Status Badge */}
                       <div className="mt-2 flex items-center gap-2">
                         {status === 'current' && (
-                          <span className="text-xs px-2 py-1 bg-[#04473C] text-white rounded-full animate-pulse">
+                          <span className="text-xs px-2 py-1 bg-[var(--stitch-ink)] text-white rounded-full animate-pulse">
                             Current Stop
                           </span>
                         )}
@@ -203,7 +203,7 @@ const MultiVisitRoute = ({
                           </span>
                         )}
                         {status === 'pending' && (
-                          <span className="text-xs px-2 py-1 bg-gray-100 text-gray-500 rounded-full">
+                          <span className="text-xs px-2 py-1 bg-gray-100 text-[var(--stitch-muted)] rounded-full">
                             Upcoming
                           </span>
                         )}
@@ -222,20 +222,20 @@ const MultiVisitRoute = ({
                       className="overflow-hidden"
                     >
                       <div className="px-4 pb-4 pl-18 ml-14">
-                        <div className="bg-[#F5F3F0] rounded-lg p-4 space-y-3">
+                        <div className="bg-[var(--stitch-soft)] rounded-lg p-4 space-y-3">
                           <div className="flex items-start gap-2">
-                            <MapPin className="w-4 h-4 text-[#C6A87C] mt-0.5" />
+                            <MapPin className="w-4 h-4 text-[var(--stitch-muted)] mt-0.5" />
                             <div>
                               <p className="text-sm font-medium">Address</p>
-                              <p className="text-sm text-[#4A4D53]">{property.address}, {property.city}</p>
+                              <p className="text-sm text-[var(--stitch-muted)]">{property.address}, {property.city}</p>
                             </div>
                           </div>
                           
                           <div className="flex items-center gap-2">
-                            <Home className="w-4 h-4 text-[#C6A87C]" />
+                            <Home className="w-4 h-4 text-[var(--stitch-muted)]" />
                             <div>
                               <p className="text-sm font-medium">Rent</p>
-                              <p className="text-sm text-[#4A4D53]">₹{property.rent?.toLocaleString()}/month</p>
+                              <p className="text-sm text-[var(--stitch-muted)]">₹{property.rent?.toLocaleString()}/month</p>
                             </div>
                           </div>
 
@@ -267,7 +267,7 @@ const MultiVisitRoute = ({
       {currentStep === 'go_to_customer' && (
         <button
           onClick={onStartVisit}
-          className="w-full py-4 bg-[#04473C] text-white rounded-xl font-semibold hover:bg-[#033830] transition-colors flex items-center justify-center gap-2"
+          className="w-full py-4 bg-[var(--stitch-ink)] text-white rounded-xl font-semibold hover:bg-[#033830] transition-colors flex items-center justify-center gap-2"
         >
           <Play className="w-5 h-5" />
           Start Visit Route

@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Active Visit Workflow</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-dim": "#dadada",
+                        "on-tertiary-fixed-variant": "#e5e2e1",
+                        "inverse-surface": "#2f3131",
+                        "outline-variant": "#c6c6c6",
+                        "on-surface": "#1a1c1c",
+                        "on-tertiary-container": "#ffffff",
+                        "on-primary-fixed": "#ffffff",
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary-fixed-variant": "#3b3b3b",
+                        "on-tertiary-fixed": "#ffffff",
+                        "tertiary-container": "#757474",
+                        "surface-bright": "#f9f9f9",
+                        "surface-container": "#eeeeee",
+                        "on-error": "#ffffff",
+                        "secondary": "#5e5e5e",
+                        "on-primary-container": "#ffffff",
+                        "tertiary-fixed-dim": "#474746",
+                        "surface-container-highest": "#e2e2e2",
+                        "on-surface-variant": "#474747",
+                        "primary-container": "#3b3b3b",
+                        "on-secondary-container": "#1b1b1b",
+                        "error-container": "#ffdad6",
+                        "surface": "#f9f9f9",
+                        "on-error-container": "#410002",
+                        "outline": "#777777",
+                        "on-tertiary": "#e5e2e1",
+                        "on-primary": "#e2e2e2",
+                        "primary": "#000000",
+                        "surface-tint": "#5e5e5e",
+                        "on-secondary": "#ffffff",
+                        "error": "#ba1a1a",
+                        "inverse-primary": "#c6c6c6",
+                        "surface-variant": "#e2e2e2",
+                        "on-secondary-fixed": "#1b1b1b",
+                        "secondary-fixed": "#c6c6c6",
+                        "inverse-on-surface": "#f0f1f1",
+                        "secondary-container": "#d4d4d4",
+                        "primary-fixed": "#5e5e5e",
+                        "background": "#f9f9f9",
+                        "tertiary-fixed": "#5f5e5e",
+                        "surface-container-high": "#e8e8e8",
+                        "surface-container-low": "#f3f3f4",
+                        "primary-fixed-dim": "#474747",
+                        "on-background": "#1a1c1c",
+                        "secondary-fixed-dim": "#ababab",
+                        "on-primary-fixed-variant": "#e2e2e2",
+                        "tertiary": "#3c3b3b"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {},
+                    "fontFamily": {
+                        "headline": ["Inter"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface h-screen flex flex-col overflow-hidden font-body">
+<!-- TopAppBar - Exact injection from JSON -->
+<header class="bg-[#F9F9F9] dark:bg-[#000000] text-[#000000] dark:text-[#F9F9F9] font-['Inter'] font-bold tracking-tighter uppercase docked full-width top-0 border-b-2 border-[#000000] dark:border-[#E2E2E2] shadow-none no-shadows flex justify-between items-center w-full px-8 h-20 z-50 relative shrink-0">
+<div class="text-2xl font-black tracking-tighter text-[#000000] dark:text-[#F9F9F9]">APNAGHR</div>
+<div class="flex items-center gap-6">
+<button class="font-['Inter'] font-bold tracking-tighter uppercase text-[#000000] dark:text-[#F9F9F9] border-b-2 border-transparent hover:border-[#000000] dark:hover:border-[#F9F9F9] transition-all pb-1">GO ONLINE</button>
+<div class="flex gap-4">
+<span class="material-symbols-outlined scale-102 active:scale-95 transition-transform duration-100 cursor-pointer">notifications</span>
+<span class="material-symbols-outlined scale-102 active:scale-95 transition-transform duration-100 cursor-pointer">help</span>
+</div>
+</div>
+</header>
+<!-- Main Workspace Area -->
+<main class="flex-1 flex flex-col lg:flex-row w-full h-full overflow-hidden relative">
+<!-- Map Background / Left Column -->
+<div class="h-[307px] lg:h-full lg:w-5/12 relative bg-surface-container-low border-b lg:border-b-0 lg:border-r border-outline-variant z-0 shrink-0">
+<img alt="Map view" class="w-full h-full object-cover grayscale opacity-60 mix-blend-multiply" data-alt="Minimalist desaturated map background showing city street grid lines in greyscale, conveying a utilitarian tracking aesthetic" data-location="Metropolitan Area" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDDPGHnuDObSPjObR0g8LVl_VhyqtvQMmxnPiSYcB2I6gF3P__8uMWe8iWJcOQRhzTte6hzAwMUmt-oBj8bHRO2M5sBwhx-GUp94_ieA8Y9hFAs97g-mTbfI1o_vI5Ti7i-xn6ydG5Zg6EQuaiPerWJo4Kxg_aXXkWt30IQtt_8iz27zhVW5z9RdbU7_lYHB4CKfR5w4Cn_NNafkOa-d9nXLeDHBKiBfFermXVkq2e0Sgy4nOHiDK8CgDZQRtl8FDbsy-BtL7862Bp3"/>
+<!-- Map Overlay UI -->
+<div class="absolute inset-0 flex flex-col items-center justify-center p-4 pointer-events-none">
+<!-- Location Pin -->
+<div class="w-6 h-6 bg-primary rounded-full ring-8 ring-primary/20 shadow-none flex items-center justify-center pointer-events-auto">
+<div class="w-2 h-2 bg-surface rounded-full"></div>
+</div>
+<!-- Route Line (Decorative) -->
+<div class="absolute bottom-0 left-1/2 w-1 h-32 bg-primary transform -translate-x-1/2 origin-bottom"></div>
+</div>
+</div>
+<!-- Active Mission Tray / Right Column -->
+<div class="flex-1 flex flex-col bg-surface overflow-y-auto z-10 lg:w-7/12 shadow-none border-l-0 lg:border-l border-outline-variant">
+<div class="p-6 md:p-12 max-w-3xl mx-auto w-full flex flex-col gap-16">
+<!-- Progress List: Multi-Property Tour -->
+<section class="flex flex-col gap-6">
+<div class="flex justify-between items-baseline border-b border-outline-variant pb-4">
+<h2 class="font-headline text-sm uppercase tracking-widest text-outline font-bold">Active Mission Status</h2>
+<span class="font-label text-xs uppercase bg-surface-container-low text-primary px-3 py-1 font-bold">Tour 402-B</span>
+</div>
+<div class="flex flex-col border border-outline-variant bg-surface-container-lowest">
+<!-- Step 1: Completed -->
+<div class="flex items-center gap-6 p-5 bg-surface-container-low border-b border-outline-variant opacity-60">
+<span class="material-symbols-outlined text-outline">check_circle</span>
+<span class="font-body text-outline line-through uppercase tracking-wider text-sm font-bold">HQ Equipment Pickup</span>
+</div>
+<!-- Step 2: Active -->
+<div class="flex items-center gap-6 p-5 bg-surface border-b border-outline-variant">
+<div class="w-8 h-8 bg-primary text-on-primary rounded-none flex items-center justify-center font-bold text-sm shrink-0">2</div>
+<span class="font-body font-black text-primary text-lg tracking-tight">Meet Client at Property Alpha</span>
+</div>
+<!-- Step 3: Pending -->
+<div class="flex items-center gap-6 p-5 bg-surface text-outline">
+<div class="w-8 h-8 border-2 border-outline-variant rounded-none flex items-center justify-center font-bold text-sm shrink-0 text-outline">3</div>
+<span class="font-body uppercase tracking-wider text-sm font-bold">Proceed to Property Beta</span>
+</div>
+</div>
+</section>
+<!-- Pickup Section -->
+<section class="flex flex-col gap-4 border-l-8 border-primary pl-6 py-2">
+<span class="font-label text-xs uppercase tracking-widest text-outline font-bold">Client Information</span>
+<div>
+<h1 class="font-headline text-5xl md:text-6xl font-black tracking-tighter text-primary uppercase leading-none">Sarah<br/>Jenkins</h1>
+</div>
+<a class="inline-flex items-center gap-3 mt-4 text-primary hover:bg-surface-container-low w-max pr-6 py-2 transition-colors border-b-2 border-primary" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">phone_enabled</span>
+<span class="font-body font-bold uppercase tracking-widest text-sm">+1 (555) 019-2834</span>
+</a>
+</section>
+<!-- Navigation Button (Massive Solid) -->
+<section class="w-full pt-4">
+<button class="w-full bg-primary text-on-primary rounded-full py-8 px-8 flex justify-between items-center hover:scale-[1.01] active:scale-[0.99] transition-transform group">
+<span class="font-headline text-2xl md:text-3xl font-black tracking-tighter uppercase pl-4">Navigate To Pickup</span>
+<div class="w-16 h-16 bg-surface-container-highest text-primary rounded-full flex items-center justify-center group-hover:bg-surface transition-colors">
+<span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">navigation</span>
+</div>
+</button>
+</section>
+<!-- Arrived at Customer: OTP Keypad -->
+<section class="flex flex-col gap-8 bg-surface-container-low p-8 md:p-12 border-t-4 border-primary">
+<div class="flex flex-col gap-2">
+<h3 class="font-headline text-2xl font-black tracking-tighter text-primary uppercase">Arrival Authorization</h3>
+<p class="font-body text-sm text-on-surface-variant font-bold max-w-md">ENTER THE 4-DIGIT PIN PROVIDED BY THE CLIENT TO COMMENCE PROPERTY ACCESS.</p>
+</div>
+<!-- OTP Display Trays -->
+<div class="flex justify-start gap-4">
+<div class="w-16 h-20 bg-surface border-b-4 border-primary flex items-center justify-center text-4xl font-black text-primary rounded-sm shadow-none">5</div>
+<div class="w-16 h-20 bg-surface border-b-4 border-primary flex items-center justify-center text-4xl font-black text-primary rounded-sm shadow-none">8</div>
+<div class="w-16 h-20 bg-surface border-b-4 border-outline-variant flex items-center justify-center text-4xl font-black text-outline rounded-sm shadow-none relative">
+<!-- Blinking cursor indicator -->
+<div class="w-1 h-8 bg-primary animate-pulse"></div>
+</div>
+<div class="w-16 h-20 bg-surface border-b-4 border-outline-variant flex items-center justify-center text-4xl font-black text-outline rounded-sm shadow-none"></div>
+</div>
+<!-- Minimalist Keypad -->
+<div class="grid grid-cols-3 gap-1 mt-6 max-w-[280px]">
+<button class="h-16 bg-surface text-primary font-headline text-2xl font-bold hover:bg-surface-variant transition-colors active:bg-outline-variant">1</button>
+<button class="h-16 bg-surface text-primary font-headline text-2xl font-bold hover:bg-surface-variant transition-colors active:bg-outline-variant">2</button>
+<button class="h-16 bg-surface text-primary font-headline text-2xl font-bold hover:bg-surface-variant transition-colors active:bg-outline-variant">3</button>
+<button class="h-16 bg-surface text-primary font-headline text-2xl font-bold hover:bg-surface-variant transition-colors active:bg-outline-variant">4</button>
+<button class="h-16 bg-surface text-primary font-headline text-2xl font-bold hover:bg-surface-variant transition-colors active:bg-outline-variant">5</button>
+<button class="h-16 bg-surface text-primary font-headline text-2xl font-bold hover:bg-surface-variant transition-colors active:bg-outline-variant">6</button>
+<button class="h-16 bg-surface text-primary font-headline text-2xl font-bold hover:bg-surface-variant transition-colors active:bg-outline-variant">7</button>
+<button class="h-16 bg-surface text-primary font-headline text-2xl font-bold hover:bg-surface-variant transition-colors active:bg-outline-variant">8</button>
+<button class="h-16 bg-surface text-primary font-headline text-2xl font-bold hover:bg-surface-variant transition-colors active:bg-outline-variant">9</button>
+<div class="h-16 bg-transparent"></div>
+<button class="h-16 bg-surface text-primary font-headline text-2xl font-bold hover:bg-surface-variant transition-colors active:bg-outline-variant">0</button>
+<button class="h-16 bg-surface text-primary font-headline text-2xl flex items-center justify-center hover:bg-surface-variant transition-colors active:bg-outline-variant">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">backspace</span>
+</button>
+</div>
+</section>
+<!-- Bottom spacer for scrolling -->
+<div class="h-12 w-full"></div>
+</div>
+</div>
+</main>
+</body></html>

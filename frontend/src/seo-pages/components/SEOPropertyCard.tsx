@@ -56,7 +56,7 @@ const SEOPropertyCard = ({ property, listingType = 'rent' }) => {
         {/* Price */}
         <div className="mb-2" itemProp="offers" itemScope itemType="https://schema.org/Offer">
           <span 
-            className="text-xl font-bold text-[#04473C]"
+            className="text-xl font-bold text-[var(--stitch-ink)]"
             itemProp="price"
             content={property.price || property.rent}
           >
@@ -112,7 +112,7 @@ const SEOPropertyCard = ({ property, listingType = 'rent' }) => {
         {/* CTA */}
         <Link
           to={`/property/${property.id}`}
-          className="block w-full mt-4 py-2.5 bg-[#04473C] text-white text-center rounded-lg font-medium hover:bg-[#033530] transition-colors"
+          className="block w-full mt-4 py-2.5 bg-[var(--stitch-ink)] text-white text-center rounded-lg font-medium hover:bg-[var(--stitch-ink)] transition-colors"
         >
           View Details
         </Link>

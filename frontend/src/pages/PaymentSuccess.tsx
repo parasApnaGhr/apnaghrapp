@@ -1,325 +1,209 @@
 // @ts-nocheck
-import React, { useState, useEffect, useCallback } from 'react';
-import { motion } from 'framer-motion';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import { paymentAPI, visitAPI } from '../utils/api';
-import { CheckCircle, Loader, XCircle, Home, Package, Megaphone, ArrowRight, Calendar } from 'lucide-react';
-import { toast } from 'sonner';
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { ArrowRight, Calendar, CheckCircle2, Home, Loader2, Megaphone, Package, XCircle } from "lucide-react";
+import { toast } from "sonner";
+import { paymentAPI, visitAPI } from "../utils/api";
+import { StitchButton, StitchCard, StitchShell } from "../stitch/components/StitchPrimitives";
+import { formatCurrency } from "../stitch/utils";
 
-const PaymentSuccess = () => {
+export default function PaymentSuccess() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const [status, setStatus] = useState('checking');
+  const [status, setStatus] = useState("checking");
   const [transaction, setTransaction] = useState(null);
   const [visitBooked, setVisitBooked] = useState(false);
   const [bookingDetails, setBookingDetails] = useState(null);
-  
-  const orderId = searchParams.get('order_id') || searchParams.get('session_id');
-  const paymentType = searchParams.get('type');
 
-  // Auto-book visit after payment success
+  const orderId = searchParams.get("order_id") || searchParams.get("session_id");
+  const paymentType = searchParams.get("type");
+
   const autoBookVisit = useCallback(async () => {
-    const pendingBookingStr = localStorage.getItem('pendingVisitBooking');
-    if (!pendingBookingStr) {
-      console.log('No pending booking found in localStorage');
-      return;
-    }
+    const pendingBookingStr = localStorage.getItem("pendingVisitBooking");
+    if (!pendingBookingStr) return;
 
     try {
       const pendingBooking = JSON.parse(pendingBookingStr);
-      console.log('Attempting to auto-book visit:', pendingBooking);
-      
-      // Small delay to ensure package is created
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Create the visit booking
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
       const response = await visitAPI.bookVisit({
         property_ids: pendingBooking.property_ids,
         scheduled_date: pendingBooking.scheduled_date,
         scheduled_time: pendingBooking.scheduled_time,
         pickup_location: pendingBooking.pickup_location,
         pickup_lat: pendingBooking.pickup_lat,
-        pickup_lng: pendingBooking.pickup_lng
+        pickup_lng: pendingBooking.pickup_lng,
       });
 
-      console.log('Visit booked successfully:', response.data);
       setVisitBooked(true);
       setBookingDetails(response.data);
-      
-      // Clear pending booking and cart
-      localStorage.removeItem('pendingVisitBooking');
-      localStorage.removeItem('visitCart');
-      
-      toast.success('Visit scheduled successfully!');
+      localStorage.removeItem("pendingVisitBooking");
+      localStorage.removeItem("visitCart");
+      toast.success("Visit scheduled");
     } catch (error) {
-      console.error('Auto-book visit error:', error);
-      const errorMsg = error.response?.data?.detail || error.message;
-      
-      // If no credits, it's still a success - just need to book separately
-      if (errorMsg?.includes('No available visit credits')) {
-        toast.info('Payment successful! Visit package added. You can now book your visit.');
-        localStorage.removeItem('visitCart');
+      const message = error.response?.data?.detail || error.message;
+      if (message?.includes("No available visit credits")) {
+        toast.info("Package added. Book your visit now.");
+        localStorage.removeItem("visitCart");
       } else {
-        toast.error('Payment successful! Please book your visit from My Bookings.');
+        toast.error("Payment succeeded. Book the visit from your dashboard.");
       }
     }
   }, []);
 
-  const pollPaymentStatus = useCallback(async (attempts = 0) => {
-    const maxAttempts = 20;
-
-    if (attempts >= maxAttempts) {
-      setStatus('timeout');
-      return;
-    }
-
-    try {
-      const response = await paymentAPI.getPaymentStatus(orderId);
-      setTransaction(response.data);
-      
-      const paymentStatus = response.data.payment_status?.toLowerCase();
-      console.log(`Payment status check #${attempts + 1}: ${paymentStatus}`);
-
-      if (paymentStatus === 'paid' || paymentStatus === 'success') {
-        setStatus('success');
-        // Auto-book visit if pending
-        await autoBookVisit();
-      } else if (paymentStatus === 'failed' || paymentStatus === 'cancelled' || paymentStatus === 'expired') {
-        setStatus('error');
-      } else {
-        // Still pending - keep polling
-        setTimeout(() => pollPaymentStatus(attempts + 1), 2000);
+  const pollPaymentStatus = useCallback(
+    async (attempt = 0) => {
+      if (!orderId) {
+        setStatus("error");
+        return;
       }
-    } catch (error) {
-      console.error('Payment status check error:', error);
-      // On error, keep trying
-      setTimeout(() => pollPaymentStatus(attempts + 1), 2000);
-    }
-  }, [autoBookVisit, orderId]);
+
+      if (attempt >= 20) {
+        setStatus("timeout");
+        return;
+      }
+
+      try {
+        const response = await paymentAPI.getPaymentStatus(orderId);
+        setTransaction(response.data);
+        const paymentStatus = response.data?.payment_status?.toLowerCase();
+
+        if (paymentStatus === "paid" || paymentStatus === "success") {
+          setStatus("success");
+          await autoBookVisit();
+          return;
+        }
+
+        if (["failed", "cancelled", "expired"].includes(paymentStatus)) {
+          setStatus("error");
+          return;
+        }
+      } catch {
+        // keep polling
+      }
+
+      setTimeout(() => pollPaymentStatus(attempt + 1), 2000);
+    },
+    [autoBookVisit, orderId]
+  );
 
   useEffect(() => {
-    if (orderId) {
-      pollPaymentStatus();
-    } else {
-      setStatus('error');
-    }
-  }, [orderId, pollPaymentStatus]);
+    pollPaymentStatus();
+  }, [pollPaymentStatus]);
 
-  const getSuccessMessage = () => {
+  const successInfo = useMemo(() => {
     const type = transaction?.metadata?.type || paymentType;
     const packageType = transaction?.package_type;
-    
-    if (type === 'packers' || packageType?.startsWith('packers_')) {
-      return {
-        title: 'Booking Confirmed!',
-        message: 'Your packers & movers booking is confirmed. Our team will contact you shortly.',
-        icon: Package,
-        buttonText: 'View Bookings',
-        redirectTo: '/customer/packers'
-      };
-    }
-    
-    if (type === 'advertising' || packageType?.startsWith('ads_')) {
-      return {
-        title: 'Campaign Submitted!',
-        message: 'Your ad campaign is now active. Track impressions in your dashboard.',
-        icon: Megaphone,
-        buttonText: 'View Ads',
-        redirectTo: '/customer/advertise'
-      };
-    }
-    
-    if (packageType === 'single_visit') {
-      if (visitBooked && bookingDetails) {
-        return {
-          title: 'Visit Scheduled!',
-          message: `Your property visit is confirmed for ${bookingDetails.scheduled_date} at ${bookingDetails.scheduled_time}. A rider will pick you up.`,
-          icon: Calendar,
-          buttonText: 'View My Bookings',
-          redirectTo: '/customer/bookings'
-        };
-      }
-      return {
-        title: 'Payment Successful!',
-        message: 'You can now book 1 property visit.',
-        icon: Home,
-        buttonText: 'Browse Properties',
-        redirectTo: '/customer'
-      };
-    }
-    if (packageType === 'three_visits') {
-      if (visitBooked && bookingDetails) {
-        return {
-          title: 'Visit Scheduled!',
-          message: `Your property visit is confirmed for ${bookingDetails.scheduled_date} at ${bookingDetails.scheduled_time}. You have ${2} more visits remaining.`,
-          icon: Calendar,
-          buttonText: 'View My Bookings',
-          redirectTo: '/customer/bookings'
-        };
-      }
-      return {
-        title: 'Payment Successful!',
-        message: 'Your 3-visit package is now active. Valid for 7 days.',
-        icon: Home,
-        buttonText: 'Browse Properties',
-        redirectTo: '/customer'
-      };
-    }
-    if (packageType === 'five_visits') {
-      if (visitBooked && bookingDetails) {
-        return {
-          title: 'Visit Scheduled!',
-          message: `Your property visit is confirmed for ${bookingDetails.scheduled_date} at ${bookingDetails.scheduled_time}. You have ${4} more visits remaining.`,
-          icon: Calendar,
-          buttonText: 'View My Bookings',
-          redirectTo: '/customer/bookings'
-        };
-      }
-      return {
-        title: 'Payment Successful!',
-        message: 'Your 5-visit package is now active. Valid for 10 days.',
-        icon: Home,
-        buttonText: 'Browse Properties',
-        redirectTo: '/customer'
-      };
-    }
-    if (packageType === 'property_lock') {
-      return {
-        title: 'Property Locked!',
-        message: 'This property is now reserved for you. Contact support to finalize.',
-        icon: Home,
-        buttonText: 'View Locked Property',
-        redirectTo: '/customer/bookings'
-      };
-    }
-    
-    return {
-      title: 'Payment Successful!',
-      message: 'Your payment has been processed successfully.',
-      icon: Home,
-      buttonText: 'Continue',
-      redirectTo: '/customer'
-    };
-  };
 
-  const successInfo = getSuccessMessage();
-  const SuccessIcon = successInfo.icon;
+    if (type === "packers" || packageType?.startsWith("packers_")) {
+      return {
+        title: "Booking confirmed",
+        message: "Packers booking created.",
+        icon: Package,
+        buttonText: "Open packers",
+        redirectTo: "/customer/packers",
+      };
+    }
+
+    if (type === "advertising" || packageType?.startsWith("ads_")) {
+      return {
+        title: "Campaign submitted",
+        message: "Advertising payment received.",
+        icon: Megaphone,
+        buttonText: "Open advertising",
+        redirectTo: "/customer/advertise",
+      };
+    }
+
+    if (visitBooked && bookingDetails) {
+      return {
+        title: "Visit scheduled",
+        message: `${bookingDetails.scheduled_date} at ${bookingDetails.scheduled_time}`,
+        icon: Calendar,
+        buttonText: "Open bookings",
+        redirectTo: "/customer/bookings",
+      };
+    }
+
+    return {
+      title: "Payment verified",
+      message: "Your payment was processed successfully.",
+      icon: Home,
+      buttonText: "Go home",
+      redirectTo: "/customer",
+    };
+  }, [bookingDetails, paymentType, transaction, visitBooked]);
+
+  const StateIcon = successInfo.icon;
 
   return (
-    <div className="min-h-screen bg-[#FDFCFB] flex items-center justify-center p-6">
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="max-w-md w-full"
-      >
-        {status === 'checking' && (
-          <div className="bg-white border border-[#E5E1DB] p-8 text-center">
-            <div className="w-20 h-20 mx-auto mb-6 bg-[#C6A87C]/20 flex items-center justify-center">
-              <Loader className="w-10 h-10 text-[#C6A87C] animate-spin" strokeWidth={1.5} />
+    <StitchShell title="Payment" compact>
+      <div className="mx-auto flex w-full max-w-2xl flex-1 items-center justify-center py-10">
+        {status === "checking" ? (
+          <StitchCard className="w-full p-8 text-center md:p-12">
+            <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-black text-white">
+              <Loader2 className="h-10 w-10 animate-spin" />
             </div>
-            <h2 className="text-2xl mb-3" style={{ fontFamily: 'Playfair Display, serif' }}>
-              Processing Payment
-            </h2>
-            <p className="text-[#4A4D53]">Please wait while we verify your payment...</p>
-            <div className="mt-6 flex justify-center gap-1">
-              {[0, 1, 2].map(i => (
-                <motion.span
-                  key={i}
-                  className="w-2 h-2 bg-[#04473C] rounded-full"
-                  animate={{ y: [0, -8, 0] }}
-                  transition={{ repeat: Infinity, duration: 0.6, delay: i * 0.1 }}
-                />
-              ))}
-            </div>
-          </div>
-        )}
+            <h2 className="mt-8 text-4xl font-black uppercase tracking-[-0.06em]">Processing</h2>
+            <p className="mt-3 text-sm text-[var(--stitch-muted)]">Verifying payment status.</p>
+          </StitchCard>
+        ) : null}
 
-        {status === 'success' && (
-          <motion.div 
-            initial={{ scale: 0.9 }}
-            animate={{ scale: 1 }}
-            className="bg-white border border-[#E5E1DB] p-8 text-center"
-          >
-            <motion.div 
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ type: "spring", delay: 0.2 }}
-              className="w-20 h-20 mx-auto mb-6 bg-[#04473C] flex items-center justify-center"
-            >
-              <CheckCircle className="w-10 h-10 text-white" strokeWidth={1.5} />
-            </motion.div>
-            <h2 className="text-3xl mb-3" style={{ fontFamily: 'Playfair Display, serif' }}>
-              {successInfo.title}
-            </h2>
-            <p className="text-[#4A4D53] mb-6">
-              {successInfo.message}
-            </p>
-            
-            {transaction && (
-              <div className="bg-[#F5F3F0] p-4 mb-6 border border-[#E5E1DB]">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-[#4A4D53] uppercase tracking-wide">Amount Paid</span>
-                  <span className="price-display text-xl">
-                    <span className="price-currency text-base">₹</span>
-                    {transaction.amount?.toLocaleString()}
-                  </span>
-                </div>
+        {status === "success" ? (
+          <StitchCard className="w-full p-8 text-center md:p-12">
+            <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-black text-white">
+              <CheckCircle2 className="h-10 w-10" />
+            </div>
+            <h2 className="mt-8 text-5xl font-black uppercase tracking-[-0.08em]">{successInfo.title}</h2>
+            <p className="mt-4 text-sm text-[var(--stitch-muted)]">{successInfo.message}</p>
+            {transaction ? (
+              <div className="mt-8 rounded-[28px] border border-[var(--stitch-line)] bg-[var(--stitch-soft)] p-6">
+                <p className="text-xs font-bold uppercase tracking-[0.16em] text-[var(--stitch-muted)]">Amount</p>
+                <p className="mt-3 text-4xl font-black tracking-[-0.05em]">Rs {formatCurrency(transaction.amount || 0)}</p>
               </div>
-            )}
-            
-            <button
-              onClick={() => navigate(successInfo.redirectTo)}
-              className="btn-primary w-full flex items-center justify-center gap-2"
-              data-testid="continue-button"
-            >
-              {successInfo.buttonText}
-              <ArrowRight className="w-5 h-5" strokeWidth={1.5} />
-            </button>
-          </motion.div>
-        )}
-
-        {status === 'timeout' && (
-          <div className="bg-white border border-[#E5E1DB] p-8 text-center">
-            <div className="w-20 h-20 mx-auto mb-6 bg-[#C6A87C]/20 flex items-center justify-center">
-              <Loader className="w-10 h-10 text-[#C6A87C]" strokeWidth={1.5} />
+            ) : null}
+            <div className="mt-8 flex justify-center">
+              <StitchButton onClick={() => navigate(successInfo.redirectTo)}>
+                <StateIcon className="h-4 w-4" />
+                {successInfo.buttonText}
+                <ArrowRight className="h-4 w-4" />
+              </StitchButton>
             </div>
-            <h2 className="text-2xl mb-3" style={{ fontFamily: 'Playfair Display, serif' }}>
-              Still Processing
-            </h2>
-            <p className="text-[#4A4D53] mb-6">
-              Your payment is being processed. Please check your bookings in a few minutes.
-            </p>
-            <button 
-              onClick={() => navigate('/customer')} 
-              className="btn-secondary w-full"
-            >
-              Go to Home
-            </button>
-          </div>
-        )}
+          </StitchCard>
+        ) : null}
 
-        {status === 'error' && (
-          <div className="bg-white border border-[#E5E1DB] p-8 text-center">
-            <div className="w-20 h-20 mx-auto mb-6 bg-[#8F2727]/10 flex items-center justify-center">
-              <XCircle className="w-10 h-10 text-[#8F2727]" strokeWidth={1.5} />
+        {status === "timeout" ? (
+          <StitchCard className="w-full p-8 text-center md:p-12">
+            <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-[var(--stitch-soft)]">
+              <Loader2 className="h-10 w-10" />
             </div>
-            <h2 className="text-2xl mb-3" style={{ fontFamily: 'Playfair Display, serif' }}>
-              Payment Failed
-            </h2>
-            <p className="text-[#4A4D53] mb-6">
-              Something went wrong with your payment. Please try again.
-            </p>
-            <button 
-              onClick={() => navigate('/customer')} 
-              className="btn-primary w-full"
-            >
-              Try Again
-            </button>
-          </div>
-        )}
-      </motion.div>
-    </div>
+            <h2 className="mt-8 text-4xl font-black uppercase tracking-[-0.06em]">Still processing</h2>
+            <p className="mt-3 text-sm text-[var(--stitch-muted)]">Check your dashboard in a few minutes.</p>
+            <div className="mt-8">
+              <StitchButton onClick={() => navigate("/customer")}>
+                <Home className="h-4 w-4" />
+                Go home
+              </StitchButton>
+            </div>
+          </StitchCard>
+        ) : null}
+
+        {status === "error" ? (
+          <StitchCard className="w-full p-8 text-center md:p-12">
+            <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-red-100 text-red-700">
+              <XCircle className="h-10 w-10" />
+            </div>
+            <h2 className="mt-8 text-4xl font-black uppercase tracking-[-0.06em]">Payment failed</h2>
+            <p className="mt-3 text-sm text-[var(--stitch-muted)]">Something went wrong while verifying this payment.</p>
+            <div className="mt-8">
+              <StitchButton onClick={() => navigate("/customer")}>
+                <Home className="h-4 w-4" />
+                Go home
+              </StitchButton>
+            </div>
+          </StitchCard>
+        ) : null}
+      </div>
+    </StitchShell>
   );
-};
-
-export default PaymentSuccess;
+}

@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ApnaGhr Seller Dashboard</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Config -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary-fixed-dim": "#ababab",
+                        "inverse-primary": "#c6c6c6",
+                        "primary-fixed": "#5e5e5e",
+                        "on-tertiary": "#e5e2e1",
+                        "on-primary-fixed": "#ffffff",
+                        "tertiary-fixed-dim": "#474746",
+                        "on-error": "#ffffff",
+                        "surface-variant": "#e2e2e2",
+                        "inverse-surface": "#2f3131",
+                        "on-primary-container": "#ffffff",
+                        "error": "#ba1a1a",
+                        "secondary-container": "#d4d4d4",
+                        "on-error-container": "#410002",
+                        "on-secondary-container": "#1b1b1b",
+                        "secondary-fixed": "#c6c6c6",
+                        "surface-container-highest": "#e2e2e2",
+                        "secondary": "#5e5e5e",
+                        "primary-fixed-dim": "#474747",
+                        "primary-container": "#3b3b3b",
+                        "tertiary-container": "#757474",
+                        "on-secondary-fixed-variant": "#3b3b3b",
+                        "tertiary": "#3c3b3b",
+                        "background": "#f9f9f9",
+                        "on-secondary": "#ffffff",
+                        "on-background": "#1a1c1c",
+                        "on-tertiary-container": "#ffffff",
+                        "surface-container-high": "#e8e8e8",
+                        "surface-tint": "#5e5e5e",
+                        "surface-dim": "#dadada",
+                        "on-surface": "#1a1c1c",
+                        "inverse-on-surface": "#f0f1f1",
+                        "tertiary-fixed": "#5f5e5e",
+                        "error-container": "#ffdad6",
+                        "surface-bright": "#f9f9f9",
+                        "primary": "#000000",
+                        "on-surface-variant": "#474747",
+                        "on-secondary-fixed": "#1b1b1b",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container": "#eeeeee",
+                        "outline-variant": "#c6c6c6",
+                        "on-tertiary-fixed-variant": "#e5e2e1",
+                        "outline": "#777777",
+                        "surface": "#f9f9f9",
+                        "surface-container-low": "#f3f3f4",
+                        "on-tertiary-fixed": "#ffffff",
+                        "on-primary": "#e2e2e2",
+                        "on-primary-fixed-variant": "#e2e2e2"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Inter"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; background-color: #f9f9f9; color: #1a1c1c; }
+    </style>
+</head>
+<body class="flex h-screen overflow-hidden bg-surface text-on-surface selection:bg-primary selection:text-on-primary">
+<!-- Shared Component: SideNavBar -->
+<nav class="hidden md:flex flex-col fixed left-0 top-0 h-full w-64 z-40 bg-neutral-50 dark:bg-neutral-950 py-8 space-y-2 border-r border-neutral-200 dark:border-neutral-800 font-['Inter'] text-sm font-bold tracking-widest uppercase text-neutral-900 dark:text-neutral-50 flat no-shadows">
+<!-- Header area mapped from JSON (Avatar/Title) - Simplified for Utilitarian strictness -->
+<div class="px-6 pb-12">
+<div class="w-12 h-12 bg-primary rounded-sm mb-4"></div>
+<div class="text-xl font-black tracking-tighter normal-case">Agent Portal</div>
+<div class="text-xs text-outline font-normal normal-case">Independent Partner</div>
+</div>
+<div class="flex-1 flex flex-col px-4 gap-1">
+<!-- Active Tab -->
+<a class="flex items-center gap-4 bg-neutral-900 dark:bg-neutral-50 text-neutral-50 dark:text-neutral-900 rounded-full px-6 py-3 my-1 hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-all duration-200 Active: scale-[0.98] duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span>Dashboard</span>
+</a>
+<!-- Inactive Tabs -->
+<a class="flex items-center gap-4 text-neutral-600 dark:text-neutral-400 px-6 py-3 my-1 hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span>Leads</span>
+</a>
+<a class="flex items-center gap-4 text-neutral-600 dark:text-neutral-400 px-6 py-3 my-1 hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="domain">domain</span>
+<span>Inventory</span>
+</a>
+<a class="flex items-center gap-4 text-neutral-600 dark:text-neutral-400 px-6 py-3 my-1 hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="account_balance_wallet">account_balance_wallet</span>
+<span>Earnings</span>
+</a>
+<a class="flex items-center gap-4 text-neutral-600 dark:text-neutral-400 px-6 py-3 my-1 hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="campaign">campaign</span>
+<span>Marketing</span>
+</a>
+<a class="flex items-center gap-4 text-neutral-600 dark:text-neutral-400 px-6 py-3 my-1 hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span>Settings</span>
+</a>
+</div>
+<!-- Footer / CTA -->
+<div class="px-6 pt-8 mt-auto flex flex-col gap-4">
+<button class="bg-primary text-on-primary rounded-full px-8 py-4 font-bold uppercase tracking-wider w-full hover:scale-[1.02] transition-transform text-xs">
+                New Referral
+            </button>
+<div class="flex flex-col gap-1 mt-4">
+<a class="flex items-center gap-4 text-neutral-600 dark:text-neutral-400 px-2 py-2 hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-all duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="help">help</span>
+<span class="text-xs">Support</span>
+</a>
+<a class="flex items-center gap-4 text-neutral-600 dark:text-neutral-400 px-2 py-2 hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-all duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="logout">logout</span>
+<span class="text-xs">Logout</span>
+</a>
+</div>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="flex-1 md:ml-64 h-full overflow-y-auto px-8 py-16 md:px-16 lg:px-24">
+<header class="mb-24">
+<h1 class="text-5xl md:text-7xl font-black tracking-[-0.04em] text-primary mb-4">Operations</h1>
+<p class="text-base text-on-surface-variant max-w-xl leading-relaxed">Manage your active pipeline, track conversions, and monitor referral performance through structural utility.</p>
+</header>
+<!-- Section 1: Wallet (Monolithic Primitives) -->
+<section class="mb-32">
+<h2 class="text-xs font-bold uppercase tracking-widest text-outline mb-6">Financial State</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-8">
+<!-- Total -->
+<div class="bg-surface-container-low p-8 rounded-sm flex flex-col justify-between aspect-square md:aspect-auto md:h-48">
+<span class="text-xs font-bold uppercase tracking-widest text-on-surface-variant">Total Value</span>
+<span class="text-4xl md:text-5xl font-black tracking-tighter text-primary mt-auto">₹14.2M</span>
+</div>
+<!-- Pending -->
+<div class="bg-surface-container-lowest border border-outline-variant p-8 rounded-sm flex flex-col justify-between aspect-square md:aspect-auto md:h-48">
+<span class="text-xs font-bold uppercase tracking-widest text-outline">Pending</span>
+<span class="text-4xl md:text-5xl font-black tracking-tighter text-tertiary mt-auto">₹3.5M</span>
+</div>
+<!-- Approved -->
+<div class="bg-surface-container-lowest border border-outline-variant p-8 rounded-sm flex flex-col justify-between aspect-square md:aspect-auto md:h-48">
+<span class="text-xs font-bold uppercase tracking-widest text-outline">Approved</span>
+<span class="text-4xl md:text-5xl font-black tracking-tighter text-tertiary mt-auto">₹8.1M</span>
+</div>
+<!-- Paid -->
+<div class="bg-primary p-8 rounded-sm flex flex-col justify-between aspect-square md:aspect-auto md:h-48">
+<span class="text-xs font-bold uppercase tracking-widest text-on-primary opacity-70">Paid Out</span>
+<span class="text-4xl md:text-5xl font-black tracking-tighter text-on-primary mt-auto">₹2.6M</span>
+</div>
+</div>
+</section>
+<!-- Section 2: CRM Lead Management Table (Surgical Dividers) -->
+<section class="mb-32">
+<h2 class="text-xs font-bold uppercase tracking-widest text-outline mb-6">Active Pipeline</h2>
+<div class="flex flex-col">
+<!-- Row 1 -->
+<div class="flex flex-col sm:flex-row sm:items-center justify-between py-6 border-b border-outline-variant gap-4">
+<div class="flex items-center gap-6">
+<div class="w-12 h-12 bg-surface-container-highest rounded-full flex items-center justify-center font-bold text-lg">A</div>
+<div>
+<div class="font-bold text-lg">Arjun Mehta</div>
+<div class="text-sm text-on-surface-variant">Looking for 3BHK in Gurugram</div>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<span class="bg-surface-container-high text-primary px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest">New Lead</span>
+<span class="text-sm font-bold w-24 text-right">Today</span>
+</div>
+</div>
+<!-- Row 2 -->
+<div class="flex flex-col sm:flex-row sm:items-center justify-between py-6 border-b border-outline-variant gap-4">
+<div class="flex items-center gap-6">
+<div class="w-12 h-12 bg-surface-container-highest rounded-full flex items-center justify-center font-bold text-lg">P</div>
+<div>
+<div class="font-bold text-lg">Priya Sharma</div>
+<div class="text-sm text-on-surface-variant">Commercial Space Query</div>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<span class="bg-primary text-on-primary px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest">Negotiating</span>
+<span class="text-sm font-bold w-24 text-right">Yesterday</span>
+</div>
+</div>
+<!-- Row 3 -->
+<div class="flex flex-col sm:flex-row sm:items-center justify-between py-6 border-b border-outline-variant gap-4">
+<div class="flex items-center gap-6">
+<div class="w-12 h-12 bg-surface-container-highest rounded-full flex items-center justify-center font-bold text-lg">V</div>
+<div>
+<div class="font-bold text-lg">Vikram Singh</div>
+<div class="text-sm text-on-surface-variant">Villa plot investment</div>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<span class="border border-primary text-primary px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest">Interested</span>
+<span class="text-sm font-bold w-24 text-right">Oct 12</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 3: Referral Generator -->
+<section class="mb-32 max-w-3xl">
+<h2 class="text-2xl font-bold tracking-tight text-primary mb-2">Referral Link Generation</h2>
+<p class="text-sm text-on-surface-variant mb-8 leading-relaxed">Generate unique tracking links for specific properties to ensure accurate attribution of your leads.</p>
+<div class="bg-surface-container-low p-8 rounded-sm">
+<label class="block text-[10px] font-black uppercase tracking-widest text-on-surface-variant mb-4">Target Property URL</label>
+<div class="flex flex-col sm:flex-row gap-4">
+<!-- Input Field: High-Precision Tray -->
+<div class="flex-1 relative">
+<input class="w-full bg-surface-container-highest text-primary font-bold text-sm px-6 py-5 rounded-sm border-0 border-b-2 border-transparent focus:border-primary focus:ring-0 transition-colors" readonly="" type="text" value="https://apnaghr.com/prop/dlf-camellias-gurugram?ref=agt_8829"/>
+</div>
+<!-- Button: Massive Solid -->
+<button class="bg-primary text-on-primary rounded-full px-12 py-5 font-bold uppercase tracking-wider hover:scale-[1.02] transition-transform flex items-center justify-center gap-2 shrink-0">
+<span class="material-symbols-outlined text-[18px]" data-icon="content_copy">content_copy</span>
+                        Copy Link
+                    </button>
+</div>
+<div class="mt-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[16px]" data-icon="lock">lock</span>
+<span class="text-xs font-bold uppercase tracking-widest text-primary">Share Lock Active</span>
+<span class="text-xs text-outline ml-2">— Leads attributed for 90 days</span>
+</div>
+</div>
+</section>
+</main>
+</body></html>

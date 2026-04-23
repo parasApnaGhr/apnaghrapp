@@ -143,7 +143,7 @@ const AdminPerformancePanel = () => {
 
   const getAttendanceStatus = (activity) => {
     if (activity.no_login) return { status: 'absent', color: 'bg-red-100 text-red-700' };
-    if (!activity.login_time) return { status: 'not logged in', color: 'bg-gray-100 text-gray-600' };
+    if (!activity.login_time) return { status: 'not logged in', color: 'bg-gray-100 text-[var(--stitch-muted)]' };
     
     // Convert to IST and check hours
     const loginDate = new Date(activity.login_time);
@@ -158,12 +158,12 @@ const AdminPerformancePanel = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-[#1A1C20]">Seller Performance Management</h2>
-          <p className="text-[#4A4D53]">Track, score, and manage seller activities</p>
+          <h2 className="text-2xl font-bold text-[var(--stitch-ink)]">Seller Performance Management</h2>
+          <p className="text-[var(--stitch-muted)]">Track, score, and manage seller activities</p>
         </div>
         <button
           onClick={loadData}
-          className="flex items-center gap-2 px-4 py-2 bg-[#04473C] text-white rounded-lg hover:bg-[#065f4e]"
+          className="flex items-center gap-2 px-4 py-2 bg-[var(--stitch-ink)] text-white rounded-lg hover:bg-[var(--stitch-ink)]"
         >
           <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
           Refresh
@@ -171,7 +171,7 @@ const AdminPerformancePanel = () => {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-2 border-b border-[#E5E1DB] pb-2 overflow-x-auto">
+      <div className="flex gap-2 border-b border-[var(--stitch-line)] pb-2 overflow-x-auto">
         {[
           { id: 'tracking', label: 'Daily Tracking', icon: Clock },
           { id: 'leaderboard', label: 'Leaderboard', icon: Trophy },
@@ -184,8 +184,8 @@ const AdminPerformancePanel = () => {
             onClick={() => setActiveTab(tab.id)}
             className={`flex items-center gap-2 px-4 py-2 rounded-t-lg font-medium transition-all ${
               activeTab === tab.id
-                ? 'bg-[#04473C] text-white'
-                : 'bg-[#F5F3F0] text-[#4A4D53] hover:bg-[#E5E1DB]'
+                ? 'bg-[var(--stitch-ink)] text-white'
+                : 'bg-[var(--stitch-soft)] text-[var(--stitch-muted)] hover:bg-[var(--stitch-line)]'
             }`}
           >
             <tab.icon className="w-4 h-4" />
@@ -199,12 +199,12 @@ const AdminPerformancePanel = () => {
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
           {/* Date Selector */}
           <div className="flex items-center gap-4 mb-4">
-            <label className="text-sm font-medium text-[#4A4D53]">Date:</label>
+            <label className="text-sm font-medium text-[var(--stitch-muted)]">Date:</label>
             <input
               type="date"
               value={selectedDate}
               onChange={(e) => setSelectedDate(e.target.value)}
-              className="px-4 py-2 border border-[#E5E1DB] rounded-lg"
+              className="px-4 py-2 border border-[var(--stitch-line)] rounded-lg"
             />
           </div>
 
@@ -245,35 +245,35 @@ const AdminPerformancePanel = () => {
           </div>
 
           {/* Tracking Table */}
-          <div className="bg-white rounded-xl border border-[#E5E1DB] overflow-hidden">
+          <div className="bg-white rounded-xl border border-[var(--stitch-line)] overflow-hidden">
             <table className="w-full">
-              <thead className="bg-[#F5F3F0]">
+              <thead className="bg-[var(--stitch-soft)]">
                 <tr>
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-[#1A1C20]">Seller</th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-[#1A1C20]">Login</th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-[#1A1C20]">Logout</th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-[#1A1C20]">Hours</th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-[#1A1C20]">Calls</th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-[#1A1C20]">Shared</th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-[#1A1C20]">Visits</th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-[#1A1C20]">Deals</th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-[#1A1C20]">Score</th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-[#1A1C20]">Status</th>
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-[var(--stitch-ink)]">Seller</th>
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-[var(--stitch-ink)]">Login</th>
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-[var(--stitch-ink)]">Logout</th>
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-[var(--stitch-ink)]">Hours</th>
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-[var(--stitch-ink)]">Calls</th>
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-[var(--stitch-ink)]">Shared</th>
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-[var(--stitch-ink)]">Visits</th>
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-[var(--stitch-ink)]">Deals</th>
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-[var(--stitch-ink)]">Score</th>
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-[var(--stitch-ink)]">Status</th>
                 </tr>
               </thead>
               <tbody>
                 {trackingData.map((activity, idx) => {
                   const attendance = getAttendanceStatus(activity);
                   return (
-                    <tr key={idx} className="border-t border-[#E5E1DB] hover:bg-[#F5F3F0]">
+                    <tr key={idx} className="border-t border-[var(--stitch-line)] hover:bg-[var(--stitch-soft)]">
                       <td className="px-4 py-3">
                         <button
                           onClick={() => loadSellerDetail(activity.seller_id)}
-                          className="text-[#04473C] hover:underline font-medium"
+                          className="text-[var(--stitch-ink)] hover:underline font-medium"
                         >
                           {activity.seller_name || 'Unknown'}
                         </button>
-                        <p className="text-xs text-[#4A4D53]">{activity.seller_phone}</p>
+                        <p className="text-xs text-[var(--stitch-muted)]">{activity.seller_phone}</p>
                       </td>
                       <td className="px-4 py-3 text-sm">{formatTime(activity.login_time)}</td>
                       <td className="px-4 py-3 text-sm">{formatTime(activity.logout_time)}</td>
@@ -318,8 +318,8 @@ const AdminPerformancePanel = () => {
       {activeTab === 'leaderboard' && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="grid md:grid-cols-2 gap-6">
           {/* Daily Leaderboard */}
-          <div className="bg-white rounded-xl border border-[#E5E1DB] overflow-hidden">
-            <div className="bg-gradient-to-r from-[#04473C] to-[#065f4e] p-4 text-white">
+          <div className="bg-white rounded-xl border border-[var(--stitch-line)] overflow-hidden">
+            <div className="bg-gradient-to-r from-[var(--stitch-ink)] to-[var(--stitch-ink)] p-4 text-white">
               <h3 className="font-semibold flex items-center gap-2">
                 <Calendar className="w-5 h-5" />
                 Today's Leaderboard
@@ -327,13 +327,13 @@ const AdminPerformancePanel = () => {
             </div>
             <div className="p-4 space-y-3">
               {leaderboard.daily.length === 0 ? (
-                <p className="text-center text-[#4A4D53] py-4">No data for today</p>
+                <p className="text-center text-[var(--stitch-muted)] py-4">No data for today</p>
               ) : (
                 leaderboard.daily.slice(0, 10).map((seller, idx) => (
                   <div
                     key={idx}
                     className={`flex items-center justify-between p-3 rounded-lg ${
-                      idx < 3 ? 'bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200' : 'bg-[#F5F3F0]'
+                      idx < 3 ? 'bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200' : 'bg-[var(--stitch-soft)]'
                     }`}
                   >
                     <div className="flex items-center gap-3">
@@ -341,16 +341,16 @@ const AdminPerformancePanel = () => {
                         idx === 0 ? 'bg-yellow-400 text-yellow-900' :
                         idx === 1 ? 'bg-gray-300 text-gray-700' :
                         idx === 2 ? 'bg-orange-400 text-orange-900' :
-                        'bg-[#E5E1DB] text-[#4A4D53]'
+                        'bg-[var(--stitch-line)] text-[var(--stitch-muted)]'
                       }`}>
                         {idx + 1}
                       </span>
                       <div>
-                        <p className="font-medium text-[#1A1C20]">{seller.seller_name}</p>
-                        <p className="text-xs text-[#4A4D53]">{seller.deals} deals • {seller.properties_shared} shared</p>
+                        <p className="font-medium text-[var(--stitch-ink)]">{seller.seller_name}</p>
+                        <p className="text-xs text-[var(--stitch-muted)]">{seller.deals} deals • {seller.properties_shared} shared</p>
                       </div>
                     </div>
-                    <span className="text-xl font-bold text-[#04473C]">{seller.score}</span>
+                    <span className="text-xl font-bold text-[var(--stitch-ink)]">{seller.score}</span>
                   </div>
                 ))
               )}
@@ -358,8 +358,8 @@ const AdminPerformancePanel = () => {
           </div>
 
           {/* Monthly Leaderboard */}
-          <div className="bg-white rounded-xl border border-[#E5E1DB] overflow-hidden">
-            <div className="bg-gradient-to-r from-[#C6A87C] to-[#a8895e] p-4 text-white">
+          <div className="bg-white rounded-xl border border-[var(--stitch-line)] overflow-hidden">
+            <div className="bg-gradient-to-r from-[var(--stitch-muted)] to-[#a8895e] p-4 text-white">
               <h3 className="font-semibold flex items-center gap-2">
                 <Trophy className="w-5 h-5" />
                 Monthly Leaderboard
@@ -367,13 +367,13 @@ const AdminPerformancePanel = () => {
             </div>
             <div className="p-4 space-y-3">
               {leaderboard.monthly.length === 0 ? (
-                <p className="text-center text-[#4A4D53] py-4">No data this month</p>
+                <p className="text-center text-[var(--stitch-muted)] py-4">No data this month</p>
               ) : (
                 leaderboard.monthly.slice(0, 10).map((seller, idx) => (
                   <div
                     key={idx}
                     className={`flex items-center justify-between p-3 rounded-lg ${
-                      idx < 3 ? 'bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200' : 'bg-[#F5F3F0]'
+                      idx < 3 ? 'bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200' : 'bg-[var(--stitch-soft)]'
                     }`}
                   >
                     <div className="flex items-center gap-3">
@@ -381,24 +381,24 @@ const AdminPerformancePanel = () => {
                         idx === 0 ? 'bg-yellow-400 text-yellow-900' :
                         idx === 1 ? 'bg-gray-300 text-gray-700' :
                         idx === 2 ? 'bg-orange-400 text-orange-900' :
-                        'bg-[#E5E1DB] text-[#4A4D53]'
+                        'bg-[var(--stitch-line)] text-[var(--stitch-muted)]'
                       }`}>
                         {idx + 1}
                       </span>
                       <div>
-                        <p className="font-medium text-[#1A1C20]">{seller.seller_name}</p>
-                        <p className="text-xs text-[#4A4D53]">
+                        <p className="font-medium text-[var(--stitch-ink)]">{seller.seller_name}</p>
+                        <p className="text-xs text-[var(--stitch-muted)]">
                           {seller.deals} deals • {seller.login_days} days • 
                           <span className={`ml-1 ${
                             seller.performance_tag === 'Top Performer' ? 'text-yellow-600' :
                             seller.performance_tag === 'Good' ? 'text-green-600' :
-                            seller.performance_tag === 'Average' ? 'text-blue-600' : 'text-gray-600'
+                            seller.performance_tag === 'Average' ? 'text-blue-600' : 'text-[var(--stitch-muted)]'
                           }`}>{seller.performance_tag}</span>
                         </p>
                       </div>
                     </div>
                     <div className="text-right">
-                      <span className="text-xl font-bold text-[#04473C]">{seller.score}</span>
+                      <span className="text-xl font-bold text-[var(--stitch-ink)]">{seller.score}</span>
                       <p className="text-xs text-green-600">+₹{(seller.performance_bonus + seller.high_performer_bonus).toLocaleString()}</p>
                     </div>
                   </div>
@@ -413,12 +413,12 @@ const AdminPerformancePanel = () => {
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
           {/* Month Selector */}
           <div className="flex items-center gap-4 mb-4">
-            <label className="text-sm font-medium text-[#4A4D53]">Month:</label>
+            <label className="text-sm font-medium text-[var(--stitch-muted)]">Month:</label>
             <input
               type="month"
               value={selectedMonth}
               onChange={(e) => setSelectedMonth(e.target.value)}
-              className="px-4 py-2 border border-[#E5E1DB] rounded-lg"
+              className="px-4 py-2 border border-[var(--stitch-line)] rounded-lg"
             />
             <button
               onClick={() => {
@@ -434,27 +434,27 @@ const AdminPerformancePanel = () => {
           </div>
 
           {/* Earnings Table */}
-          <div className="bg-white rounded-xl border border-[#E5E1DB] overflow-hidden">
+          <div className="bg-white rounded-xl border border-[var(--stitch-line)] overflow-hidden">
             <table className="w-full">
-              <thead className="bg-[#F5F3F0]">
+              <thead className="bg-[var(--stitch-soft)]">
                 <tr>
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-[#1A1C20]">Seller</th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-[#1A1C20]">Login Days</th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-[#1A1C20]">Score</th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-[#1A1C20]">Deals</th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-[#1A1C20]">Perf. Bonus</th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-[#1A1C20]">High Perf.</th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-[#1A1C20]">Total Bonus</th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-[#1A1C20]">Status</th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-[#1A1C20]">Action</th>
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-[var(--stitch-ink)]">Seller</th>
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-[var(--stitch-ink)]">Login Days</th>
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-[var(--stitch-ink)]">Score</th>
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-[var(--stitch-ink)]">Deals</th>
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-[var(--stitch-ink)]">Perf. Bonus</th>
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-[var(--stitch-ink)]">High Perf.</th>
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-[var(--stitch-ink)]">Total Bonus</th>
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-[var(--stitch-ink)]">Status</th>
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-[var(--stitch-ink)]">Action</th>
                 </tr>
               </thead>
               <tbody>
                 {earnings.map((seller, idx) => (
-                  <tr key={idx} className="border-t border-[#E5E1DB] hover:bg-[#F5F3F0]">
+                  <tr key={idx} className="border-t border-[var(--stitch-line)] hover:bg-[var(--stitch-soft)]">
                     <td className="px-4 py-3">
-                      <p className="font-medium text-[#1A1C20]">{seller.seller_name}</p>
-                      <p className="text-xs text-[#4A4D53]">{seller.seller_phone}</p>
+                      <p className="font-medium text-[var(--stitch-ink)]">{seller.seller_name}</p>
+                      <p className="text-xs text-[var(--stitch-muted)]">{seller.seller_phone}</p>
                     </td>
                     <td className="px-4 py-3">
                       <span className={seller.login_days >= 25 ? 'text-green-600' : 'text-red-600'}>
@@ -465,7 +465,7 @@ const AdminPerformancePanel = () => {
                     <td className="px-4 py-3">{seller.total_deals}</td>
                     <td className="px-4 py-3 text-green-600">₹{seller.performance_bonus?.toLocaleString()}</td>
                     <td className="px-4 py-3 text-purple-600">₹{seller.high_performer_bonus?.toLocaleString()}</td>
-                    <td className="px-4 py-3 font-bold text-[#04473C]">₹{seller.total_bonus?.toLocaleString()}</td>
+                    <td className="px-4 py-3 font-bold text-[var(--stitch-ink)]">₹{seller.total_bonus?.toLocaleString()}</td>
                     <td className="px-4 py-3">
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                         seller.payout_status === 'paid' 
@@ -499,14 +499,14 @@ const AdminPerformancePanel = () => {
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <ShieldAlert className="w-5 h-5 text-red-500" />
-              <h3 className="text-lg font-semibold text-[#1A1C20]">Locked Seller Accounts</h3>
+              <h3 className="text-lg font-semibold text-[var(--stitch-ink)]">Locked Seller Accounts</h3>
               <span className="px-2 py-0.5 bg-red-100 text-red-700 rounded-full text-sm font-medium">
                 {lockedSellers.length}
               </span>
             </div>
             <button
               onClick={loadLockedSellers}
-              className="flex items-center gap-2 px-4 py-2 bg-[#04473C] text-white rounded-lg hover:bg-[#065f4e]"
+              className="flex items-center gap-2 px-4 py-2 bg-[var(--stitch-ink)] text-white rounded-lg hover:bg-[var(--stitch-ink)]"
             >
               <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
               Refresh
@@ -529,15 +529,15 @@ const AdminPerformancePanel = () => {
 
           {/* Locked Sellers List */}
           {lockedSellers.length === 0 ? (
-            <div className="bg-white rounded-xl border border-[#E5E1DB] p-12 text-center">
+            <div className="bg-white rounded-xl border border-[var(--stitch-line)] p-12 text-center">
               <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
                 <CheckCircle className="w-8 h-8 text-green-500" />
               </div>
-              <h3 className="text-lg font-medium text-[#1A1C20] mb-2">No Locked Accounts</h3>
-              <p className="text-[#4A4D53]">All seller accounts are currently active and in good standing.</p>
+              <h3 className="text-lg font-medium text-[var(--stitch-ink)] mb-2">No Locked Accounts</h3>
+              <p className="text-[var(--stitch-muted)]">All seller accounts are currently active and in good standing.</p>
             </div>
           ) : (
-            <div className="bg-white rounded-xl border border-[#E5E1DB] overflow-hidden">
+            <div className="bg-white rounded-xl border border-[var(--stitch-line)] overflow-hidden">
               <table className="w-full">
                 <thead className="bg-red-50">
                   <tr>
@@ -550,20 +550,20 @@ const AdminPerformancePanel = () => {
                 </thead>
                 <tbody>
                   {lockedSellers.map((seller, idx) => (
-                    <tr key={idx} className="border-t border-[#E5E1DB] hover:bg-red-50/50">
+                    <tr key={idx} className="border-t border-[var(--stitch-line)] hover:bg-red-50/50">
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
                             <Lock className="w-5 h-5 text-red-500" />
                           </div>
                           <div>
-                            <p className="font-medium text-[#1A1C20]">{seller.seller_name || 'Unknown'}</p>
-                            <p className="text-xs text-[#4A4D53]">{seller.seller_phone}</p>
+                            <p className="font-medium text-[var(--stitch-ink)]">{seller.seller_name || 'Unknown'}</p>
+                            <p className="text-xs text-[var(--stitch-muted)]">{seller.seller_phone}</p>
                           </div>
                         </div>
                       </td>
                       <td className="px-4 py-3">
-                        <p className="text-sm text-[#1A1C20]">
+                        <p className="text-sm text-[var(--stitch-ink)]">
                           {seller.locked_at ? new Date(seller.locked_at).toLocaleDateString('en-IN', {
                             day: 'numeric',
                             month: 'short',
@@ -613,10 +613,10 @@ const AdminPerformancePanel = () => {
       {activeTab === 'quotes' && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
           <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-semibold text-[#1A1C20]">Motivation Quotes</h3>
+            <h3 className="text-lg font-semibold text-[var(--stitch-ink)]">Motivation Quotes</h3>
             <button
               onClick={() => setShowQuoteModal(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-[#04473C] text-white rounded-lg hover:bg-[#065f4e]"
+              className="flex items-center gap-2 px-4 py-2 bg-[var(--stitch-ink)] text-white rounded-lg hover:bg-[var(--stitch-ink)]"
             >
               <Plus className="w-4 h-4" />
               Add Quote
@@ -625,10 +625,10 @@ const AdminPerformancePanel = () => {
 
           <div className="grid md:grid-cols-2 gap-4">
             {quotes.map((quote, idx) => (
-              <div key={idx} className="bg-white rounded-xl border border-[#E5E1DB] p-4">
-                <p className="text-[#1A1C20] italic mb-2">"{quote.quote}"</p>
-                {quote.author && <p className="text-sm text-[#4A4D53]">— {quote.author}</p>}
-                {quote.date && <p className="text-xs text-[#8A8D91] mt-1">For: {quote.date}</p>}
+              <div key={idx} className="bg-white rounded-xl border border-[var(--stitch-line)] p-4">
+                <p className="text-[var(--stitch-ink)] italic mb-2">"{quote.quote}"</p>
+                {quote.author && <p className="text-sm text-[var(--stitch-muted)]">— {quote.author}</p>}
+                {quote.date && <p className="text-xs text-[var(--stitch-muted)] mt-1">For: {quote.date}</p>}
                 <div className="flex justify-end mt-2">
                   <button
                     onClick={() => deleteQuote(quote.id)}
@@ -665,7 +665,7 @@ const AdminPerformancePanel = () => {
                       <textarea
                         value={newQuote.quote}
                         onChange={(e) => setNewQuote({ ...newQuote, quote: e.target.value })}
-                        className="w-full px-4 py-2 border border-[#E5E1DB] rounded-lg"
+                        className="w-full px-4 py-2 border border-[var(--stitch-line)] rounded-lg"
                         rows={3}
                         placeholder="Enter motivational quote..."
                       />
@@ -676,7 +676,7 @@ const AdminPerformancePanel = () => {
                         type="text"
                         value={newQuote.author}
                         onChange={(e) => setNewQuote({ ...newQuote, author: e.target.value })}
-                        className="w-full px-4 py-2 border border-[#E5E1DB] rounded-lg"
+                        className="w-full px-4 py-2 border border-[var(--stitch-line)] rounded-lg"
                         placeholder="Quote author (optional)"
                       />
                     </div>
@@ -686,20 +686,20 @@ const AdminPerformancePanel = () => {
                         type="date"
                         value={newQuote.date}
                         onChange={(e) => setNewQuote({ ...newQuote, date: e.target.value })}
-                        className="w-full px-4 py-2 border border-[#E5E1DB] rounded-lg"
+                        className="w-full px-4 py-2 border border-[var(--stitch-line)] rounded-lg"
                       />
-                      <p className="text-xs text-[#8A8D91] mt-1">Leave empty to show randomly</p>
+                      <p className="text-xs text-[var(--stitch-muted)] mt-1">Leave empty to show randomly</p>
                     </div>
                     <div className="flex gap-3">
                       <button
                         onClick={() => setShowQuoteModal(false)}
-                        className="flex-1 px-4 py-2 border border-[#E5E1DB] rounded-lg hover:bg-[#F5F3F0]"
+                        className="flex-1 px-4 py-2 border border-[var(--stitch-line)] rounded-lg hover:bg-[var(--stitch-soft)]"
                       >
                         Cancel
                       </button>
                       <button
                         onClick={addQuote}
-                        className="flex-1 px-4 py-2 bg-[#04473C] text-white rounded-lg hover:bg-[#065f4e]"
+                        className="flex-1 px-4 py-2 bg-[var(--stitch-ink)] text-white rounded-lg hover:bg-[var(--stitch-ink)]"
                       >
                         Add Quote
                       </button>
@@ -729,9 +729,9 @@ const AdminPerformancePanel = () => {
               className="bg-white rounded-xl max-w-2xl w-full max-h-[80vh] overflow-y-auto"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="p-6 border-b border-[#E5E1DB]">
+              <div className="p-6 border-b border-[var(--stitch-line)]">
                 <h3 className="text-xl font-semibold">{sellerDetail.seller?.name}</h3>
-                <p className="text-[#4A4D53]">{sellerDetail.seller?.phone}</p>
+                <p className="text-[var(--stitch-muted)]">{sellerDetail.seller?.phone}</p>
               </div>
               <div className="p-6">
                 {/* Stats */}
@@ -748,11 +748,11 @@ const AdminPerformancePanel = () => {
                     <p className="text-2xl font-bold text-purple-600">{sellerDetail.performance?.total_score || 0}</p>
                     <p className="text-xs text-purple-500">Total Score</p>
                   </div>
-                  <div className={`p-3 rounded-lg text-center ${sellerDetail.stats?.is_at_risk ? 'bg-red-50' : 'bg-gray-50'}`}>
-                    <p className={`text-2xl font-bold ${sellerDetail.stats?.is_at_risk ? 'text-red-600' : 'text-gray-600'}`}>
+                  <div className={`p-3 rounded-lg text-center ${sellerDetail.stats?.is_at_risk ? 'bg-red-50' : 'bg-[var(--stitch-soft)]'}`}>
+                    <p className={`text-2xl font-bold ${sellerDetail.stats?.is_at_risk ? 'text-red-600' : 'text-[var(--stitch-muted)]'}`}>
                       {sellerDetail.stats?.is_at_risk ? 'At Risk' : 'OK'}
                     </p>
-                    <p className="text-xs text-gray-500">Status</p>
+                    <p className="text-xs text-[var(--stitch-muted)]">Status</p>
                   </div>
                 </div>
 
@@ -760,16 +760,16 @@ const AdminPerformancePanel = () => {
                 <h4 className="font-semibold mb-3">Recent Activity</h4>
                 <div className="space-y-2 max-h-60 overflow-y-auto">
                   {sellerDetail.activities?.slice(0, 10).map((activity, idx) => (
-                    <div key={idx} className="flex items-center justify-between p-3 bg-[#F5F3F0] rounded-lg">
+                    <div key={idx} className="flex items-center justify-between p-3 bg-[var(--stitch-soft)] rounded-lg">
                       <div>
                         <p className="font-medium">{activity.date}</p>
-                        <p className="text-xs text-[#4A4D53]">
+                        <p className="text-xs text-[var(--stitch-muted)]">
                           {formatTime(activity.login_time)} - {formatTime(activity.logout_time)}
                         </p>
                       </div>
                       <div className="text-right">
-                        <p className="font-bold text-[#04473C]">{activity.daily_score || 0} pts</p>
-                        <p className="text-xs text-[#4A4D53]">
+                        <p className="font-bold text-[var(--stitch-ink)]">{activity.daily_score || 0} pts</p>
+                        <p className="text-xs text-[var(--stitch-muted)]">
                           {activity.properties_shared} shared • {activity.visits_booked} visits • {activity.deals_closed} deals
                         </p>
                       </div>
@@ -777,10 +777,10 @@ const AdminPerformancePanel = () => {
                   ))}
                 </div>
               </div>
-              <div className="p-4 border-t border-[#E5E1DB]">
+              <div className="p-4 border-t border-[var(--stitch-line)]">
                 <button
                   onClick={() => setSelectedSeller(null)}
-                  className="w-full py-2 border border-[#E5E1DB] rounded-lg hover:bg-[#F5F3F0]"
+                  className="w-full py-2 border border-[var(--stitch-line)] rounded-lg hover:bg-[var(--stitch-soft)]"
                 >
                   Close
                 </button>

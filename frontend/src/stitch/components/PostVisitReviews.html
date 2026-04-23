@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Post-Visit Review - APNAGHR</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-low": "#f3f3f4",
+                        "surface-container-high": "#e8e8e8",
+                        "on-secondary-fixed-variant": "#3b3b3b",
+                        "secondary": "#5e5e5e",
+                        "on-primary-container": "#ffffff",
+                        "on-surface": "#1a1c1c",
+                        "on-tertiary-fixed-variant": "#e5e2e1",
+                        "primary": "#000000",
+                        "background": "#f9f9f9",
+                        "secondary-fixed": "#c6c6c6",
+                        "primary-container": "#3b3b3b",
+                        "on-primary-fixed": "#ffffff",
+                        "on-primary": "#e2e2e2",
+                        "secondary-fixed-dim": "#ababab",
+                        "on-tertiary-container": "#ffffff",
+                        "surface-variant": "#e2e2e2",
+                        "on-tertiary": "#e5e2e1",
+                        "surface-tint": "#5e5e5e",
+                        "inverse-primary": "#c6c6c6",
+                        "error": "#ba1a1a",
+                        "primary-fixed": "#5e5e5e",
+                        "surface-container-highest": "#e2e2e2",
+                        "on-error-container": "#410002",
+                        "surface": "#f9f9f9",
+                        "inverse-on-surface": "#f0f1f1",
+                        "tertiary-fixed-dim": "#474746",
+                        "surface-bright": "#f9f9f9",
+                        "on-tertiary-fixed": "#ffffff",
+                        "surface-container": "#eeeeee",
+                        "on-background": "#1a1c1c",
+                        "primary-fixed-dim": "#474747",
+                        "on-error": "#ffffff",
+                        "surface-dim": "#dadada",
+                        "outline": "#777777",
+                        "on-secondary-container": "#1b1b1b",
+                        "on-secondary": "#ffffff",
+                        "secondary-container": "#d4d4d4",
+                        "on-primary-fixed-variant": "#e2e2e2",
+                        "on-secondary-fixed": "#1b1b1b",
+                        "inverse-surface": "#2f3131",
+                        "tertiary-container": "#757474",
+                        "outline-variant": "#c6c6c6",
+                        "on-surface-variant": "#474747",
+                        "error-container": "#ffdad6",
+                        "tertiary": "#3c3b3b",
+                        "surface-container-lowest": "#ffffff",
+                        "tertiary-fixed": "#5f5e5e"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px",
+                        "sm": "0.5rem",
+                        "none": "0"
+                    },
+                    "spacing": {},
+                    "fontFamily": {
+                        "headline": ["Inter", "sans-serif"],
+                        "body": ["Inter", "sans-serif"],
+                        "label": ["Inter", "sans-serif"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; background-color: #f9f9f9; color: #1a1c1c; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .material-symbols-outlined.outline-icon { font-variation-settings: 'FILL' 0; }
+        
+        /* Hide scrollbar for clean look */
+        ::-webkit-scrollbar { width: 0px; background: transparent; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface antialiased flex flex-col md:flex-row h-screen overflow-hidden">
+<!-- TopAppBar (Mobile) -->
+<header class="md:hidden flex justify-between items-center px-8 h-20 w-full bg-white dark:bg-black text-black dark:text-white font-headline font-bold tracking-tighter uppercase top-0 border-b-0 bg-zinc-100 dark:bg-zinc-900 z-50">
+<div class="text-2xl font-black tracking-tighter text-black dark:text-white">APNAGHR</div>
+<div class="flex gap-4">
+<span class="material-symbols-outlined hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-all cursor-pointer p-2 rounded-full scale-102 active:scale-98 transition-transform" data-icon="notifications">notifications</span>
+<span class="material-symbols-outlined hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-all cursor-pointer p-2 rounded-full scale-102 active:scale-98 transition-transform" data-icon="account_circle">account_circle</span>
+</div>
+</header>
+<!-- SideNavBar (Desktop) -->
+<nav class="hidden md:flex flex-col h-full p-6 border-r border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 text-black dark:text-white font-headline font-bold text-[0.75rem] uppercase tracking-widest w-64 border-r-0 z-50 shrink-0">
+<div class="text-xl font-black text-black dark:text-white mb-8">APNAGHR<br/><span class="text-xs text-zinc-500 font-normal">Terminal v2.0</span></div>
+<ul class="flex flex-col gap-2 flex-grow">
+<li>
+<a class="flex items-center gap-3 text-zinc-500 dark:text-zinc-400 px-4 py-2 my-1 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-all rounded-none scale-102 duration-100" href="#">
+<span class="material-symbols-outlined outline-icon text-lg" data-icon="map">map</span> Map
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-3 bg-black dark:bg-white text-white dark:text-black rounded-full px-4 py-2 my-1 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-all scale-102 duration-100" href="#">
+<span class="material-symbols-outlined outline-icon text-lg" data-icon="rate_review">rate_review</span> Reviews
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-3 text-zinc-500 dark:text-zinc-400 px-4 py-2 my-1 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-all rounded-none scale-102 duration-100" href="#">
+<span class="material-symbols-outlined outline-icon text-lg" data-icon="calculate">calculate</span> Calculator
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-3 text-zinc-500 dark:text-zinc-400 px-4 py-2 my-1 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-all rounded-none scale-102 duration-100" href="#">
+<span class="material-symbols-outlined outline-icon text-lg" data-icon="analytics">analytics</span> Analytics
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-3 text-zinc-500 dark:text-zinc-400 px-4 py-2 my-1 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-all rounded-none scale-102 duration-100" href="#">
+<span class="material-symbols-outlined outline-icon text-lg" data-icon="payments">payments</span> Earnings
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-3 text-zinc-500 dark:text-zinc-400 px-4 py-2 my-1 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-all rounded-none scale-102 duration-100" href="#">
+<span class="material-symbols-outlined outline-icon text-lg" data-icon="wb_sunny">wb_sunny</span> Heatmap
+                </a>
+</li>
+</ul>
+<button class="mt-8 bg-primary text-on-primary py-3 px-6 rounded-full font-bold uppercase tracking-widest text-xs hover:scale-[1.02] transition-transform w-full">New Analysis</button>
+</nav>
+<!-- Main Content Canvas -->
+<main class="flex-1 h-full overflow-y-auto pb-24 md:pb-0">
+<!-- Header Zone -->
+<div class="px-6 md:px-16 pt-12 pb-8 bg-surface-container-low">
+<div class="max-w-4xl mx-auto">
+<span class="font-label text-xs font-bold uppercase tracking-widest text-secondary mb-2 block">Tour Completed</span>
+<h1 class="font-headline text-5xl md:text-7xl font-black tracking-tighter text-primary leading-none mb-4 -ml-1">POST-VISIT<br/>ASSESSMENT</h1>
+<p class="font-body text-lg text-on-surface opacity-80 max-w-2xl mt-6">Record your immediate impressions of 742 Evergreen Terrace. Data will be compiled into your primary dashboard.</p>
+</div>
+</div>
+<!-- Form Area -->
+<div class="px-6 md:px-16 py-12 max-w-4xl mx-auto">
+<form action="#" class="space-y-16" method="POST">
+<!-- Property Context Card -->
+<div class="bg-surface-container-lowest p-6 flex flex-col md:flex-row gap-6 items-center">
+<div class="w-full md:w-32 h-32 bg-surface-container-highest shrink-0 overflow-hidden relative">
+<img alt="Modern home exterior" class="w-full h-full object-cover grayscale" data-alt="modern minimalist home exterior with stark shadows and monochrome tones" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAh7AKYUn62_8bLZchsSfa92-r5i70T2KDd52n6FwBooRnIeciobVbz34Wiij_a3mhPP4DL9x4jN9wmVpD3mPHA52wivUKlT4QSaB-EyCnyRocL76Fq96rBrHuohISDsidekxWYaUY2fhtUMB_7uu_qXwFw5jj-qVPviu8kebVqApa7fMtIOpb7Om-nBMArT2UNj8JxaYuhr8DCtYfFhayX-rcklEUfzR4H9-Ds_x_UX5LUQ3C69dyAi8Au5Ci9JhBmYzeRcoZf-DaM"/>
+</div>
+<div class="flex-1">
+<h2 class="font-headline text-xl font-bold text-primary">742 Evergreen Terrace</h2>
+<div class="flex gap-4 mt-2">
+<span class="font-label text-xs uppercase tracking-widest text-secondary flex items-center gap-1">
+<span class="material-symbols-outlined outline-icon text-sm" data-icon="calendar_today">calendar_today</span> Oct 24, 2023
+                            </span>
+<span class="font-label text-xs uppercase tracking-widest text-secondary flex items-center gap-1">
+<span class="material-symbols-outlined outline-icon text-sm" data-icon="schedule">schedule</span> 14:00 - 15:30
+                            </span>
+</div>
+</div>
+</div>
+<div class="h-px bg-outline-variant w-full"></div>
+<!-- Rating Section -->
+<section>
+<h3 class="font-headline text-2xl font-bold text-primary mb-8 tracking-tight">QUANTITATIVE RATING</h3>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<!-- Structural Condition -->
+<div class="bg-surface-container-low p-6 rounded-none">
+<label class="font-label text-xs font-bold uppercase tracking-widest text-primary block mb-4">Structural Condition</label>
+<div class="flex justify-between items-center bg-surface-container-lowest p-2 border border-outline/20">
+<button class="w-10 h-10 flex items-center justify-center text-secondary hover:text-primary transition-colors" type="button"><span class="material-symbols-outlined" data-icon="star">star</span></button>
+<button class="w-10 h-10 flex items-center justify-center text-secondary hover:text-primary transition-colors" type="button"><span class="material-symbols-outlined" data-icon="star">star</span></button>
+<button class="w-10 h-10 flex items-center justify-center text-secondary hover:text-primary transition-colors" type="button"><span class="material-symbols-outlined" data-icon="star">star</span></button>
+<button class="w-10 h-10 flex items-center justify-center text-surface-container-highest transition-colors" type="button"><span class="material-symbols-outlined" data-icon="star">star</span></button>
+<button class="w-10 h-10 flex items-center justify-center text-surface-container-highest transition-colors" type="button"><span class="material-symbols-outlined" data-icon="star">star</span></button>
+</div>
+</div>
+<!-- Aesthetic Appeal -->
+<div class="bg-surface-container-low p-6 rounded-none">
+<label class="font-label text-xs font-bold uppercase tracking-widest text-primary block mb-4">Aesthetic Appeal</label>
+<div class="flex justify-between items-center bg-surface-container-lowest p-2 border border-outline/20">
+<button class="w-10 h-10 flex items-center justify-center text-secondary hover:text-primary transition-colors" type="button"><span class="material-symbols-outlined" data-icon="star">star</span></button>
+<button class="w-10 h-10 flex items-center justify-center text-secondary hover:text-primary transition-colors" type="button"><span class="material-symbols-outlined" data-icon="star">star</span></button>
+<button class="w-10 h-10 flex items-center justify-center text-secondary hover:text-primary transition-colors" type="button"><span class="material-symbols-outlined" data-icon="star">star</span></button>
+<button class="w-10 h-10 flex items-center justify-center text-secondary hover:text-primary transition-colors" type="button"><span class="material-symbols-outlined" data-icon="star">star</span></button>
+<button class="w-10 h-10 flex items-center justify-center text-surface-container-highest transition-colors" type="button"><span class="material-symbols-outlined" data-icon="star">star</span></button>
+</div>
+</div>
+</div>
+</section>
+<div class="h-px bg-outline-variant w-full"></div>
+<!-- Qualitative Section -->
+<section>
+<h3 class="font-headline text-2xl font-bold text-primary mb-8 tracking-tight">QUALITATIVE NOTES</h3>
+<div class="space-y-6">
+<div class="relative">
+<label class="font-label text-xs font-bold uppercase tracking-widest text-primary block mb-2" for="initial_impressions">Initial Impressions</label>
+<textarea class="w-full bg-surface-container-low border-0 border-b-2 border-transparent focus:border-primary focus:ring-0 rounded-sm p-4 font-body text-base text-on-surface placeholder:text-secondary-fixed-dim transition-all resize-none outline-none" id="initial_impressions" name="initial_impressions" placeholder="Record immediate thoughts upon entry..." rows="4"></textarea>
+</div>
+<div class="relative">
+<label class="font-label text-xs font-bold uppercase tracking-widest text-primary block mb-2" for="concerns">Red Flags &amp; Concerns</label>
+<textarea class="w-full bg-surface-container-low border-0 border-b-2 border-transparent focus:border-primary focus:ring-0 rounded-sm p-4 font-body text-base text-on-surface placeholder:text-secondary-fixed-dim transition-all resize-none outline-none" id="concerns" name="concerns" placeholder="Note any structural, neighborhood, or aesthetic issues..." rows="3"></textarea>
+</div>
+</div>
+</section>
+<!-- Action Button -->
+<div class="pt-8 flex justify-end">
+<button class="bg-primary hover:bg-primary-container text-on-primary font-headline font-bold uppercase tracking-widest text-sm py-6 px-16 rounded-full transition-all transform hover:scale-[1.02] flex items-center gap-3" type="submit">
+                        Submit Analysis <span class="material-symbols-outlined outline-icon" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</form>
+</div>
+</main>
+<!-- BottomNavBar (Mobile) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full flex justify-around items-center px-4 py-2 pb-safe bg-white/80 dark:bg-black/80 backdrop-blur-xl text-black dark:text-white font-headline font-bold text-[10px] uppercase border-t border-zinc-200 dark:border-zinc-800 z-50">
+<a class="flex flex-col items-center justify-center text-zinc-400 dark:text-zinc-600 p-3 hover:opacity-80 scale-105 active:scale-95 transition-all" href="#">
+<span class="material-symbols-outlined mb-1 text-xl outline-icon" data-icon="explore">explore</span>
+            Explore
+        </a>
+<a class="flex flex-col items-center justify-center bg-black dark:bg-white text-white dark:text-black rounded-full p-3 hover:opacity-80 scale-105 active:scale-95 transition-all w-16 h-16 -mt-6 shadow-lg shadow-black/10" href="#">
+<span class="material-symbols-outlined text-2xl" data-icon="rate_review">rate_review</span>
+</a>
+<a class="flex flex-col items-center justify-center text-zinc-400 dark:text-zinc-600 p-3 hover:opacity-80 scale-105 active:scale-95 transition-all" href="#">
+<span class="material-symbols-outlined mb-1 text-xl outline-icon" data-icon="trending_up">trending_up</span>
+            Trends
+        </a>
+<a class="flex flex-col items-center justify-center text-zinc-400 dark:text-zinc-600 p-3 hover:opacity-80 scale-105 active:scale-95 transition-all" href="#">
+<span class="material-symbols-outlined mb-1 text-xl outline-icon" data-icon="notifications">notifications</span>
+            Alerts
+        </a>
+</nav>
+</body></html>

@@ -1,12 +1,12 @@
-# Graph Report - C:\Users\shaur\Documents\apnaghrapp  (2026-04-21)
+# Graph Report - C:\Users\shaur\Documents\apnaghrapp  (2026-04-23)
 
 ## Corpus Check
-- 175 files · ~644,127 words
+- 175 files · ~734,628 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 2473 nodes · 3265 edges · 160 communities detected
-- Extraction: 91% EXTRACTED · 9% INFERRED · 0% AMBIGUOUS · INFERRED: 290 edges (avg confidence: 0.61)
+- 2455 nodes · 3246 edges · 161 communities detected
+- Extraction: 91% EXTRACTED · 9% INFERRED · 0% AMBIGUOUS · INFERRED: 291 edges (avg confidence: 0.61)
 - Token cost: 0 input · 0 output
 
 ## Community Hubs (Navigation)
@@ -170,6 +170,7 @@
 - [[_COMMUNITY_Community 157|Community 157]]
 - [[_COMMUNITY_Community 158|Community 158]]
 - [[_COMMUNITY_Community 159|Community 159]]
+- [[_COMMUNITY_Community 160|Community 160]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `CashfreePaymentService` - 158 edges
@@ -218,68 +219,68 @@ Cohesion: 0.02
 Nodes (47): customer_token(), ApnaGhr Admin Features API Tests Tests for: - Property Analytics Panel (summar, Test that customer cannot access property analytics, Daily Status Verification tests, Test getting properties that need daily verification, Test marking property as available, Test marking property as rented, Test marking property as under_verification (+39 more)
 
 ### Community 5 - "Community 5"
-Cohesion: 0.03
-Nodes (46): admin_token(), api_client(), authenticated_customer(), customer_token(), Test suite for ApnaGhr Visit Platform - New Features Tests: Packers & Movers mo, Test login with invalid credentials, Test Packers & Movers API endpoints, Test getting packages without authentication (should work) (+38 more)
+Cohesion: 0.04
+Nodes (68): admin_approve_ad(), admin_get_all_ads(), admin_get_all_profiles(), admin_reject_ad(), admin_verify_profile(), AdPaymentRequest, Advertisement, AdvertisementCreate (+60 more)
 
 ### Community 6 - "Community 6"
 Cohesion: 0.03
-Nodes (47): Seller Performance & Tracking System Tests Tests for: - Daily login tracking, Test daily status check without auth returns 401/403, Tests for seller daily start report submission, Test /api/seller-performance/daily-start endpoint, Test daily start validation - empty plan should fail, Tests for seller daily end report submission, Test /api/seller-performance/daily-end endpoint, Tests for seller performance data retrieval (+39 more)
+Nodes (46): admin_token(), api_client(), authenticated_customer(), customer_token(), Test suite for ApnaGhr Visit Platform - New Features Tests: Packers & Movers mo, Test login with invalid credentials, Test Packers & Movers API endpoints, Test getting packages without authentication (should work) (+38 more)
 
 ### Community 7 - "Community 7"
-Cohesion: 0.04
-Nodes (68): admin_approve_ad(), admin_get_all_ads(), admin_get_all_profiles(), admin_reject_ad(), admin_verify_profile(), AdPaymentRequest, Advertisement, AdvertisementCreate (+60 more)
+Cohesion: 0.03
+Nodes (47): Seller Performance & Tracking System Tests Tests for: - Daily login tracking, Test daily status check without auth returns 401/403, Tests for seller daily start report submission, Test /api/seller-performance/daily-start endpoint, Test daily start validation - empty plan should fail, Tests for seller daily end report submission, Test /api/seller-performance/daily-end endpoint, Tests for seller performance data retrieval (+39 more)
 
 ### Community 8 - "Community 8"
 Cohesion: 0.03
 Nodes (37): SEO Module Tests - Testing SEO pages, blog system, and sitemap functionality Te, Test /api/sitemap.xml endpoint - PUBLIC, no auth required, Test that sitemap.xml endpoint is accessible, Test that sitemap returns valid XML, Test that sitemap contains essential URLs, Basic health check to ensure API is running, Test that sitemap contains city-level pages, Test that sitemap contains property type pages (+29 more)
 
 ### Community 9 - "Community 9"
-Cohesion: 0.05
-Nodes (34): getMediaUrl(), sleep(), addServerFileToProperty(), checkImageStatus(), fetchProperties(), handleImageUpload(), removeImageFromProperty(), replaceAllWithExternal() (+26 more)
-
-### Community 10 - "Community 10"
 Cohesion: 0.03
 Nodes (39): customer_token(), ApnaGhr Visit Platform API Tests Tests for: - Auth endpoints (login) - Rider, Rider shift toggle online/offline tests, Test getting rider's current shift status, Test toggling rider to online status, Test toggling rider to offline status, Test that customer cannot access rider shift endpoint, Property listing tests (+31 more)
 
-### Community 11 - "Community 11"
+### Community 10 - "Community 10"
 Cohesion: 0.03
 Nodes (41): admin_token(), api_client(), authenticated_admin(), authenticated_customer(), customer_token(), Cashfree Payment Integration Tests Tests for visit packages, packers & movers,, Test five visits package (₹500) checkout creates valid Cashfree order, Test property lock (₹999) checkout creates valid Cashfree order (+33 more)
 
-### Community 12 - "Community 12"
+### Community 11 - "Community 11"
 Cohesion: 0.05
 Nodes (51): ai_analyze_property(), detect_property_type(), evaluate_description(), find_missing_amenities(), generate_issues(), generate_suggestions(), get_amenities_list(), get_current_user() (+43 more)
+
+### Community 12 - "Community 12"
+Cohesion: 0.06
+Nodes (56): admin_add_quote(), admin_delete_quote(), admin_get_earnings(), admin_get_leaderboard(), admin_get_quotes(), admin_get_seller_detail(), admin_get_sellers_tracking(), admin_mark_paid() (+48 more)
 
 ### Community 13 - "Community 13"
 Cohesion: 0.03
 Nodes (32): Test Registration, Login, Admin Settings, and AI Ad Generator Features Tests fo, Test builder registration, Test that duplicate phone registration fails, Test that login with wrong password fails, Test login with existing test credentials from test_credentials.md, Test user registration for all roles, Test login with customer credentials, Test login with rider credentials (+24 more)
 
 ### Community 14 - "Community 14"
-Cohesion: 0.06
-Nodes (56): admin_add_quote(), admin_delete_quote(), admin_get_earnings(), admin_get_leaderboard(), admin_get_quotes(), admin_get_seller_detail(), admin_get_sellers_tracking(), admin_mark_paid() (+48 more)
-
-### Community 15 - "Community 15"
 Cohesion: 0.04
 Nodes (28): Test suite for bug fixes: 1. Rider online/offline toggle 2. Rider wallet showi, Test rider can get wallet data, Test rider can get transaction history, Test ToLet tasks functionality, Test rider can get available ToLet tasks, Test admin can create ToLet task, Test customer properties display and filtering, Test customer/advertiser can login (+20 more)
 
-### Community 16 - "Community 16"
+### Community 15 - "Community 15"
 Cohesion: 0.04
 Nodes (30): Seller Client Verification System Tests Tests for: 1. Admin Login with Access, Test GET /api/seller-verification/check-share-lock, Test GET /api/seller-verification/pending-verifications, Test POST /api/seller-verification/verify-client validation, Test POST /api/seller-verification/verify-client status validation, Test POST /api/seller-verification/verify-client - in_progress requires notes, Test Admin Locked Sellers APIs, Test GET /api/seller-verification/admin/locked-sellers requires admin (+22 more)
+
+### Community 16 - "Community 16"
+Cohesion: 0.07
+Nodes (24): Inventory Access Control and Tracking System Tests Tests for access-type select, Test inventory key verification with wrong key, Test key verification with invalid access type, Test getting predefined inventory users list, Test getting available cities for inventory work plan, Test inventory user login with valid data, Test inventory login with invalid user name, Test getting inventory user stats (+16 more)
 
 ### Community 17 - "Community 17"
 Cohesion: 0.07
 Nodes (44): admin_get_builder_projects(), admin_update_project(), BuilderEvent, BuilderProject, BuilderProjectCreate, BuilderProjectLead, create_builder_event(), create_builder_project() (+36 more)
 
 ### Community 18 - "Community 18"
+Cohesion: 0.06
+Nodes (43): add_city(), AddCityRequest, DailyWorkPlanRequest, get_available_cities(), get_current_user(), get_inventory_team_performance(), get_inventory_user_detail(), get_my_inventory_stats() (+35 more)
+
+### Community 19 - "Community 19"
 Cohesion: 0.07
 Nodes (35): compress_image(), get_image_storage(), ImageStorageService, MongoDB-based Image Storage Service Stores images permanently in MongoDB GridFS, Retrieve image from MongoDB GridFS         Returns: (content_bytes, content_typ, Delete image from GridFS, Upload base64 encoded image to MongoDB, Get or create image storage service (+27 more)
 
-### Community 19 - "Community 19"
+### Community 20 - "Community 20"
 Cohesion: 0.04
 Nodes (24): Test suite for ApnaGhr new features: 1. Forgot Password flow (OTP request, veri, Test password reset with too short password, Test app settings and seasonal theme functionality, Test getting app customization settings (public endpoint), Test updating app customization settings as admin, Test ToLet task completion with proof images and admin verification, Test admin creating a ToLet task, Test forgot password flow: request OTP -> verify OTP -> reset password (+16 more)
-
-### Community 20 - "Community 20"
-Cohesion: 0.06
-Nodes (43): add_city(), AddCityRequest, DailyWorkPlanRequest, get_available_cities(), get_current_user(), get_inventory_team_performance(), get_inventory_user_detail(), get_my_inventory_stats() (+35 more)
 
 ### Community 21 - "Community 21"
 Cohesion: 0.05
@@ -318,52 +319,52 @@ Cohesion: 0.07
 Nodes (15): Test AI Chatbot API endpoints Tests: new session creation, message sending, pro, Test sending a message with location preference, Test getting chat history for a session, Test getting all chat sessions for current user, Test deleting a chat session, AI Chatbot endpoint tests, Test that chatbot requires authentication, Test property search functionality in chatbot (+7 more)
 
 ### Community 30 - "Community 30"
-Cohesion: 0.08
-Nodes (6): handleAdSubmit(), initiateCashfreePayment(), handleSubmit(), handleBookVisit(), handleLockProperty(), handlePayAndBook()
-
-### Community 31 - "Community 31"
 Cohesion: 0.12
 Nodes (17): get_seeding_status(), Production Data Seeder for ApnaGhr Visit Platform This script seeds the product, Get current status of all collections, Validate that all image URLs are external (not local uploads), Seed production database with preview data.     Only seeds if collections are e, seed_production_data(), validate_image_urls(), create_indexes() (+9 more)
 
-### Community 32 - "Community 32"
+### Community 31 - "Community 31"
 Cohesion: 0.16
 Nodes (18): delete_lead(), get_all_leads(), get_current_user(), get_lead_stats(), Lead, LeadCreate, LeadUpdate, Leads Routes - Lead tracking and management (+10 more)
 
+### Community 32 - "Community 32"
+Cohesion: 0.15
+Nodes (10): addQuote(), deleteQuote(), markAsPaid(), loadData(), handleApproveTask(), handleAssignTask(), handleCreateTask(), handleUpdateRate() (+2 more)
+
 ### Community 33 - "Community 33"
+Cohesion: 0.11
+Nodes (6): handleAdSubmit(), initiateCashfreePayment(), handleSubmit(), handleCheckout(), persistCart(), removeFromCart()
+
+### Community 34 - "Community 34"
+Cohesion: 0.14
+Nodes (10): getMediaUrl(), sleep(), addServerFileToProperty(), checkImageStatus(), fetchProperties(), handleImageUpload(), removeImageFromProperty(), replaceAllWithExternal() (+2 more)
+
+### Community 35 - "Community 35"
 Cohesion: 0.18
 Nodes (8): executeStepUpdate(), handleCompleteTask(), handleComplianceSubmit(), handleUpdateStep(), loadAvailableTasks(), loadAvailableVisits(), loadWallet(), toggleOnlineStatus()
 
-### Community 34 - "Community 34"
-Cohesion: 0.18
-Nodes (9): addQuote(), deleteQuote(), markAsPaid(), handleApproveTask(), handleAssignTask(), handleCreateTask(), handleUpdateRate(), handleVerifyTask() (+1 more)
-
-### Community 35 - "Community 35"
+### Community 36 - "Community 36"
 Cohesion: 0.15
 Nodes (2): fetchRegistrations(), handleViewRegistrations()
 
-### Community 36 - "Community 36"
+### Community 37 - "Community 37"
 Cohesion: 0.18
 Nodes (12): close_database(), create_indexes(), get_client(), get_database(), get_db(), init_database(), FastAPI dependency to get database, Get the database instance (+4 more)
 
-### Community 37 - "Community 37"
+### Community 38 - "Community 38"
 Cohesion: 0.18
 Nodes (2): retakePhoto(), startCamera()
 
-### Community 38 - "Community 38"
+### Community 39 - "Community 39"
 Cohesion: 0.17
 Nodes (0): 
 
-### Community 39 - "Community 39"
+### Community 40 - "Community 40"
 Cohesion: 0.31
 Nodes (9): export_all_data(), export_endpoint(), import_to_atlas(), login(), main(), Import exported data to MongoDB Atlas, Export data from an API endpoint, Export all production data via APIs (+1 more)
 
-### Community 40 - "Community 40"
+### Community 41 - "Community 41"
 Cohesion: 0.24
 Nodes (3): handleSubmit(), resetForm(), trackPropertyAdded()
-
-### Community 41 - "Community 41"
-Cohesion: 0.25
-Nodes (2): handlePropertyClick(), trackLead()
 
 ### Community 42 - "Community 42"
 Cohesion: 0.25
@@ -406,8 +407,8 @@ Cohesion: 0.47
 Nodes (5): export_endpoint(), login(), main(), Login as admin and get token, Export data from an API endpoint
 
 ### Community 52 - "Community 52"
-Cohesion: 0.4
-Nodes (2): addNotification(), calculateETA()
+Cohesion: 0.33
+Nodes (1): ErrorBoundary
 
 ### Community 53 - "Community 53"
 Cohesion: 0.4
@@ -454,24 +455,24 @@ Cohesion: 0.4
 Nodes (0): 
 
 ### Community 64 - "Community 64"
-Cohesion: 0.4
+Cohesion: 0.5
 Nodes (0): 
 
 ### Community 65 - "Community 65"
-Cohesion: 0.4
-Nodes (0): 
+Cohesion: 0.67
+Nodes (2): compressImage(), handleFileSelect()
 
 ### Community 66 - "Community 66"
-Cohesion: 0.4
+Cohesion: 0.5
 Nodes (0): 
 
 ### Community 67 - "Community 67"
-Cohesion: 0.4
+Cohesion: 0.5
 Nodes (0): 
 
 ### Community 68 - "Community 68"
-Cohesion: 0.6
-Nodes (3): handleSaveBankAccount(), handleSaveProfile(), loadProfile()
+Cohesion: 0.83
+Nodes (3): handleApprove(), handleReject(), loadPendingVisits()
 
 ### Community 69 - "Community 69"
 Cohesion: 0.5
@@ -482,8 +483,8 @@ Cohesion: 0.5
 Nodes (0): 
 
 ### Community 71 - "Community 71"
-Cohesion: 0.67
-Nodes (2): compressImage(), handleFileSelect()
+Cohesion: 0.5
+Nodes (0): 
 
 ### Community 72 - "Community 72"
 Cohesion: 0.5
@@ -494,20 +495,20 @@ Cohesion: 0.5
 Nodes (0): 
 
 ### Community 74 - "Community 74"
-Cohesion: 0.83
-Nodes (3): handleApprove(), handleReject(), loadPendingVisits()
-
-### Community 75 - "Community 75"
 Cohesion: 0.5
 Nodes (0): 
 
+### Community 75 - "Community 75"
+Cohesion: 0.83
+Nodes (3): handleSaveBankAccount(), handleSaveProfile(), loadProfile()
+
 ### Community 76 - "Community 76"
-Cohesion: 0.5
+Cohesion: 0.67
 Nodes (0): 
 
 ### Community 77 - "Community 77"
 Cohesion: 0.67
-Nodes (2): copyToClipboard(), handleShare()
+Nodes (0): 
 
 ### Community 78 - "Community 78"
 Cohesion: 0.67
@@ -522,16 +523,16 @@ Cohesion: 0.67
 Nodes (0): 
 
 ### Community 81 - "Community 81"
-Cohesion: 0.67
-Nodes (0): 
+Cohesion: 1.0
+Nodes (2): handleProcessPayouts(), loadWallets()
 
 ### Community 82 - "Community 82"
 Cohesion: 0.67
 Nodes (0): 
 
 ### Community 83 - "Community 83"
-Cohesion: 1.0
-Nodes (2): handleProcessPayouts(), loadWallets()
+Cohesion: 0.67
+Nodes (0): 
 
 ### Community 84 - "Community 84"
 Cohesion: 0.67
@@ -546,24 +547,24 @@ Cohesion: 0.67
 Nodes (0): 
 
 ### Community 87 - "Community 87"
-Cohesion: 0.67
-Nodes (0): 
+Cohesion: 1.0
+Nodes (2): hash_password(), seed_data()
 
 ### Community 88 - "Community 88"
-Cohesion: 0.67
-Nodes (0): 
+Cohesion: 1.0
+Nodes (2): hash_password(), seed_data()
 
 ### Community 89 - "Community 89"
-Cohesion: 0.67
+Cohesion: 1.0
 Nodes (0): 
 
 ### Community 90 - "Community 90"
 Cohesion: 1.0
-Nodes (2): hash_password(), seed_data()
+Nodes (0): 
 
 ### Community 91 - "Community 91"
 Cohesion: 1.0
-Nodes (2): hash_password(), seed_data()
+Nodes (0): 
 
 ### Community 92 - "Community 92"
 Cohesion: 1.0
@@ -837,30 +838,40 @@ Nodes (0):
 Cohesion: 1.0
 Nodes (0): 
 
+### Community 160 - "Community 160"
+Cohesion: 1.0
+Nodes (0): 
+
 ## Knowledge Gaps
 - **795 isolated node(s):** `Run a single API test`, `Test login for a specific role`, `Test /auth/me endpoint`, `Test rider CRUD operations`, `Test rider duty toggle and location updates` (+790 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **Thin community `Community 92`** (2 nodes): `AddBoard()`, `AddBoard.tsx`
+- **Thin community `Community 89`** (2 nodes): `AIPropertyValidator()`, `AIPropertyValidator.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 93`** (2 nodes): `AIPropertyValidator()`, `AIPropertyValidator.tsx`
+- **Thin community `Community 90`** (2 nodes): `InventoryTeamPerformance.tsx`, `InventoryTeamPerformance()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 94`** (2 nodes): `InventoryTeamPerformance.tsx`, `InventoryTeamPerformance()`
+- **Thin community `Community 91`** (2 nodes): `InventoryUserDashboard.tsx`, `InventoryUserDashboard()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 95`** (2 nodes): `InventoryUserDashboard.tsx`, `InventoryUserDashboard()`
+- **Thin community `Community 92`** (2 nodes): `RiderLocationTracker.tsx`, `getStatusColor()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 96`** (2 nodes): `RiderLocationTracker.tsx`, `getStatusColor()`
+- **Thin community `Community 93`** (2 nodes): `CustomerPrivacy.tsx`, `handleChangePassword()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 97`** (2 nodes): `PaymentSuccess.tsx`, `getSuccessMessage()`
+- **Thin community `Community 94`** (2 nodes): `LandingPage.tsx`, `getDashboardLink()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 98`** (2 nodes): `RiderLeadForm.tsx`, `handleSubmit()`
+- **Thin community `Community 95`** (2 nodes): `PrivacyPolicyPage.tsx`, `PrivacyPolicyPage()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 99`** (2 nodes): `SEOPropertyCard.tsx`, `formatPrice()`
+- **Thin community `Community 96`** (2 nodes): `PropertyDetail.tsx`, `PropertyDetail()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 100`** (2 nodes): `seoData.ts`, `generateAllSEORoutes()`
+- **Thin community `Community 97`** (2 nodes): `RiderLeadForm.tsx`, `handleSubmit()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 101`** (2 nodes): `handleShare()`, `BlogPostPage.tsx`
+- **Thin community `Community 98`** (2 nodes): `SEOPropertyCard.tsx`, `formatPrice()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 102`** (2 nodes): `SEOListingPage.tsx`, `fetchProperties()`
+- **Thin community `Community 99`** (2 nodes): `seoData.ts`, `generateAllSEORoutes()`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 100`** (2 nodes): `handleShare()`, `BlogPostPage.tsx`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 101`** (2 nodes): `SEOListingPage.tsx`, `fetchProperties()`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 102`** (2 nodes): `StitchPrimitives.tsx`, `StitchShell()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 - **Thin community `Community 103`** (2 nodes): `create_test_visits.py`, `create_test_visits()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
@@ -952,38 +963,40 @@ Nodes (0):
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 - **Thin community `Community 147`** (1 nodes): `CustomerSupport.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 148`** (1 nodes): `PrivacyPolicyPage.tsx`
+- **Thin community `Community 148`** (1 nodes): `LegalPolicies.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 149`** (1 nodes): `EarningsCalculator.tsx`
+- **Thin community `Community 149`** (1 nodes): `PaymentSuccess.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 150`** (1 nodes): `SEOFAQSection.tsx`
+- **Thin community `Community 150`** (1 nodes): `EarningsCalculator.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 151`** (1 nodes): `SEOHead.tsx`
+- **Thin community `Community 151`** (1 nodes): `SEOFAQSection.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 152`** (1 nodes): `SEOInternalLinks.tsx`
+- **Thin community `Community 152`** (1 nodes): `SEOHead.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 153`** (1 nodes): `riderEarningData.ts`
+- **Thin community `Community 153`** (1 nodes): `SEOInternalLinks.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 154`** (1 nodes): `BlogListPage.tsx`
+- **Thin community `Community 154`** (1 nodes): `riderEarningData.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 155`** (1 nodes): `CityRiderPage.tsx`
+- **Thin community `Community 155`** (1 nodes): `BlogListPage.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 156`** (1 nodes): `Earn2000Page.tsx`
+- **Thin community `Community 156`** (1 nodes): `CityRiderPage.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 157`** (1 nodes): `EarnMoneyPage.tsx`
+- **Thin community `Community 157`** (1 nodes): `Earn2000Page.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 158`** (1 nodes): `index.ts`
+- **Thin community `Community 158`** (1 nodes): `EarnMoneyPage.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 159`** (1 nodes): `__init__.py`
+- **Thin community `Community 159`** (1 nodes): `index.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 160`** (1 nodes): `__init__.py`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `CustomerProfileUpdate` connect `Community 3` to `Community 0`?**
-  _High betweenness centrality (0.027) - this node is a cross-community bridge._
-- **Why does `CashfreePaymentService` connect `Community 0` to `Community 1`, `Community 18`, `Community 2`?**
-  _High betweenness centrality (0.025) - this node is a cross-community bridge._
+- **Why does `CashfreePaymentService` connect `Community 0` to `Community 1`, `Community 2`, `Community 19`?**
+  _High betweenness centrality (0.035) - this node is a cross-community bridge._
+- **Why does `sleep()` connect `Community 34` to `Community 16`, `Community 2`?**
+  _High betweenness centrality (0.017) - this node is a cross-community bridge._
 - **Are the 148 inferred relationships involving `CashfreePaymentService` (e.g. with `CircuitBreaker` and `MongoJSONEncoder`) actually correct?**
   _`CashfreePaymentService` has 148 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 11 inferred relationships involving `sanitize_mongo_doc()` (e.g. with `.get_all_properties()` and `.get_property_by_id()`) actually correct?**

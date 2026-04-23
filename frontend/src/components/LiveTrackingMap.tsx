@@ -7,7 +7,7 @@ import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from 'react-
 import MarkerClusterGroup from 'react-leaflet-cluster';
 import L from 'leaflet';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Navigation, MapPin, Clock, Phone } from 'lucide-react';
+import { Navigation, MapPin, Clock, Phone, Check } from 'lucide-react';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet.markercluster/dist/MarkerCluster.css';
 import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
@@ -32,7 +32,7 @@ const createRiderIcon = (heading = 0, isOnline = true, status = 'online') => {
     return iconCache.get(cacheKey);
   }
   
-  const color = status === 'on_duty' ? '#04473C' : isOnline ? '#3B82F6' : '#6B7280';
+  const color = status === 'on_duty' ? 'var(--stitch-ink)' : isOnline ? '#3B82F6' : '#6B7280';
   const pulseColor = status === 'on_duty' ? '#22C55E' : '#3B82F6';
   
   const icon = L.divIcon({
@@ -83,7 +83,7 @@ const createDestinationIcon = (order = null) => {
       <div style="
         width: 28px;
         height: 28px;
-        background: #C6A87C;
+        background: var(--stitch-muted);
         border-radius: 50% 50% 50% 0;
         border: 2px solid white;
         box-shadow: 0 2px 6px rgba(0,0,0,0.3);
@@ -120,7 +120,7 @@ const createClusterCustomIcon = (cluster) => {
     html: `<div style="
       width: ${radius}px;
       height: ${radius}px;
-      background: linear-gradient(135deg, #04473C 0%, #065446 100%);
+      background: linear-gradient(135deg, var(--stitch-ink) 0%, var(--stitch-ink) 100%);
       border-radius: 50%;
       border: 3px solid white;
       box-shadow: 0 3px 10px rgba(0,0,0,0.3);
@@ -273,7 +273,7 @@ const LiveTrackingMap = ({
           <Popup>
             <div className="text-center min-w-[120px]">
               <p className="font-semibold">{rider.rider_name || rider.name}</p>
-              <p className="text-sm text-gray-500 capitalize">{rider.status}</p>
+              <p className="text-sm text-[var(--stitch-muted)] capitalize">{rider.status}</p>
               {rider.location.speed && (
                 <p className="text-xs text-gray-400">{Math.round(rider.location.speed)} km/h</p>
               )}
@@ -301,21 +301,21 @@ const LiveTrackingMap = ({
             initial={{ y: -50, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: -50, opacity: 0 }}
-            className="absolute top-4 left-4 right-4 z-[1000] bg-white rounded-lg shadow-lg p-4"
+            className="absolute top-4 left-4 right-4 z-[1000] stitch-panel p-5 bg-[var(--stitch-bg)]/90 backdrop-blur-md border border-[var(--stitch-line)]"
           >
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-[#04473C] rounded-full flex items-center justify-center">
-                  <Clock className="w-5 h-5 text-white" />
+              <div className="flex items-center gap-4">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--stitch-ink)] text-[var(--stitch-bg)]">
+                  <Clock className="h-6 w-6" />
                 </div>
                 <div>
-                  <p className="text-sm text-[#4A4D53]">Estimated Arrival</p>
-                  <p className="text-xl font-semibold text-[#04473C]">{eta.eta_text}</p>
+                  <p className="stitch-eyebrow">Estimated Arrival</p>
+                  <p className="font-headline text-2xl font-black uppercase tracking-tight text-[var(--stitch-ink)]">{eta.eta_text}</p>
                 </div>
               </div>
               <div className="text-right">
-                <p className="text-sm text-[#4A4D53]">Distance</p>
-                <p className="text-lg font-medium">{eta.distance_km} km</p>
+                <p className="stitch-eyebrow">Distance</p>
+                <p className="font-headline text-xl font-black">{eta.distance_km} KM</p>
               </div>
             </div>
           </motion.div>
@@ -329,33 +329,28 @@ const LiveTrackingMap = ({
             initial={{ y: 50, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 50, opacity: 0 }}
-            className={`absolute bottom-4 left-4 right-4 z-[1000] rounded-lg shadow-lg p-4 ${
-              visitStatus === 'completed' ? 'bg-green-500' :
-              visitStatus === 'reached' ? 'bg-[#C6A87C]' :
-              visitStatus === 'on_the_way' ? 'bg-[#04473C]' :
-              'bg-gray-500'
-            } text-white`}
+            className="absolute bottom-4 left-4 right-4 z-[1000] stitch-panel p-5 bg-[var(--stitch-ink)] text-[var(--stitch-bg)]"
           >
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center text-lg">
-                  {visitStatus === 'completed' ? '✓' :
-                   visitStatus === 'reached' ? '📍' :
-                   visitStatus === 'on_the_way' ? '🚗' : '⏳'}
+              <div className="flex items-center gap-4">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--stitch-bg)] text-[var(--stitch-ink)]">
+                  {visitStatus === 'completed' ? <Check className="h-6 w-6" /> :
+                   visitStatus === 'reached' ? <MapPin className="h-6 w-6" /> :
+                   <Navigation className="h-6 w-6" />}
                 </div>
                 <div>
-                  <p className="font-semibold text-lg capitalize">
+                  <p className="font-headline text-xl font-black uppercase tracking-tight">
                     {visitStatus.replace('_', ' ')}
                   </p>
-                  {riderName && <p className="text-sm opacity-90">Rider: {riderName}</p>}
+                  {riderName && <p className="text-xs font-bold uppercase tracking-widest opacity-70">Rider: {riderName}</p>}
                 </div>
               </div>
               {riderPhone && (
                 <a
                   href={`tel:${riderPhone}`}
-                  className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center hover:bg-white/30"
+                  className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--stitch-bg)]/20 hover:bg-[var(--stitch-bg)]/30 transition-colors"
                 >
-                  <Phone className="w-5 h-5" />
+                  <Phone className="h-6 w-6" />
                 </a>
               )}
             </div>
@@ -379,7 +374,7 @@ const LiveTrackingMap = ({
         {routeGeometry?.coordinates && (
           <Polyline
             positions={routeGeometry.coordinates.map(c => [c[1], c[0]])}
-            color="#04473C"
+            color="var(--stitch-ink)"
             weight={4}
             opacity={0.8}
             dashArray="10, 10"
@@ -397,7 +392,7 @@ const LiveTrackingMap = ({
               <div className="text-center">
                 <p className="font-semibold">{riderName || 'Rider'}</p>
                 {riderLocation.speed && (
-                  <p className="text-sm text-gray-500">{Math.round(riderLocation.speed)} km/h</p>
+                  <p className="text-sm text-[var(--stitch-muted)]">{Math.round(riderLocation.speed)} km/h</p>
                 )}
               </div>
             </Popup>
@@ -429,7 +424,7 @@ const LiveTrackingMap = ({
             <Popup>
               <div>
                 <p className="font-semibold">{dest.title || `Visit ${index + 1}`}</p>
-                {dest.address && <p className="text-sm text-gray-500">{dest.address}</p>}
+                {dest.address && <p className="text-sm text-[var(--stitch-muted)]">{dest.address}</p>}
               </div>
             </Popup>
           </Marker>

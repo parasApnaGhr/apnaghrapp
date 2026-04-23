@@ -150,7 +150,7 @@ const FileUploader = ({ type = 'image', multiple = false, onUploadComplete, labe
 
   return (
     <div className="space-y-3">
-      <label className="block text-sm font-medium text-[#264653] mb-1.5">{label}</label>
+      <label className="block text-sm font-medium text-[var(--stitch-ink)] mb-1.5">{label}</label>
 
       <div
         onClick={() => fileInputRef.current?.click()}
@@ -168,27 +168,27 @@ const FileUploader = ({ type = 'image', multiple = false, onUploadComplete, labe
 
         {uploading ? (
           <div className="flex flex-col items-center">
-            <div className="w-12 h-12 border-4 border-[#04473C] border-t-transparent rounded-full animate-spin mb-3"></div>
-            <p className="text-sm text-[#4A626C] mb-2">Uploading... {uploadProgress}%</p>
+            <div className="w-12 h-12 border-4 border-[var(--stitch-ink)] border-t-transparent rounded-full animate-spin mb-3"></div>
+            <p className="text-sm text-[var(--stitch-muted)] mb-2">Uploading... {uploadProgress}%</p>
             <div className="w-full bg-gray-200 rounded-full h-2">
               <div 
-                className="bg-[#04473C] h-2 rounded-full transition-all duration-300" 
+                className="bg-[var(--stitch-ink)] h-2 rounded-full transition-all duration-300" 
                 style={{ width: `${uploadProgress}%` }}
               ></div>
             </div>
-            <p className="text-xs text-[#4A626C] mt-2">Please wait, do not close this page</p>
+            <p className="text-xs text-[var(--stitch-muted)] mt-2">Please wait, do not close this page</p>
           </div>
         ) : (
           <div className="flex flex-col items-center">
             {type === 'image' ? (
-              <ImageIcon className="w-12 h-12 text-[#E07A5F] mb-3" />
+              <ImageIcon className="w-12 h-12 text-[var(--stitch-ink)] mb-3" />
             ) : (
-              <Video className="w-12 h-12 text-[#E07A5F] mb-3" />
+              <Video className="w-12 h-12 text-[var(--stitch-ink)] mb-3" />
             )}
-            <p className="text-sm font-medium text-[#264653] mb-1">
+            <p className="text-sm font-medium text-[var(--stitch-ink)] mb-1">
               {type === 'image' ? 'Add Photos' : 'Add Video'}
             </p>
-            <p className="text-xs text-[#4A626C]">
+            <p className="text-xs text-[var(--stitch-muted)]">
               Choose from gallery or camera
             </p>
           </div>

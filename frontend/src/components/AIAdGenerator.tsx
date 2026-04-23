@@ -124,13 +124,13 @@ const AIAdGenerator = () => {
         animate={{ opacity: 1, y: 0 }}
         className="text-center"
       >
-        <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-[#FFD166] to-[#FF5A5F] rounded-2xl mb-4">
+        <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-[var(--stitch-muted)] to-[var(--stitch-ink)] rounded-2xl mb-4">
           <Wand2 className="w-8 h-8 text-white" />
         </div>
         <h2 className="text-3xl font-black mb-2" style={{ fontFamily: 'Outfit' }}>
           AI Ad Generator
         </h2>
-        <p className="text-[#52525B] max-w-md mx-auto">
+        <p className="text-[var(--stitch-muted)] max-w-md mx-auto">
           Create stunning advertisement posters instantly using AI. Just tell us about your business!
         </p>
       </motion.div>
@@ -140,10 +140,10 @@ const AIAdGenerator = () => {
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
-          className="bg-white rounded-xl border-2 border-[#111111] shadow-[4px_4px_0px_#111111] p-6"
+          className="bg-white rounded-xl border border-[var(--stitch-line)] shadow-[4px_4px_0px_var(--stitch-ink)] p-6"
         >
           <h3 className="font-bold text-lg mb-6 flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-[#FFD166]" />
+            <Sparkles className="w-5 h-5 text-[var(--stitch-muted)]" />
             Create Your Ad
           </h3>
 
@@ -159,7 +159,7 @@ const AIAdGenerator = () => {
                 value={formData.company_name}
                 onChange={(e) => setFormData({ ...formData, company_name: e.target.value })}
                 placeholder="e.g., Quick Movers India"
-                className="w-full px-4 py-3 border-2 border-[#111111] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFD166]"
+                className="w-full px-4 py-3 border border-[var(--stitch-line)] rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--stitch-muted)]"
                 data-testid="ai-company-name-input"
                 required
               />
@@ -174,7 +174,7 @@ const AIAdGenerator = () => {
               <select
                 value={formData.business_type}
                 onChange={(e) => setFormData({ ...formData, business_type: e.target.value })}
-                className="w-full px-4 py-3 border-2 border-[#111111] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFD166] bg-white"
+                className="w-full px-4 py-3 border border-[var(--stitch-line)] rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--stitch-muted)] bg-white"
                 data-testid="ai-business-type-select"
               >
                 {businessTypes.map(type => (
@@ -194,7 +194,7 @@ const AIAdGenerator = () => {
                 value={formData.tagline}
                 onChange={(e) => setFormData({ ...formData, tagline: e.target.value })}
                 placeholder="e.g., Your trusted moving partner"
-                className="w-full px-4 py-3 border-2 border-[#111111] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFD166]"
+                className="w-full px-4 py-3 border border-[var(--stitch-line)] rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--stitch-muted)]"
                 data-testid="ai-tagline-input"
               />
             </div>
@@ -213,8 +213,8 @@ const AIAdGenerator = () => {
                     onClick={() => setFormData({ ...formData, style: style.value })}
                     className={`p-3 rounded-xl border-2 text-left transition-all ${
                       formData.style === style.value
-                        ? 'border-[#111111] bg-[#FFD166]/20 shadow-[2px_2px_0px_#111111]'
-                        : 'border-[#E5E3D8] hover:border-[#111111]'
+                        ? 'border-[var(--stitch-ink)] bg-[var(--stitch-muted)]/20 shadow-[2px_2px_0px_var(--stitch-ink)]'
+                        : 'border-[var(--stitch-line)] hover:border-[var(--stitch-ink)]'
                     }`}
                     data-testid={`ai-style-${style.value}`}
                   >
@@ -241,8 +241,8 @@ const AIAdGenerator = () => {
                       onClick={() => setFormData({ ...formData, ad_type: type.value })}
                       className={`p-3 rounded-xl border-2 text-center transition-all ${
                         formData.ad_type === type.value
-                          ? 'border-[#111111] bg-[#4ECDC4]/20 shadow-[2px_2px_0px_#111111]'
-                          : 'border-[#E5E3D8] hover:border-[#111111]'
+                          ? 'border-[var(--stitch-ink)] bg-[var(--stitch-ink)]/20 shadow-[2px_2px_0px_var(--stitch-ink)]'
+                          : 'border-[var(--stitch-line)] hover:border-[var(--stitch-ink)]'
                       }`}
                       data-testid={`ai-type-${type.value}`}
                     >
@@ -264,7 +264,7 @@ const AIAdGenerator = () => {
                 value={formData.color_scheme}
                 onChange={(e) => setFormData({ ...formData, color_scheme: e.target.value })}
                 placeholder="e.g., Blue and Orange, Earthy tones"
-                className="w-full px-4 py-3 border-2 border-[#111111] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFD166]"
+                className="w-full px-4 py-3 border border-[var(--stitch-line)] rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--stitch-muted)]"
                 data-testid="ai-color-input"
               />
             </div>
@@ -276,7 +276,7 @@ const AIAdGenerator = () => {
                   type="checkbox"
                   checked={formData.include_contact}
                   onChange={(e) => setFormData({ ...formData, include_contact: e.target.checked })}
-                  className="w-5 h-5 rounded border-2 border-[#111111]"
+                  className="w-5 h-5 rounded border border-[var(--stitch-line)]"
                   data-testid="ai-include-contact"
                 />
                 <span className="font-medium">Include Contact Info</span>
@@ -289,7 +289,7 @@ const AIAdGenerator = () => {
                 value={formData.contact_info}
                 onChange={(e) => setFormData({ ...formData, contact_info: e.target.value })}
                 placeholder="e.g., Call: 98765-43210"
-                className="w-full px-4 py-3 border-2 border-[#111111] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFD166]"
+                className="w-full px-4 py-3 border border-[var(--stitch-line)] rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--stitch-muted)]"
                 data-testid="ai-contact-input"
               />
             )}
@@ -300,7 +300,7 @@ const AIAdGenerator = () => {
               disabled={generating}
               whileHover={{ scale: generating ? 1 : 1.02 }}
               whileTap={{ scale: generating ? 1 : 0.98 }}
-              className="btn-primary w-full flex items-center justify-center gap-2"
+              className="stitch-button w-full flex items-center justify-center gap-2"
               data-testid="ai-generate-button"
             >
               {generating ? (
@@ -322,7 +322,7 @@ const AIAdGenerator = () => {
         <motion.div
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
-          className="bg-white rounded-xl border-2 border-[#111111] shadow-[4px_4px_0px_#111111] p-6"
+          className="bg-white rounded-xl border border-[var(--stitch-line)] shadow-[4px_4px_0px_var(--stitch-ink)] p-6"
         >
           <h3 className="font-bold text-lg mb-6">Generated Ad Preview</h3>
 
@@ -333,18 +333,18 @@ const AIAdGenerator = () => {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="aspect-[3/4] bg-gradient-to-br from-[#FAF9F6] to-[#FFD166]/20 rounded-xl flex flex-col items-center justify-center"
+                className="aspect-[3/4] bg-gradient-to-br from-[var(--stitch-soft)] to-[var(--stitch-muted)]/20 rounded-xl flex flex-col items-center justify-center"
               >
                 <div className="w-20 h-20 relative mb-4">
                   <motion.div
                     animate={{ rotate: 360 }}
                     transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                    className="absolute inset-0 border-4 border-[#FFD166] border-t-transparent rounded-full"
+                    className="absolute inset-0 border-4 border-[var(--stitch-muted)] border-t-transparent rounded-full"
                   />
-                  <Wand2 className="absolute inset-0 m-auto w-8 h-8 text-[#FF5A5F]" />
+                  <Wand2 className="absolute inset-0 m-auto w-8 h-8 text-[var(--stitch-ink)]" />
                 </div>
-                <p className="font-bold text-[#111111]">AI is working its magic...</p>
-                <p className="text-sm text-[#52525B] mt-1">This may take up to 60 seconds</p>
+                <p className="font-bold text-[var(--stitch-ink)]">AI is working its magic...</p>
+                <p className="text-sm text-[var(--stitch-muted)] mt-1">This may take up to 60 seconds</p>
               </motion.div>
             ) : generatedImage ? (
               <motion.div
@@ -354,7 +354,7 @@ const AIAdGenerator = () => {
                 exit={{ opacity: 0 }}
                 className="space-y-4"
               >
-                <div className="rounded-xl overflow-hidden border-2 border-[#E5E3D8]">
+                <div className="rounded-xl overflow-hidden border-2 border-[var(--stitch-line)]">
                   <img
                     src={`data:image/png;base64,${generatedImage}`}
                     alt="Generated Ad"
@@ -368,7 +368,7 @@ const AIAdGenerator = () => {
                     onClick={handleDownload}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
-                    className="flex-1 btn-secondary flex items-center justify-center gap-2"
+                    className="flex-1 stitch-button stitch-button-secondary flex items-center justify-center gap-2"
                     data-testid="ai-download-button"
                   >
                     <Download className="w-4 h-4" />
@@ -378,7 +378,7 @@ const AIAdGenerator = () => {
                     onClick={() => setGeneratedImage(null)}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
-                    className="flex-1 btn-secondary flex items-center justify-center gap-2"
+                    className="flex-1 stitch-button stitch-button-secondary flex items-center justify-center gap-2"
                     data-testid="ai-regenerate-button"
                   >
                     <RefreshCw className="w-4 h-4" />
@@ -392,13 +392,13 @@ const AIAdGenerator = () => {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="aspect-[3/4] bg-[#FAF9F6] rounded-xl flex flex-col items-center justify-center border-2 border-dashed border-[#E5E3D8]"
+                className="aspect-[3/4] bg-[var(--stitch-soft)] rounded-xl flex flex-col items-center justify-center border-2 border-dashed border-[var(--stitch-line)]"
               >
-                <div className="w-16 h-16 bg-[#FFD166]/20 rounded-full flex items-center justify-center mb-4">
-                  <Image className="w-8 h-8 text-[#FFD166]" />
+                <div className="w-16 h-16 bg-[var(--stitch-muted)]/20 rounded-full flex items-center justify-center mb-4">
+                  <Image className="w-8 h-8 text-[var(--stitch-muted)]" />
                 </div>
-                <p className="font-medium text-[#52525B]">Your AI-generated ad will appear here</p>
-                <p className="text-sm text-[#52525B]/70 mt-1">Fill the form and click Generate</p>
+                <p className="font-medium text-[var(--stitch-muted)]">Your AI-generated ad will appear here</p>
+                <p className="text-sm text-[var(--stitch-muted)]/70 mt-1">Fill the form and click Generate</p>
               </motion.div>
             )}
           </AnimatePresence>
@@ -410,13 +410,13 @@ const AIAdGenerator = () => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white rounded-xl border-2 border-[#111111] shadow-[4px_4px_0px_#111111] p-6"
+          className="bg-white rounded-xl border border-[var(--stitch-line)] shadow-[4px_4px_0px_var(--stitch-ink)] p-6"
         >
           <h3 className="font-bold text-lg mb-4">Your Generated Ads</h3>
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
             {generatedAds.map((ad) => (
               <div key={ad.id} className="relative group">
-                <div className="aspect-square rounded-lg overflow-hidden border-2 border-[#E5E3D8]">
+                <div className="aspect-square rounded-lg overflow-hidden border-2 border-[var(--stitch-line)]">
                   <img
                     src={`data:image/png;base64,${ad.image_base64}`}
                     alt={ad.company_name}

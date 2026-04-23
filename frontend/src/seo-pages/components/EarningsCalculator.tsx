@@ -14,7 +14,7 @@ const EarningsCalculator = () => {
   const yearlyEarnings = monthlyEarnings * 12;
 
   return (
-    <div className="bg-gradient-to-br from-[#04473C] to-[#065f4e] rounded-2xl p-6 md:p-8 text-white">
+    <div className="bg-gradient-to-br from-[var(--stitch-ink)] to-[var(--stitch-ink)] rounded-2xl p-6 md:p-8 text-white">
       <div className="flex items-center gap-3 mb-6">
         <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
           <Calculator className="w-6 h-6" />

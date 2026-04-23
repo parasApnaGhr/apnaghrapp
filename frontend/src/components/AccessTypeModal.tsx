@@ -81,11 +81,11 @@ const AccessTypeModal = ({ isOpen, onAccessGranted }) => {
           initial={{ scale: 0.9, opacity: 0, y: 20 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
           exit={{ scale: 0.9, opacity: 0, y: 20 }}
-          className="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden"
+          className="stitch-panel w-full max-w-md overflow-hidden"
         >
           {/* Header */}
-          <div className="bg-gradient-to-r from-[#04473C] to-[#065F4E] text-white p-6">
-            <h2 className="text-xl font-semibold" style={{ fontFamily: 'Playfair Display, serif' }}>
+          <div className="bg-[var(--stitch-ink)] text-[var(--stitch-bg)] p-6">
+            <h2 className="text-xl font-semibold" style={{  }}>
               Select Access Type
             </h2>
             <p className="text-white/80 text-sm mt-1">
@@ -103,15 +103,15 @@ const AccessTypeModal = ({ isOpen, onAccessGranted }) => {
                 {/* Admin Option */}
                 <button
                   onClick={() => handleAccessTypeSelect('admin')}
-                  className="w-full p-4 border-2 border-[#E5E1DB] rounded-lg hover:border-[#04473C] hover:bg-[#F8F7F5] transition-all group text-left flex items-start gap-4"
+                  className="w-full p-4 border border-[var(--stitch-line)] rounded-lg hover:border-[var(--stitch-ink)] hover:bg-[var(--stitch-soft)] transition-all group text-left flex items-start gap-4"
                   data-testid="select-admin-access"
                 >
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#04473C] to-[#065F4E] flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                  <div className="w-12 h-12 rounded-full bg-[var(--stitch-ink)] flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
                     <Shield className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-[#1A1C20] text-lg">Admin Access</h3>
-                    <p className="text-sm text-[#4A4D53] mt-1">
+                    <h3 className="font-semibold text-[var(--stitch-ink)] text-lg">Admin Access</h3>
+                    <p className="text-sm text-[var(--stitch-muted)] mt-1">
                       Full unrestricted access to all modules including settings, payouts, and team management.
                     </p>
                   </div>
@@ -120,15 +120,15 @@ const AccessTypeModal = ({ isOpen, onAccessGranted }) => {
                 {/* Inventory Option */}
                 <button
                   onClick={() => handleAccessTypeSelect('inventory')}
-                  className="w-full p-4 border-2 border-[#E5E1DB] rounded-lg hover:border-[#C6A87C] hover:bg-[#FDF8F3] transition-all group text-left flex items-start gap-4"
+                  className="w-full p-4 border border-[var(--stitch-line)] rounded-lg hover:border-[var(--stitch-ink)] hover:bg-[var(--stitch-soft)] transition-all group text-left flex items-start gap-4"
                   data-testid="select-inventory-access"
                 >
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#C6A87C] to-[#B8956C] flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                  <div className="w-12 h-12 rounded-full bg-[var(--stitch-muted)] flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
                     <Package className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-[#1A1C20] text-lg">Inventory Access</h3>
-                    <p className="text-sm text-[#4A4D53] mt-1">
+                    <h3 className="font-semibold text-[var(--stitch-ink)] text-lg">Inventory Access</h3>
+                    <p className="text-sm text-[var(--stitch-muted)] mt-1">
                       Restricted access to Inventory and Property Analytics modules only.
                     </p>
                   </div>
@@ -143,11 +143,11 @@ const AccessTypeModal = ({ isOpen, onAccessGranted }) => {
                 className="space-y-4"
               >
                 {/* Access Type Badge */}
-                <div className="flex items-center gap-3 p-3 bg-[#F8F7F5] rounded-lg">
+                <div className="flex items-center gap-3 p-3 bg-[var(--stitch-soft)] rounded-lg">
                   <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
                     accessType === 'admin' 
-                      ? 'bg-gradient-to-br from-[#04473C] to-[#065F4E]' 
-                      : 'bg-gradient-to-br from-[#C6A87C] to-[#B8956C]'
+                      ? 'bg-[var(--stitch-ink)]' 
+                      : 'bg-[var(--stitch-muted)]'
                   }`}>
                     {accessType === 'admin' ? (
                       <Shield className="w-5 h-5 text-white" />
@@ -156,14 +156,14 @@ const AccessTypeModal = ({ isOpen, onAccessGranted }) => {
                     )}
                   </div>
                   <div>
-                    <p className="text-sm text-[#4A4D53]">Verifying for</p>
-                    <p className="font-semibold text-[#1A1C20] capitalize">{accessType} Access</p>
+                    <p className="text-sm text-[var(--stitch-muted)]">Verifying for</p>
+                    <p className="font-semibold text-[var(--stitch-ink)] capitalize">{accessType} Access</p>
                   </div>
                 </div>
 
                 {/* Key Input */}
                 <div>
-                  <label className="block text-sm font-medium text-[#1A1C20] mb-2">
+                  <label className="block text-sm font-medium text-[var(--stitch-ink)] mb-2">
                     <Lock className="w-4 h-4 inline mr-1" />
                     Enter {accessType === 'admin' ? 'Admin' : 'Inventory'} Key
                   </label>
@@ -174,14 +174,14 @@ const AccessTypeModal = ({ isOpen, onAccessGranted }) => {
                       onChange={(e) => setKey(e.target.value)}
                       onKeyPress={(e) => e.key === 'Enter' && handleVerifyKey()}
                       placeholder="Enter access key"
-                      className="w-full px-4 py-3 border border-[#E5E1DB] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#04473C]/20 focus:border-[#04473C] pr-12"
+                      className="w-full px-4 py-3 border border-[var(--stitch-line)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--stitch-ink)]/20 focus:border-[var(--stitch-ink)] pr-12"
                       data-testid="access-key-input"
                       autoFocus
                     />
                     <button
                       type="button"
                       onClick={() => setShowKey(!showKey)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-[#4A4D53] hover:text-[#1A1C20]"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--stitch-muted)] hover:text-[var(--stitch-ink)]"
                     >
                       {showKey ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                     </button>
@@ -204,7 +204,7 @@ const AccessTypeModal = ({ isOpen, onAccessGranted }) => {
                 <div className="flex gap-3 pt-2">
                   <button
                     onClick={handleBack}
-                    className="flex-1 px-4 py-3 border border-[#E5E1DB] text-[#4A4D53] rounded-lg hover:bg-[#F8F7F5] transition-colors font-medium"
+                    className="flex-1 px-4 py-3 border border-[var(--stitch-line)] text-[var(--stitch-muted)] rounded-lg hover:bg-[var(--stitch-soft)] transition-colors font-medium"
                   >
                     Back
                   </button>
@@ -213,8 +213,8 @@ const AccessTypeModal = ({ isOpen, onAccessGranted }) => {
                     disabled={loading || !key.trim()}
                     className={`flex-1 px-4 py-3 rounded-lg font-medium transition-all flex items-center justify-center gap-2 ${
                       accessType === 'admin'
-                        ? 'bg-gradient-to-r from-[#04473C] to-[#065F4E] text-white hover:opacity-90'
-                        : 'bg-gradient-to-r from-[#C6A87C] to-[#B8956C] text-white hover:opacity-90'
+                        ? 'bg-[var(--stitch-ink)] text-white hover:opacity-90'
+                        : 'bg-[var(--stitch-muted)] text-white hover:opacity-90'
                     } disabled:opacity-50 disabled:cursor-not-allowed`}
                     data-testid="verify-key-button"
                   >

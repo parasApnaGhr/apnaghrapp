@@ -76,7 +76,7 @@ const DailyStartModal = ({ isOpen, onComplete, warnings = [], motivationQuote, q
           className="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl"
         >
           {/* Header */}
-          <div className="bg-gradient-to-r from-[#04473C] to-[#065f4e] p-6 text-white rounded-t-2xl">
+          <div className="bg-gradient-to-r from-[var(--stitch-ink)] to-[var(--stitch-ink)] p-6 text-white rounded-t-2xl">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-white/20 rounded-lg">
                 <Sparkles className="w-6 h-6" />
@@ -112,7 +112,7 @@ const DailyStartModal = ({ isOpen, onComplete, warnings = [], motivationQuote, q
                 </div>
                 <button
                   onClick={() => setStep(1)}
-                  className="w-full py-3 bg-[#04473C] text-white rounded-xl font-semibold hover:bg-[#065f4e] transition-colors"
+                  className="w-full py-3 bg-[var(--stitch-ink)] text-white rounded-xl font-semibold hover:bg-[var(--stitch-ink)] transition-colors"
                 >
                   I Understand, Continue
                 </button>
@@ -128,23 +128,23 @@ const DailyStartModal = ({ isOpen, onComplete, warnings = [], motivationQuote, q
               >
                 {/* Motivation Quote */}
                 {motivationQuote && (
-                  <div className="bg-gradient-to-br from-[#C6A87C]/10 to-[#04473C]/5 rounded-xl p-4 border border-[#C6A87C]/20">
-                    <p className="text-[#1A1C20] italic text-center">"{motivationQuote}"</p>
+                  <div className="bg-gradient-to-br from-[var(--stitch-muted)]/10 to-[var(--stitch-ink)]/5 rounded-xl p-4 border border-[var(--stitch-muted)]/20">
+                    <p className="text-[var(--stitch-ink)] italic text-center">"{motivationQuote}"</p>
                     {quoteAuthor && (
-                      <p className="text-[#4A4D53] text-sm text-center mt-2">— {quoteAuthor}</p>
+                      <p className="text-[var(--stitch-muted)] text-sm text-center mt-2">— {quoteAuthor}</p>
                     )}
                   </div>
                 )}
 
                 {/* Office Selfie */}
                 <div>
-                  <label className="block text-sm font-semibold text-[#1A1C20] mb-2">
+                  <label className="block text-sm font-semibold text-[var(--stitch-ink)] mb-2">
                     <Camera className="w-4 h-4 inline mr-1" />
                     Office Selfie (Optional)
                   </label>
                   <div 
                     onClick={() => fileInputRef.current?.click()}
-                    className="border-2 border-dashed border-[#E5E1DB] rounded-xl p-6 text-center cursor-pointer hover:border-[#04473C] transition-colors"
+                    className="border-2 border-dashed border-[var(--stitch-line)] rounded-xl p-6 text-center cursor-pointer hover:border-[var(--stitch-ink)] transition-colors"
                   >
                     {imagePreview ? (
                       <div className="relative">
@@ -162,8 +162,8 @@ const DailyStartModal = ({ isOpen, onComplete, warnings = [], motivationQuote, q
                       </div>
                     ) : (
                       <>
-                        <Upload className="w-8 h-8 text-[#4A4D53] mx-auto mb-2" />
-                        <p className="text-sm text-[#4A4D53]">Click to upload photo</p>
+                        <Upload className="w-8 h-8 text-[var(--stitch-muted)] mx-auto mb-2" />
+                        <p className="text-sm text-[var(--stitch-muted)]">Click to upload photo</p>
                       </>
                     )}
                   </div>
@@ -179,7 +179,7 @@ const DailyStartModal = ({ isOpen, onComplete, warnings = [], motivationQuote, q
 
                 {/* Today's Plan */}
                 <div>
-                  <label className="block text-sm font-semibold text-[#1A1C20] mb-2">
+                  <label className="block text-sm font-semibold text-[var(--stitch-ink)] mb-2">
                     <Target className="w-4 h-4 inline mr-1" />
                     Today's Plan *
                   </label>
@@ -188,7 +188,7 @@ const DailyStartModal = ({ isOpen, onComplete, warnings = [], motivationQuote, q
                     onChange={(e) => setFormData({ ...formData, today_plan: e.target.value })}
                     placeholder="What do you plan to achieve today?"
                     rows={3}
-                    className="w-full px-4 py-3 border border-[#E5E1DB] rounded-xl focus:ring-2 focus:ring-[#04473C]/20 focus:border-[#04473C]"
+                    className="w-full px-4 py-3 border border-[var(--stitch-line)] rounded-xl focus:ring-2 focus:ring-[var(--stitch-ink)]/20 focus:border-[var(--stitch-ink)]"
                     required
                   />
                 </div>
@@ -196,7 +196,7 @@ const DailyStartModal = ({ isOpen, onComplete, warnings = [], motivationQuote, q
                 {/* Planned Visits & Expected Deals */}
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-semibold text-[#1A1C20] mb-2">
+                    <label className="block text-sm font-semibold text-[var(--stitch-ink)] mb-2">
                       <Calendar className="w-4 h-4 inline mr-1" />
                       Planned Visits
                     </label>
@@ -205,11 +205,11 @@ const DailyStartModal = ({ isOpen, onComplete, warnings = [], motivationQuote, q
                       min="0"
                       value={formData.planned_visits}
                       onChange={(e) => setFormData({ ...formData, planned_visits: parseInt(e.target.value) || 0 })}
-                      className="w-full px-4 py-3 border border-[#E5E1DB] rounded-xl focus:ring-2 focus:ring-[#04473C]/20"
+                      className="w-full px-4 py-3 border border-[var(--stitch-line)] rounded-xl focus:ring-2 focus:ring-[var(--stitch-ink)]/20"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-[#1A1C20] mb-2">
+                    <label className="block text-sm font-semibold text-[var(--stitch-ink)] mb-2">
                       <Sparkles className="w-4 h-4 inline mr-1" />
                       Expected Deals
                     </label>
@@ -218,7 +218,7 @@ const DailyStartModal = ({ isOpen, onComplete, warnings = [], motivationQuote, q
                       min="0"
                       value={formData.expected_deals}
                       onChange={(e) => setFormData({ ...formData, expected_deals: parseInt(e.target.value) || 0 })}
-                      className="w-full px-4 py-3 border border-[#E5E1DB] rounded-xl focus:ring-2 focus:ring-[#04473C]/20"
+                      className="w-full px-4 py-3 border border-[var(--stitch-line)] rounded-xl focus:ring-2 focus:ring-[var(--stitch-ink)]/20"
                     />
                   </div>
                 </div>
@@ -227,7 +227,7 @@ const DailyStartModal = ({ isOpen, onComplete, warnings = [], motivationQuote, q
                 <button
                   onClick={handleSubmit}
                   disabled={submitting || !formData.today_plan.trim()}
-                  className="w-full py-4 bg-gradient-to-r from-[#04473C] to-[#065f4e] text-white rounded-xl font-semibold hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  className="w-full py-4 bg-gradient-to-r from-[var(--stitch-ink)] to-[var(--stitch-ink)] text-white rounded-xl font-semibold hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                   {submitting ? (
                     <>

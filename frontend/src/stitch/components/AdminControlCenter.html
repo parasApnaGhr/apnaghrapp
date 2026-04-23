@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Admin Control Center</title>
+<!-- Google Fonts: Inter -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Theme Config -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-container": "#757474",
+                        "background": "#f9f9f9",
+                        "surface-container-low": "#f3f3f4",
+                        "on-tertiary-fixed-variant": "#e5e2e1",
+                        "error": "#ba1a1a",
+                        "outline-variant": "#c6c6c6",
+                        "on-secondary-fixed": "#1b1b1b",
+                        "on-primary-container": "#ffffff",
+                        "surface": "#f9f9f9",
+                        "error-container": "#ffdad6",
+                        "surface-tint": "#5e5e5e",
+                        "on-primary": "#e2e2e2",
+                        "surface-container-highest": "#e2e2e2",
+                        "on-primary-fixed": "#ffffff",
+                        "primary-fixed": "#5e5e5e",
+                        "on-tertiary-container": "#ffffff",
+                        "on-error-container": "#410002",
+                        "secondary-container": "#d4d4d4",
+                        "surface-container-high": "#e8e8e8",
+                        "on-secondary-fixed-variant": "#3b3b3b",
+                        "surface-dim": "#dadada",
+                        "surface-container": "#eeeeee",
+                        "outline": "#777777",
+                        "on-surface": "#1a1c1c",
+                        "surface-variant": "#e2e2e2",
+                        "secondary-fixed": "#c6c6c6",
+                        "primary": "#000000",
+                        "primary-container": "#3b3b3b",
+                        "secondary": "#5e5e5e",
+                        "surface-container-lowest": "#ffffff",
+                        "tertiary-fixed-dim": "#474746",
+                        "on-error": "#ffffff",
+                        "on-tertiary": "#e5e2e1",
+                        "inverse-surface": "#2f3131",
+                        "secondary-fixed-dim": "#ababab",
+                        "tertiary-fixed": "#5f5e5e",
+                        "on-background": "#1a1c1c",
+                        "tertiary": "#3c3b3b",
+                        "on-secondary": "#ffffff",
+                        "on-secondary-container": "#1b1b1b",
+                        "primary-fixed-dim": "#474747",
+                        "inverse-primary": "#c6c6c6",
+                        "surface-bright": "#f9f9f9",
+                        "on-tertiary-fixed": "#ffffff",
+                        "on-surface-variant": "#474747",
+                        "on-primary-fixed-variant": "#e2e2e2",
+                        "inverse-on-surface": "#f0f1f1"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {},
+                    "fontFamily": {
+                        "headline": ["Inter", "sans-serif"],
+                        "body": ["Inter", "sans-serif"],
+                        "label": ["Inter", "sans-serif"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface flex min-h-screen overflow-x-hidden">
+<!-- SideNavBar (from JSON blueprint) -->
+<nav class="bg-[#F3F3F4] dark:bg-zinc-900 text-black dark:text-white font-['Inter'] text-sm font-bold uppercase tracking-widest h-screen w-72 flex-col fixed left-0 top-0 border-r border-zinc-200 dark:border-zinc-800 shadow-none flex flex-col p-6 gap-8 z-50">
+<!-- Header / Identity -->
+<div class="flex flex-col gap-2">
+<h1 class="text-lg font-black text-black dark:text-white">CONTROL</h1>
+<span class="text-xs text-outline tracking-normal">v1.0.4-STABLE</span>
+<div class="mt-4 flex items-center gap-3">
+<div class="w-10 h-10 bg-primary rounded-full flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined" data-icon="admin_panel_settings">admin_panel_settings</span>
+</div>
+<span class="text-xs">System Administrator</span>
+</div>
+</div>
+<!-- Navigation Links -->
+<div class="flex-1 flex flex-col gap-1">
+<!-- Active Tab: Live Tracking -->
+<a class="bg-black dark:bg-white text-white dark:text-black rounded-full px-6 py-3 my-1 flex items-center gap-4 transition-transform duration-200 ease-in-out active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined" data-icon="radar">radar</span>
+<span>Live Tracking</span>
+</a>
+<!-- Inactive Tabs -->
+<a class="text-zinc-500 dark:text-zinc-400 px-6 py-3 my-1 flex items-center gap-4 hover:bg-zinc-200 dark:hover:bg-zinc-800 rounded-full transition-all duration-200 ease-in-out active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined" data-icon="task_alt">task_alt</span>
+<span>Approval Queues</span>
+</a>
+<a class="text-zinc-500 dark:text-zinc-400 px-6 py-3 my-1 flex items-center gap-4 hover:bg-zinc-200 dark:hover:bg-zinc-800 rounded-full transition-all duration-200 ease-in-out active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined" data-icon="group_add">group_add</span>
+<span>Lead Management</span>
+</a>
+<a class="text-zinc-500 dark:text-zinc-400 px-6 py-3 my-1 flex items-center gap-4 hover:bg-zinc-200 dark:hover:bg-zinc-800 rounded-full transition-all duration-200 ease-in-out active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined" data-icon="style">style</span>
+<span>Design System</span>
+</a>
+<a class="text-zinc-500 dark:text-zinc-400 px-6 py-3 my-1 flex items-center gap-4 hover:bg-zinc-200 dark:hover:bg-zinc-800 rounded-full transition-all duration-200 ease-in-out active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined" data-icon="terminal">terminal</span>
+<span>Global Logs</span>
+</a>
+</div>
+<!-- CTA -->
+<button class="w-full bg-primary text-on-primary py-4 px-6 rounded-full font-bold uppercase tracking-widest text-xs hover:scale-[1.02] transition-transform">
+            Create New Lead
+        </button>
+</nav>
+<!-- Main Content Canvas -->
+<main class="ml-72 flex-1 p-8 lg:p-12 flex flex-col gap-12">
+<!-- Top Section: Asymmetric Layout (Map + Approvals) -->
+<div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
+<!-- Feature 1: Live Tracking Map (2/3 width) -->
+<section class="xl:col-span-2 flex flex-col gap-4">
+<div class="flex justify-between items-end">
+<h2 class="font-headline text-3xl font-bold tracking-tighter uppercase text-primary">Live Tracking</h2>
+<span class="font-label text-xs font-bold uppercase text-outline flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-primary block animate-pulse"></span>
+                        14 Active Units
+                    </span>
+</div>
+<!-- Minimal Map Container -->
+<div class="w-full h-[500px] bg-surface-container-low rounded-sm relative overflow-hidden group">
+<img alt="Map" class="w-full h-full object-cover grayscale opacity-60 contrast-125" data-alt="highly desaturated monochrome minimal street map of a dense urban grid, high contrast, utility aesthetic" data-location="Metropolis" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCTowZSyEL0cgePcL7W_pdDFuOxwqvEsv_pOA3SBjVHQHoSIgjp8czytr1Eu_IwUTA-ojpYMMwAlWrioSZULwE5RcuHNXMVSpJHwmYGS6Yi3L2t-rwExJOtvskg7RrX8RkLYnjXTIwUcMGBrr1egPeNDphV_Sme7Cx3Q20Z8TgnLYOhxNrusHCCpic6y4kJZbZMqN8EdSiEYg_z7tK-h_DBKd1hn5to_IUX1hmFkSWgxiKoIteiiv05TW6kZ-s-Pf0gnGyhnfg1dh5M"/>
+<!-- Overlay GPS Markers (Simulated) -->
+<div class="absolute top-1/4 left-1/3 w-3 h-3 bg-primary rounded-full ring-4 ring-primary/20"></div>
+<div class="absolute top-1/2 left-1/2 w-3 h-3 bg-primary rounded-full ring-4 ring-primary/20"></div>
+<div class="absolute bottom-1/3 right-1/4 w-3 h-3 bg-primary rounded-full ring-4 ring-primary/20"></div>
+<!-- Floating Panel on Map -->
+<div class="absolute bottom-6 left-6 bg-surface-container-lowest p-6 min-w-[240px] flex flex-col gap-4 shadow-none border border-outline-variant/30">
+<div class="text-xs font-bold uppercase tracking-widest text-outline">Sector 4 Status</div>
+<div class="text-2xl font-black tracking-tighter">OPTIMAL</div>
+</div>
+</div>
+</section>
+<!-- Feature 2: Visit Approvals Queue (1/3 width) -->
+<section class="flex flex-col gap-4">
+<div class="flex justify-between items-end">
+<h2 class="font-headline text-xl font-bold tracking-tighter uppercase text-primary">Approvals</h2>
+<span class="font-label text-xs font-bold uppercase text-outline">Queue: 3</span>
+</div>
+<div class="flex flex-col gap-0 bg-surface-container-lowest border border-outline-variant/30 rounded-sm overflow-hidden">
+<!-- Queue Item 1 -->
+<div class="p-6 flex flex-col gap-4 border-b border-outline-variant/50 relative">
+<div class="flex items-center gap-4">
+<img alt="Rider Selfie" class="w-12 h-12 rounded-none object-cover grayscale" data-alt="monochrome stark portrait of a man, high contrast lighting, neutral expression" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCVV2BiUjINKTBLY0RtTDRprTw440V1FgrykU28qJDn-8U2NVKj7E6ZsrFEXZWW7cHWEPbCLV72cub2yDkdsYQT1CvVleT5bqD6u2-7NHUZm4sYI6S8j4hOMKcix7XEeCq4JsjZTHLPVf3FxFmy3Ab2cTLSEK-4RhZH3W-PDvVuZlmL0sBlVLo5_8MnkEen7a4I_2jcorKNyylU5D00B2Ndtia_QyDjyJ9Ik_rQnKwo5ANg6hvQTKHD0jf8JDM2uwbquFFcQ-erBi91"/>
+<div>
+<div class="font-bold text-sm">ID-4992</div>
+<div class="text-xs text-outline font-label uppercase">Site Check-in</div>
+</div>
+</div>
+<div class="flex gap-2 w-full mt-2">
+<button class="flex-1 bg-primary text-on-primary py-3 font-bold uppercase text-xs rounded-full hover:scale-[1.02] transition-transform">Approve</button>
+<button class="px-4 py-3 border border-outline text-primary font-bold uppercase text-xs rounded-full hover:bg-surface-container-low transition-colors">Reject</button>
+</div>
+</div>
+<!-- Queue Item 2 -->
+<div class="p-6 flex flex-col gap-4 border-b border-outline-variant/50 relative opacity-80">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 bg-surface-container-high flex items-center justify-center">
+<span class="material-symbols-outlined text-outline" data-icon="videocam">videocam</span>
+</div>
+<div>
+<div class="font-bold text-sm">ID-5011</div>
+<div class="text-xs text-outline font-label uppercase">Delivery Proof</div>
+</div>
+</div>
+<div class="flex gap-2 w-full mt-2">
+<button class="flex-1 bg-primary text-on-primary py-3 font-bold uppercase text-xs rounded-full hover:scale-[1.02] transition-transform">Approve</button>
+<button class="px-4 py-3 border border-outline text-primary font-bold uppercase text-xs rounded-full hover:bg-surface-container-low transition-colors">Reject</button>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Bottom Section: Lead Management & Ops -->
+<div class="grid grid-cols-1 xl:grid-cols-4 gap-8">
+<!-- Feature 3: Lead Management Board -->
+<section class="xl:col-span-3 flex flex-col gap-4">
+<h2 class="font-headline text-xl font-bold tracking-tighter uppercase text-primary">Master Lead Flow</h2>
+<div class="bg-surface-container-lowest w-full rounded-sm overflow-hidden">
+<!-- Table Header -->
+<div class="grid grid-cols-4 p-4 border-b border-primary bg-surface-container-low">
+<div class="font-label text-xs font-bold uppercase text-primary">Lead Ref</div>
+<div class="font-label text-xs font-bold uppercase text-primary">Origin Agent</div>
+<div class="font-label text-xs font-bold uppercase text-primary">Target Agent</div>
+<div class="font-label text-xs font-bold uppercase text-primary text-right">Status</div>
+</div>
+<!-- Table Rows -->
+<div class="flex flex-col">
+<div class="grid grid-cols-4 p-4 border-b border-outline-variant/30 items-center hover:bg-surface-container-low transition-colors">
+<div class="font-bold text-sm">L-88291</div>
+<div class="text-sm">Agent Alpha</div>
+<div class="text-sm">Agent Delta</div>
+<div class="text-right"><span class="bg-surface-container-high text-xs font-bold px-2 py-1 uppercase rounded-sm">In Transit</span></div>
+</div>
+<div class="grid grid-cols-4 p-4 border-b border-outline-variant/30 items-center hover:bg-surface-container-low transition-colors">
+<div class="font-bold text-sm">L-88292</div>
+<div class="text-sm">Agent Beta</div>
+<div class="text-sm">Agent Sigma</div>
+<div class="text-right"><span class="bg-primary text-on-primary text-xs font-bold px-2 py-1 uppercase rounded-sm">Confirmed</span></div>
+</div>
+</div>
+</div>
+</section>
+<!-- Feature 4: Operational Panels -->
+<section class="flex flex-col gap-4">
+<h2 class="font-headline text-xl font-bold tracking-tighter uppercase text-primary">System Ops</h2>
+<div class="bg-primary text-on-primary p-6 rounded-sm flex flex-col gap-6">
+<div>
+<div class="text-xs font-label uppercase text-outline tracking-widest mb-1">Global Override</div>
+<div class="flex items-center justify-between">
+<span class="font-bold text-sm">Accept New Leads</span>
+<div class="w-12 h-6 bg-on-primary rounded-full relative cursor-pointer">
+<div class="w-5 h-5 bg-primary rounded-full absolute right-0.5 top-0.5"></div>
+</div>
+</div>
+</div>
+<div class="w-full h-px bg-outline-variant/30"></div>
+<div>
+<div class="text-xs font-label uppercase text-outline tracking-widest mb-1">Emergency Protocols</div>
+<button class="w-full mt-2 bg-on-primary text-primary font-black uppercase tracking-tighter py-3 hover:bg-surface-container-lowest transition-colors">
+                            HALT ALL UNITS
+                        </button>
+</div>
+</div>
+</section>
+</div>
+</main>
+</body></html>

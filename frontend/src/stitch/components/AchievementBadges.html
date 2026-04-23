@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Achievement Badges - APNAGHR</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-low": "#f3f3f4",
+                        "surface-container-high": "#e8e8e8",
+                        "on-secondary-fixed-variant": "#3b3b3b",
+                        "secondary": "#5e5e5e",
+                        "on-primary-container": "#ffffff",
+                        "on-surface": "#1a1c1c",
+                        "on-tertiary-fixed-variant": "#e5e2e1",
+                        "primary": "#000000",
+                        "background": "#f9f9f9",
+                        "secondary-fixed": "#c6c6c6",
+                        "primary-container": "#3b3b3b",
+                        "on-primary-fixed": "#ffffff",
+                        "on-primary": "#e2e2e2",
+                        "secondary-fixed-dim": "#ababab",
+                        "on-tertiary-container": "#ffffff",
+                        "surface-variant": "#e2e2e2",
+                        "on-tertiary": "#e5e2e1",
+                        "surface-tint": "#5e5e5e",
+                        "inverse-primary": "#c6c6c6",
+                        "error": "#ba1a1a",
+                        "primary-fixed": "#5e5e5e",
+                        "surface-container-highest": "#e2e2e2",
+                        "on-error-container": "#410002",
+                        "surface": "#f9f9f9",
+                        "inverse-on-surface": "#f0f1f1",
+                        "tertiary-fixed-dim": "#474746",
+                        "surface-bright": "#f9f9f9",
+                        "on-tertiary-fixed": "#ffffff",
+                        "surface-container": "#eeeeee",
+                        "on-background": "#1a1c1c",
+                        "primary-fixed-dim": "#474747",
+                        "on-error": "#ffffff",
+                        "surface-dim": "#dadada",
+                        "outline": "#777777",
+                        "on-secondary-container": "#1b1b1b",
+                        "on-secondary": "#ffffff",
+                        "secondary-container": "#d4d4d4",
+                        "on-primary-fixed-variant": "#e2e2e2",
+                        "on-secondary-fixed": "#1b1b1b",
+                        "inverse-surface": "#2f3131",
+                        "tertiary-container": "#757474",
+                        "outline-variant": "#c6c6c6",
+                        "on-surface-variant": "#474747",
+                        "error-container": "#ffdad6",
+                        "tertiary": "#3c3b3b",
+                        "surface-container-lowest": "#ffffff",
+                        "tertiary-fixed": "#5f5e5e"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {},
+                    "fontFamily": {
+                        "headline": ["Inter"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface min-h-screen flex flex-col md:flex-row antialiased selection:bg-primary selection:text-on-primary">
+<!-- TopAppBar (Mobile Only) -->
+<header class="md:hidden flex justify-between items-center px-8 h-20 w-full bg-white text-black font-['Inter'] font-bold tracking-tighter uppercase docked full-width top-0 border-b-0 sticky z-50 shadow-[0_1px_0_rgba(198,198,198,1)]">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined" data-icon="account_circle" style="font-variation-settings: 'FILL' 1;">account_circle</span>
+<span class="text-2xl font-black tracking-tighter text-black">APNAGHR</span>
+</div>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined" data-icon="notifications" style="font-variation-settings: 'FILL' 1;">notifications</span>
+</div>
+</header>
+<!-- SideNavBar (Desktop Only) -->
+<nav class="hidden md:flex flex-col h-screen p-6 border-r border-outline-variant bg-surface-container-low text-black font-['Inter'] font-bold text-[0.75rem] uppercase tracking-widest w-64 shrink-0 sticky top-0 shadowless stacking">
+<div class="text-xl font-black text-black mb-8 tracking-tighter">APNAGHR</div>
+<div class="text-xs text-secondary font-bold mb-8 uppercase tracking-widest">Terminal v2.0</div>
+<div class="flex-1 flex flex-col gap-2">
+<!-- Simulated active intent mapping to Profile/Rider stats -->
+<a class="flex items-center gap-3 bg-black text-white rounded-full px-4 py-2 my-1 scale-102 duration-100" href="#">
+<span class="material-symbols-outlined" data-icon="analytics" style="font-variation-settings: 'FILL' 1;">analytics</span>
+<span>Analytics</span>
+</a>
+<a class="flex items-center gap-3 text-secondary px-4 py-2 my-1 hover:bg-surface-container-highest transition-all duration-100 rounded-full" href="#">
+<span class="material-symbols-outlined" data-icon="map" style="font-variation-settings: 'FILL' 0;">map</span>
+<span>Map</span>
+</a>
+<a class="flex items-center gap-3 text-secondary px-4 py-2 my-1 hover:bg-surface-container-highest transition-all duration-100 rounded-full" href="#">
+<span class="material-symbols-outlined" data-icon="rate_review" style="font-variation-settings: 'FILL' 0;">rate_review</span>
+<span>Reviews</span>
+</a>
+<a class="flex items-center gap-3 text-secondary px-4 py-2 my-1 hover:bg-surface-container-highest transition-all duration-100 rounded-full" href="#">
+<span class="material-symbols-outlined" data-icon="calculate" style="font-variation-settings: 'FILL' 0;">calculate</span>
+<span>Calculator</span>
+</a>
+<a class="flex items-center gap-3 text-secondary px-4 py-2 my-1 hover:bg-surface-container-highest transition-all duration-100 rounded-full" href="#">
+<span class="material-symbols-outlined" data-icon="payments" style="font-variation-settings: 'FILL' 0;">payments</span>
+<span>Earnings</span>
+</a>
+<a class="flex items-center gap-3 text-secondary px-4 py-2 my-1 hover:bg-surface-container-highest transition-all duration-100 rounded-full" href="#">
+<span class="material-symbols-outlined" data-icon="wb_sunny" style="font-variation-settings: 'FILL' 0;">wb_sunny</span>
+<span>Heatmap</span>
+</a>
+</div>
+<div class="mt-auto pt-8">
+<button class="w-full bg-primary text-on-primary py-[1.5rem] px-[3rem] rounded-full font-bold text-sm tracking-widest uppercase hover:scale-[1.02] transition-transform flex items-center justify-center gap-2 bg-primary-container">
+<span class="material-symbols-outlined" data-icon="add" style="font-variation-settings: 'FILL' 0;">add</span>
+                 New Analysis
+             </button>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="flex-1 p-8 md:p-16 lg:p-24 overflow-y-auto pb-32 md:pb-24">
+<!-- Header -->
+<header class="mb-24 flex flex-col md:flex-row justify-between items-start md:items-end gap-8 border-b border-outline-variant pb-8">
+<div class="max-w-3xl">
+<h1 class="text-[3.5rem] font-bold leading-none tracking-[-0.02em] text-primary mb-4">ACHIEVEMENT BADGES</h1>
+<p class="text-xl text-on-surface leading-[1.6] max-w-2xl">Milestone recognition for high-performance riders. Zero decorative elements. Pure structural authority.</p>
+</div>
+<div class="flex items-center gap-4 bg-surface-container-low px-6 py-4 rounded-sm border-b-2 border-primary">
+<span class="text-[0.75rem] font-bold uppercase tracking-widest text-secondary">Global Rank</span>
+<span class="text-2xl font-black text-primary">#142</span>
+</div>
+</header>
+<!-- Stats Overview Bento -->
+<section class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-32">
+<div class="bg-surface-container-low p-8 rounded-sm flex flex-col gap-12">
+<span class="material-symbols-outlined text-4xl text-primary" data-icon="local_taxi" style="font-variation-settings: 'FILL' 1;">local_taxi</span>
+<div>
+<h3 class="text-[0.75rem] font-bold uppercase tracking-widest text-secondary mb-2">Total Visits</h3>
+<p class="text-[2.5rem] font-bold tracking-tighter text-primary leading-none">1,492</p>
+</div>
+</div>
+<div class="bg-primary text-on-primary p-8 rounded-sm flex flex-col gap-12 shadow-[0_0_0_1px_rgba(0,0,0,1)]">
+<span class="material-symbols-outlined text-4xl text-on-primary" data-icon="bolt" style="font-variation-settings: 'FILL' 1;">bolt</span>
+<div>
+<h3 class="text-[0.75rem] font-bold uppercase tracking-widest text-secondary-fixed mb-2">Current Streak</h3>
+<p class="text-[2.5rem] font-bold tracking-tighter text-on-primary leading-none">42 DAYS</p>
+</div>
+</div>
+<div class="bg-surface-container-low p-8 rounded-sm flex flex-col gap-12">
+<span class="material-symbols-outlined text-4xl text-primary" data-icon="check_circle" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<div>
+<h3 class="text-[0.75rem] font-bold uppercase tracking-widest text-secondary mb-2">Cancellation Rate</h3>
+<p class="text-[2.5rem] font-bold tracking-tighter text-primary leading-none">0.0%</p>
+</div>
+</div>
+</section>
+<!-- Badge Grid -->
+<section class="mb-32">
+<h2 class="text-[1.5rem] font-semibold text-primary mb-12 uppercase tracking-tight">Unlocked Milestones</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+<!-- Badge 1: 1K Club -->
+<article class="group bg-surface border border-outline-variant rounded-sm overflow-hidden flex flex-col hover:bg-surface-container-low transition-colors duration-200">
+<div class="h-48 bg-primary-container flex items-center justify-center p-8">
+<div class="w-32 h-32 bg-primary rounded-full flex items-center justify-center group-hover:scale-[1.05] transition-transform duration-300">
+<span class="material-symbols-outlined text-5xl text-on-primary" data-icon="workspace_premium" style="font-variation-settings: 'FILL' 1;">workspace_premium</span>
+</div>
+</div>
+<div class="p-6 flex-1 flex flex-col">
+<h3 class="text-xl font-bold text-primary mb-2 uppercase tracking-tight">1K VANGUARD</h3>
+<p class="text-sm text-secondary leading-relaxed mb-6">Completed 1,000 successful property visits without critical error.</p>
+<div class="mt-auto pt-4 border-t border-outline-variant flex justify-between items-center">
+<span class="text-[0.75rem] font-bold uppercase tracking-widest text-secondary">Earned</span>
+<span class="text-[0.75rem] font-bold text-primary">OCT 12</span>
+</div>
+</div>
+</article>
+<!-- Badge 2: Iron Streak -->
+<article class="group bg-surface border border-outline-variant rounded-sm overflow-hidden flex flex-col hover:bg-surface-container-low transition-colors duration-200">
+<div class="h-48 bg-surface-container-high flex items-center justify-center p-8">
+<div class="w-32 h-32 border-[8px] border-primary flex items-center justify-center group-hover:bg-primary transition-colors duration-300">
+<span class="material-symbols-outlined text-5xl text-primary group-hover:text-on-primary transition-colors duration-300" data-icon="local_fire_department" style="font-variation-settings: 'FILL' 1;">local_fire_department</span>
+</div>
+</div>
+<div class="p-6 flex-1 flex flex-col">
+<h3 class="text-xl font-bold text-primary mb-2 uppercase tracking-tight">IRON STREAK</h3>
+<p class="text-sm text-secondary leading-relaxed mb-6">Maintained continuous active status for 30 consecutive days.</p>
+<div class="mt-auto pt-4 border-t border-outline-variant flex justify-between items-center">
+<span class="text-[0.75rem] font-bold uppercase tracking-widest text-secondary">Earned</span>
+<span class="text-[0.75rem] font-bold text-primary">NOV 04</span>
+</div>
+</div>
+</article>
+<!-- Badge 3: Perfect Record -->
+<article class="group bg-surface border border-outline-variant rounded-sm overflow-hidden flex flex-col hover:bg-surface-container-low transition-colors duration-200">
+<div class="h-48 bg-surface-container-lowest flex items-center justify-center p-8 relative overflow-hidden">
+<!-- Geometric pattern representation -->
+<div class="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_center,_#000_1px,_transparent_1px)] bg-[size:16px_16px]"></div>
+<div class="w-24 h-24 bg-primary rotate-45 flex items-center justify-center group-hover:rotate-90 transition-transform duration-500 z-10">
+<span class="material-symbols-outlined text-4xl text-on-primary -rotate-45 group-hover:-rotate-90 transition-transform duration-500" data-icon="verified_user" style="font-variation-settings: 'FILL' 1;">verified_user</span>
+</div>
+</div>
+<div class="p-6 flex-1 flex flex-col">
+<h3 class="text-xl font-bold text-primary mb-2 uppercase tracking-tight">ZERO DROPS</h3>
+<p class="text-sm text-secondary leading-relaxed mb-6">Maintained 0.0% cancellation rate over 100 consecutive assignments.</p>
+<div class="mt-auto pt-4 border-t border-outline-variant flex justify-between items-center">
+<span class="text-[0.75rem] font-bold uppercase tracking-widest text-secondary">Earned</span>
+<span class="text-[0.75rem] font-bold text-primary">DEC 01</span>
+</div>
+</div>
+</article>
+<!-- Badge 4: Locked -->
+<article class="group bg-surface-container-low border border-outline-variant rounded-sm overflow-hidden flex flex-col opacity-60 grayscale cursor-not-allowed">
+<div class="h-48 flex items-center justify-center p-8">
+<div class="w-24 h-24 border-2 border-dashed border-secondary rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-4xl text-secondary" data-icon="lock" style="font-variation-settings: 'FILL' 0;">lock</span>
+</div>
+</div>
+<div class="p-6 flex-1 flex flex-col">
+<h3 class="text-xl font-bold text-secondary mb-2 uppercase tracking-tight">5K ELITE</h3>
+<p class="text-sm text-secondary leading-relaxed mb-6">Complete 5,000 successful property visits. Current progress: 29%.</p>
+<div class="mt-auto pt-4 border-t border-outline-variant flex justify-between items-center">
+<div class="w-full h-1 bg-surface-container-highest">
+<div class="h-full bg-secondary w-[29%]"></div>
+</div>
+</div>
+</div>
+</article>
+</div>
+</section>
+</main>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full flex justify-around items-center px-4 py-2 pb-safe bg-white/80 dark:bg-black/80 backdrop-blur-xl z-50 border-t border-zinc-200 dark:border-zinc-800 tonal shift bg-zinc-50 dark:bg-zinc-900 font-['Inter'] font-bold text-[10px] uppercase">
+<a class="flex flex-col items-center justify-center text-zinc-400 dark:text-zinc-600 p-3 hover:opacity-80 scale-105 active:scale-95 transition-all" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="explore" style="font-variation-settings: 'FILL' 0;">explore</span>
+<span>Explore</span>
+</a>
+<a class="flex flex-col items-center justify-center text-zinc-400 dark:text-zinc-600 p-3 hover:opacity-80 scale-105 active:scale-95 transition-all" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="calculate" style="font-variation-settings: 'FILL' 0;">calculate</span>
+<span>Calc</span>
+</a>
+<!-- Assuming Analytics/Trends maps here for active state based on context -->
+<a class="flex flex-col items-center justify-center bg-black dark:bg-white text-white dark:text-black rounded-full p-3 scale-105 active:scale-95 transition-all shadow-[0_0_0_4px_rgba(255,255,255,1)]" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="trending_up" style="font-variation-settings: 'FILL' 1;">trending_up</span>
+<span>Trends</span>
+</a>
+<a class="flex flex-col items-center justify-center text-zinc-400 dark:text-zinc-600 p-3 hover:opacity-80 scale-105 active:scale-95 transition-all" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="notifications" style="font-variation-settings: 'FILL' 0;">notifications</span>
+<span>Alerts</span>
+</a>
+</nav>
+</body></html>

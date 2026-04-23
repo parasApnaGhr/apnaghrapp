@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Rider Profile &amp; Settlements</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-dim": "#dadada",
+                        "on-tertiary-fixed-variant": "#e5e2e1",
+                        "inverse-surface": "#2f3131",
+                        "outline-variant": "#c6c6c6",
+                        "on-surface": "#1a1c1c",
+                        "on-tertiary-container": "#ffffff",
+                        "on-primary-fixed": "#ffffff",
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary-fixed-variant": "#3b3b3b",
+                        "on-tertiary-fixed": "#ffffff",
+                        "tertiary-container": "#757474",
+                        "surface-bright": "#f9f9f9",
+                        "surface-container": "#eeeeee",
+                        "on-error": "#ffffff",
+                        "secondary": "#5e5e5e",
+                        "on-primary-container": "#ffffff",
+                        "tertiary-fixed-dim": "#474746",
+                        "surface-container-highest": "#e2e2e2",
+                        "on-surface-variant": "#474747",
+                        "primary-container": "#3b3b3b",
+                        "on-secondary-container": "#1b1b1b",
+                        "error-container": "#ffdad6",
+                        "surface": "#f9f9f9",
+                        "on-error-container": "#410002",
+                        "outline": "#777777",
+                        "on-tertiary": "#e5e2e1",
+                        "on-primary": "#e2e2e2",
+                        "primary": "#000000",
+                        "surface-tint": "#5e5e5e",
+                        "on-secondary": "#ffffff",
+                        "error": "#ba1a1a",
+                        "inverse-primary": "#c6c6c6",
+                        "surface-variant": "#e2e2e2",
+                        "on-secondary-fixed": "#1b1b1b",
+                        "secondary-fixed": "#c6c6c6",
+                        "inverse-on-surface": "#f0f1f1",
+                        "secondary-container": "#d4d4d4",
+                        "primary-fixed": "#5e5e5e",
+                        "background": "#f9f9f9",
+                        "tertiary-fixed": "#5f5e5e",
+                        "surface-container-high": "#e8e8e8",
+                        "surface-container-low": "#f3f3f4",
+                        "primary-fixed-dim": "#474747",
+                        "on-background": "#1a1c1c",
+                        "secondary-fixed-dim": "#ababab",
+                        "on-primary-fixed-variant": "#e2e2e2",
+                        "tertiary": "#3c3b3b"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Inter", "sans-serif"],
+                        "body": ["Inter", "sans-serif"],
+                        "label": ["Inter", "sans-serif"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface pb-32 md:pb-0">
+<!-- TopAppBar from JSON -->
+<header class="flex justify-between items-center w-full px-8 h-20 docked full-width top-0 border-b-2 border-primary bg-surface transition-colors">
+<div class="text-2xl font-black tracking-tighter text-primary">APNAGHR</div>
+<div class="hidden md:flex gap-8 items-center font-['Inter'] font-bold tracking-tighter uppercase">
+<a class="text-outline" href="#">Tasks</a>
+<a class="text-outline" href="#">Earnings</a>
+<a class="text-primary font-black underline decoration-4 scale-102 transition-transform duration-100" href="#">Profile</a>
+<a class="text-outline" href="#">Support</a>
+</div>
+<div class="flex gap-4 items-center">
+<button class="text-primary hover:bg-surface-container-highest transition-colors rounded-full p-2">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="text-primary hover:bg-surface-container-highest transition-colors rounded-full p-2">
+<span class="material-symbols-outlined">help</span>
+</button>
+<button class="bg-primary text-on-primary font-bold px-6 py-2 rounded-full uppercase tracking-widest text-[0.75rem] hover:bg-primary-container transition-colors hidden md:block">
+                GO ONLINE
+            </button>
+</div>
+</header>
+<main class="max-w-7xl mx-auto px-4 md:px-8 py-12">
+<h1 class="text-[3.5rem] font-bold tracking-[-0.02em] leading-none mb-16">Profile &amp; Settlements</h1>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-16">
+<!-- Left Column: Profile Status & Vehicle -->
+<div class="lg:col-span-5 flex flex-col gap-16">
+<!-- Profile Completion -->
+<section>
+<h2 class="text-[1.5rem] font-semibold mb-6">Account Status</h2>
+<div class="bg-surface-container-low p-8 rounded-none">
+<div class="flex justify-between items-end mb-4">
+<span class="text-[1rem] font-bold">Profile Completion</span>
+<span class="text-[1.5rem] font-black">80%</span>
+</div>
+<div class="w-full h-4 bg-outline-variant relative mb-6">
+<div class="absolute top-0 left-0 h-full bg-primary w-[80%]"></div>
+</div>
+<ul class="flex flex-col gap-4">
+<li class="flex items-center gap-4 text-[1rem]">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+                                Basic Information
+                            </li>
+<li class="flex items-center gap-4 text-[1rem]">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+                                Vehicle Registration
+                            </li>
+<li class="flex items-center gap-4 text-[1rem] text-outline">
+<span class="material-symbols-outlined">radio_button_unchecked</span>
+                                KYC Verification (Pending)
+                            </li>
+</ul>
+</div>
+</section>
+<!-- Vehicle Details -->
+<section>
+<div class="flex justify-between items-center mb-6">
+<h2 class="text-[1.5rem] font-semibold">Vehicle</h2>
+<button class="text-[0.75rem] font-bold uppercase tracking-widest text-primary hover:underline">Edit</button>
+</div>
+<div class="bg-surface-container-lowest flex flex-col gap-6">
+<div class="flex flex-col gap-2">
+<label class="text-[0.75rem] font-bold uppercase text-outline">Vehicle Type</label>
+<div class="bg-surface-container-low px-4 py-3 rounded-sm border-b-2 border-transparent focus-within:border-primary transition-colors">
+<input class="w-full bg-transparent border-none p-0 focus:ring-0 text-[1rem] font-semibold text-on-surface" readonly="" type="text" value="Motorcycle"/>
+</div>
+</div>
+<div class="flex flex-col gap-2">
+<label class="text-[0.75rem] font-bold uppercase text-outline">Plate Number</label>
+<div class="bg-surface-container-low px-4 py-3 rounded-sm border-b-2 border-transparent focus-within:border-primary transition-colors">
+<input class="w-full bg-transparent border-none p-0 focus:ring-0 text-[1rem] font-semibold text-on-surface" readonly="" type="text" value="MH 12 AB 3456"/>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Right Column: Payouts -->
+<div class="lg:col-span-7 flex flex-col gap-16">
+<section>
+<h2 class="text-[1.5rem] font-semibold mb-6">Settlement Account</h2>
+<div class="bg-surface-container-low p-8 rounded-none">
+<div class="flex flex-col gap-8 mb-12">
+<div class="flex justify-between items-center border-b border-outline-variant pb-4">
+<div class="flex flex-col">
+<span class="text-[0.75rem] font-bold uppercase text-outline mb-1">Account Number</span>
+<span class="text-[1.5rem] font-black tracking-widest">•••• •••• 9876</span>
+</div>
+<span class="material-symbols-outlined text-outline">account_balance</span>
+</div>
+<div class="flex justify-between items-center border-b border-outline-variant pb-4">
+<div class="flex flex-col">
+<span class="text-[0.75rem] font-bold uppercase text-outline mb-1">IFSC Code</span>
+<span class="text-[1rem] font-bold">HDFC0001234</span>
+</div>
+</div>
+<div class="flex justify-between items-center border-b border-outline-variant pb-4">
+<div class="flex flex-col">
+<span class="text-[0.75rem] font-bold uppercase text-outline mb-1">UPI ID</span>
+<span class="text-[1rem] font-bold">rider.name@okbank</span>
+</div>
+</div>
+</div>
+<div class="flex flex-col gap-4">
+<div class="flex justify-between items-end mb-4">
+<span class="text-[1rem] font-bold">Available Balance</span>
+<span class="text-[2.5rem] font-black leading-none">₹ 4,250.00</span>
+</div>
+<button class="w-full bg-primary text-on-primary rounded-full py-6 text-[1rem] font-bold hover:bg-primary-container hover:scale-102 transition-all active:scale-95">
+                                WITHDRAW TO BANK
+                            </button>
+<p class="text-[0.75rem] text-center text-outline uppercase font-bold mt-2">Standard settlement takes 1-2 business days.</p>
+</div>
+</div>
+</section>
+</div>
+</div>
+</main>
+<!-- BottomNavBar from JSON for Mobile -->
+<nav class="fixed bottom-0 w-full flex justify-around items-center px-4 py-6 bg-surface border-t-2 border-primary z-50 md:hidden transition-colors">
+<a class="flex flex-col items-center justify-center text-primary opacity-60 hover:opacity-100 transition-opacity" href="#">
+<span class="material-symbols-outlined mb-1 text-[1.5rem]">checklist</span>
+<span class="font-['Inter'] text-[0.75rem] font-bold uppercase tracking-widest">Tasks</span>
+</a>
+<a class="flex flex-col items-center justify-center text-primary opacity-60 hover:opacity-100 transition-opacity" href="#">
+<span class="material-symbols-outlined mb-1 text-[1.5rem]">payments</span>
+<span class="font-['Inter'] text-[0.75rem] font-bold uppercase tracking-widest">Earnings</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-primary text-surface rounded-full px-6 py-2 scale-98 transition-all" href="#">
+<span class="material-symbols-outlined mb-1 text-[1.5rem]" style="font-variation-settings: 'FILL' 1;">person</span>
+<span class="font-['Inter'] text-[0.75rem] font-bold uppercase tracking-widest">Profile</span>
+</a>
+<a class="flex flex-col items-center justify-center text-primary opacity-60 hover:opacity-100 transition-opacity" href="#">
+<span class="material-symbols-outlined mb-1 text-[1.5rem]">contact_support</span>
+<span class="font-['Inter'] text-[0.75rem] font-bold uppercase tracking-widest">Support</span>
+</a>
+</nav>
+</body></html>

@@ -130,7 +130,7 @@ const ToLetTasksPanel = () => {
   };
 
   if (loading) {
-    return <div className="flex justify-center py-12"><div className="w-8 h-8 border-4 border-[#E07A5F] border-t-transparent rounded-full animate-spin"></div></div>;
+    return <div className="flex justify-center py-12"><div className="w-8 h-8 border-4 border-[var(--stitch-ink)] border-t-transparent rounded-full animate-spin"></div></div>;
   }
 
   return (
@@ -139,7 +139,7 @@ const ToLetTasksPanel = () => {
         <h2 className="text-2xl font-bold" style={{ fontFamily: 'Outfit' }}>ToLet Board Tasks</h2>
         <button
           onClick={() => setShowCreateModal(true)}
-          className="btn-primary flex items-center gap-2"
+          className="stitch-button flex items-center gap-2"
           data-testid="create-tolet-task-button"
         >
           <Plus className="w-4 h-4" />
@@ -165,9 +165,9 @@ const ToLetTasksPanel = () => {
                 <div className="flex items-start justify-between mb-3">
                   <div>
                     <h4 className="font-bold">{task.title}</h4>
-                    <p className="text-sm text-[#52525B]">{task.location}</p>
+                    <p className="text-sm text-[var(--stitch-muted)]">{task.location}</p>
                     {task.rider && (
-                      <p className="text-xs text-[#4ECDC4] mt-1">
+                      <p className="text-xs text-[var(--stitch-ink)] mt-1">
                         <User className="w-3 h-3 inline mr-1" />
                         {task.rider.name} ({task.rider.phone})
                       </p>
@@ -200,7 +200,7 @@ const ToLetTasksPanel = () => {
                 </div>
 
                 <div className="flex items-center justify-between pt-3 border-t">
-                  <span className="font-bold text-[#4ECDC4]">₹{task.earnings}</span>
+                  <span className="font-bold text-[var(--stitch-ink)]">₹{task.earnings}</span>
                   <div className="flex gap-2">
                     <button
                       onClick={() => setViewingPhotos(task)}
@@ -252,7 +252,7 @@ const ToLetTasksPanel = () => {
               <div className="sticky top-0 bg-white p-4 border-b flex items-center justify-between">
                 <div>
                   <h3 className="font-bold text-lg">{viewingPhotos.title}</h3>
-                  <p className="text-sm text-[#52525B]">
+                  <p className="text-sm text-[var(--stitch-muted)]">
                     {viewingPhotos.actual_boards_collected} boards • ₹{viewingPhotos.earnings}
                   </p>
                 </div>
@@ -265,7 +265,7 @@ const ToLetTasksPanel = () => {
                 {/* Photo Grid */}
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
                   {(viewingPhotos.proof_images || []).map((img, idx) => (
-                    <div key={idx} className="aspect-square rounded-xl overflow-hidden border-2 border-[#E5E3D8]">
+                    <div key={idx} className="aspect-square rounded-xl overflow-hidden border-2 border-[var(--stitch-line)]">
                       <img src={img} alt={`Board ${idx+1}`} className="w-full h-full object-cover" />
                       <div className="bg-black/50 text-white text-xs text-center py-1">Board #{idx+1}</div>
                     </div>
@@ -273,9 +273,9 @@ const ToLetTasksPanel = () => {
                 </div>
 
                 {viewingPhotos.notes && (
-                  <div className="bg-gray-50 rounded-xl p-4 mb-6">
+                  <div className="bg-[var(--stitch-soft)] rounded-xl p-4 mb-6">
                     <p className="text-sm font-medium mb-1">Rider Notes:</p>
-                    <p className="text-[#52525B]">{viewingPhotos.notes}</p>
+                    <p className="text-[var(--stitch-muted)]">{viewingPhotos.notes}</p>
                   </div>
                 )}
 
@@ -287,7 +287,7 @@ const ToLetTasksPanel = () => {
                       value={rejectionReason}
                       onChange={(e) => setRejectionReason(e.target.value)}
                       placeholder="Why are you rejecting this submission?"
-                      className="w-full px-4 py-3 border-2 border-[#111111] rounded-xl"
+                      className="w-full px-4 py-3 border border-[var(--stitch-line)] rounded-xl"
                       rows={2}
                     />
                   </div>
@@ -335,11 +335,11 @@ const ToLetTasksPanel = () => {
                 <div className="flex items-start justify-between">
                   <div>
                     <h4 className="font-bold">{task.title}</h4>
-                    <p className="text-sm text-[#4A626C]">{task.location}</p>
+                    <p className="text-sm text-[var(--stitch-muted)]">{task.location}</p>
                     <div className="flex items-center gap-4 mt-2 text-sm">
                       <span><User className="w-4 h-4 inline mr-1" />{task.rider?.name}</span>
                       <span>Boards: {task.actual_boards_collected}</span>
-                      <span className="text-[#2A9D8F] font-bold">₹{task.earnings}</span>
+                      <span className="text-[var(--stitch-ink)] font-bold">₹{task.earnings}</span>
                     </div>
                   </div>
                   <div className="flex gap-2">
@@ -368,19 +368,19 @@ const ToLetTasksPanel = () => {
       {/* All Tasks */}
       <div className="space-y-4">
         {tasks.length === 0 ? (
-          <div className="text-center py-12 bg-white rounded-xl border border-[#E5E3D8]">
-            <MapPin className="w-12 h-12 text-[#4A626C] mx-auto mb-3 opacity-50" />
-            <p className="text-[#4A626C]">No ToLet tasks created yet</p>
+          <div className="text-center py-12 bg-white rounded-xl border border-[var(--stitch-line)]">
+            <MapPin className="w-12 h-12 text-[var(--stitch-muted)] mx-auto mb-3 opacity-50" />
+            <p className="text-[var(--stitch-muted)]">No ToLet tasks created yet</p>
           </div>
         ) : (
           tasks.map(task => {
             const statusInfo = getStatusBadge(task.status);
             return (
-              <div key={task.id} className="bg-white rounded-xl border border-[#E5E3D8] p-4">
+              <div key={task.id} className="bg-white rounded-xl border border-[var(--stitch-line)] p-4">
                 <div className="flex items-start justify-between mb-3">
                   <div>
                     <h4 className="font-bold text-lg">{task.title}</h4>
-                    <p className="text-sm text-[#4A626C]">{task.description}</p>
+                    <p className="text-sm text-[var(--stitch-muted)]">{task.description}</p>
                   </div>
                   <span className={`px-3 py-1 rounded-full text-sm font-medium ${statusInfo.class}`}>
                     {statusInfo.text}
@@ -389,11 +389,11 @@ const ToLetTasksPanel = () => {
 
                 <div className="flex items-center gap-4 text-sm mb-3">
                   <span className="flex items-center gap-1">
-                    <MapPin className="w-4 h-4 text-[#E07A5F]" />
+                    <MapPin className="w-4 h-4 text-[var(--stitch-ink)]" />
                     {task.location}
                   </span>
                   <span className="flex items-center gap-1">
-                    <IndianRupee className="w-4 h-4 text-[#2A9D8F]" />
+                    <IndianRupee className="w-4 h-4 text-[var(--stitch-ink)]" />
                     {editingRate === task.id ? (
                       <div className="flex items-center gap-1">
                         <input
@@ -402,13 +402,13 @@ const ToLetTasksPanel = () => {
                           onChange={(e) => setNewRate(e.target.value)}
                           className="w-16 px-2 py-1 border rounded"
                         />
-                        <button onClick={() => handleUpdateRate(task.id)} className="text-[#2A9D8F]">
+                        <button onClick={() => handleUpdateRate(task.id)} className="text-[var(--stitch-ink)]">
                           <CheckCircle className="w-4 h-4" />
                         </button>
                       </div>
                     ) : (
                       <span 
-                        className="cursor-pointer hover:text-[#E07A5F]"
+                        className="cursor-pointer hover:text-[var(--stitch-ink)]"
                         onClick={() => { setEditingRate(task.id); setNewRate(task.rate_per_board.toString()); }}
                       >
                         ₹{task.rate_per_board}/board <Edit2 className="w-3 h-3 inline" />
@@ -420,7 +420,7 @@ const ToLetTasksPanel = () => {
 
                 {task.rider && (
                   <div className="bg-[#F3F2EB] rounded-lg p-2 mb-3 flex items-center gap-2">
-                    <User className="w-4 h-4 text-[#4A626C]" />
+                    <User className="w-4 h-4 text-[var(--stitch-muted)]" />
                     <span className="text-sm">Assigned to: <strong>{task.rider.name}</strong></span>
                   </div>
                 )}
@@ -429,7 +429,7 @@ const ToLetTasksPanel = () => {
                   <div className="flex gap-2">
                     <button
                       onClick={() => setShowAssignModal(task)}
-                      className="btn-secondary flex-1 flex items-center justify-center gap-2"
+                      className="stitch-button stitch-button-secondary flex-1 flex items-center justify-center gap-2"
                       data-testid={`assign-task-${task.id}`}
                     >
                       <Send className="w-4 h-4" />
@@ -509,10 +509,10 @@ const ToLetTasksPanel = () => {
             </div>
 
             <div className="flex gap-3 mt-6">
-              <button onClick={() => setShowCreateModal(false)} className="btn-secondary flex-1">
+              <button onClick={() => setShowCreateModal(false)} className="stitch-button stitch-button-secondary flex-1">
                 Cancel
               </button>
-              <button onClick={handleCreateTask} className="btn-primary flex-1" data-testid="submit-task-button">
+              <button onClick={handleCreateTask} className="stitch-button flex-1" data-testid="submit-task-button">
                 Create & Notify Riders
               </button>
             </div>
@@ -525,25 +525,25 @@ const ToLetTasksPanel = () => {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl max-w-md w-full p-6">
             <h3 className="text-xl font-bold mb-4">Assign Task to Rider</h3>
-            <p className="text-sm text-[#4A626C] mb-4">{showAssignModal.title}</p>
+            <p className="text-sm text-[var(--stitch-muted)] mb-4">{showAssignModal.title}</p>
             
             {riders.length === 0 ? (
-              <p className="text-center py-6 text-[#4A626C]">No online riders available</p>
+              <p className="text-center py-6 text-[var(--stitch-muted)]">No online riders available</p>
             ) : (
               <div className="space-y-2 max-h-60 overflow-y-auto">
                 {riders.map(rider => (
                   <button
                     key={rider.id}
                     onClick={() => handleAssignTask(showAssignModal.id, rider.id)}
-                    className="w-full p-3 bg-[#F3F2EB] rounded-lg hover:bg-[#E5E3D8] flex items-center gap-3 text-left"
+                    className="w-full p-3 bg-[#F3F2EB] rounded-lg hover:bg-[var(--stitch-line)] flex items-center gap-3 text-left"
                     data-testid={`select-rider-${rider.id}`}
                   >
-                    <div className="w-10 h-10 bg-[#E07A5F] text-white rounded-full flex items-center justify-center font-bold">
+                    <div className="w-10 h-10 bg-[var(--stitch-ink)] text-white rounded-full flex items-center justify-center font-bold">
                       {rider.name?.charAt(0)}
                     </div>
                     <div>
                       <p className="font-medium">{rider.name}</p>
-                      <p className="text-xs text-[#4A626C]">{rider.phone}</p>
+                      <p className="text-xs text-[var(--stitch-muted)]">{rider.phone}</p>
                     </div>
                     <div className="ml-auto w-2 h-2 bg-green-500 rounded-full"></div>
                   </button>
@@ -551,7 +551,7 @@ const ToLetTasksPanel = () => {
               </div>
             )}
 
-            <button onClick={() => setShowAssignModal(null)} className="btn-secondary w-full mt-4">
+            <button onClick={() => setShowAssignModal(null)} className="stitch-button stitch-button-secondary w-full mt-4">
               Cancel
             </button>
           </div>

@@ -258,12 +258,12 @@ const ImageMigrationTool = ({ onClose }) => {
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="bg-white w-full max-w-5xl max-h-[90vh] overflow-hidden border border-[#E5E1DB]"
+        className="bg-white w-full max-w-5xl max-h-[90vh] overflow-hidden border border-[var(--stitch-line)]"
       >
         {/* Header */}
-        <div className="bg-[#04473C] p-5 flex items-center justify-between">
+        <div className="bg-[var(--stitch-ink)] p-5 flex items-center justify-between">
           <div>
-            <h2 className="text-xl font-medium text-white" style={{ fontFamily: 'Playfair Display, serif' }}>
+            <h2 className="text-xl font-medium text-white" >
               Image & Video Manager
             </h2>
             <p className="text-sm text-white/70">Restore your original uploads or add new images</p>
@@ -277,16 +277,16 @@ const ImageMigrationTool = ({ onClose }) => {
         </div>
 
         {/* Server Files Section */}
-        <div className="p-4 bg-[#C6A87C]/10 border-b border-[#E5E1DB]">
+        <div className="p-4 bg-[var(--stitch-muted)]/10 border-b border-[var(--stitch-line)]">
           <div className="flex items-center gap-2 mb-3">
-            <Folder className="w-5 h-5 text-[#C6A87C]" />
-            <h3 className="font-medium text-[#1A1C20]">Your Original Uploads ({serverFiles.images.length} images, {serverFiles.videos.length} videos)</h3>
+            <Folder className="w-5 h-5 text-[var(--stitch-muted)]" />
+            <h3 className="font-medium text-[var(--stitch-ink)]">Your Original Uploads ({serverFiles.images.length} images, {serverFiles.videos.length} videos)</h3>
           </div>
           <div className="flex gap-2 flex-wrap">
             {serverFiles.images.slice(0, 6).map((img, idx) => (
               <div 
                 key={idx}
-                className="w-16 h-16 border border-[#E5E1DB] overflow-hidden cursor-pointer hover:ring-2 ring-[#04473C] transition-all"
+                className="w-16 h-16 border border-[var(--stitch-line)] overflow-hidden cursor-pointer hover:ring-2 ring-[var(--stitch-ink)] transition-all"
                 onClick={() => setPreviewFile({ url: img, type: 'image' })}
               >
                 <img 
@@ -298,38 +298,38 @@ const ImageMigrationTool = ({ onClose }) => {
               </div>
             ))}
             {serverFiles.images.length > 6 && (
-              <div className="w-16 h-16 bg-[#F5F3F0] border border-[#E5E1DB] flex items-center justify-center text-sm font-medium text-[#4A4D53]">
+              <div className="w-16 h-16 bg-[var(--stitch-soft)] border border-[var(--stitch-line)] flex items-center justify-center text-sm font-medium text-[var(--stitch-muted)]">
                 +{serverFiles.images.length - 6}
               </div>
             )}
             {serverFiles.videos.map((vid, idx) => (
               <div 
                 key={`vid-${idx}`}
-                className="w-16 h-16 bg-[#1A1C20] border border-[#E5E1DB] flex items-center justify-center cursor-pointer hover:ring-2 ring-[#04473C] transition-all"
+                className="w-16 h-16 bg-[var(--stitch-ink)] border border-[var(--stitch-line)] flex items-center justify-center cursor-pointer hover:ring-2 ring-[var(--stitch-ink)] transition-all"
                 onClick={() => setPreviewFile({ url: vid, type: 'video' })}
               >
                 <Video className="w-6 h-6 text-white" />
               </div>
             ))}
           </div>
-          <p className="text-xs text-[#4A4D53] mt-2">
+          <p className="text-xs text-[var(--stitch-muted)] mt-2">
             Click on any property below, then use "Add from Server" to restore your original images
           </p>
         </div>
 
         {/* Actions Bar */}
-        <div className="p-4 border-b border-[#E5E1DB] flex gap-3">
+        <div className="p-4 border-b border-[var(--stitch-line)] flex gap-3">
           <button
             onClick={checkAllImages}
             disabled={checking}
-            className="btn-secondary flex items-center gap-2 text-sm"
+            className="stitch-button stitch-button-secondary flex items-center gap-2 text-sm"
           >
             <RefreshCw className={`w-4 h-4 ${checking ? 'animate-spin' : ''}`} />
             {checking ? 'Checking...' : 'Check Images'}
           </button>
           <button
             onClick={fetchProperties}
-            className="px-4 py-2 border border-[#E5E1DB] hover:bg-[#F5F3F0] flex items-center gap-2 text-sm font-medium"
+            className="px-4 py-2 border border-[var(--stitch-line)] hover:bg-[var(--stitch-soft)] flex items-center gap-2 text-sm font-medium"
           >
             <RefreshCw className="w-4 h-4" />
             Refresh
@@ -340,7 +340,7 @@ const ImageMigrationTool = ({ onClose }) => {
         <div className="p-4 overflow-y-auto max-h-[50vh]">
           {loading ? (
             <div className="flex items-center justify-center py-12">
-              <RefreshCw className="w-8 h-8 animate-spin text-[#04473C]" />
+              <RefreshCw className="w-8 h-8 animate-spin text-[var(--stitch-ink)]" />
             </div>
           ) : (
             <div className="space-y-4">
@@ -353,10 +353,10 @@ const ImageMigrationTool = ({ onClose }) => {
                     key={property.id}
                     className={`p-4 border transition-all cursor-pointer ${
                       isSelected 
-                        ? 'border-[#04473C] bg-[#E6F0EE]' 
+                        ? 'border-[var(--stitch-ink)] bg-[var(--stitch-soft)]' 
                         : hasIssues 
-                          ? 'border-[#C6A87C] bg-[#C6A87C]/5' 
-                          : 'border-[#E5E1DB] hover:border-[#D0C9C0]'
+                          ? 'border-[var(--stitch-muted)] bg-[var(--stitch-muted)]/5' 
+                          : 'border-[var(--stitch-line)] hover:border-[var(--stitch-muted)]'
                     }`}
                     onClick={() => setSelectedProperty(isSelected ? null : property.id)}
                   >
@@ -364,12 +364,12 @@ const ImageMigrationTool = ({ onClose }) => {
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-2">
                           {hasIssues ? (
-                            <AlertTriangle className="w-4 h-4 text-[#C6A87C]" />
+                            <AlertTriangle className="w-4 h-4 text-[var(--stitch-muted)]" />
                           ) : (
-                            <CheckCircle className="w-4 h-4 text-[#04473C]" />
+                            <CheckCircle className="w-4 h-4 text-[var(--stitch-ink)]" />
                           )}
-                          <h3 className="font-medium text-[#1A1C20]">{property.title}</h3>
-                          <span className="text-xs text-[#4A4D53]">({(property.images || []).length} images)</span>
+                          <h3 className="font-medium text-[var(--stitch-ink)]">{property.title}</h3>
+                          <span className="text-xs text-[var(--stitch-muted)]">({(property.images || []).length} images)</span>
                         </div>
                         
                         {/* Current Images */}
@@ -382,7 +382,7 @@ const ImageMigrationTool = ({ onClose }) => {
                               <div
                                 key={idx}
                                 className={`relative w-14 h-14 overflow-hidden border ${
-                                  isWorking ? 'border-[#04473C]' : 'border-[#C6A87C]'
+                                  isWorking ? 'border-[var(--stitch-ink)]' : 'border-[var(--stitch-muted)]'
                                 }`}
                               >
                                 <img
@@ -406,13 +406,13 @@ const ImageMigrationTool = ({ onClose }) => {
                             );
                           })}
                           {(!property.images || property.images.length === 0) && (
-                            <span className="text-sm text-[#4A4D53] italic">No images</span>
+                            <span className="text-sm text-[var(--stitch-muted)] italic">No images</span>
                           )}
                         </div>
                         
                         {/* Video */}
                         {property.video_url && (
-                          <div className="mt-2 flex items-center gap-2 text-xs text-[#4A4D53]">
+                          <div className="mt-2 flex items-center gap-2 text-xs text-[var(--stitch-muted)]">
                             <Video className="w-3 h-3" />
                             Has video
                           </div>
@@ -427,13 +427,13 @@ const ImageMigrationTool = ({ onClose }) => {
                               e.stopPropagation();
                               setShowFilePicker(true);
                             }}
-                            className="btn-primary text-xs px-3 py-2 flex items-center gap-1"
+                            className="stitch-button text-xs px-3 py-2 flex items-center gap-1"
                           >
                             <Folder className="w-3 h-3" />
                             Add from Server
                           </button>
                           
-                          <label className="btn-secondary text-xs px-3 py-2 flex items-center gap-1 cursor-pointer">
+                          <label className="stitch-button stitch-button-secondary text-xs px-3 py-2 flex items-center gap-1 cursor-pointer">
                             <Upload className="w-3 h-3" />
                             {uploading[property.id] ? 'Uploading...' : 'Upload New'}
                             <input
@@ -456,7 +456,7 @@ const ImageMigrationTool = ({ onClose }) => {
                               replaceAllWithExternal(property.id);
                             }}
                             disabled={uploading[property.id]}
-                            className="text-xs px-3 py-2 border border-[#E5E1DB] hover:bg-[#F5F3F0] flex items-center gap-1"
+                            className="text-xs px-3 py-2 border border-[var(--stitch-line)] hover:bg-[var(--stitch-soft)] flex items-center gap-1"
                           >
                             <Image className="w-3 h-3" />
                             Use Stock
@@ -472,8 +472,8 @@ const ImageMigrationTool = ({ onClose }) => {
         </div>
 
         {/* Footer */}
-        <div className="p-4 border-t border-[#E5E1DB] bg-[#F5F3F0]">
-          <p className="text-xs text-[#4A4D53]">
+        <div className="p-4 border-t border-[var(--stitch-line)] bg-[var(--stitch-soft)]">
+          <p className="text-xs text-[var(--stitch-muted)]">
             <strong>How to restore:</strong> Click on a property → Click "Add from Server" → Select your original images from the picker
           </p>
         </div>
@@ -493,10 +493,10 @@ const ImageMigrationTool = ({ onClose }) => {
               initial={{ scale: 0.9 }}
               animate={{ scale: 1 }}
               exit={{ scale: 0.9 }}
-              className="bg-white w-full max-w-2xl max-h-[80vh] overflow-hidden border border-[#E5E1DB]"
+              className="bg-white w-full max-w-2xl max-h-[80vh] overflow-hidden border border-[var(--stitch-line)]"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="bg-[#04473C] p-4 flex items-center justify-between">
+              <div className="bg-[var(--stitch-ink)] p-4 flex items-center justify-between">
                 <h3 className="text-lg font-medium text-white">Select from Your Uploads</h3>
                 <button onClick={() => setShowFilePicker(false)} className="p-1 hover:bg-white/10">
                   <X className="w-5 h-5 text-white" />
@@ -504,12 +504,12 @@ const ImageMigrationTool = ({ onClose }) => {
               </div>
               
               <div className="p-4 overflow-y-auto max-h-[60vh]">
-                <h4 className="font-medium text-sm text-[#4A4D53] mb-3 uppercase tracking-wide">Images</h4>
+                <h4 className="font-medium text-sm text-[var(--stitch-muted)] mb-3 uppercase tracking-wide">Images</h4>
                 <div className="grid grid-cols-4 gap-3 mb-6">
                   {serverFiles.images.map((img, idx) => (
                     <div
                       key={idx}
-                      className="aspect-square border border-[#E5E1DB] overflow-hidden cursor-pointer hover:ring-2 ring-[#04473C] transition-all group relative"
+                      className="aspect-square border border-[var(--stitch-line)] overflow-hidden cursor-pointer hover:ring-2 ring-[var(--stitch-ink)] transition-all group relative"
                       onClick={() => addServerFileToProperty(selectedProperty, img)}
                     >
                       <img 
@@ -518,23 +518,23 @@ const ImageMigrationTool = ({ onClose }) => {
                         className="w-full h-full object-cover"
                         onError={(e) => e.target.src = 'https://via.placeholder.com/100?text=?'}
                       />
-                      <div className="absolute inset-0 bg-[#04473C]/0 group-hover:bg-[#04473C]/50 transition-colors flex items-center justify-center">
+                      <div className="absolute inset-0 bg-[var(--stitch-ink)]/0 group-hover:bg-black/50 transition-colors flex items-center justify-center">
                         <Plus className="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
                       </div>
                     </div>
                   ))}
                 </div>
                 
-                <h4 className="font-medium text-sm text-[#4A4D53] mb-3 uppercase tracking-wide">Videos</h4>
+                <h4 className="font-medium text-sm text-[var(--stitch-muted)] mb-3 uppercase tracking-wide">Videos</h4>
                 <div className="grid grid-cols-4 gap-3">
                   {serverFiles.videos.map((vid, idx) => (
                     <div
                       key={idx}
-                      className="aspect-square bg-[#1A1C20] border border-[#E5E1DB] overflow-hidden cursor-pointer hover:ring-2 ring-[#04473C] transition-all group relative flex items-center justify-center"
+                      className="aspect-square bg-[var(--stitch-ink)] border border-[var(--stitch-line)] overflow-hidden cursor-pointer hover:ring-2 ring-[var(--stitch-ink)] transition-all group relative flex items-center justify-center"
                       onClick={() => setPropertyVideo(selectedProperty, vid)}
                     >
                       <Video className="w-8 h-8 text-white" />
-                      <div className="absolute inset-0 bg-[#04473C]/0 group-hover:bg-[#04473C]/50 transition-colors flex items-center justify-center">
+                      <div className="absolute inset-0 bg-[var(--stitch-ink)]/0 group-hover:bg-black/50 transition-colors flex items-center justify-center">
                         <Plus className="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
                       </div>
                       <span className="absolute bottom-1 left-1 right-1 text-[8px] text-white/70 truncate">

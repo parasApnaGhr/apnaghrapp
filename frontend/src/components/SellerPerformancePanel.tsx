@@ -13,7 +13,7 @@ const PERFORMANCE_TAGS = {
   'Top Performer': { color: 'bg-gradient-to-r from-yellow-400 to-yellow-500', icon: Trophy, textColor: 'text-yellow-900' },
   'Good': { color: 'bg-gradient-to-r from-green-400 to-green-500', icon: Star, textColor: 'text-green-900' },
   'Average': { color: 'bg-gradient-to-r from-blue-400 to-blue-500', icon: Target, textColor: 'text-blue-900' },
-  'Low': { color: 'bg-gradient-to-r from-gray-400 to-gray-500', icon: TrendingUp, textColor: 'text-gray-900' }
+  'Low': { color: 'bg-gradient-to-r from-gray-400 to-gray-500', icon: TrendingUp, textColor: 'text-[var(--stitch-ink)]' }
 };
 
 const SellerPerformancePanel = () => {
@@ -50,7 +50,7 @@ const SellerPerformancePanel = () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center py-12">
-        <RefreshCw className="w-8 h-8 text-[#04473C] animate-spin" />
+        <RefreshCw className="w-8 h-8 text-[var(--stitch-ink)] animate-spin" />
       </div>
     );
   }
@@ -61,7 +61,7 @@ const SellerPerformancePanel = () => {
   return (
     <div className="space-y-6">
       {/* Performance Header */}
-      <div className="bg-gradient-to-br from-[#04473C] to-[#065f4e] rounded-2xl p-6 text-white">
+      <div className="bg-gradient-to-br from-[var(--stitch-ink)] to-[var(--stitch-ink)] rounded-2xl p-6 text-white">
         <div className="flex items-center justify-between mb-4">
           <div>
             <h2 className="text-2xl font-bold">My Performance</h2>
@@ -105,8 +105,8 @@ const SellerPerformancePanel = () => {
             onClick={() => setActiveTab(tab.id)}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium whitespace-nowrap transition-all ${
               activeTab === tab.id
-                ? 'bg-[#04473C] text-white'
-                : 'bg-[#E5E1DB] text-[#4A4D53] hover:bg-[#d5d1cb]'
+                ? 'bg-[var(--stitch-ink)] text-white'
+                : 'bg-[var(--stitch-line)] text-[var(--stitch-muted)] hover:bg-[#d5d1cb]'
             }`}
           >
             <tab.icon className="w-4 h-4" />
@@ -159,12 +159,12 @@ const SellerPerformancePanel = () => {
           animate={{ opacity: 1, y: 0 }}
           className="space-y-4"
         >
-          <div className="bg-white rounded-xl border border-[#E5E1DB] p-6">
-            <h3 className="font-semibold text-[#1A1C20] mb-4">Today's Progress</h3>
+          <div className="bg-white rounded-xl border border-[var(--stitch-line)] p-6">
+            <h3 className="font-semibold text-[var(--stitch-ink)] mb-4">Today's Progress</h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="text-center p-4 bg-[#04473C]/5 rounded-xl">
-                <p className="text-3xl font-bold text-[#04473C]">{performance?.today?.score || 0}</p>
-                <p className="text-sm text-[#4A4D53]">Today's Score</p>
+              <div className="text-center p-4 bg-black/5 rounded-xl">
+                <p className="text-3xl font-bold text-[var(--stitch-ink)]">{performance?.today?.score || 0}</p>
+                <p className="text-sm text-[var(--stitch-muted)]">Today's Score</p>
               </div>
               <div className="text-center p-4 bg-blue-50 rounded-xl">
                 <p className="text-3xl font-bold text-blue-600">{performance?.today?.properties_shared || 0}</p>
@@ -182,9 +182,9 @@ const SellerPerformancePanel = () => {
           </div>
 
           {/* Scoring Formula */}
-          <div className="bg-gradient-to-br from-[#C6A87C]/10 to-[#04473C]/5 rounded-xl p-4 border border-[#C6A87C]/20">
-            <h4 className="font-semibold text-[#1A1C20] mb-2">How Score is Calculated:</h4>
-            <div className="space-y-1 text-sm text-[#4A4D53]">
+          <div className="bg-gradient-to-br from-[var(--stitch-muted)]/10 to-[var(--stitch-ink)]/5 rounded-xl p-4 border border-[var(--stitch-muted)]/20">
+            <h4 className="font-semibold text-[var(--stitch-ink)] mb-2">How Score is Calculated:</h4>
+            <div className="space-y-1 text-sm text-[var(--stitch-muted)]">
               <p>• Properties Shared × 1 point</p>
               <p>• Visits Booked × 5 points</p>
               <p>• Deals Closed × 20 points</p>
@@ -201,8 +201,8 @@ const SellerPerformancePanel = () => {
           animate={{ opacity: 1, y: 0 }}
           className="space-y-4"
         >
-          <div className="bg-white rounded-xl border border-[#E5E1DB] p-6">
-            <h3 className="font-semibold text-[#1A1C20] mb-4">Earnings This Month</h3>
+          <div className="bg-white rounded-xl border border-[var(--stitch-line)] p-6">
+            <h3 className="font-semibold text-[var(--stitch-ink)] mb-4">Earnings This Month</h3>
             
             <div className="space-y-4">
               {/* Performance Bonus */}
@@ -212,8 +212,8 @@ const SellerPerformancePanel = () => {
                     <Zap className="w-5 h-5 text-green-600" />
                   </div>
                   <div>
-                    <p className="font-medium text-[#1A1C20]">Performance Bonus</p>
-                    <p className="text-sm text-[#4A4D53]">100 points = ₹50</p>
+                    <p className="font-medium text-[var(--stitch-ink)]">Performance Bonus</p>
+                    <p className="text-sm text-[var(--stitch-muted)]">100 points = ₹50</p>
                   </div>
                 </div>
                 <p className="text-xl font-bold text-green-600">
@@ -228,8 +228,8 @@ const SellerPerformancePanel = () => {
                     <Award className="w-5 h-5 text-purple-600" />
                   </div>
                   <div>
-                    <p className="font-medium text-[#1A1C20]">High Performer Bonus</p>
-                    <p className="text-sm text-[#4A4D53]">
+                    <p className="font-medium text-[var(--stitch-ink)]">High Performer Bonus</p>
+                    <p className="text-sm text-[var(--stitch-muted)]">
                       {performance?.monthly?.deals >= 20 ? '20+ deals' :
                        performance?.monthly?.deals >= 15 ? '15+ deals' :
                        performance?.monthly?.deals >= 10 ? '10+ deals' : 'Reach 10 deals'}
@@ -242,7 +242,7 @@ const SellerPerformancePanel = () => {
               </div>
 
               {/* Total */}
-              <div className="flex items-center justify-between p-4 bg-[#04473C] rounded-xl text-white">
+              <div className="flex items-center justify-between p-4 bg-[var(--stitch-ink)] rounded-xl text-white">
                 <p className="font-semibold">Total Bonus Earnings</p>
                 <p className="text-2xl font-bold">
                   ₹{((performance?.monthly?.performance_bonus || 0) + (performance?.monthly?.high_performer_bonus || 0)).toLocaleString()}
@@ -253,16 +253,16 @@ const SellerPerformancePanel = () => {
 
           {/* Predictions */}
           {performance?.predictions?.length > 0 && (
-            <div className="bg-gradient-to-br from-[#C6A87C]/10 to-[#04473C]/5 rounded-xl p-4 border border-[#C6A87C]/20">
-              <h4 className="font-semibold text-[#1A1C20] mb-3 flex items-center gap-2">
-                <TrendingUp className="w-5 h-5 text-[#C6A87C]" />
+            <div className="bg-gradient-to-br from-[var(--stitch-muted)]/10 to-[var(--stitch-ink)]/5 rounded-xl p-4 border border-[var(--stitch-muted)]/20">
+              <h4 className="font-semibold text-[var(--stitch-ink)] mb-3 flex items-center gap-2">
+                <TrendingUp className="w-5 h-5 text-[var(--stitch-muted)]" />
                 Earnings Prediction
               </h4>
               <div className="space-y-2">
                 {performance.predictions.map((pred, idx) => (
                   <div key={idx} className="flex items-center gap-2 text-sm">
                     <ArrowUp className="w-4 h-4 text-green-500" />
-                    <span className="text-[#4A4D53]">{pred.message}</span>
+                    <span className="text-[var(--stitch-muted)]">{pred.message}</span>
                   </div>
                 ))}
               </div>
@@ -270,8 +270,8 @@ const SellerPerformancePanel = () => {
           )}
 
           {/* Commission Structure */}
-          <div className="bg-white rounded-xl border border-[#E5E1DB] p-4">
-            <h4 className="font-semibold text-[#1A1C20] mb-3">Commission Structure (Per Deal)</h4>
+          <div className="bg-white rounded-xl border border-[var(--stitch-line)] p-4">
+            <h4 className="font-semibold text-[var(--stitch-ink)] mb-3">Commission Structure (Per Deal)</h4>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-sm">
               {[
                 { range: '₹10k-15k', commission: '₹500' },
@@ -286,9 +286,9 @@ const SellerPerformancePanel = () => {
                 { range: '₹71k-1L', commission: '₹8,000' },
                 { range: '₹1.05L-1.5L', commission: '₹10,000' },
               ].map((item, idx) => (
-                <div key={idx} className="flex justify-between p-2 bg-gray-50 rounded-lg">
-                  <span className="text-[#4A4D53]">{item.range}</span>
-                  <span className="font-semibold text-[#04473C]">{item.commission}</span>
+                <div key={idx} className="flex justify-between p-2 bg-[var(--stitch-soft)] rounded-lg">
+                  <span className="text-[var(--stitch-muted)]">{item.range}</span>
+                  <span className="font-semibold text-[var(--stitch-ink)]">{item.commission}</span>
                 </div>
               ))}
             </div>
@@ -303,18 +303,18 @@ const SellerPerformancePanel = () => {
           className="space-y-3"
         >
           {history.length === 0 ? (
-            <div className="text-center py-8 text-[#4A4D53]">
+            <div className="text-center py-8 text-[var(--stitch-muted)]">
               No activity history yet
             </div>
           ) : (
             history.map((activity, idx) => (
               <div
                 key={idx}
-                className="bg-white rounded-xl border border-[#E5E1DB] p-4 flex items-center justify-between"
+                className="bg-white rounded-xl border border-[var(--stitch-line)] p-4 flex items-center justify-between"
               >
                 <div>
-                  <p className="font-medium text-[#1A1C20]">{activity.date}</p>
-                  <div className="flex gap-4 text-sm text-[#4A4D53] mt-1">
+                  <p className="font-medium text-[var(--stitch-ink)]">{activity.date}</p>
+                  <div className="flex gap-4 text-sm text-[var(--stitch-muted)] mt-1">
                     <span>📤 {activity.properties_shared || 0} shared</span>
                     <span>📅 {activity.visits_booked || 0} visits</span>
                     <span>🤝 {activity.deals_closed || 0} deals</span>
@@ -327,7 +327,7 @@ const SellerPerformancePanel = () => {
                   }`}>
                     {activity.daily_score || 0}
                   </p>
-                  <p className="text-xs text-[#4A4D53]">points</p>
+                  <p className="text-xs text-[var(--stitch-muted)]">points</p>
                 </div>
               </div>
             ))
@@ -353,14 +353,14 @@ const StatCard = ({ icon: Icon, label, value, target, color }) => {
     <div className={`${c.bg} rounded-xl p-4`}>
       <div className="flex items-center gap-2 mb-2">
         <Icon className={`w-4 h-4 ${c.text}`} />
-        <span className="text-sm text-[#4A4D53]">{label}</span>
+        <span className="text-sm text-[var(--stitch-muted)]">{label}</span>
       </div>
       <p className={`text-2xl font-bold ${c.text}`}>{value}</p>
       <div className="mt-2">
         <div className="h-1.5 bg-white rounded-full overflow-hidden">
           <div className={`h-full ${c.bar} rounded-full transition-all`} style={{ width: `${percentage}%` }} />
         </div>
-        <p className="text-xs text-[#4A4D53] mt-1">{percentage}% of target ({target})</p>
+        <p className="text-xs text-[var(--stitch-muted)] mt-1">{percentage}% of target ({target})</p>
       </div>
     </div>
   );

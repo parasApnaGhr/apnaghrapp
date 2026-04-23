@@ -103,8 +103,8 @@ const RiderManagementPanel = () => {
     return (
       <div className="flex items-center justify-center py-20">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-[#E07A5F] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-[#4A626C]">Loading riders...</p>
+          <div className="w-16 h-16 border-4 border-[var(--stitch-ink)] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-[var(--stitch-muted)]">Loading riders...</p>
         </div>
       </div>
     );
@@ -118,53 +118,53 @@ const RiderManagementPanel = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-6">
         <div className="stat-card">
-          <p className="text-sm text-[#4A626C] mb-1">Total Riders</p>
+          <p className="text-sm text-[var(--stitch-muted)] mb-1">Total Riders</p>
           <p className="text-3xl font-bold" style={{ fontFamily: 'Outfit' }}>{riders.length}</p>
         </div>
         <div className="stat-card">
-          <p className="text-sm text-[#4A626C] mb-1">On Duty</p>
-          <p className="text-3xl font-bold text-[#2A9D8F]" style={{ fontFamily: 'Outfit' }}>
+          <p className="text-sm text-[var(--stitch-muted)] mb-1">On Duty</p>
+          <p className="text-3xl font-bold text-[var(--stitch-ink)]" style={{ fontFamily: 'Outfit' }}>
             {riders.filter(r => r.on_duty).length}
           </p>
         </div>
         <div className="stat-card">
-          <p className="text-sm text-[#4A626C] mb-1">With Location</p>
-          <p className="text-3xl font-bold text-[#E07A5F]" style={{ fontFamily: 'Outfit' }}>
+          <p className="text-sm text-[var(--stitch-muted)] mb-1">With Location</p>
+          <p className="text-3xl font-bold text-[var(--stitch-ink)]" style={{ fontFamily: 'Outfit' }}>
             {riders.filter(r => r.current_lat && r.current_lng).length}
           </p>
         </div>
         <div className="stat-card">
-          <p className="text-sm text-[#4A626C] mb-1">Available</p>
+          <p className="text-sm text-[var(--stitch-muted)] mb-1">Available</p>
           <p className="text-3xl font-bold text-[#F4A261]" style={{ fontFamily: 'Outfit' }}>
             {riders.filter(r => r.on_duty && !r.current_visit).length}
           </p>
         </div>
       </div>
 
-      <div className="bg-white rounded-xl border border-[#E5E3D8] p-6 mb-6">
+      <div className="bg-white rounded-xl border border-[var(--stitch-line)] p-6 mb-6">
         <h3 className="font-bold mb-4">Live Rider Status</h3>
         {riders.length === 0 ? (
           <div className="text-center py-12">
-            <Bike className="w-16 h-16 text-[#4A626C] mx-auto mb-4 opacity-50" />
-            <p className="text-[#4A626C]">No riders registered yet</p>
+            <Bike className="w-16 h-16 text-[var(--stitch-muted)] mx-auto mb-4 opacity-50" />
+            <p className="text-[var(--stitch-muted)]">No riders registered yet</p>
           </div>
         ) : (
           <div className="space-y-3">
             {riders.map((rider) => (
               <div
                 key={rider.id}
-                className="border border-[#E5E3D8] rounded-lg p-4 hover:shadow-md transition"
+                className="border border-[var(--stitch-line)] rounded-lg p-4 hover:shadow-md transition"
                 data-testid={`rider-${rider.id}`}
               >
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 bg-gradient-to-br from-[#E07A5F] to-[#F4A261] rounded-full flex items-center justify-center text-white font-bold text-lg">
+                    <div className="w-12 h-12 bg-gradient-to-br from-[var(--stitch-ink)] to-[#F4A261] rounded-full flex items-center justify-center text-white font-bold text-lg">
                       {rider.user?.name?.charAt(0).toUpperCase() || 'R'}
                     </div>
                     <div>
                       <h4 className="font-bold text-lg">{rider.user?.name || 'Rider'}</h4>
-                      <p className="text-sm text-[#4A626C]">{rider.user?.phone || 'No phone'}</p>
-                      <p className="text-xs text-[#4A626C]">
+                      <p className="text-sm text-[var(--stitch-muted)]">{rider.user?.phone || 'No phone'}</p>
+                      <p className="text-xs text-[var(--stitch-muted)]">
                         {rider.city} • {rider.vehicle_type}
                       </p>
                     </div>
@@ -183,15 +183,15 @@ const RiderManagementPanel = () => {
 
                 <div className="grid grid-cols-3 gap-4 mb-3 p-3 bg-[#F3F2EB] rounded-lg">
                   <div>
-                    <p className="text-xs text-[#4A626C]">KM Today</p>
+                    <p className="text-xs text-[var(--stitch-muted)]">KM Today</p>
                     <p className="text-lg font-bold">{rider.km_today || 0} km</p>
                   </div>
                   <div>
-                    <p className="text-xs text-[#4A626C]">Bonus Earned</p>
-                    <p className="text-lg font-bold text-[#2A9D8F]">₹{getTotalEarnings(rider.id)}</p>
+                    <p className="text-xs text-[var(--stitch-muted)]">Bonus Earned</p>
+                    <p className="text-lg font-bold text-[var(--stitch-ink)]">₹{getTotalEarnings(rider.id)}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-[#4A626C]">Last Update</p>
+                    <p className="text-xs text-[var(--stitch-muted)]">Last Update</p>
                     <p className="text-xs font-bold">
                       {rider.last_location_update 
                         ? new Date(rider.last_location_update).toLocaleTimeString()
@@ -204,7 +204,7 @@ const RiderManagementPanel = () => {
                   <button
                     onClick={() => handleTrackLocation(rider)}
                     disabled={!rider.current_lat || !rider.current_lng}
-                    className={`btn-secondary flex-1 flex items-center justify-center gap-2 text-sm ${
+                    className={`stitch-button variant-secondary flex-1 flex items-center justify-center gap-2 text-sm ${
                       !rider.current_lat || !rider.current_lng ? 'opacity-50 cursor-not-allowed' : ''
                     }`}
                     data-testid={`track-${rider.id}`}
@@ -214,7 +214,7 @@ const RiderManagementPanel = () => {
                   </button>
                   <button
                     onClick={() => setShowBonusModal(rider)}
-                    className="flex-1 px-4 py-2 bg-[#2A9D8F] text-white rounded-lg hover:bg-[#238276] flex items-center justify-center gap-2 text-sm transition"
+                    className="flex-1 px-4 py-2 bg-[var(--stitch-ink)] text-white rounded-lg hover:bg-[#238276] flex items-center justify-center gap-2 text-sm transition"
                     data-testid={`bonus-${rider.id}`}
                   >
                     <DollarSign className="w-4 h-4" />
@@ -239,12 +239,12 @@ const RiderManagementPanel = () => {
       {selectedRider && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
-            <div className="p-6 border-b border-[#E5E3D8] flex items-center justify-between">
+            <div className="p-6 border-b border-[var(--stitch-line)] flex items-center justify-between">
               <div>
                 <h3 className="text-2xl font-bold" style={{ fontFamily: 'Outfit' }}>
                   Live Rider Location
                 </h3>
-                <p className="text-sm text-[#4A626C]">
+                <p className="text-sm text-[var(--stitch-muted)]">
                   Tracking: {selectedRider.user?.name || 'Rider'} • {selectedRider.city}
                 </p>
               </div>
@@ -272,7 +272,7 @@ const RiderManagementPanel = () => {
                       <p className="font-bold">{selectedRider.user?.name || 'Rider'}</p>
                       <p className="text-sm">Status: {selectedRider.on_duty ? 'On Duty' : 'Off Duty'}</p>
                       <p className="text-sm">KM Today: {selectedRider.km_today || 0}</p>
-                      <p className="text-xs text-gray-500 mt-1">
+                      <p className="text-xs text-[var(--stitch-muted)] mt-1">
                         Last Update: {selectedRider.last_location_update 
                           ? new Date(selectedRider.last_location_update).toLocaleString()
                           : 'Just now'}
@@ -281,8 +281,8 @@ const RiderManagementPanel = () => {
                   </Popup>
                 </Marker>
               </MapContainer>
-              <div className="absolute bottom-4 left-4 bg-white/95 backdrop-blur-sm rounded-lg p-3 shadow-lg border border-[#E5E3D8] z-[1000]">
-                <p className="text-xs text-[#4A626C] mb-1">GPS Coordinates</p>
+              <div className="absolute bottom-4 left-4 bg-white/95 backdrop-blur-sm rounded-lg p-3 shadow-lg border border-[var(--stitch-line)] z-[1000]">
+                <p className="text-xs text-[var(--stitch-muted)] mb-1">GPS Coordinates</p>
                 <p className="text-sm font-mono font-bold">
                   {selectedRider.current_lat.toFixed(6)}, {selectedRider.current_lng.toFixed(6)}
                 </p>
@@ -296,17 +296,17 @@ const RiderManagementPanel = () => {
       {showBonusModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl w-full max-w-md">
-            <div className="p-6 border-b border-[#E5E3D8]">
+            <div className="p-6 border-b border-[var(--stitch-line)]">
               <h3 className="text-2xl font-bold" style={{ fontFamily: 'Outfit' }}>
                 Assign Bonus
               </h3>
-              <p className="text-sm text-[#4A626C]">
+              <p className="text-sm text-[var(--stitch-muted)]">
                 Rider: {showBonusModal.user?.name || 'Rider'}
               </p>
             </div>
             <div className="p-6 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-[#264653] mb-2">
+                <label className="block text-sm font-medium text-[var(--stitch-ink)] mb-2">
                   Bonus Amount (₹)
                 </label>
                 <input
@@ -320,7 +320,7 @@ const RiderManagementPanel = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-[#264653] mb-2">
+                <label className="block text-sm font-medium text-[var(--stitch-ink)] mb-2">
                   Reason for Bonus
                 </label>
                 <select
@@ -337,9 +337,9 @@ const RiderManagementPanel = () => {
                   <option value="Special achievement">Special achievement</option>
                 </select>
               </div>
-              <div className="bg-[#F0FDF9] rounded-lg p-4 border border-[#2A9D8F]/20">
-                <p className="text-sm text-[#2A9D8F] font-medium mb-2">💡 Bonus Guidelines:</p>
-                <ul className="text-xs text-[#4A626C] space-y-1">
+              <div className="bg-[var(--stitch-soft)] rounded-lg p-4 border border-[var(--stitch-ink)]/20">
+                <p className="text-sm text-[var(--stitch-ink)] font-medium mb-2">💡 Bonus Guidelines:</p>
+                <ul className="text-xs text-[var(--stitch-muted)] space-y-1">
                   <li>• Peak hours: ₹100 - ₹300</li>
                   <li>• High ratings: ₹200 - ₹500</li>
                   <li>• Extra visits: ₹50 per visit</li>
@@ -349,7 +349,7 @@ const RiderManagementPanel = () => {
               <div className="flex gap-3">
                 <button
                   onClick={handleAssignBonus}
-                  className="btn-primary flex-1"
+                  className="stitch-button flex-1"
                   data-testid="confirm-bonus"
                 >
                   Assign Bonus
@@ -360,7 +360,7 @@ const RiderManagementPanel = () => {
                     setBonusAmount('');
                     setBonusReason('');
                   }}
-                  className="btn-secondary flex-1"
+                  className="stitch-button stitch-button-secondary flex-1"
                 >
                   Cancel
                 </button>
@@ -370,12 +370,12 @@ const RiderManagementPanel = () => {
         </div>
       )}
 
-      <div className="bg-[#F0FDF9] rounded-xl p-6 border border-[#2A9D8F]/20">
+      <div className="bg-[var(--stitch-soft)] rounded-xl p-6 border border-[var(--stitch-ink)]/20">
         <h3 className="font-bold mb-3 flex items-center gap-2">
-          <TrendingUp className="w-5 h-5 text-[#2A9D8F]" />
+          <TrendingUp className="w-5 h-5 text-[var(--stitch-ink)]" />
           Rider Performance Metrics
         </h3>
-        <ul className="space-y-2 text-sm text-[#4A626C]">
+        <ul className="space-y-2 text-sm text-[var(--stitch-muted)]">
           <li>• Location updates: Every 30 seconds when on duty</li>
           <li>• Auto-refresh: Dashboard updates every 5 seconds</li>
           <li>• GPS accuracy: Within 10 meters</li>

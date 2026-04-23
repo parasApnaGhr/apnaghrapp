@@ -318,10 +318,10 @@ const InventoryLoginModal = ({ isOpen, onSessionStarted }) => {
           initial={{ scale: 0.9, opacity: 0, y: 20 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
           exit={{ scale: 0.9, opacity: 0, y: 20 }}
-          className="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden max-h-[90vh] overflow-y-auto"
+          className="stitch-panel w-full max-w-lg overflow-hidden max-h-[90vh] overflow-y-auto"
         >
           {/* Header */}
-          <div className="bg-gradient-to-r from-[#C6A87C] to-[#B8956C] text-white p-6 sticky top-0">
+          <div className="bg-gradient-to-r from-[var(--stitch-muted)] to-[var(--stitch-muted)] text-white p-6 sticky top-0">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
                 {step === 1 && <User className="w-5 h-5" />}
@@ -329,7 +329,7 @@ const InventoryLoginModal = ({ isOpen, onSessionStarted }) => {
                 {step === 3 && <Target className="w-5 h-5" />}
               </div>
               <div>
-                <h2 className="text-xl font-semibold" style={{ fontFamily: 'Playfair Display, serif' }}>
+                <h2 className="text-xl font-semibold" style={{  }}>
                   Inventory Mode Setup
                 </h2>
                 <p className="text-white/80 text-sm">
@@ -359,7 +359,7 @@ const InventoryLoginModal = ({ isOpen, onSessionStarted }) => {
                 animate={{ opacity: 1, x: 0 }}
                 className="space-y-4"
               >
-                <label className="block text-sm font-medium text-[#1A1C20] mb-2">
+                <label className="block text-sm font-medium text-[var(--stitch-ink)] mb-2">
                   <User className="w-4 h-4 inline mr-1" />
                   Select Your Name
                 </label>
@@ -373,8 +373,8 @@ const InventoryLoginModal = ({ isOpen, onSessionStarted }) => {
                           onClick={() => setSelectedUser(user)}
                           className={`p-3 text-sm rounded-lg border-2 transition-all text-left ${
                             selectedUser === user
-                              ? 'border-[#C6A87C] bg-[#FDF8F3] text-[#1A1C20] font-medium'
-                              : 'border-[#E5E1DB] hover:border-[#C6A87C]/50'
+                              ? 'border-[var(--stitch-muted)] bg-[var(--stitch-soft)] text-[var(--stitch-ink)] font-medium'
+                              : 'border-[var(--stitch-line)] hover:border-[var(--stitch-muted)]/50'
                           }`}
                         >
                           {user}
@@ -389,7 +389,7 @@ const InventoryLoginModal = ({ isOpen, onSessionStarted }) => {
                         setSelectedUser('');
                         setError('');
                       }}
-                      className="w-full p-3 border-2 border-dashed border-[#C6A87C] text-[#C6A87C] rounded-lg hover:bg-[#FDF8F3] transition-all flex items-center justify-center gap-2 text-sm font-medium"
+                      className="w-full p-3 border-2 border-dashed border-[var(--stitch-muted)] text-[var(--stitch-muted)] rounded-lg hover:bg-[var(--stitch-soft)] transition-all flex items-center justify-center gap-2 text-sm font-medium"
                     >
                       <UserPlus className="w-4 h-4" />
                       My name is not here - Add it
@@ -401,8 +401,8 @@ const InventoryLoginModal = ({ isOpen, onSessionStarted }) => {
                     animate={{ opacity: 1, y: 0 }}
                     className="space-y-4"
                   >
-                    <div className="p-4 bg-[#FDF8F3] rounded-lg border border-[#C6A87C]/30">
-                      <p className="text-sm text-[#4A4D53] mb-3">
+                    <div className="p-4 bg-[var(--stitch-soft)] rounded-lg border border-[var(--stitch-muted)]/30">
+                      <p className="text-sm text-[var(--stitch-muted)] mb-3">
                         Enter your full name below. It will be saved for future logins.
                       </p>
                       <input
@@ -410,7 +410,7 @@ const InventoryLoginModal = ({ isOpen, onSessionStarted }) => {
                         value={customName}
                         onChange={(e) => setCustomName(e.target.value)}
                         placeholder="Enter your full name"
-                        className="w-full px-4 py-3 border border-[#E5E1DB] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#C6A87C]/20 focus:border-[#C6A87C]"
+                        className="w-full px-4 py-3 border border-[var(--stitch-line)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--stitch-muted)]/20 focus:border-[var(--stitch-muted)]"
                         autoFocus
                       />
                     </div>
@@ -422,14 +422,14 @@ const InventoryLoginModal = ({ isOpen, onSessionStarted }) => {
                           setCustomName('');
                           setError('');
                         }}
-                        className="flex-1 py-3 border border-[#E5E1DB] text-[#4A4D53] rounded-lg font-medium hover:bg-[#F8F7F5] transition-all"
+                        className="flex-1 py-3 border border-[var(--stitch-line)] text-[var(--stitch-muted)] rounded-lg font-medium hover:bg-[var(--stitch-soft)] transition-all"
                       >
                         Back to List
                       </button>
                       <button
                         onClick={handleAddNewName}
                         disabled={addingName || !customName.trim()}
-                        className="flex-1 py-3 bg-gradient-to-r from-[#C6A87C] to-[#B8956C] text-white rounded-lg font-medium hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                        className="flex-1 py-3 bg-gradient-to-r from-[var(--stitch-muted)] to-[var(--stitch-muted)] text-white rounded-lg font-medium hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                       >
                         {addingName ? (
                           <>
@@ -462,7 +462,7 @@ const InventoryLoginModal = ({ isOpen, onSessionStarted }) => {
                   <button
                     onClick={handleStep1Next}
                     disabled={!selectedUser}
-                    className="w-full py-3 bg-gradient-to-r from-[#C6A87C] to-[#B8956C] text-white rounded-lg font-medium hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    className="w-full py-3 bg-gradient-to-r from-[var(--stitch-muted)] to-[var(--stitch-muted)] text-white rounded-lg font-medium hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                   >
                     Continue to Photo
                     <Check className="w-4 h-4" />
@@ -479,7 +479,7 @@ const InventoryLoginModal = ({ isOpen, onSessionStarted }) => {
                 className="space-y-4"
               >
                 <div className="text-center">
-                  <p className="text-sm text-[#4A4D53] mb-4">
+                  <p className="text-sm text-[var(--stitch-muted)] mb-4">
                     Take a quick selfie for attendance tracking (optional)
                   </p>
                   
@@ -494,10 +494,10 @@ const InventoryLoginModal = ({ isOpen, onSessionStarted }) => {
                           className="w-full h-full object-cover"
                         />
                         {!cameraActive && (
-                          <div className="absolute inset-0 flex items-center justify-center bg-[#1A1C20]/80">
+                          <div className="absolute inset-0 flex items-center justify-center bg-[var(--stitch-ink)]/80">
                             <button
                               onClick={startCamera}
-                              className="px-4 py-2 bg-white text-[#1A1C20] rounded-lg font-medium flex items-center gap-2"
+                              className="px-4 py-2 bg-white text-[var(--stitch-ink)] rounded-lg font-medium flex items-center gap-2"
                             >
                               <Camera className="w-4 h-4" />
                               Start Camera
@@ -514,7 +514,7 @@ const InventoryLoginModal = ({ isOpen, onSessionStarted }) => {
                     {!photoBase64 && cameraActive && (
                       <button
                         onClick={capturePhoto}
-                        className="px-6 py-2 bg-gradient-to-r from-[#C6A87C] to-[#B8956C] text-white rounded-lg font-medium hover:opacity-90 transition-all flex items-center gap-2"
+                        className="px-6 py-2 bg-gradient-to-r from-[var(--stitch-muted)] to-[var(--stitch-muted)] text-white rounded-lg font-medium hover:opacity-90 transition-all flex items-center gap-2"
                       >
                         <Camera className="w-4 h-4" />
                         Capture
@@ -524,7 +524,7 @@ const InventoryLoginModal = ({ isOpen, onSessionStarted }) => {
                     {photoBase64 && (
                       <button
                         onClick={retakePhoto}
-                        className="px-4 py-2 border border-[#E5E1DB] text-[#4A4D53] rounded-lg font-medium hover:bg-[#F8F7F5] transition-all flex items-center gap-2"
+                        className="px-4 py-2 border border-[var(--stitch-line)] text-[var(--stitch-muted)] rounded-lg font-medium hover:bg-[var(--stitch-soft)] transition-all flex items-center gap-2"
                       >
                         <RefreshCw className="w-4 h-4" />
                         Retake
@@ -536,13 +536,13 @@ const InventoryLoginModal = ({ isOpen, onSessionStarted }) => {
                 <div className="flex gap-3 pt-4">
                   <button
                     onClick={handleStep2Skip}
-                    className="flex-1 py-3 border border-[#E5E1DB] text-[#4A4D53] rounded-lg font-medium hover:bg-[#F8F7F5] transition-all"
+                    className="flex-1 py-3 border border-[var(--stitch-line)] text-[var(--stitch-muted)] rounded-lg font-medium hover:bg-[var(--stitch-soft)] transition-all"
                   >
                     Skip
                   </button>
                   <button
                     onClick={handleStep2Next}
-                    className="flex-1 py-3 bg-gradient-to-r from-[#C6A87C] to-[#B8956C] text-white rounded-lg font-medium hover:opacity-90 transition-all flex items-center justify-center gap-2"
+                    className="flex-1 py-3 bg-gradient-to-r from-[var(--stitch-muted)] to-[var(--stitch-muted)] text-white rounded-lg font-medium hover:opacity-90 transition-all flex items-center justify-center gap-2"
                   >
                     Continue
                     <Check className="w-4 h-4" />
@@ -559,18 +559,18 @@ const InventoryLoginModal = ({ isOpen, onSessionStarted }) => {
                 className="space-y-4"
               >
                 <div>
-                  <label className="block text-sm font-medium text-[#1A1C20] mb-2">
+                  <label className="block text-sm font-medium text-[var(--stitch-ink)] mb-2">
                     <MapPin className="w-4 h-4 inline mr-1" />
                     Select Cities & Set Targets
-                    <span className="text-xs text-[#4A4D53] font-normal ml-2">(Default: {DEFAULT_CITY_TARGET} per city)</span>
+                    <span className="text-xs text-[var(--stitch-muted)] font-normal ml-2">(Default: {DEFAULT_CITY_TARGET} per city)</span>
                   </label>
                   
-                  <div className="space-y-2 max-h-40 overflow-y-auto border border-[#E5E1DB] rounded-lg p-3">
+                  <div className="space-y-2 max-h-40 overflow-y-auto border border-[var(--stitch-line)] rounded-lg p-3">
                     {availableCities.map((city) => (
                       <div
                         key={city}
                         className={`flex items-center justify-between p-2 rounded-lg transition-all ${
-                          selectedCities.includes(city) ? 'bg-[#FDF8F3]' : 'hover:bg-[#F8F7F5]'
+                          selectedCities.includes(city) ? 'bg-[var(--stitch-soft)]' : 'hover:bg-[var(--stitch-soft)]'
                         }`}
                       >
                         <label className="flex items-center gap-2 cursor-pointer flex-1">
@@ -578,7 +578,7 @@ const InventoryLoginModal = ({ isOpen, onSessionStarted }) => {
                             type="checkbox"
                             checked={selectedCities.includes(city)}
                             onChange={() => toggleCity(city)}
-                            className="w-4 h-4 accent-[#C6A87C]"
+                            className="w-4 h-4 accent-[var(--stitch-muted)]"
                           />
                           <span className="text-sm">{city}</span>
                         </label>
@@ -590,7 +590,7 @@ const InventoryLoginModal = ({ isOpen, onSessionStarted }) => {
                             max="100"
                             value={cityTargets[city] || DEFAULT_CITY_TARGET}
                             onChange={(e) => updateCityTarget(city, e.target.value)}
-                            className="w-16 px-2 py-1 text-sm border border-[#E5E1DB] rounded text-center"
+                            className="w-16 px-2 py-1 text-sm border border-[var(--stitch-line)] rounded text-center"
                             placeholder="Target"
                           />
                         )}
@@ -605,7 +605,7 @@ const InventoryLoginModal = ({ isOpen, onSessionStarted }) => {
                         setShowAddCity(true);
                         setError('');
                       }}
-                      className="w-full mt-2 p-2 border-2 border-dashed border-[#C6A87C] text-[#C6A87C] rounded-lg hover:bg-[#FDF8F3] transition-all flex items-center justify-center gap-2 text-sm font-medium"
+                      className="w-full mt-2 p-2 border-2 border-dashed border-[var(--stitch-muted)] text-[var(--stitch-muted)] rounded-lg hover:bg-[var(--stitch-soft)] transition-all flex items-center justify-center gap-2 text-sm font-medium"
                     >
                       <Plus className="w-4 h-4" />
                       Add New City
@@ -614,9 +614,9 @@ const InventoryLoginModal = ({ isOpen, onSessionStarted }) => {
                     <motion.div
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className="mt-2 p-3 bg-[#FDF8F3] rounded-lg border border-[#C6A87C]/30"
+                      className="mt-2 p-3 bg-[var(--stitch-soft)] rounded-lg border border-[var(--stitch-muted)]/30"
                     >
-                      <p className="text-xs text-[#4A4D53] mb-2">
+                      <p className="text-xs text-[var(--stitch-muted)] mb-2">
                         Enter city name (Target will be set to {DEFAULT_CITY_TARGET})
                       </p>
                       <div className="flex gap-2">
@@ -625,7 +625,7 @@ const InventoryLoginModal = ({ isOpen, onSessionStarted }) => {
                           value={customCity}
                           onChange={(e) => setCustomCity(e.target.value)}
                           placeholder="Enter city name"
-                          className="flex-1 px-3 py-2 border border-[#E5E1DB] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#C6A87C]/20 focus:border-[#C6A87C]"
+                          className="flex-1 px-3 py-2 border border-[var(--stitch-line)] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[var(--stitch-muted)]/20 focus:border-[var(--stitch-muted)]"
                           autoFocus
                         />
                         <button
@@ -634,14 +634,14 @@ const InventoryLoginModal = ({ isOpen, onSessionStarted }) => {
                             setCustomCity('');
                             setError('');
                           }}
-                          className="px-3 py-2 border border-[#E5E1DB] text-[#4A4D53] rounded-lg hover:bg-white transition-all text-sm"
+                          className="px-3 py-2 border border-[var(--stitch-line)] text-[var(--stitch-muted)] rounded-lg hover:bg-white transition-all text-sm"
                         >
                           Cancel
                         </button>
                         <button
                           onClick={handleAddNewCity}
                           disabled={addingCity || !customCity.trim()}
-                          className="px-3 py-2 bg-[#C6A87C] text-white rounded-lg hover:bg-[#B8956C] transition-all disabled:opacity-50 disabled:cursor-not-allowed text-sm flex items-center gap-1"
+                          className="px-3 py-2 bg-[var(--stitch-muted)] text-white rounded-lg hover:bg-[var(--stitch-muted)] transition-all disabled:opacity-50 disabled:cursor-not-allowed text-sm flex items-center gap-1"
                         >
                           {addingCity ? (
                             <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -658,14 +658,14 @@ const InventoryLoginModal = ({ isOpen, onSessionStarted }) => {
                 </div>
 
                 {/* Summary */}
-                <div className="bg-[#F8F7F5] rounded-lg p-4">
+                <div className="bg-[var(--stitch-soft)] rounded-lg p-4">
                   <div className="flex justify-between items-center text-sm">
-                    <span className="text-[#4A4D53]">Selected Cities:</span>
-                    <span className="font-medium text-[#1A1C20]">{selectedCities.length}</span>
+                    <span className="text-[var(--stitch-muted)]">Selected Cities:</span>
+                    <span className="font-medium text-[var(--stitch-ink)]">{selectedCities.length}</span>
                   </div>
                   <div className="flex justify-between items-center text-sm mt-2">
-                    <span className="text-[#4A4D53]">Total Target:</span>
-                    <span className="font-bold text-[#C6A87C] text-lg">{totalTarget} properties</span>
+                    <span className="text-[var(--stitch-muted)]">Total Target:</span>
+                    <span className="font-bold text-[var(--stitch-muted)] text-lg">{totalTarget} properties</span>
                   </div>
                 </div>
 
@@ -683,14 +683,14 @@ const InventoryLoginModal = ({ isOpen, onSessionStarted }) => {
                 <div className="flex gap-3 pt-2">
                   <button
                     onClick={() => setStep(2)}
-                    className="flex-1 py-3 border border-[#E5E1DB] text-[#4A4D53] rounded-lg font-medium hover:bg-[#F8F7F5] transition-all"
+                    className="flex-1 py-3 border border-[var(--stitch-line)] text-[var(--stitch-muted)] rounded-lg font-medium hover:bg-[var(--stitch-soft)] transition-all"
                   >
                     Back
                   </button>
                   <button
                     onClick={handleStartSession}
                     disabled={loading || selectedCities.length === 0}
-                    className="flex-1 py-3 bg-gradient-to-r from-[#C6A87C] to-[#B8956C] text-white rounded-lg font-medium hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    className="flex-1 py-3 bg-gradient-to-r from-[var(--stitch-muted)] to-[var(--stitch-muted)] text-white rounded-lg font-medium hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                     data-testid="start-inventory-session"
                   >
                     {loading ? (

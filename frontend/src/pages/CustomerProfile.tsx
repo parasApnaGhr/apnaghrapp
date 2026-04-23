@@ -1,322 +1,342 @@
 // @ts-nocheck
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import api from '../utils/api';
-import { 
-  User, Phone, Mail, MapPin, Edit2, Save, LogOut, 
-  ChevronRight, ArrowLeft, Shield, Bell, HelpCircle,
-  CreditCard, Calendar, Home, Truck, Locate, Check
-} from 'lucide-react';
-import { toast } from 'sonner';
+import React, { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { ArrowLeft, Bell, Calendar, Check, ChevronRight, CreditCard, HelpCircle, Home, LocateFixed, LogOut, Mail, MapPin, Megaphone, Phone, Save, Shield, ShoppingCart, User2 } from "lucide-react";
+import { toast } from "sonner";
+import { useAuth } from "../context/AuthContext";
+import api from "../utils/api";
+import {
+  StitchBottomDock,
+  StitchButton,
+  StitchCard,
+  StitchInput,
+  StitchKpi,
+  StitchLoadingPage,
+  StitchSectionHeader,
+  StitchShell,
+} from "../stitch/components/StitchPrimitives";
+import { formatCurrency } from "../stitch/utils";
 
-const CustomerProfile = () => {
+const navItems = [
+  { label: "Home", to: "/customer", icon: Home },
+  { label: "Visits", to: "/customer/bookings", icon: Calendar },
+  { label: "Cart", to: "/customer/cart", icon: ShoppingCart },
+  { label: "Ads", to: "/customer/advertise", icon: Megaphone },
+  { label: "Profile", to: "/customer/profile", icon: User2 },
+];
+
+const menuItems = [
+  { icon: Calendar, label: "My Bookings", path: "/customer/bookings" },
+  { icon: CreditCard, label: "Payment History", path: "/customer/payments" },
+  { icon: Bell, label: "Notifications", path: "/customer/notifications" },
+  { icon: HelpCircle, label: "Help", path: "/customer/support" },
+  { icon: Shield, label: "Privacy", path: "/customer/privacy" },
+];
+
+export default function CustomerProfile() {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const [editing, setEditing] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [gettingLocation, setGettingLocation] = useState(false);
   const [stats, setStats] = useState({
     total_visits: 0,
     total_spent: 0,
-    properties_viewed: 0
+    properties_viewed: 0,
+    visits_available: 0,
   });
-  
   const [formData, setFormData] = useState({
-    name: user?.name || '',
-    email: user?.email || '',
-    address: user?.address || '',
-    address_lat: null,
-    address_lng: null
+    name: user?.name || "",
+    email: user?.email || "",
+    address: user?.address || "",
+    address_lat: user?.address_lat || null,
+    address_lng: user?.address_lng || null,
   });
 
   useEffect(() => {
+    setFormData({
+      name: user?.name || "",
+      email: user?.email || "",
+      address: user?.address || "",
+      address_lat: user?.address_lat || null,
+      address_lng: user?.address_lng || null,
+    });
+  }, [user]);
+
+  useEffect(() => {
+    const loadStats = async () => {
+      try {
+        const response = await api.get("/customer/wallet");
+        setStats({
+          total_visits: response.data?.total_visits || 0,
+          total_spent: response.data?.total_spent || 0,
+          properties_viewed: response.data?.properties_viewed || 0,
+          visits_available: response.data?.visits_available || 0,
+        });
+      } catch {
+        toast.error("Failed to load profile stats");
+      } finally {
+        setLoading(false);
+      }
+    };
+
     loadStats();
   }, []);
 
-  const loadStats = async () => {
-    try {
-      const walletRes = await api.get('/customer/wallet');
-      setStats({
-        total_visits: walletRes.data?.total_visits || 0,
-        total_spent: walletRes.data?.total_spent || 0,
-        properties_viewed: walletRes.data?.properties_viewed || 0
-      });
-    } catch (error) {
-      console.log('Could not load stats');
-    }
-  };
+  const initials = useMemo(() => {
+    const source = (formData.name || user?.name || "U").trim();
+    return source.slice(0, 1).toUpperCase();
+  }, [formData.name, user?.name]);
 
   const handleSave = async () => {
-    setLoading(true);
+    setSaving(true);
     try {
-      await api.put('/customer/profile', formData);
-      toast.success('Profile updated successfully');
+      const response = await api.put("/customer/profile", formData);
+      setFormData({
+        name: response.data?.user?.name || formData.name,
+        email: response.data?.user?.email || formData.email,
+        address: response.data?.user?.address || formData.address,
+        address_lat: response.data?.user?.address_lat ?? formData.address_lat,
+        address_lng: response.data?.user?.address_lng ?? formData.address_lng,
+      });
       setEditing(false);
-    } catch (error) {
-      toast.error('Failed to update profile');
+      toast.success("Profile updated");
+    } catch {
+      toast.error("Failed to update profile");
     } finally {
-      setLoading(false);
+      setSaving(false);
     }
   };
 
   const getCurrentLocation = () => {
     if (!navigator.geolocation) {
-      toast.error('Geolocation not supported');
+      toast.error("Geolocation not supported");
       return;
     }
 
     setGettingLocation(true);
     navigator.geolocation.getCurrentPosition(
-      async (position) => {
-        const { latitude, longitude } = position.coords;
+      async ({ coords }) => {
+        const latitude = coords.latitude;
+        const longitude = coords.longitude;
+
         try {
           const response = await fetch(
             `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
           );
           const data = await response.json();
-          const address = data.display_name || `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
-          setFormData(prev => ({
-            ...prev,
-            address: address,
+          setFormData((current) => ({
+            ...current,
+            address: data.display_name || `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`,
             address_lat: latitude,
-            address_lng: longitude
+            address_lng: longitude,
           }));
-          toast.success('Location captured!');
-        } catch (error) {
-          setFormData(prev => ({
-            ...prev,
+          toast.success("Location captured");
+        } catch {
+          setFormData((current) => ({
+            ...current,
             address: `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`,
             address_lat: latitude,
-            address_lng: longitude
+            address_lng: longitude,
           }));
+          toast.success("Coordinates captured");
+        } finally {
+          setGettingLocation(false);
         }
-        setGettingLocation(false);
       },
-      (error) => {
+      () => {
         setGettingLocation(false);
-        toast.error('Unable to get location');
+        toast.error("Unable to get location");
       },
       { enableHighAccuracy: true, timeout: 10000 }
     );
   };
 
-  const handleLogout = () => {
-    logout();
-    navigate('/');
-  };
-
-  const menuItems = [
-    { icon: Calendar, label: 'My Bookings', path: '/customer/bookings', badge: null },
-    { icon: CreditCard, label: 'Payment History', path: '/customer/payments', badge: null },
-    { icon: Bell, label: 'Notifications', path: '/customer/notifications', badge: '3' },
-    { icon: HelpCircle, label: 'Help & Support', path: '/customer/support', badge: null },
-    { icon: Shield, label: 'Privacy & Security', path: '/customer/privacy', badge: null },
-  ];
+  if (loading) {
+    return <StitchLoadingPage label="Loading profile" />;
+  }
 
   return (
-    <div className="min-h-screen bg-[#FDFCFB] pb-24">
-      {/* Header */}
-      <header className="glass-header sticky top-0 z-50">
-        <div className="max-w-2xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <button
-                onClick={() => navigate('/customer')}
-                className="p-2 hover:bg-[#F5F3F0] transition-colors"
-              >
-                <ArrowLeft className="w-5 h-5 text-[#1A1C20]" strokeWidth={1.5} />
-              </button>
-              <h1 className="text-xl font-medium" style={{ fontFamily: 'Playfair Display, serif' }}>
-                My Profile
-              </h1>
-            </div>
-            {!editing ? (
-              <button
-                onClick={() => setEditing(true)}
-                className="p-2 hover:bg-[#F5F3F0] transition-colors"
-              >
-                <Edit2 className="w-5 h-5 text-[#04473C]" strokeWidth={1.5} />
-              </button>
+    <>
+      <StitchShell
+        title="Profile"
+        eyebrow="Account"
+        actions={
+          <>
+            <button onClick={() => navigate("/customer")} className="stitch-button stitch-button-secondary">
+              <ArrowLeft className="h-4 w-4" />
+              Back
+            </button>
+            {editing ? (
+              <StitchButton onClick={handleSave} disabled={saving}>
+                <Save className="h-4 w-4" />
+                {saving ? "Saving" : "Save"}
+              </StitchButton>
             ) : (
-              <button
-                onClick={handleSave}
-                disabled={loading}
-                className="p-2 hover:bg-[#F5F3F0] transition-colors"
-              >
-                <Save className="w-5 h-5 text-[#04473C]" strokeWidth={1.5} />
+              <button onClick={() => setEditing(true)} className="stitch-button stitch-button-ghost">
+                Edit
               </button>
             )}
+          </>
+        }
+      >
+        <div className="grid gap-6 xl:grid-cols-[0.92fr_1.08fr]">
+          <div className="space-y-6">
+            <StitchCard className="p-6 md:p-8">
+              <div className="flex flex-col gap-6 md:flex-row md:items-center">
+                <div className="flex h-24 w-24 items-center justify-center rounded-[28px] bg-black text-4xl font-black text-white">
+                  {initials}
+                </div>
+                <div className="space-y-2">
+                  <p className="stitch-eyebrow">Member</p>
+                  <h2 className="font-headline text-3xl font-black uppercase tracking-[-0.05em]">
+                    {formData.name || user?.name || "User"}
+                  </h2>
+                  <p className="text-sm font-bold uppercase tracking-[0.16em] text-[var(--stitch-muted)]">
+                    {user?.role || "customer"}
+                  </p>
+                </div>
+              </div>
+            </StitchCard>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <StitchKpi label="Completed visits" value={String(stats.total_visits)} />
+              <StitchKpi label="Credits left" value={String(stats.visits_available)} />
+              <StitchKpi label="Spent" value={`Rs ${formatCurrency(stats.total_spent)}`} />
+              <StitchKpi label="Bookings" value={String(stats.properties_viewed)} />
+            </div>
+
+            <StitchCard className="p-6">
+              <button
+                onClick={() => {
+                  logout();
+                  navigate("/");
+                }}
+                className="stitch-button stitch-button-secondary w-full justify-center border-red-200 text-red-700"
+              >
+                <LogOut className="h-4 w-4" />
+                Logout
+              </button>
+            </StitchCard>
+          </div>
+
+          <div className="space-y-6">
+            <StitchCard className="p-6 md:p-8">
+              <StitchSectionHeader title="Details" />
+              <div className="mt-6 grid gap-4">
+                <div className="rounded-[26px] border border-[var(--stitch-line)] bg-[var(--stitch-soft)] p-4">
+                  <div className="mb-3 flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-[var(--stitch-muted)]">
+                    <User2 className="h-4 w-4" />
+                    Name
+                  </div>
+                  {editing ? (
+                    <StitchInput
+                      value={formData.name}
+                      onChange={(event) => setFormData((current) => ({ ...current, name: event.target.value }))}
+                      placeholder="Name"
+                    />
+                  ) : (
+                    <p className="text-lg font-black">{formData.name || "-"}</p>
+                  )}
+                </div>
+
+                <div className="rounded-[26px] border border-[var(--stitch-line)] bg-[var(--stitch-soft)] p-4">
+                  <div className="mb-3 flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-[var(--stitch-muted)]">
+                    <Phone className="h-4 w-4" />
+                    Phone
+                  </div>
+                  <p className="text-lg font-black">{user?.phone || "-"}</p>
+                </div>
+
+                <div className="rounded-[26px] border border-[var(--stitch-line)] bg-[var(--stitch-soft)] p-4">
+                  <div className="mb-3 flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-[var(--stitch-muted)]">
+                    <Mail className="h-4 w-4" />
+                    Email
+                  </div>
+                  {editing ? (
+                    <StitchInput
+                      type="email"
+                      value={formData.email}
+                      onChange={(event) => setFormData((current) => ({ ...current, email: event.target.value }))}
+                      placeholder="Email"
+                    />
+                  ) : (
+                    <p className="text-lg font-black">{formData.email || "-"}</p>
+                  )}
+                </div>
+
+                <div className="rounded-[26px] border border-[var(--stitch-line)] bg-[var(--stitch-soft)] p-4">
+                  <div className="mb-3 flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-[var(--stitch-muted)]">
+                    <MapPin className="h-4 w-4" />
+                    Address
+                  </div>
+                  {editing ? (
+                    <div className="space-y-3">
+                      <StitchInput
+                        value={formData.address}
+                        onChange={(event) =>
+                          setFormData((current) => ({
+                            ...current,
+                            address: event.target.value,
+                            address_lat: null,
+                            address_lng: null,
+                          }))
+                        }
+                        placeholder="Address"
+                      />
+                      <div className="flex flex-wrap items-center gap-3">
+                        <button
+                          type="button"
+                          onClick={getCurrentLocation}
+                          disabled={gettingLocation}
+                          className="stitch-button stitch-button-secondary"
+                        >
+                          <LocateFixed className="h-4 w-4" />
+                          {gettingLocation ? "Locating" : "Use current location"}
+                        </button>
+                        {formData.address_lat ? (
+                          <span className="inline-flex items-center gap-1 text-xs font-bold uppercase tracking-[0.16em] text-green-700">
+                            <Check className="h-3.5 w-3.5" />
+                            GPS saved
+                          </span>
+                        ) : null}
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="text-base font-bold leading-7">{formData.address || "-"}</p>
+                  )}
+                </div>
+              </div>
+            </StitchCard>
+
+            <StitchCard className="p-6 md:p-8">
+              <StitchSectionHeader title="Links" />
+              <div className="mt-4">
+                {menuItems.map((item, index) => (
+                  <button
+                    key={item.path}
+                    onClick={() => navigate(item.path)}
+                    className={`flex w-full items-center justify-between gap-4 px-1 py-4 text-left ${
+                      index !== menuItems.length - 1 ? "border-b border-[var(--stitch-line)]" : ""
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-11 w-11 items-center justify-center rounded-full border border-[var(--stitch-line)] bg-[var(--stitch-soft)]">
+                        <item.icon className="h-4.5 w-4.5" />
+                      </div>
+                      <span className="text-sm font-black uppercase tracking-[0.08em]">{item.label}</span>
+                    </div>
+                    <ChevronRight className="h-4 w-4 text-[var(--stitch-muted)]" />
+                  </button>
+                ))}
+              </div>
+            </StitchCard>
           </div>
         </div>
-      </header>
+      </StitchShell>
 
-      <main className="max-w-2xl mx-auto px-6 py-8">
-        {/* Profile Card */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-white border border-[#E5E1DB] p-6 mb-6"
-        >
-          <div className="flex items-center gap-4 mb-6">
-            <div className="w-20 h-20 bg-[#04473C] flex items-center justify-center">
-              <span className="text-3xl font-medium text-white" style={{ fontFamily: 'Playfair Display, serif' }}>
-                {user?.name?.charAt(0)?.toUpperCase() || 'U'}
-              </span>
-            </div>
-            <div className="flex-1">
-              {editing ? (
-                <input
-                  type="text"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="premium-input text-xl font-medium mb-1"
-                  placeholder="Your name"
-                />
-              ) : (
-                <h2 className="text-xl font-medium text-[#1A1C20]" style={{ fontFamily: 'Playfair Display, serif' }}>
-                  {user?.name || 'User'}
-                </h2>
-              )}
-              <p className="text-sm text-[#4A4D53] capitalize">{user?.role || 'Customer'}</p>
-            </div>
-          </div>
-
-          {/* Contact Info */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-3 p-4 bg-[#F5F3F0]">
-              <Phone className="w-5 h-5 text-[#04473C]" strokeWidth={1.5} />
-              <div className="flex-1">
-                <p className="text-xs text-[#4A4D53] uppercase tracking-wide">Phone</p>
-                <p className="font-medium text-[#1A1C20]">{user?.phone || 'Not set'}</p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3 p-4 bg-[#F5F3F0]">
-              <Mail className="w-5 h-5 text-[#04473C]" strokeWidth={1.5} />
-              <div className="flex-1">
-                <p className="text-xs text-[#4A4D53] uppercase tracking-wide">Email</p>
-                {editing ? (
-                  <input
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="premium-input py-1"
-                    placeholder="your@email.com"
-                  />
-                ) : (
-                  <p className="font-medium text-[#1A1C20]">{user?.email || 'Not set'}</p>
-                )}
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3 p-4 bg-[#F5F3F0]">
-              <MapPin className="w-5 h-5 text-[#04473C]" strokeWidth={1.5} />
-              <div className="flex-1">
-                <p className="text-xs text-[#4A4D53] uppercase tracking-wide">Address</p>
-                {editing ? (
-                  <div className="flex gap-2 items-center mt-1">
-                    <input
-                      type="text"
-                      value={formData.address}
-                      onChange={(e) => setFormData({ ...formData, address: e.target.value, address_lat: null, address_lng: null })}
-                      className="premium-input py-1 flex-1"
-                      placeholder="Your address"
-                    />
-                    <button
-                      type="button"
-                      onClick={getCurrentLocation}
-                      disabled={gettingLocation}
-                      className="p-2 bg-[#04473C] text-white hover:bg-[#033530] transition-colors disabled:opacity-50"
-                      title="Use current location"
-                    >
-                      {gettingLocation ? (
-                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      ) : (
-                        <Locate className="w-4 h-4" />
-                      )}
-                    </button>
-                  </div>
-                ) : (
-                  <p className="font-medium text-[#1A1C20]">{user?.address || 'Not set'}</p>
-                )}
-                {editing && formData.address_lat && (
-                  <p className="text-xs text-green-600 mt-1 flex items-center gap-1">
-                    <Check className="w-3 h-3" /> GPS location captured
-                  </p>
-                )}
-              </div>
-            </div>
-          </div>
-        </motion.div>
-
-        {/* Stats */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="grid grid-cols-3 gap-4 mb-6"
-        >
-          <div className="bg-white border border-[#E5E1DB] p-4 text-center">
-            <p className="text-2xl font-medium text-[#04473C]">{stats.total_visits}</p>
-            <p className="text-xs text-[#4A4D53] uppercase tracking-wide">Visits</p>
-          </div>
-          <div className="bg-white border border-[#E5E1DB] p-4 text-center">
-            <p className="text-2xl font-medium text-[#04473C]">₹{stats.total_spent}</p>
-            <p className="text-xs text-[#4A4D53] uppercase tracking-wide">Spent</p>
-          </div>
-          <div className="bg-white border border-[#E5E1DB] p-4 text-center">
-            <p className="text-2xl font-medium text-[#04473C]">{stats.properties_viewed}</p>
-            <p className="text-xs text-[#4A4D53] uppercase tracking-wide">Viewed</p>
-          </div>
-        </motion.div>
-
-        {/* Menu Items */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="bg-white border border-[#E5E1DB] mb-6"
-        >
-          {menuItems.map((item, idx) => (
-            <button
-              key={item.label}
-              onClick={() => navigate(item.path)}
-              className={`w-full flex items-center justify-between p-4 hover:bg-[#F5F3F0] transition-colors ${
-                idx !== menuItems.length - 1 ? 'border-b border-[#E5E1DB]' : ''
-              }`}
-            >
-              <div className="flex items-center gap-3">
-                <item.icon className="w-5 h-5 text-[#04473C]" strokeWidth={1.5} />
-                <span className="font-medium text-[#1A1C20]">{item.label}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                {item.badge && (
-                  <span className="w-5 h-5 bg-[#04473C] text-white text-xs font-medium flex items-center justify-center">
-                    {item.badge}
-                  </span>
-                )}
-                <ChevronRight className="w-5 h-5 text-[#D0C9C0]" strokeWidth={1.5} />
-              </div>
-            </button>
-          ))}
-        </motion.div>
-
-        {/* Logout Button */}
-        <motion.button
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          onClick={handleLogout}
-          className="w-full p-4 bg-[#8F2727]/10 border border-[#8F2727]/30 flex items-center justify-center gap-2 text-[#8F2727] font-medium hover:bg-[#8F2727]/20 transition-colors"
-        >
-          <LogOut className="w-5 h-5" strokeWidth={1.5} />
-          Logout
-        </motion.button>
-      </main>
-    </div>
+      <StitchBottomDock items={navItems} />
+    </>
   );
-};
-
-export default CustomerProfile;
+}

@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ApnaGhr - Home</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                            "on-tertiary": "#e5e2e1",
+                            "on-surface": "#1a1c1c",
+                            "on-tertiary-container": "#ffffff",
+                            "surface-dim": "#dadada",
+                            "surface-tint": "#5e5e5e",
+                            "on-tertiary-fixed-variant": "#e5e2e1",
+                            "error": "#ba1a1a",
+                            "secondary": "#5e5e5e",
+                            "primary-container": "#3b3b3b",
+                            "on-secondary-fixed-variant": "#3b3b3b",
+                            "tertiary-container": "#757474",
+                            "secondary-fixed-dim": "#ababab",
+                            "error-container": "#ffdad6",
+                            "outline": "#777777",
+                            "surface-container": "#eeeeee",
+                            "on-secondary-container": "#1b1b1b",
+                            "secondary-fixed": "#c6c6c6",
+                            "on-error": "#ffffff",
+                            "inverse-primary": "#c6c6c6",
+                            "tertiary-fixed-dim": "#474746",
+                            "background": "#f9f9f9",
+                            "on-surface-variant": "#474747",
+                            "outline-variant": "#c6c6c6",
+                            "inverse-on-surface": "#f0f1f1",
+                            "on-error-container": "#410002",
+                            "on-primary-fixed": "#ffffff",
+                            "tertiary": "#3c3b3b",
+                            "surface-variant": "#e2e2e2",
+                            "surface-container-highest": "#e2e2e2",
+                            "on-primary": "#e2e2e2",
+                            "surface-container-lowest": "#ffffff",
+                            "secondary-container": "#d4d4d4",
+                            "inverse-surface": "#2f3131",
+                            "on-secondary": "#ffffff",
+                            "on-background": "#1a1c1c",
+                            "primary-fixed": "#5e5e5e",
+                            "surface-bright": "#f9f9f9",
+                            "surface-container-low": "#f3f3f4",
+                            "primary-fixed-dim": "#474747",
+                            "on-primary-container": "#ffffff",
+                            "surface": "#f9f9f9",
+                            "primary": "#000000",
+                            "on-secondary-fixed": "#1b1b1b",
+                            "on-primary-fixed-variant": "#e2e2e2",
+                            "tertiary-fixed": "#5f5e5e",
+                            "surface-container-high": "#e8e8e8",
+                            "on-tertiary-fixed": "#ffffff"
+                    },
+                    "borderRadius": {
+                            "DEFAULT": "1rem",
+                            "lg": "2rem",
+                            "xl": "3rem",
+                            "full": "9999px"
+                    },
+                    "spacing": {},
+                    "fontFamily": {
+                            "headline": [
+                                    "Inter"
+                            ],
+                            "body": [
+                                    "Inter"
+                            ],
+                            "label": [
+                                    "Inter"
+                            ]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface min-h-screen flex flex-col pb-24 md:pb-0">
+<!-- TopAppBar -->
+<header class="bg-[#F9F9F9] dark:bg-[#000000] w-full top-0 sticky border-b border-[#C6C6C6] dark:border-[#3B3B3B] z-40 hidden md:block">
+<div class="flex justify-between items-center px-8 py-6 w-full max-w-[1440px] mx-auto">
+<div class="text-2xl font-black tracking-tighter text-[#000000] dark:text-[#F9F9F9]">APNAGHR</div>
+<nav class="flex space-x-8 font-['Inter'] font-bold tracking-[-0.02em]">
+<a class="text-[#777777] dark:text-[#E2E2E2] hover:bg-[#E2E2E2] dark:hover:bg-[#3B3B3B] transition-all px-4 py-2 rounded-sm scale-102 active:scale-98" href="#">Support</a>
+<a class="text-[#777777] dark:text-[#E2E2E2] hover:bg-[#E2E2E2] dark:hover:bg-[#3B3B3B] transition-all px-4 py-2 rounded-sm scale-102 active:scale-98" href="#">Cities</a>
+<a class="text-[#777777] dark:text-[#E2E2E2] hover:bg-[#E2E2E2] dark:hover:bg-[#3B3B3B] transition-all px-4 py-2 rounded-sm scale-102 active:scale-98" href="#">Partners</a>
+</nav>
+<div class="flex items-center space-x-6">
+<!-- Search on Right Desktop -->
+<div class="relative hidden lg:block">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline">search</span>
+<input class="bg-surface-container-low text-on-surface pl-12 pr-4 py-3 rounded-sm border-0 focus:ring-0 focus:border-b-2 focus:border-primary w-64 font-body" placeholder="Search cities..." type="text"/>
+</div>
+<button class="bg-primary text-on-primary font-bold px-8 py-4 rounded-full hover:scale-[1.02] active:scale-[0.98] transition-transform uppercase tracking-widest text-xs">Join Now</button>
+</div>
+</div>
+</header>
+<main class="flex-grow w-full max-w-[1440px] mx-auto px-4 md:px-8 py-8 flex flex-col gap-16">
+<!-- Hero Search Section -->
+<section class="flex flex-col gap-6 pt-4 md:pt-12">
+<h1 class="text-[3.5rem] font-bold tracking-[-0.02em] leading-tight text-primary max-w-3xl">FIND YOUR SPACE. <br/>FAST.</h1>
+<div class="flex flex-col sm:flex-row gap-4 w-full max-w-4xl relative">
+<div class="relative flex-grow">
+<span class="material-symbols-outlined absolute left-6 top-1/2 -translate-y-1/2 text-outline text-2xl">search</span>
+<input class="w-full bg-surface-container-lowest text-on-surface text-lg pl-16 pr-16 py-6 border-b-2 border-transparent focus:border-primary border-t-0 border-l-0 border-r-0 focus:ring-0 transition-colors placeholder-outline" placeholder="Enter locality, landmark or project" type="text"/>
+<button class="absolute right-4 top-1/2 -translate-y-1/2 p-2 text-primary hover:bg-surface-container-low rounded-full transition-colors">
+<span class="material-symbols-outlined">mic</span>
+</button>
+</div>
+<button class="bg-primary text-on-primary font-bold px-10 py-6 rounded-none sm:rounded-r-sm hover:scale-[1.02] active:scale-[0.98] transition-transform whitespace-nowrap flex items-center justify-center gap-2">
+                    SEARCH
+                    <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+<button class="sm:absolute sm:-right-20 sm:top-1/2 sm:-translate-y-1/2 p-4 border border-outline-variant bg-surface-container-lowest rounded-sm hover:bg-surface-container-low transition-colors flex items-center justify-center">
+<span class="material-symbols-outlined">tune</span>
+</button>
+</div>
+</section>
+<!-- Active Tracking Card (Uber Style) -->
+<section class="w-full max-w-2xl">
+<div class="bg-surface-container-lowest p-6 flex flex-col gap-4 border-l-4 border-primary">
+<div class="flex justify-between items-center border-b border-outline-variant pb-4">
+<h3 class="text-sm font-bold uppercase tracking-widest text-outline">Current Visit</h3>
+<span class="bg-primary text-on-primary px-3 py-1 text-[10px] font-bold uppercase rounded-sm">In Progress</span>
+</div>
+<div class="flex gap-6 items-center pt-2">
+<div class="w-16 h-16 bg-surface-container-high rounded-full flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-3xl text-primary">person</span>
+</div>
+<div class="flex-grow">
+<h4 class="text-xl font-bold text-primary">Agent Rahul is arriving</h4>
+<p class="text-on-surface-variant mt-1 text-sm">Toyota Innova • MH 12 AB 1234</p>
+</div>
+<div class="text-right">
+<p class="text-3xl font-black text-primary">5<span class="text-lg">min</span></p>
+<p class="text-xs text-outline font-bold uppercase">Away</p>
+</div>
+</div>
+<div class="flex gap-2 mt-4">
+<button class="flex-1 border border-outline-variant py-3 rounded-sm text-sm font-bold hover:bg-surface-container-low transition-colors">CALL</button>
+<button class="flex-1 bg-surface-container-low py-3 rounded-sm text-sm font-bold hover:bg-surface-container-highest transition-colors">MESSAGE</button>
+</div>
+</div>
+</section>
+<!-- Infinite Scroll Grid (Bento Style) -->
+<section class="flex flex-col gap-8">
+<div class="flex justify-between items-end">
+<h2 class="text-2xl font-bold tracking-[-0.02em] text-primary">DISCOVER.</h2>
+<div class="flex gap-2">
+<button class="p-2 border border-outline-variant rounded-sm hover:bg-surface-container-low"><span class="material-symbols-outlined">grid_view</span></button>
+<button class="p-2 text-outline hover:bg-surface-container-low rounded-sm"><span class="material-symbols-outlined">view_list</span></button>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+<!-- Card 1 -->
+<article class="bg-surface-container-lowest group cursor-pointer">
+<div class="w-full h-64 bg-surface-container-high relative overflow-hidden">
+<img alt="Modern luxury apartment living room with large windows, minimalist furniture, and bright natural lighting" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" data-alt="Modern luxury apartment living room with large windows, minimalist furniture, and bright natural lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB_UFtCLGgmWVWdwJiYBfLrzgOR6p5UwjsUL3gSRy0bnBn_FYW0TXGbVEOZlOh4cvexl6VvJqdyWluf5UedSwt6VV6K7dZvXCWYV1CbME-1y6LPSxp9JH5kro7L-ZNu7Fz8a3ijqPCvC1aq6HU9K75FrtTeEiErFSL0SY7r9ut-zFr9H2DPLL5UMptmRwufPzIFaY9omIl6fjgA42gKrBnz75WlC1bcFw-y5yVjZUqOm10Ok0fmw7Z-ttxdO3jkjEDfDpwqZ-l3BRF_"/>
+<div class="absolute top-4 left-4 bg-primary text-on-primary px-3 py-1 text-[10px] font-bold uppercase rounded-sm">Featured</div>
+<div class="absolute bottom-4 right-4 bg-surface-container-lowest/90 backdrop-blur-sm px-4 py-2 font-bold text-lg">₹45,000<span class="text-xs font-normal text-outline">/mo</span></div>
+</div>
+<div class="p-6 flex flex-col gap-4">
+<div>
+<h3 class="text-xl font-bold text-primary mb-1">Minimalist Haven</h3>
+<p class="text-sm text-on-surface-variant">Koramangala, Bangalore</p>
+</div>
+<div class="flex gap-4 border-t border-outline-variant pt-4 text-sm text-on-surface-variant font-bold">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">bed</span> 2 BHK</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">square_foot</span> 1200 Sq.Ft</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">check_circle</span> Verified</span>
+</div>
+</div>
+</article>
+<!-- Card 2 -->
+<article class="bg-surface-container-lowest group cursor-pointer">
+<div class="w-full h-64 bg-surface-container-high relative overflow-hidden">
+<img alt="High contrast black and white photo of modern architecture building exterior" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" data-alt="High contrast black and white photo of modern architecture building exterior" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCwE5Jg2kW5NoZa-ibvr3G2FsEpq2eLIcv0nr9e3wbnlFcgQKgYwhyi9RfCPmztUU4ocbmWYZDpyNsA1kd-72wjbJl-p0l6WE4vVT72heSCJccGTC_utk9dtkzilPRlQS8BOanjN4F4s5_DdPLDcVJG0HBjmNVtmMJ9J5rnPbvPgDy7Im5eZjnOpLwzKkLD9K1MKkVTV3F6pku_aBNi5xuZzxTFxP9Om1NzNsmK48fZCWr09o7Px6Wuiun1MUnz14v_iDxP-6N1PnrP"/>
+<div class="absolute bottom-4 right-4 bg-surface-container-lowest/90 backdrop-blur-sm px-4 py-2 font-bold text-lg">₹32,000<span class="text-xs font-normal text-outline">/mo</span></div>
+</div>
+<div class="p-6 flex flex-col gap-4">
+<div>
+<h3 class="text-xl font-bold text-primary mb-1">Urban Studio</h3>
+<p class="text-sm text-on-surface-variant">Indiranagar, Bangalore</p>
+</div>
+<div class="flex gap-4 border-t border-outline-variant pt-4 text-sm text-on-surface-variant font-bold">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">bed</span> 1 BHK</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">square_foot</span> 800 Sq.Ft</span>
+</div>
+</div>
+</article>
+<!-- Card 3 -->
+<article class="bg-surface-container-lowest group cursor-pointer">
+<div class="w-full h-64 bg-surface-container-high relative overflow-hidden">
+<img alt="Minimalist interior with concrete walls, sleek furniture and dramatic lighting" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" data-alt="Minimalist interior with concrete walls, sleek furniture and dramatic lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBaGrnC7rO-IZv07vktprvouCoXwtGHUG0Wj_f6AcSSRbfjfMqzGw4fR6EmxeZxJmWVwht8QbnPn6A_4zYg7N1WEXsj_jsnlDEqbEx3JkZaE9LdkR8p3Fm0PAotXotGHxpHtXgUMiynT0ff2rp-stR92anAG66cA0DbjL3GM0905JO_f1hudua7cdZI6yUGeOBe_msquq2bBLgtHRWnmaoiB0AGtdNwfYk0iYZ8Oy_8eRZiY-xr2SZEcdlOc7FgRcLe7Dbh3w57BXEd"/>
+<div class="absolute bottom-4 right-4 bg-surface-container-lowest/90 backdrop-blur-sm px-4 py-2 font-bold text-lg">₹65,000<span class="text-xs font-normal text-outline">/mo</span></div>
+</div>
+<div class="p-6 flex flex-col gap-4">
+<div>
+<h3 class="text-xl font-bold text-primary mb-1">Industrial Loft</h3>
+<p class="text-sm text-on-surface-variant">Whitefield, Bangalore</p>
+</div>
+<div class="flex gap-4 border-t border-outline-variant pt-4 text-sm text-on-surface-variant font-bold">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">bed</span> 3 BHK</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">square_foot</span> 1800 Sq.Ft</span>
+</div>
+</div>
+</article>
+</div>
+<div class="flex justify-center mt-8">
+<button class="border-2 border-primary text-primary font-bold px-12 py-4 rounded-full hover:bg-surface-container-low transition-colors uppercase tracking-widest text-xs">Load More</button>
+</div>
+</section>
+</main>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="fixed bottom-0 w-full z-50 border-t border-[#C6C6C6] dark:border-[#3B3B3B] bg-[#F9F9F9]/80 dark:bg-[#000000]/80 backdrop-blur-xl md:hidden">
+<div class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 py-3 pb-safe">
+<!-- Explore (Active) -->
+<button class="flex flex-col items-center justify-center bg-[#000000] dark:bg-[#F9F9F9] text-[#F9F9F9] dark:text-[#000000] rounded-full px-6 py-2 scale-95 active:scale-90 transition-transform">
+<span class="material-symbols-outlined">search</span>
+<span class="font-['Inter'] text-[10px] font-bold uppercase tracking-wider mt-1">Explore</span>
+</button>
+<!-- Bookings (Inactive) -->
+<button class="flex flex-col items-center justify-center text-[#777777] dark:text-[#E2E2E2] px-6 py-2 hover:opacity-80 transition-opacity scale-95 active:scale-90 transition-transform">
+<span class="material-symbols-outlined">local_shipping</span>
+<span class="font-['Inter'] text-[10px] font-bold uppercase tracking-wider mt-1">Bookings</span>
+</button>
+<!-- Wallet (Inactive) -->
+<button class="flex flex-col items-center justify-center text-[#777777] dark:text-[#E2E2E2] px-6 py-2 hover:opacity-80 transition-opacity scale-95 active:scale-90 transition-transform">
+<span class="material-symbols-outlined">account_balance_wallet</span>
+<span class="font-['Inter'] text-[10px] font-bold uppercase tracking-wider mt-1">Wallet</span>
+</button>
+<!-- Profile (Inactive) -->
+<button class="flex flex-col items-center justify-center text-[#777777] dark:text-[#E2E2E2] px-6 py-2 hover:opacity-80 transition-opacity scale-95 active:scale-90 transition-transform">
+<span class="material-symbols-outlined">person</span>
+<span class="font-['Inter'] text-[10px] font-bold uppercase tracking-wider mt-1">Profile</span>
+</button>
+</div>
+</nav>
+<!-- Footer -->
+<footer class="w-full border-t border-[#C6C6C6] dark:border-[#3B3B3B] bg-[#F3F3F4] dark:bg-[#000000] mt-auto hidden md:block">
+<div class="flex flex-col md:flex-row justify-between items-center px-8 py-12 w-full max-w-[1440px] mx-auto">
+<div class="text-lg font-black text-[#000000] dark:text-[#F9F9F9] mb-6 md:mb-0">APNAGHR</div>
+<div class="font-['Inter'] text-[0.75rem] font-bold uppercase tracking-widest text-[#000000] dark:text-[#F9F9F9] opacity-50 mb-6 md:mb-0">
+                © 2024 APNAGHR. KINETIC UTILITARIANISM IN HOUSING.
+            </div>
+<nav class="flex flex-wrap justify-center gap-6 font-['Inter'] text-[0.75rem] font-bold uppercase tracking-widest">
+<a class="text-[#777777] dark:text-[#E2E2E2] hover:text-[#000000] dark:hover:text-[#F9F9F9] transition-colors" href="#">Privacy</a>
+<a class="text-[#777777] dark:text-[#E2E2E2] hover:text-[#000000] dark:hover:text-[#F9F9F9] transition-colors" href="#">Terms</a>
+<a class="text-[#777777] dark:text-[#E2E2E2] hover:text-[#000000] dark:hover:text-[#F9F9F9] transition-colors" href="#">Logistics</a>
+<a class="text-[#777777] dark:text-[#E2E2E2] hover:text-[#000000] dark:hover:text-[#F9F9F9] transition-colors" href="#">Careers</a>
+</nav>
+</div>
+</footer>
+</body></html>

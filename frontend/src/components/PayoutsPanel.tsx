@@ -50,7 +50,7 @@ const PayoutsPanel = () => {
   const totalPaid = wallets.reduce((sum, w) => sum + (w.paid_earnings || 0), 0);
 
   if (loading) {
-    return <div className="flex justify-center py-12"><div className="w-8 h-8 border-4 border-[#E07A5F] border-t-transparent rounded-full animate-spin"></div></div>;
+    return <div className="flex justify-center py-12"><div className="w-8 h-8 border-4 border-[var(--stitch-ink)] border-t-transparent rounded-full animate-spin"></div></div>;
   }
 
   return (
@@ -60,7 +60,7 @@ const PayoutsPanel = () => {
         <button
           onClick={handleProcessPayouts}
           disabled={processingPayout || totalApproved === 0}
-          className="btn-primary flex items-center gap-2 disabled:opacity-50"
+          className="stitch-button flex items-center gap-2 disabled:opacity-50"
           data-testid="process-payouts-button"
         >
           {processingPayout ? (
@@ -109,7 +109,7 @@ const PayoutsPanel = () => {
       </div>
 
       {/* Next Payout Date */}
-      <div className="bg-[#264653] text-white rounded-xl p-4 mb-6 flex items-center justify-between">
+      <div className="bg-[var(--stitch-ink)] text-white rounded-xl p-4 mb-6 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Calendar className="w-6 h-6" />
           <div>
@@ -121,13 +121,13 @@ const PayoutsPanel = () => {
       </div>
 
       {/* Rider Wallets Table */}
-      <div className="bg-white rounded-xl border border-[#E5E3D8] overflow-hidden">
-        <div className="p-4 border-b border-[#E5E3D8]">
+      <div className="bg-white rounded-xl border border-[var(--stitch-line)] overflow-hidden">
+        <div className="p-4 border-b border-[var(--stitch-line)]">
           <h3 className="font-bold">Rider Wallets</h3>
         </div>
         
         {wallets.length === 0 ? (
-          <div className="p-8 text-center text-[#4A626C]">
+          <div className="p-8 text-center text-[var(--stitch-muted)]">
             No rider wallets found
           </div>
         ) : (
@@ -135,25 +135,25 @@ const PayoutsPanel = () => {
             <table className="w-full">
               <thead className="bg-[#F3F2EB]">
                 <tr>
-                  <th className="text-left p-3 text-sm font-medium text-[#4A626C]">Rider</th>
-                  <th className="text-right p-3 text-sm font-medium text-[#4A626C]">Total Earned</th>
-                  <th className="text-right p-3 text-sm font-medium text-[#4A626C]">Pending</th>
-                  <th className="text-right p-3 text-sm font-medium text-[#4A626C]">Approved</th>
-                  <th className="text-right p-3 text-sm font-medium text-[#4A626C]">Paid Out</th>
-                  <th className="text-right p-3 text-sm font-medium text-[#4A626C]">Last Payout</th>
+                  <th className="text-left p-3 text-sm font-medium text-[var(--stitch-muted)]">Rider</th>
+                  <th className="text-right p-3 text-sm font-medium text-[var(--stitch-muted)]">Total Earned</th>
+                  <th className="text-right p-3 text-sm font-medium text-[var(--stitch-muted)]">Pending</th>
+                  <th className="text-right p-3 text-sm font-medium text-[var(--stitch-muted)]">Approved</th>
+                  <th className="text-right p-3 text-sm font-medium text-[var(--stitch-muted)]">Paid Out</th>
+                  <th className="text-right p-3 text-sm font-medium text-[var(--stitch-muted)]">Last Payout</th>
                 </tr>
               </thead>
               <tbody>
                 {wallets.map(wallet => (
-                  <tr key={wallet.rider_id} className="border-b border-[#E5E3D8] hover:bg-[#F3F2EB]/50">
+                  <tr key={wallet.rider_id} className="border-b border-[var(--stitch-line)] hover:bg-[#F3F2EB]/50">
                     <td className="p-3">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 bg-[#E07A5F] text-white rounded-full flex items-center justify-center font-bold text-sm">
+                        <div className="w-8 h-8 bg-[var(--stitch-ink)] text-white rounded-full flex items-center justify-center font-bold text-sm">
                           {wallet.rider?.name?.charAt(0) || '?'}
                         </div>
                         <div>
                           <p className="font-medium">{wallet.rider?.name || 'Unknown'}</p>
-                          <p className="text-xs text-[#4A626C]">{wallet.rider?.phone}</p>
+                          <p className="text-xs text-[var(--stitch-muted)]">{wallet.rider?.phone}</p>
                         </div>
                       </div>
                     </td>
@@ -164,20 +164,20 @@ const PayoutsPanel = () => {
                       {wallet.pending_earnings > 0 ? (
                         <span className="text-amber-600 font-medium">₹{wallet.pending_earnings.toLocaleString()}</span>
                       ) : (
-                        <span className="text-[#4A626C]">₹0</span>
+                        <span className="text-[var(--stitch-muted)]">₹0</span>
                       )}
                     </td>
                     <td className="p-3 text-right">
                       {wallet.approved_earnings > 0 ? (
                         <span className="text-blue-600 font-medium">₹{wallet.approved_earnings.toLocaleString()}</span>
                       ) : (
-                        <span className="text-[#4A626C]">₹0</span>
+                        <span className="text-[var(--stitch-muted)]">₹0</span>
                       )}
                     </td>
                     <td className="p-3 text-right text-green-600 font-medium">
                       ₹{(wallet.paid_earnings || 0).toLocaleString()}
                     </td>
-                    <td className="p-3 text-right text-sm text-[#4A626C]">
+                    <td className="p-3 text-right text-sm text-[var(--stitch-muted)]">
                       {wallet.last_payout_date ? new Date(wallet.last_payout_date).toLocaleDateString() : '-'}
                     </td>
                   </tr>

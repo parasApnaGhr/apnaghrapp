@@ -108,20 +108,20 @@ const SEOListingPage = ({ listingType = 'rent' }) => {
           <div className="max-w-7xl mx-auto px-4 py-4">
             <div className="flex items-center justify-between">
               <Link to="/" className="flex items-center gap-2">
-                <Home className="w-6 h-6 text-[#04473C]" />
-                <span className="font-bold text-xl text-[#04473C]">ApnaGhr</span>
+                <Home className="w-6 h-6 text-[var(--stitch-ink)]" />
+                <span className="font-bold text-xl text-[var(--stitch-ink)]">ApnaGhr</span>
               </Link>
               
               <nav className="hidden md:flex items-center gap-6">
-                <Link to="/rent/flats-in-mohali" className="text-gray-600 hover:text-[#04473C]">Rent</Link>
-                <Link to="/buy/flats-in-mohali" className="text-gray-600 hover:text-[#04473C]">Buy</Link>
-                <Link to="/pg/pg-in-mohali" className="text-gray-600 hover:text-[#04473C]">PG</Link>
-                <Link to="/blogs" className="text-gray-600 hover:text-[#04473C]">Blog</Link>
+                <Link to="/rent/flats-in-mohali" className="text-gray-600 hover:text-[var(--stitch-ink)]">Rent</Link>
+                <Link to="/buy/flats-in-mohali" className="text-gray-600 hover:text-[var(--stitch-ink)]">Buy</Link>
+                <Link to="/pg/pg-in-mohali" className="text-gray-600 hover:text-[var(--stitch-ink)]">PG</Link>
+                <Link to="/blogs" className="text-gray-600 hover:text-[var(--stitch-ink)]">Blog</Link>
               </nav>
 
               <Link
                 to="/"
-                className="px-4 py-2 bg-[#04473C] text-white rounded-lg text-sm font-medium hover:bg-[#033530]"
+                className="px-4 py-2 bg-[var(--stitch-ink)] text-white rounded-lg text-sm font-medium hover:bg-[var(--stitch-ink)]"
               >
                 Book Visit
               </Link>
@@ -133,15 +133,15 @@ const SEOListingPage = ({ listingType = 'rent' }) => {
         <div className="bg-white border-b border-gray-100">
           <div className="max-w-7xl mx-auto px-4 py-3">
             <nav className="flex items-center gap-2 text-sm text-gray-600">
-              <Link to="/" className="hover:text-[#04473C]">Home</Link>
+              <Link to="/" className="hover:text-[var(--stitch-ink)]">Home</Link>
               <ChevronRight className="w-4 h-4" />
-              <Link to={`/${listingType}/flats-in-mohali`} className="hover:text-[#04473C] capitalize">{listingType}</Link>
+              <Link to={`/${listingType}/flats-in-mohali`} className="hover:text-[var(--stitch-ink)] capitalize">{listingType}</Link>
               {parsedSlug?.city && (
                 <>
                   <ChevronRight className="w-4 h-4" />
                   <Link 
                     to={`/${listingType}/flats-in-${parsedSlug.city.slug}`}
-                    className="hover:text-[#04473C]"
+                    className="hover:text-[var(--stitch-ink)]"
                   >
                     {parsedSlug.city.name}
                   </Link>
@@ -175,7 +175,7 @@ const SEOListingPage = ({ listingType = 'rent' }) => {
           <div className="flex flex-wrap items-center gap-3 mb-6 p-4 bg-white rounded-xl border border-gray-200">
             {/* Property Type Filter */}
             <select 
-              className="px-4 py-2 border border-gray-300 rounded-lg text-sm focus:border-[#04473C] focus:ring-1 focus:ring-[#04473C]"
+              className="px-4 py-2 border border-gray-300 rounded-lg text-sm focus:border-[var(--stitch-ink)] focus:ring-1 focus:ring-[var(--stitch-ink)]"
               onChange={(e) => {
                 if (e.target.value && parsedSlug?.city) {
                   navigate(`/${listingType}/${e.target.value}-in-${parsedSlug.city.slug}`);
@@ -191,7 +191,7 @@ const SEOListingPage = ({ listingType = 'rent' }) => {
 
             {/* Budget Filter */}
             <select 
-              className="px-4 py-2 border border-gray-300 rounded-lg text-sm focus:border-[#04473C] focus:ring-1 focus:ring-[#04473C]"
+              className="px-4 py-2 border border-gray-300 rounded-lg text-sm focus:border-[var(--stitch-ink)] focus:ring-1 focus:ring-[var(--stitch-ink)]"
               onChange={(e) => {
                 if (e.target.value && parsedSlug?.city) {
                   navigate(`/${listingType}/flats-${e.target.value}-in-${parsedSlug.city.slug}`);
@@ -207,7 +207,7 @@ const SEOListingPage = ({ listingType = 'rent' }) => {
 
             {/* City Filter */}
             <select 
-              className="px-4 py-2 border border-gray-300 rounded-lg text-sm focus:border-[#04473C] focus:ring-1 focus:ring-[#04473C]"
+              className="px-4 py-2 border border-gray-300 rounded-lg text-sm focus:border-[var(--stitch-ink)] focus:ring-1 focus:ring-[var(--stitch-ink)]"
               onChange={(e) => {
                 if (e.target.value) {
                   navigate(`/${listingType}/flats-in-${e.target.value}`);
@@ -279,7 +279,7 @@ const SEOListingPage = ({ listingType = 'rent' }) => {
               </p>
               <Link
                 to="/"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-[#04473C] text-white rounded-lg font-medium hover:bg-[#033530]"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-[var(--stitch-ink)] text-white rounded-lg font-medium hover:bg-[var(--stitch-ink)]"
               >
                 <Home className="w-5 h-5" />
                 Explore All Properties
@@ -306,7 +306,7 @@ const SEOListingPage = ({ listingType = 'rent' }) => {
                     onClick={() => setCurrentPage(pageNum)}
                     className={`px-4 py-2 rounded-lg ${
                       currentPage === pageNum
-                        ? 'bg-[#04473C] text-white'
+                        ? 'bg-[var(--stitch-ink)] text-white'
                         : 'border border-gray-300 hover:bg-gray-50'
                     }`}
                   >
@@ -344,7 +344,7 @@ const SEOListingPage = ({ listingType = 'rent' }) => {
           />
 
           {/* CTA Section */}
-          <section className="mt-12 bg-gradient-to-r from-[#04473C] to-[#065f4e] rounded-2xl p-8 md:p-12 text-white text-center">
+          <section className="mt-12 bg-gradient-to-r from-[var(--stitch-ink)] to-[var(--stitch-ink)] rounded-2xl p-8 md:p-12 text-white text-center">
             <h2 className="text-2xl md:text-3xl font-bold mb-4">
               Ready to Find Your Perfect Home?
             </h2>
@@ -353,7 +353,7 @@ const SEOListingPage = ({ listingType = 'rent' }) => {
             </p>
             <Link
               to="/"
-              className="inline-flex items-center gap-2 px-8 py-4 bg-white text-[#04473C] rounded-xl font-bold hover:bg-gray-100 transition-colors"
+              className="inline-flex items-center gap-2 px-8 py-4 bg-white text-[var(--stitch-ink)] rounded-xl font-bold hover:bg-gray-100 transition-colors"
             >
               <Home className="w-5 h-5" />
               Book Property Visit Now

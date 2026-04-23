@@ -68,13 +68,13 @@ const EarnMoneyPage = () => {
           <div className="max-w-7xl mx-auto px-4 py-4">
             <div className="flex items-center justify-between">
               <Link to="/" className="flex items-center gap-2">
-                <Home className="w-6 h-6 text-[#04473C]" />
-                <span className="font-bold text-xl text-[#04473C]">ApnaGhr</span>
+                <Home className="w-6 h-6 text-[var(--stitch-ink)]" />
+                <span className="font-bold text-xl text-[var(--stitch-ink)]">ApnaGhr</span>
               </Link>
               
               <Link
                 to="/join-as-rider"
-                className="px-6 py-2 bg-[#04473C] text-white rounded-lg font-medium hover:bg-[#033530]"
+                className="px-6 py-2 bg-[var(--stitch-ink)] text-white rounded-lg font-medium hover:bg-[var(--stitch-ink)]"
               >
                 Apply Now
               </Link>
@@ -83,7 +83,7 @@ const EarnMoneyPage = () => {
         </header>
 
         {/* Hero Section */}
-        <section className="relative bg-gradient-to-br from-[#04473C] via-[#065f4e] to-[#087f5b] text-white overflow-hidden">
+        <section className="relative bg-gradient-to-br from-[var(--stitch-ink)] via-[var(--stitch-ink)] to-[#087f5b] text-white overflow-hidden">
           <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1920')] opacity-10 bg-cover bg-center" />
           
           <div className="relative max-w-7xl mx-auto px-4 py-16 md:py-24">
@@ -140,19 +140,19 @@ const EarnMoneyPage = () => {
           <div className="max-w-7xl mx-auto px-4">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
               <div>
-                <div className="text-3xl md:text-4xl font-bold text-[#04473C]">{EARNING_STATS.totalRiders}+</div>
+                <div className="text-3xl md:text-4xl font-bold text-[var(--stitch-ink)]">{EARNING_STATS.totalRiders}+</div>
                 <div className="text-gray-600">Active Riders</div>
               </div>
               <div>
-                <div className="text-3xl md:text-4xl font-bold text-[#04473C]">₹{(EARNING_STATS.monthlyPotential/1000).toFixed(0)}K+</div>
+                <div className="text-3xl md:text-4xl font-bold text-[var(--stitch-ink)]">₹{(EARNING_STATS.monthlyPotential/1000).toFixed(0)}K+</div>
                 <div className="text-gray-600">Monthly Earnings</div>
               </div>
               <div>
-                <div className="text-3xl md:text-4xl font-bold text-[#04473C]">{EARNING_STATS.citiesActive}</div>
+                <div className="text-3xl md:text-4xl font-bold text-[var(--stitch-ink)]">{EARNING_STATS.citiesActive}</div>
                 <div className="text-gray-600">Cities Active</div>
               </div>
               <div>
-                <div className="text-3xl md:text-4xl font-bold text-[#04473C]">{EARNING_STATS.propertiesListed}+</div>
+                <div className="text-3xl md:text-4xl font-bold text-[var(--stitch-ink)]">{EARNING_STATS.propertiesListed}+</div>
                 <div className="text-gray-600">Properties Listed</div>
               </div>
             </div>
@@ -178,7 +178,7 @@ const EarnMoneyPage = () => {
                     <div className="hidden md:block absolute top-12 left-full w-full h-0.5 bg-gray-200 -translate-x-1/2" />
                   )}
                   <div className="bg-white rounded-2xl p-6 border border-gray-200 hover:shadow-xl transition-shadow relative">
-                    <div className="w-12 h-12 bg-[#04473C] text-white rounded-xl flex items-center justify-center font-bold text-xl mb-4">
+                    <div className="w-12 h-12 bg-[var(--stitch-ink)] text-white rounded-xl flex items-center justify-center font-bold text-xl mb-4">
                       {step.step}
                     </div>
                     <h3 className="text-xl font-bold text-gray-900 mb-2">{step.title}</h3>
@@ -227,11 +227,11 @@ const EarnMoneyPage = () => {
                     </div>
                     <div className="flex justify-between items-center pb-4 border-b border-gray-200">
                       <span className="text-gray-600">Daily Earnings</span>
-                      <span className="font-bold text-[#04473C]">{tier.dailyEarnings}</span>
+                      <span className="font-bold text-[var(--stitch-ink)]">{tier.dailyEarnings}</span>
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-gray-600">Monthly</span>
-                      <span className="font-bold text-2xl text-[#04473C]">{tier.monthlyEarnings}</span>
+                      <span className="font-bold text-2xl text-[var(--stitch-ink)]">{tier.monthlyEarnings}</span>
                     </div>
                   </div>
 
@@ -239,7 +239,7 @@ const EarnMoneyPage = () => {
                     to="/join-as-rider"
                     className={`block w-full py-3 rounded-xl font-bold text-center ${
                       tier.tier === 'Pro'
-                        ? 'bg-[#04473C] text-white hover:bg-[#033530]'
+                        ? 'bg-[var(--stitch-ink)] text-white hover:bg-[var(--stitch-ink)]'
                         : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
                     }`}
                   >
@@ -263,8 +263,8 @@ const EarnMoneyPage = () => {
             <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
               {BENEFITS.map((benefit) => (
                 <div key={benefit.title} className="bg-white rounded-xl p-6 border border-gray-200 hover:shadow-lg transition-shadow">
-                  <div className="w-12 h-12 bg-[#04473C]/10 rounded-xl flex items-center justify-center mb-4">
-                    <Banknote className="w-6 h-6 text-[#04473C]" />
+                  <div className="w-12 h-12 bg-[var(--stitch-ink)]/10 rounded-xl flex items-center justify-center mb-4">
+                    <Banknote className="w-6 h-6 text-[var(--stitch-ink)]" />
                   </div>
                   <h3 className="font-bold text-gray-900 mb-1">{benefit.title}</h3>
                   <p className="text-gray-600 text-sm">{benefit.description}</p>
@@ -306,7 +306,7 @@ const EarnMoneyPage = () => {
                     ))}
                   </div>
                   <p className="text-gray-700 italic mb-4">"{testimonial.quote}"</p>
-                  <div className="flex items-center gap-2 text-[#04473C] font-bold">
+                  <div className="flex items-center gap-2 text-[var(--stitch-ink)] font-bold">
                     <Wallet className="w-5 h-5" />
                     {testimonial.earnings}
                   </div>
@@ -333,11 +333,11 @@ const EarnMoneyPage = () => {
                 <Link
                   key={city.slug}
                   to={`/become-property-rider/${city.slug}`}
-                  className="bg-white rounded-xl p-4 border border-gray-200 hover:border-[#04473C] hover:shadow-lg transition-all text-center"
+                  className="bg-white rounded-xl p-4 border border-gray-200 hover:border-[var(--stitch-ink)] hover:shadow-lg transition-all text-center"
                 >
                   <h3 className="font-bold text-gray-900">{city.name}</h3>
                   <p className="text-sm text-gray-500">{city.activeRiders} riders</p>
-                  <p className="text-sm text-[#04473C] font-medium">{city.avgEarnings}/mo</p>
+                  <p className="text-sm text-[var(--stitch-ink)] font-medium">{city.avgEarnings}/mo</p>
                 </Link>
               ))}
             </div>

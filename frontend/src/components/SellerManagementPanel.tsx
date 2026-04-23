@@ -135,7 +135,7 @@ const SellerManagementPanel = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="w-8 h-8 border-2 border-[#04473C] border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border border-[var(--stitch-line)] border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -143,12 +143,12 @@ const SellerManagementPanel = () => {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl" style={{ fontFamily: 'Playfair Display, serif' }}>
+        <h2 className="text-2xl" >
           Seller Management
         </h2>
         <button
           onClick={() => setShowCreateModal(true)}
-          className="btn-primary flex items-center gap-2"
+          className="stitch-button flex items-center gap-2"
           data-testid="create-seller-btn"
         >
           <Plus className="w-4 h-4" />
@@ -158,21 +158,21 @@ const SellerManagementPanel = () => {
 
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        <div className="bg-white border border-[#E5E1DB] p-4">
-          <p className="text-sm text-[#4A4D53]">Total Sellers</p>
+        <div className="bg-white border border-[var(--stitch-line)] p-4">
+          <p className="text-sm text-[var(--stitch-muted)]">Total Sellers</p>
           <p className="text-2xl font-medium">{stats.total}</p>
         </div>
-        <div className="bg-white border border-[#E5E1DB] p-4">
-          <p className="text-sm text-[#4A4D53]">Active</p>
+        <div className="bg-white border border-[var(--stitch-line)] p-4">
+          <p className="text-sm text-[var(--stitch-muted)]">Active</p>
           <p className="text-2xl font-medium text-green-600">{stats.approved}</p>
         </div>
-        <div className="bg-white border border-[#E5E1DB] p-4">
-          <p className="text-sm text-[#4A4D53]">Pending Approval</p>
-          <p className="text-2xl font-medium text-[#C6A87C]">{stats.pending}</p>
+        <div className="bg-white border border-[var(--stitch-line)] p-4">
+          <p className="text-sm text-[var(--stitch-muted)]">Pending Approval</p>
+          <p className="text-2xl font-medium text-[var(--stitch-muted)]">{stats.pending}</p>
         </div>
-        <div className="bg-white border border-[#E5E1DB] p-4">
-          <p className="text-sm text-[#4A4D53]">Total Commissions</p>
-          <p className="text-2xl font-medium text-[#04473C]">₹{stats.totalEarnings.toLocaleString()}</p>
+        <div className="bg-white border border-[var(--stitch-line)] p-4">
+          <p className="text-sm text-[var(--stitch-muted)]">Total Commissions</p>
+          <p className="text-2xl font-medium text-[var(--stitch-ink)]">₹{stats.totalEarnings.toLocaleString()}</p>
         </div>
       </div>
 
@@ -181,7 +181,7 @@ const SellerManagementPanel = () => {
         <button
           onClick={() => setActiveView('all')}
           className={`px-4 py-2 text-sm font-medium border ${
-            activeView === 'all' ? 'bg-[#04473C] text-white border-[#04473C]' : 'border-[#E5E1DB]'
+            activeView === 'all' ? 'bg-[var(--stitch-ink)] text-white border-[var(--stitch-ink)]' : 'border-[var(--stitch-line)]'
           }`}
         >
           All Sellers ({sellers.length})
@@ -189,7 +189,7 @@ const SellerManagementPanel = () => {
         <button
           onClick={() => setActiveView('pending')}
           className={`px-4 py-2 text-sm font-medium border ${
-            activeView === 'pending' ? 'bg-[#C6A87C] text-white border-[#C6A87C]' : 'border-[#E5E1DB]'
+            activeView === 'pending' ? 'bg-[var(--stitch-muted)] text-white border-[var(--stitch-muted)]' : 'border-[var(--stitch-line)]'
           }`}
         >
           Pending Approval ({pendingSellers.length})
@@ -200,9 +200,9 @@ const SellerManagementPanel = () => {
       {activeView === 'pending' && (
         <div className="space-y-4">
           {pendingSellers.length === 0 ? (
-            <div className="bg-white border border-[#E5E1DB] p-12 text-center">
+            <div className="bg-white border border-[var(--stitch-line)] p-12 text-center">
               <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-3" />
-              <p className="text-[#4A4D53]">No pending approvals</p>
+              <p className="text-[var(--stitch-muted)]">No pending approvals</p>
             </div>
           ) : (
             pendingSellers.map((seller) => (
@@ -210,23 +210,23 @@ const SellerManagementPanel = () => {
                 key={seller.id}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-white border border-[#E5E1DB] p-4"
+                className="bg-white border border-[var(--stitch-line)] p-4"
               >
                 <div className="flex items-start justify-between">
                   <div>
                     <h3 className="font-medium text-lg">{seller.name}</h3>
-                    <p className="text-sm text-[#4A4D53] flex items-center gap-2">
+                    <p className="text-sm text-[var(--stitch-muted)] flex items-center gap-2">
                       <Phone className="w-3 h-3" /> {seller.phone}
                     </p>
                     {seller.email && (
-                      <p className="text-sm text-[#4A4D53] flex items-center gap-2">
+                      <p className="text-sm text-[var(--stitch-muted)] flex items-center gap-2">
                         <Mail className="w-3 h-3" /> {seller.email}
                       </p>
                     )}
-                    <p className="text-sm text-[#4A4D53] flex items-center gap-2">
+                    <p className="text-sm text-[var(--stitch-muted)] flex items-center gap-2">
                       <MapPin className="w-3 h-3" /> {seller.city || 'Not specified'}
                     </p>
-                    <p className="text-xs text-[#4A4D53] mt-2">
+                    <p className="text-xs text-[var(--stitch-muted)] mt-2">
                       <Clock className="w-3 h-3 inline mr-1" />
                       Applied: {new Date(seller.created_at).toLocaleDateString()}
                     </p>
@@ -267,17 +267,17 @@ const SellerManagementPanel = () => {
               key={seller.id}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="bg-white border border-[#E5E1DB] p-4"
+              className="bg-white border border-[var(--stitch-line)] p-4"
             >
               <div className="flex items-start justify-between mb-3">
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-[#04473C] text-white flex items-center justify-center text-lg font-medium">
+                  <div className="w-12 h-12 bg-[var(--stitch-ink)] text-white flex items-center justify-center text-lg font-medium">
                     {seller.name?.[0] || 'S'}
                   </div>
                   <div>
                     <h3 className="font-medium text-lg">{seller.name}</h3>
-                    <p className="text-sm text-[#4A4D53]">{seller.phone}</p>
-                    <p className="text-xs text-[#04473C] font-medium">Code: {seller.referral_code}</p>
+                    <p className="text-sm text-[var(--stitch-muted)]">{seller.phone}</p>
+                    <p className="text-xs text-[var(--stitch-ink)] font-medium">Code: {seller.referral_code}</p>
                   </div>
                 </div>
                 <div className="text-right">
@@ -288,34 +288,34 @@ const SellerManagementPanel = () => {
               </div>
 
               {/* Stats */}
-              <div className="grid grid-cols-4 gap-3 mb-3 p-3 bg-[#F5F3F0]">
+              <div className="grid grid-cols-4 gap-3 mb-3 p-3 bg-[var(--stitch-soft)]">
                 <div>
-                  <p className="text-xs text-[#4A4D53]">Referrals</p>
+                  <p className="text-xs text-[var(--stitch-muted)]">Referrals</p>
                   <p className="font-medium">{seller.stats?.total_referrals || 0}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-[#4A4D53]">Converted</p>
-                  <p className="font-medium text-[#04473C]">{seller.stats?.converted || 0}</p>
+                  <p className="text-xs text-[var(--stitch-muted)]">Converted</p>
+                  <p className="font-medium text-[var(--stitch-ink)]">{seller.stats?.converted || 0}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-[#4A4D53]">Deals</p>
-                  <p className="font-medium text-[#C6A87C]">{seller.stats?.deals_closed || 0}</p>
+                  <p className="text-xs text-[var(--stitch-muted)]">Deals</p>
+                  <p className="font-medium text-[var(--stitch-muted)]">{seller.stats?.deals_closed || 0}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-[#4A4D53]">Earnings</p>
+                  <p className="text-xs text-[var(--stitch-muted)]">Earnings</p>
                   <p className="font-medium text-green-600">₹{seller.wallet?.total_earnings?.toLocaleString() || 0}</p>
                 </div>
               </div>
 
               {/* Lead Access Toggle */}
-              <div className="flex items-center justify-between py-2 border-t border-[#E5E1DB]">
+              <div className="flex items-center justify-between py-2 border-t border-[var(--stitch-line)]">
                 <div className="flex items-center gap-2">
                   {seller.admin_lead_enabled ? (
                     <Bell className="w-4 h-4 text-green-600" />
                   ) : (
                     <BellOff className="w-4 h-4 text-gray-400" />
                   )}
-                  <span className="text-sm text-[#4A4D53]">Receive Leads</span>
+                  <span className="text-sm text-[var(--stitch-muted)]">Receive Leads</span>
                 </div>
                 <button
                   onClick={async () => {
@@ -332,7 +332,7 @@ const SellerManagementPanel = () => {
                   className={`px-3 py-1 text-xs font-medium rounded-full ${
                     seller.admin_lead_enabled
                       ? 'bg-green-100 text-green-700'
-                      : 'bg-gray-100 text-gray-600'
+                      : 'bg-gray-100 text-[var(--stitch-muted)]'
                   }`}
                 >
                   {seller.admin_lead_enabled ? 'Enabled' : 'Disabled'}
@@ -347,7 +347,7 @@ const SellerManagementPanel = () => {
                   className={`flex-1 py-2 text-sm font-medium flex items-center justify-center gap-1 ${
                     seller.wallet?.approved_earnings > 0
                       ? 'bg-green-600 text-white hover:bg-green-700'
-                      : 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                      : 'bg-gray-200 text-[var(--stitch-muted)] cursor-not-allowed'
                   }`}
                   data-testid={`payout-${seller.id}`}
                 >
@@ -364,73 +364,73 @@ const SellerManagementPanel = () => {
       {showCreateModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white w-full max-w-md">
-            <div className="p-4 border-b border-[#E5E1DB] flex items-center justify-between">
+            <div className="p-4 border-b border-[var(--stitch-line)] flex items-center justify-between">
               <h3 className="text-lg font-medium">Create New Seller</h3>
-              <button onClick={() => setShowCreateModal(false)} className="p-1 hover:bg-[#F5F3F0]">
+              <button onClick={() => setShowCreateModal(false)} className="p-1 hover:bg-[var(--stitch-soft)]">
                 <X className="w-5 h-5" />
               </button>
             </div>
             <div className="p-4 space-y-4">
               <div>
-                <label className="premium-label">Name *</label>
+                <label className="stitch-eyebrow">Name *</label>
                 <input
                   type="text"
                   value={newSeller.name}
                   onChange={(e) => setNewSeller({ ...newSeller, name: e.target.value })}
-                  className="premium-input"
+                  className="stitch-input"
                   placeholder="Full name"
                 />
               </div>
               <div>
-                <label className="premium-label">Phone *</label>
+                <label className="stitch-eyebrow">Phone *</label>
                 <input
                   type="text"
                   value={newSeller.phone}
                   onChange={(e) => setNewSeller({ ...newSeller, phone: e.target.value })}
-                  className="premium-input"
+                  className="stitch-input"
                   placeholder="10-digit phone"
                 />
               </div>
               <div>
-                <label className="premium-label">Email</label>
+                <label className="stitch-eyebrow">Email</label>
                 <input
                   type="email"
                   value={newSeller.email}
                   onChange={(e) => setNewSeller({ ...newSeller, email: e.target.value })}
-                  className="premium-input"
+                  className="stitch-input"
                   placeholder="email@example.com"
                 />
               </div>
               <div>
-                <label className="premium-label">Password *</label>
+                <label className="stitch-eyebrow">Password *</label>
                 <input
                   type="password"
                   value={newSeller.password}
                   onChange={(e) => setNewSeller({ ...newSeller, password: e.target.value })}
-                  className="premium-input"
+                  className="stitch-input"
                   placeholder="Minimum 6 characters"
                 />
               </div>
               <div>
-                <label className="premium-label">City</label>
+                <label className="stitch-eyebrow">City</label>
                 <input
                   type="text"
                   value={newSeller.city}
                   onChange={(e) => setNewSeller({ ...newSeller, city: e.target.value })}
-                  className="premium-input"
+                  className="stitch-input"
                   placeholder="City name"
                 />
               </div>
               <div className="flex gap-3">
                 <button
                   onClick={handleCreateSeller}
-                  className="btn-primary flex-1"
+                  className="stitch-button flex-1"
                 >
                   Create Seller
                 </button>
                 <button
                   onClick={() => setShowCreateModal(false)}
-                  className="btn-secondary flex-1"
+                  className="stitch-button stitch-button-secondary flex-1"
                 >
                   Cancel
                 </button>
@@ -444,38 +444,38 @@ const SellerManagementPanel = () => {
       {showPayoutModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white w-full max-w-sm">
-            <div className="p-4 border-b border-[#E5E1DB]">
+            <div className="p-4 border-b border-[var(--stitch-line)]">
               <h3 className="text-lg font-medium">Process Payout</h3>
-              <p className="text-sm text-[#4A4D53]">Seller: {showPayoutModal.name}</p>
+              <p className="text-sm text-[var(--stitch-muted)]">Seller: {showPayoutModal.name}</p>
             </div>
             <div className="p-4 space-y-4">
-              <div className="bg-[#F5F3F0] p-3">
-                <p className="text-sm text-[#4A4D53]">Available for payout</p>
+              <div className="bg-[var(--stitch-soft)] p-3">
+                <p className="text-sm text-[var(--stitch-muted)]">Available for payout</p>
                 <p className="text-2xl font-medium text-green-600">
                   ₹{showPayoutModal.wallet?.approved_earnings?.toLocaleString() || 0}
                 </p>
               </div>
               <div>
-                <label className="premium-label">Payout Amount</label>
+                <label className="stitch-eyebrow">Payout Amount</label>
                 <input
                   type="number"
                   value={payoutAmount}
                   onChange={(e) => setPayoutAmount(e.target.value)}
                   max={showPayoutModal.wallet?.approved_earnings || 0}
-                  className="premium-input"
+                  className="stitch-input"
                   placeholder="Enter amount"
                 />
               </div>
               <div className="flex gap-3">
                 <button
                   onClick={() => handlePayout(showPayoutModal.id)}
-                  className="btn-primary flex-1"
+                  className="stitch-button flex-1"
                 >
                   Process Payout
                 </button>
                 <button
                   onClick={() => { setShowPayoutModal(null); setPayoutAmount(''); }}
-                  className="btn-secondary flex-1"
+                  className="stitch-button stitch-button-secondary flex-1"
                 >
                   Cancel
                 </button>

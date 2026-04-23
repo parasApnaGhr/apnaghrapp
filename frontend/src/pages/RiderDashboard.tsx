@@ -16,6 +16,7 @@ import {
   Locate, AlertTriangle, Shield, XCircle
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { StitchShell } from '../stitch/components/StitchPrimitives';
 
 const RiderDashboard = () => {
   const navigate = useNavigate();
@@ -562,879 +563,583 @@ const RiderDashboard = () => {
   const stepInfo = getCurrentStepInfo();
 
   return (
-    <div className="min-h-screen bg-[#FDFCFB] pb-24">
-      {/* Premium Header */}
-      <header className="glass-header sticky top-0 z-50">
-        <div className="max-w-2xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              {/* Branded Rider Photo */}
-              <div className="relative">
-                <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-[#C6A87C] shadow-lg">
-                  <img 
-                    src={user?.profile_photo || `https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop`}
-                    alt={user?.name || 'Rider'}
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      e.target.onerror = null;
-                      e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'R')}&background=04473C&color=fff&size=100`;
-                    }}
-                  />
-                </div>
-                {/* ApnaGhr Badge */}
-                <div className="absolute -bottom-1 -right-1 bg-[#04473C] text-white text-[8px] font-bold px-1.5 py-0.5 rounded-sm shadow-md">
-                  AG
-                </div>
-                {/* Online Indicator */}
-                {isOnline && (
-                  <div className="absolute top-0 right-0 w-4 h-4 bg-green-500 border-2 border-white rounded-full animate-pulse" />
-                )}
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <h1 className="text-xl font-medium" style={{ fontFamily: 'Playfair Display, serif' }}>
-                    Apna<span className="text-[#04473C]">Ghr</span>
-                  </h1>
-                  <span className="text-[10px] bg-[#04473C] text-white px-2 py-0.5 tracking-wider">RIDER</span>
-                </div>
-                <p className="text-sm text-[#4A4D53]">Welcome, <span className="font-medium text-[#04473C]">{user?.name}</span></p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <button 
-                onClick={() => navigate('/rider/profile')}
-                className="p-2 hover:bg-[#F5F3F0] transition-colors rounded-full"
-                data-testid="profile-button"
-                title="Profile & Bank Account"
-              >
-                <User className="w-5 h-5 text-[#04473C]" strokeWidth={1.5} />
-              </button>
-              <button 
-                onClick={logout}
-                className="p-2 hover:bg-[#F5F3F0] transition-colors rounded-full"
-                data-testid="logout-button"
-              >
-                <LogOut className="w-5 h-5 text-[#4A4D53]" strokeWidth={1.5} />
-              </button>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      <main className="max-w-2xl mx-auto px-6 py-6">
-        {/* ApnaGhr Promotional Banner with Image */}
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="relative overflow-hidden mb-4 rounded-lg"
+    <StitchShell 
+      title="Rider Dashboard" 
+      eyebrow="Operations" 
+      subtitle={isOnline ? "Active and accepting requests" : "You are currently offline. Go online to start receiving tasks."}
+      actions={
+        <StitchButton
+          onClick={toggleOnlineStatus}
+          disabled={shiftLoading}
+          variant={isOnline ? "secondary" : "primary"}
+          className={isOnline ? "border-red-500 text-red-600" : ""}
         >
-          <img 
-            src="https://customer-assets.emergentagent.com/job_field-rider-ops/artifacts/0c2eghg4_IMG_7401.jpeg"
-            alt="ApnaGhr Rider"
-            className="w-full h-40 object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#04473C]/90 to-[#04473C]/60 flex items-center justify-between p-5">
-            <div className="text-white">
-              <p className="text-xs text-white/70 tracking-wider uppercase">Your Earnings Potential</p>
-              <motion.p 
-                className="text-xl font-semibold mt-1"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.2 }}
-              >
-                ₹150<span className="text-sm font-normal">/visit</span> • Daily Payouts
-              </motion.p>
-            </div>
-            <div className="text-right text-white">
-              <motion.div
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.3 }}
-                className="bg-[#C6A87C] text-[#1A1C20] px-3 py-1.5 text-xs font-bold tracking-wide"
-              >
-                10 visits = ₹2000
-              </motion.div>
-              <p className="text-[10px] text-white/60 mt-2 flex items-center justify-end gap-1">
-                <span className="inline-block w-1 h-1 bg-[#C6A87C] rounded-full animate-pulse"></span>
-                Powered by ApnaGhr
-              </p>
-            </div>
-          </div>
-        </motion.div>
+          {shiftLoading ? (
+            <RefreshCw className="h-4 w-4 animate-spin" />
+          ) : isOnline ? (
+            <>
+              <Power className="mr-2 h-4 w-4" />
+              Go Offline
+            </>
+          ) : (
+            <>
+              <Power className="mr-2 h-4 w-4" />
+              Go Online
+            </>
+          )}
+        </StitchButton>
+      }
+    >
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <StitchKpi 
+          label="Today's Potential" 
+          value="₹150" 
+          detail="/ per property visit" 
+          icon={IndianRupee} 
+        />
+        <StitchKpi 
+          label="Target Bonus" 
+          value="₹2000" 
+          detail="for 10 visits today" 
+          icon={CheckCircle} 
+        />
+        <StitchKpi 
+          label="Wallet Balance" 
+          value={`₹${wallet?.approved_earnings || 0}`} 
+          detail="Available for withdrawal" 
+          icon={Wallet} 
+        />
+        <StitchKpi 
+          label="Current Status" 
+          value={isOnline ? "ONLINE" : "OFFLINE"} 
+          detail={isOnline ? "Ready for tasks" : "No tasks active"} 
+          icon={Power} 
+        />
+      </div>
 
-        {/* Online/Offline Toggle */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className={`bg-white border p-6 mb-6 ${isOnline ? 'border-[#04473C] bg-[#E6F0EE]' : 'border-[#E5E1DB]'}`}
-        >
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className={`w-12 h-12 flex items-center justify-center ${
-                isOnline ? 'bg-[#04473C]' : 'bg-[#F5F3F0]'
-              }`}>
-                <Power className={`w-6 h-6 ${isOnline ? 'text-white' : 'text-[#4A4D53]'}`} strokeWidth={1.5} />
-              </div>
-              <div>
-                <p className="font-medium text-lg text-[#1A1C20]">{isOnline ? 'You are Online' : 'You are Offline'}</p>
-                <p className="text-sm text-[#4A4D53]">
-                  {isOnline ? 'Accepting new requests' : 'Go online to start earning ₹150/visit'}
-                </p>
-              </div>
-            </div>
-            <button
-              onClick={toggleOnlineStatus}
-              disabled={shiftLoading}
-              className={`px-6 py-3 font-medium tracking-wide transition-all ${
-                isOnline 
-                  ? 'bg-[#8F2727] text-white hover:bg-[#7a2121]' 
-                  : 'bg-[#04473C] text-white hover:bg-[#03352D]'
-              }`}
-              data-testid="toggle-online-button"
-            >
-              {shiftLoading ? (
-                <RefreshCw className="w-5 h-5 animate-spin" />
-              ) : isOnline ? 'Go Offline' : 'Go Online'}
-            </button>
-          </div>
-        </motion.div>
-
-        {/* Tab Navigation */}
-        <div className="flex gap-2 mb-6 overflow-x-auto pb-2 hide-scrollbar">
-          {[
-            { id: 'visits', label: 'Visits', icon: Navigation },
-            { id: 'tracking', label: 'GPS Track', icon: Locate },
-            { id: 'tasks', label: 'ToLet Tasks', icon: ClipboardList },
-            { id: 'wallet', label: 'Wallet', icon: Wallet }
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 px-5 py-2.5 border font-medium text-sm tracking-wide transition-all whitespace-nowrap ${
-                activeTab === tab.id 
-                  ? 'bg-[#04473C] text-white border-[#04473C]' 
-                  : 'bg-white border-[#E5E1DB] hover:border-[#D0C9C0] text-[#1A1C20]'
-              }`}
-              data-testid={`tab-${tab.id}`}
-            >
-              <tab.icon className="w-4 h-4" strokeWidth={1.5} />
-              {tab.label}
-            </button>
-          ))}
-        </div>
-
-        {/* Visits Tab */}
-        {activeTab === 'visits' && (
-          <>
-            {/* Active Visit */}
-            {activeVisit && stepInfo && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="bg-white border border-[#E5E1DB] mb-6 overflow-hidden"
-              >
-                <div className="bg-[#04473C] text-white p-5">
-                  <div className="flex items-center gap-4">
-                    <stepInfo.icon className="w-8 h-8" strokeWidth={1.5} />
-                    <div>
-                      <h2 className="font-medium text-lg">{stepInfo.title}</h2>
-                      <p className="text-sm opacity-80">{stepInfo.subtitle}</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="p-6 space-y-4">
-                  {/* Location with prominent NAVIGATE button - Uber Style */}
-                  {stepInfo.location && (
-                    <div className="bg-gradient-to-r from-[#1a73e8] to-[#4285f4] rounded-xl p-4 text-white">
-                      <div className="flex items-start gap-3 mb-3">
-                        <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
-                          <MapPin className="w-5 h-5" strokeWidth={2} />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-xs text-white/70 uppercase tracking-wider mb-1">
-                            {stepInfo.title === 'Go to Customer' ? 'Pickup Location' : 'Navigate To'}
-                          </p>
-                          <p className="font-medium text-white leading-tight">{stepInfo.location}</p>
-                        </div>
-                      </div>
-                      <button
-                        onClick={() => {
-                          openNavigation(stepInfo.location, stepInfo.lat, stepInfo.lng);
-                          toast.success('Opening Google Maps...', { icon: '🧭', duration: 2000 });
-                        }}
-                        className="w-full py-3 bg-white text-[#1a73e8] rounded-lg font-bold flex items-center justify-center gap-2 hover:bg-white/90 transition-colors"
-                        data-testid="navigate-button"
-                      >
-                        <Navigation className="w-5 h-5" strokeWidth={2} />
-                        NAVIGATE IN GOOGLE MAPS
-                      </button>
-                    </div>
-                  )}
-
-                  {/* OTP */}
-                  {stepInfo.showOTP && (
-                    <div className="text-center p-6 bg-[#C6A87C]/10 border border-[#C6A87C]">
-                      <p className="text-sm font-medium mb-2 text-[#4A4D53] uppercase tracking-wide">Customer OTP</p>
-                      <p className="text-4xl font-bold tracking-widest text-[#1A1C20]" style={{ fontFamily: 'Playfair Display, serif' }}>
-                        {stepInfo.otp}
-                      </p>
-                    </div>
-                  )}
-
-                  {/* Upload Proof */}
-                  {stepInfo.showUploadProof && (
-                    <button
-                      onClick={() => {
-                        setCurrentProofPropertyId(stepInfo.property?.id);
-                        setShowProofUpload(true);
-                      }}
-                      className="w-full p-4 bg-[#E6F0EE] flex items-center justify-center gap-2 hover:bg-[#d0e5e1] border border-dashed border-[#04473C] transition-colors"
-                      data-testid="upload-proof-button"
-                    >
-                      <Camera className="w-5 h-5 text-[#04473C]" strokeWidth={1.5} />
-                      <span className="text-[#04473C] font-medium">Upload Selfie & Video Proof</span>
-                    </button>
-                  )}
-
-                  {/* Customer Call */}
-                  {activeVisit.customer && (
-                    <button
-                      onClick={() => window.open(`tel:${activeVisit.customer.phone}`, '_self')}
-                      className="w-full p-4 bg-white flex items-center justify-center gap-2 border border-[#E5E1DB] hover:border-[#04473C] transition-colors"
-                      data-testid="call-customer-button"
-                    >
-                      <Phone className="w-5 h-5 text-[#04473C]" strokeWidth={1.5} />
-                      <span className="text-[#1A1C20]">Call Customer ({activeVisit.customer.phone})</span>
-                    </button>
-                  )}
-
-                  {/* Action Button */}
-                  <button
-                    onClick={() => handleUpdateStep(stepInfo.action)}
-                    className="btn-primary w-full flex items-center justify-center gap-2"
-                    data-testid="step-action-button"
-                  >
-                    {stepInfo.actionText}
-                    <ArrowRight className="w-5 h-5" strokeWidth={1.5} />
-                  </button>
-
-                  {/* Progress Bar */}
-                  <div className="pt-4 border-t border-[#E5E1DB]">
-                    <p className="text-sm text-[#4A4D53] mb-2 uppercase tracking-wide">Progress</p>
-                    <div className="flex gap-2">
-                      {activeVisit.properties?.map((prop, idx) => (
-                        <div
-                          key={prop.id}
-                          className={`flex-1 h-2 ${
-                            (activeVisit.visit.properties_completed || []).includes(prop.id)
-                              ? 'bg-[#04473C]'
-                              : idx === activeVisit.visit.current_property_index
-                              ? 'bg-[#C6A87C]'
-                              : 'bg-[#E5E1DB]'
-                          }`}
-                        />
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Multi-Property Route View */}
-                  {activeVisit.properties?.length > 1 && (
-                    <div className="pt-4 border-t border-[#E5E1DB]">
-                      <button
-                        onClick={() => setShowRouteMap(true)}
-                        className="w-full p-3 bg-[#04473C]/10 border border-[#04473C] rounded-lg flex items-center justify-center gap-2 text-[#04473C] hover:bg-[#04473C]/20 transition-colors"
-                      >
-                        <Route className="w-5 h-5" />
-                        <span className="font-medium">View Optimized Route ({activeVisit.properties.length} Properties)</span>
-                      </button>
-                      
-                      {activeVisit.optimized_route && (
-                        <div className="mt-3 grid grid-cols-2 gap-3 text-center">
-                          <div className="bg-[#F5F3F0] p-3 rounded-lg">
-                            <p className="text-2xl font-bold text-[#04473C]">{activeVisit.optimized_route.total_distance_km}</p>
-                            <p className="text-xs text-[#4A4D53]">Total km</p>
-                          </div>
-                          <div className="bg-[#F5F3F0] p-3 rounded-lg">
-                            <p className="text-2xl font-bold text-[#04473C]">{Math.round(activeVisit.optimized_route.estimated_time_minutes)} min</p>
-                            <p className="text-xs text-[#4A4D53]">Est. Time</p>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
-              </motion.div>
-            )}
-
-            {/* Available Visits */}
-            {isOnline && !activeVisit && (
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-medium text-[#1A1C20]" style={{ fontFamily: 'Playfair Display, serif' }}>Available Visits ({availableVisits.length})</h3>
-                  <button onClick={loadAvailableVisits} className="p-2 hover:bg-[#F5F3F0] transition-colors">
-                    <RefreshCw className="w-4 h-4 text-[#4A4D53]" strokeWidth={1.5} />
-                  </button>
-                </div>
-
-                {loading ? (
-                  <div className="text-center py-12">
-                    <div className="w-8 h-8 border-2 border-[#04473C] border-t-transparent rounded-full animate-spin mx-auto"></div>
-                    <p className="mt-4 text-[#4A4D53]">Loading visits...</p>
-                  </div>
-                ) : availableVisits.length === 0 ? (
-                  <div className="bg-white border border-[#E5E1DB] p-12 text-center">
-                    <Clock className="w-12 h-12 text-[#D0C9C0] mx-auto mb-3" strokeWidth={1} />
-                    <p className="text-[#4A4D53]">No visits available right now</p>
-                    <p className="text-sm text-[#4A4D53] mt-2">New requests will appear here</p>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {availableVisits.map((visit) => (
-                      <motion.div
-                        key={visit.id}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="bg-white border border-[#E5E1DB] p-6 hover:shadow-lg transition-shadow"
-                        data-testid={`visit-request-${visit.id}`}
-                      >
-                        {/* Header with Property Count & Earnings */}
-                        <div className="flex items-start justify-between mb-4">
-                          <div>
-                            <div className="flex items-center gap-2 mb-1">
-                              <h4 className="font-medium text-lg text-[#1A1C20]">
-                                {(visit.property_ids?.length || 1) === 1 
-                                  ? 'Single Property Visit' 
-                                  : `${visit.property_ids?.length || 1} Properties to Visit`}
-                              </h4>
-                              {(visit.property_ids?.length || 1) > 1 && (
-                                <span className="bg-[#FF5A5F] text-white text-xs px-2 py-0.5 rounded-full font-medium">
-                                  Multi-Stop
-                                </span>
-                              )}
-                            </div>
-                            <p className="text-sm text-[#4A4D53]">
-                              {visit.estimated_duration || `~${(visit.property_ids?.length || 1) * 30} mins`}
-                            </p>
-                          </div>
-                          <div className="flex flex-col items-end gap-1">
-                            <span className="badge badge-warning">Pending</span>
-                            {visit.distance_km !== null && visit.distance_km !== undefined && (
-                              <span className="text-xs font-medium text-[#04473C] bg-[#E6F0EE] px-2 py-1 rounded">
-                                {visit.distance_km} km
-                              </span>
-                            )}
-                          </div>
-                        </div>
-
-                        {/* Earnings Banner */}
-                        <div className="bg-gradient-to-r from-[#04473C] to-[#065f4e] rounded-lg p-4 mb-4">
-                          <div className="flex items-center justify-between text-white">
-                            <div>
-                              <p className="text-xs text-white/70 uppercase tracking-wider">You'll Earn</p>
-                              <div className="flex items-center gap-1">
-                                <IndianRupee className="w-6 h-6" />
-                                <span className="text-3xl font-bold">
-                                  {visit.total_earnings || (visit.property_ids?.length || 1) * 100}
-                                </span>
-                              </div>
-                            </div>
-                            <div className="text-right">
-                              <p className="text-xs text-white/70">
-                                ₹100 × {visit.property_ids?.length || 1} {(visit.property_ids?.length || 1) === 1 ? 'property' : 'properties'}
-                              </p>
-                              {(visit.property_ids?.length || 1) > 1 && (
-                                <p className="text-sm text-[#4ECDC4] font-medium mt-1">
-                                  +Bonus for multi-stop!
-                                </p>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* All Property Locations */}
-                        <div className="space-y-2 mb-4">
-                          <p className="text-xs text-[#6B7280] uppercase tracking-wider font-medium mb-2">
-                            {(visit.property_ids?.length || 1) === 1 ? 'Property Location' : 'All Locations'}
-                          </p>
-                          {visit.properties?.map((prop, idx) => (
-                            <div key={prop.id} className="flex items-center gap-3 bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg p-3">
-                              <div className="w-8 h-8 bg-[#FF5A5F] text-white rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0">
-                                {idx + 1}
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <p className="font-medium text-[#1A1C20] truncate">{prop.title}</p>
-                                <p className="text-sm text-[#6B7280] truncate">{prop.location || prop.area_name}</p>
-                              </div>
-                              {idx < (visit.properties?.length || 1) - 1 && (
-                                <div className="text-xs text-[#9CA3AF]">→</div>
-                              )}
-                            </div>
-                          ))}
-                          {/* If no properties array, show basic info */}
-                          {(!visit.properties || visit.properties.length === 0) && (
-                            <div className="flex items-center gap-3 bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg p-3">
-                              <div className="w-8 h-8 bg-[#FF5A5F] text-white rounded-full flex items-center justify-center font-bold text-sm">
-                                1
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <p className="font-medium text-[#1A1C20] truncate">{visit.property_title || 'Property Visit'}</p>
-                                <p className="text-sm text-[#6B7280] truncate">{visit.property_location || visit.pickup_location || 'Location details available after accepting'}</p>
-                              </div>
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Schedule & Customer Info */}
-                        <div className="flex items-center justify-between py-3 border-y border-[#E5E7EB] mb-4">
-                          <div className="flex items-center gap-2 text-sm">
-                            <Clock className="w-4 h-4 text-[#52525B]" />
-                            <span>{visit.scheduled_date || 'Flexible'} {visit.scheduled_time ? `at ${visit.scheduled_time}` : ''}</span>
-                          </div>
-                          <div className="text-sm text-[#6B7280]">
-                            Customer: {visit.customer_name || 'Available after accept'}
-                          </div>
-                        </div>
-
-                        {/* Accept Button */}
-                        <div className="flex gap-3">
-                          <button
-                            onClick={() => handleAcceptVisit(visit.id)}
-                            className="btn-primary flex-1 flex items-center justify-center gap-2 py-4 text-lg"
-                            data-testid={`accept-visit-${visit.id}`}
-                          >
-                            <CheckCircle className="w-6 h-6" />
-                            ACCEPT & Earn ₹{visit.total_earnings || (visit.property_ids?.length || 1) * 100}
-                          </button>
-                        </div>
-                      </motion.div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-
-            {!isOnline && (
-              <div className="neo-card p-12 text-center">
-                <Power className="w-12 h-12 text-[#9CA3AF] mx-auto mb-3" />
-                <p className="text-[#52525B]">Go online to see available visits</p>
-              </div>
-            )}
-          </>
-        )}
-
-        {/* GPS Tracking Tab */}
-        {activeTab === 'tracking' && (
-          <div>
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-medium text-[#1A1C20]" style={{ fontFamily: 'Playfair Display, serif' }}>
-                Live GPS Tracking
-              </h3>
-            </div>
-
-            {!isOnline ? (
-              <div className="bg-white border border-[#E5E1DB] p-12 text-center">
-                <Power className="w-12 h-12 text-[#D0C9C0] mx-auto mb-3" strokeWidth={1} />
-                <p className="text-[#4A4D53]">Go online to enable GPS tracking</p>
-                <p className="text-sm text-[#4A4D53] mt-2">Your location will be shared with customers</p>
-              </div>
-            ) : (
-              <RiderLocationTracker
-                riderId={user?.id}
-                riderName={user?.name}
-                assignedVisits={activeVisit ? [{
-                  id: activeVisit.visit?.id,
-                  properties: activeVisit.properties,
-                  ...activeVisit.visit
-                }] : []}
-                onVisitStatusChange={(visitId, status) => {
-                  console.log('Visit status changed:', visitId, status);
-                  if (status === 'completed') {
-                    loadAvailableVisits();
-                    loadWallet();
-                  }
-                }}
+      <div className="grid gap-8 lg:grid-cols-[1fr_350px]">
+        <div className="space-y-8">
+          {/* Active Tab Content */}
+          {activeTab === 'visits' && (
+            <div className="space-y-6">
+              <StitchSectionHeader 
+                title="Property Visits" 
+                copy="Manage your active and available property verification tasks."
+                action={
+                  <StitchButton variant="ghost" onClick={loadAvailableVisits} disabled={loading}>
+                    <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+                  </StitchButton>
+                }
               />
-            )}
 
-            {/* Instructions */}
-            <div className="mt-6 p-4 bg-[#E6F0EE] border border-[#04473C]/20 rounded-lg">
-              <h4 className="font-medium text-[#04473C] mb-2">How GPS Tracking Works</h4>
-              <ul className="text-sm text-[#4A4D53] space-y-2">
-                <li>• Click "Start" to begin sharing your location</li>
-                <li>• Customers will see your live position on the map</li>
-                <li>• ETA is automatically calculated using real road distances</li>
-                <li>• System detects when you reach within 100m of property</li>
-                <li>• Keep this tab open while on duty for best tracking</li>
-              </ul>
-            </div>
-          </div>
-        )}
-
-        {/* ToLet Tasks Tab */}
-        {activeTab === 'tasks' && (
-          <div>
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-bold">ToLet Board Tasks ({availableTasks.length})</h3>
-              <button onClick={loadAvailableTasks} className="p-2 hover:bg-gray-100 rounded-full">
-                <RefreshCw className="w-4 h-4" />
-              </button>
-            </div>
-
-            {/* Active Task */}
-            {activeTask && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="neo-card p-6 mb-6 bg-[#4ECDC4]/10"
-              >
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 bg-[#4ECDC4] text-white rounded-full flex items-center justify-center">
-                    <ClipboardList className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <h4 className="font-bold">{activeTask.title}</h4>
-                    <p className="text-sm text-[#52525B]">{activeTask.location}</p>
-                  </div>
-                </div>
-                <p className="text-sm mb-4">{activeTask.description}</p>
-                <div className="flex items-center justify-between py-3 border-y mb-4">
-                  <span className="text-sm">Est. Boards: {activeTask.estimated_boards}</span>
-                  <span className="font-bold text-[#4ECDC4]">₹{activeTask.rate_per_board}/board</span>
-                </div>
-
-                {/* Task Completion Form */}
-                <div className="space-y-4">
-                  {/* Boards Collected */}
-                  <div>
-                    <label className="block text-sm font-bold mb-2">Boards Collected *</label>
-                    <input
-                      type="number"
-                      min="1"
-                      max={activeTask.estimated_boards * 2}
-                      value={taskCompletion.boardsCollected}
-                      onChange={(e) => setTaskCompletion({ 
-                        ...taskCompletion, 
-                        boardsCollected: parseInt(e.target.value) || 1 
-                      })}
-                      className="w-full px-4 py-3 border-2 border-[#111111] rounded-xl"
-                      data-testid="boards-collected-input"
-                    />
-                    <p className="text-xs text-[#52525B] mt-1">
-                      Estimated earnings: ₹{(taskCompletion.boardsCollected * activeTask.rate_per_board).toLocaleString()}
-                    </p>
-                  </div>
-
-                  {/* Photo Upload */}
-                  <div>
-                    <label className="block text-sm font-bold mb-2">
-                      <Camera className="w-4 h-4 inline mr-1" />
-                      Upload Board Photos * (one per board)
-                    </label>
-                    
-                    <div className="grid grid-cols-3 gap-2 mb-3">
-                      {taskCompletion.proofImages.map((url, index) => (
-                        <div key={index} className="relative aspect-square rounded-lg overflow-hidden border-2 border-[#E5E3D8]">
-                          <img 
-                            src={url} 
-                            alt={`Board ${index + 1}`} 
-                            className="w-full h-full object-cover"
-                            onError={(e) => {
-                              e.target.onerror = null;
-                              e.target.src = 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80';
-                            }}
-                          />
-                          <button
-                            onClick={() => removeTaskPhoto(index)}
-                            className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full"
-                          >
-                            <X className="w-3 h-3" />
-                          </button>
-                          <span className="absolute bottom-1 left-1 bg-black/50 text-white text-xs px-2 py-0.5 rounded">
-                            #{index + 1}
-                          </span>
-                        </div>
-                      ))}
-                      
-                      {/* Upload Button */}
-                      <button
-                        onClick={() => taskFileInputRef.current?.click()}
-                        disabled={taskCompletion.uploading}
-                        className="aspect-square rounded-lg border-2 border-dashed border-[#4ECDC4] bg-[#4ECDC4]/10 flex flex-col items-center justify-center hover:bg-[#4ECDC4]/20 transition-colors"
-                        data-testid="upload-task-photo-button"
-                      >
-                        {taskCompletion.uploading ? (
-                          <div className="w-6 h-6 border-2 border-[#4ECDC4] border-t-transparent rounded-full animate-spin" />
-                        ) : (
-                          <>
-                            <Upload className="w-6 h-6 text-[#4ECDC4] mb-1" />
-                            <span className="text-xs text-[#4ECDC4] font-medium">Add Photo</span>
-                          </>
-                        )}
-                      </button>
-                    </div>
-                    
-                    <input
-                      ref={taskFileInputRef}
-                      type="file"
-                      accept="image/*"
-                      multiple
-                      onChange={handleTaskPhotoUpload}
-                      className="hidden"
-                    />
-                    
-                    {taskCompletion.proofImages.length < taskCompletion.boardsCollected && (
-                      <p className="text-xs text-[#FF5A5F] mt-1">
-                        ⚠️ Upload {taskCompletion.boardsCollected - taskCompletion.proofImages.length} more photo(s)
-                      </p>
-                    )}
-                  </div>
-
-                  {/* Notes */}
-                  <div>
-                    <label className="block text-sm font-bold mb-2">Notes (optional)</label>
-                    <textarea
-                      value={taskCompletion.notes}
-                      onChange={(e) => setTaskCompletion({ ...taskCompletion, notes: e.target.value })}
-                      placeholder="Any additional notes..."
-                      className="w-full px-4 py-3 border-2 border-[#111111] rounded-xl resize-none"
-                      rows={2}
-                    />
-                  </div>
-
-                  {/* Submit Button */}
-                  <motion.button
-                    onClick={handleCompleteTask}
-                    disabled={loading || taskCompletion.proofImages.length < taskCompletion.boardsCollected}
-                    whileHover={{ scale: loading ? 1 : 1.02 }}
-                    whileTap={{ scale: loading ? 1 : 0.98 }}
-                    className={`w-full py-4 rounded-xl font-bold text-white transition-all ${
-                      taskCompletion.proofImages.length >= taskCompletion.boardsCollected
-                        ? 'bg-[#4ECDC4] shadow-[3px_3px_0px_#111111]'
-                        : 'bg-gray-400 cursor-not-allowed'
-                    }`}
-                    data-testid="complete-task-button"
-                  >
-                    {loading ? 'Submitting...' : 'Submit for Verification'}
-                  </motion.button>
-                  
-                  <p className="text-xs text-center text-[#52525B]">
-                    Your photos will be reviewed by admin before payout
-                  </p>
-                </div>
-              </motion.div>
-            )}
-
-            {!isOnline ? (
-              <div className="bg-white border border-[#E5E1DB] p-12 text-center">
-                <Power className="w-12 h-12 text-[#D0C9C0] mx-auto mb-3" strokeWidth={1} />
-                <p className="text-[#4A4D53]">Go online to see available tasks</p>
-              </div>
-            ) : availableTasks.length === 0 ? (
-              <div className="bg-white border border-[#E5E1DB] p-12 text-center">
-                <ClipboardList className="w-12 h-12 text-[#D0C9C0] mx-auto mb-3" strokeWidth={1} />
-                <p className="text-[#4A4D53]">No ToLet tasks available</p>
-                <p className="text-sm text-[#4A4D53] mt-2">Check back later</p>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {availableTasks.map((task) => (
-                  <motion.div
-                    key={task.id}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="bg-white border border-[#E5E1DB] p-6 hover:shadow-lg transition-shadow"
-                    data-testid={`task-${task.id}`}
-                  >
-                    <div className="flex items-start justify-between mb-3">
+              {/* Active Visit */}
+              {activeVisit && stepInfo && (
+                <StitchCard className="overflow-hidden border border-[var(--stitch-line)]">
+                  <div className="bg-[var(--stitch-ink)] p-5 text-[var(--stitch-bg)]">
+                    <div className="flex items-center gap-4">
+                      <stepInfo.icon className="h-8 w-8" />
                       <div>
-                        <h4 className="font-medium text-[#1A1C20]">{task.title}</h4>
-                        <p className="text-sm text-[#4A4D53] flex items-center gap-1">
-                          <MapPin className="w-3 h-3" strokeWidth={1.5} />
-                          {task.location}
-                        </p>
+                        <p className="stitch-eyebrow text-[var(--stitch-bg)] opacity-70">Current Step</p>
+                        <h2 className="font-headline text-xl font-black uppercase">{stepInfo.title}</h2>
                       </div>
-                      <span className="px-3 py-1 bg-[#E6F0EE] text-[#04473C] text-xs font-medium">{task.status}</span>
                     </div>
-                    <p className="text-sm text-[#4A4D53] mb-4">{task.description}</p>
-                    <div className="flex items-center justify-between py-3 border-y border-[#E5E1DB] mb-4">
-                      <span className="text-sm text-[#4A4D53]">Est. Boards: {task.estimated_boards}</span>
-                      <span className="price-display">
-                        <span className="price-currency text-sm">₹</span>
-                        {(task.rate_per_board * task.estimated_boards).toFixed(0)}
-                      </span>
+                  </div>
+
+                  <div className="p-6 space-y-6">
+                    {stepInfo.location && (
+                      <div className="rounded-2xl border border-[var(--stitch-line)] bg-[var(--stitch-soft)] p-5">
+                        <div className="flex items-start gap-3 mb-4">
+                          <MapPin className="mt-1 h-5 w-5 text-[var(--stitch-muted)]" />
+                          <div>
+                            <p className="stitch-eyebrow">Location</p>
+                            <p className="font-bold">{stepInfo.location}</p>
+                          </div>
+                        </div>
+                        <StitchButton 
+                          className="w-full justify-center"
+                          onClick={() => openNavigation(stepInfo.location, stepInfo.lat, stepInfo.lng)}
+                        >
+                          <Navigation className="mr-2 h-4 w-4" />
+                          Open in Google Maps
+                        </StitchButton>
+                      </div>
+                    )}
+
+                    {stepInfo.showOTP && (
+                      <div className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-[var(--stitch-line-strong)] p-8">
+                        <p className="stitch-eyebrow mb-2">Customer OTP</p>
+                        <p className="font-headline text-5xl font-black tracking-[0.2em]">{stepInfo.otp}</p>
+                      </div>
+                    )}
+
+                    {stepInfo.showUploadProof && (
+                      <StitchButton 
+                        variant="secondary"
+                        className="w-full justify-center border-dashed"
+                        onClick={() => {
+                          setCurrentProofPropertyId(stepInfo.property?.id);
+                          setShowProofUpload(true);
+                        }}
+                      >
+                        <Camera className="mr-2 h-4 w-4" />
+                        Upload Visit Proof
+                      </StitchButton>
+                    )}
+
+                    <div className="flex flex-col gap-3 sm:flex-row">
+                      {activeVisit.customer && (
+                        <StitchButton 
+                          variant="secondary"
+                          className="flex-1 justify-center"
+                          onClick={() => window.open(`tel:${activeVisit.customer.phone}`, '_self')}
+                        >
+                          <Phone className="mr-2 h-4 w-4" />
+                          Call Customer
+                        </StitchButton>
+                      )}
+                      <StitchButton 
+                        className="flex-1 justify-center"
+                        onClick={() => handleUpdateStep(stepInfo.action)}
+                      >
+                        {stepInfo.actionText}
+                        <ArrowRight className="ml-2 h-4 w-4" />
+                      </StitchButton>
                     </div>
-                    <button
-                      onClick={() => handleAcceptTask(task.id)}
-                      className="btn-secondary w-full flex items-center justify-center gap-2"
-                      data-testid={`accept-task-${task.id}`}
-                    >
-                      <CheckCircle className="w-5 h-5" strokeWidth={1.5} />
-                      Accept Task
-                    </button>
-                  </motion.div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
 
-        {/* Wallet Tab */}
-        {activeTab === 'wallet' && (
-          <div>
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-medium text-[#1A1C20]" style={{ fontFamily: 'Playfair Display, serif' }}>My Wallet</h3>
-              <button onClick={loadWallet} className="p-2 hover:bg-[#F5F3F0] transition-colors">
-                <RefreshCw className="w-4 h-4 text-[#4A4D53]" strokeWidth={1.5} />
-              </button>
-            </div>
+                    {/* Progress */}
+                    <div className="space-y-3 pt-4 border-t border-[var(--stitch-line)]">
+                      <p className="stitch-eyebrow">Visit Progress</p>
+                      <div className="flex gap-2">
+                        {activeVisit.properties?.map((prop, idx) => (
+                          <div
+                            key={prop.id}
+                            className={`h-2 flex-1 rounded-full transition-colors ${
+                              (activeVisit.visit.properties_completed || []).includes(prop.id)
+                                ? 'bg-[var(--stitch-ink)]'
+                                : idx === activeVisit.visit.current_property_index
+                                ? 'bg-[var(--stitch-line-strong)]'
+                                : 'bg-[var(--stitch-line)]'
+                            }`}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </StitchCard>
+              )}
 
-            {/* Wallet Summary */}
-            <div className="bg-white border border-[#E5E1DB] p-6 mb-6">
-              <div className="text-center mb-6">
-                <p className="text-sm text-[#4A4D53] uppercase tracking-wide mb-1">Total Earnings</p>
-                <p className="price-display text-4xl">
-                  <span className="price-currency text-xl">₹</span>
-                  {wallet?.total_earnings?.toLocaleString() || 0}
-                </p>
-              </div>
+              {/* Available Visits List */}
+              {isOnline && !activeVisit && (
+                <div className="space-y-4">
+                  {loading ? (
+                    <div className="grid gap-4">
+                      <StitchSkeleton className="h-48 rounded-[28px]" />
+                      <StitchSkeleton className="h-48 rounded-[28px]" />
+                    </div>
+                  ) : availableVisits.length === 0 ? (
+                    <StitchCard className="flex flex-col items-center justify-center p-12 text-center">
+                      <Clock className="mb-4 h-12 w-12 text-[var(--stitch-muted)] opacity-20" />
+                      <p className="font-bold uppercase tracking-widest text-[var(--stitch-muted)]">No active requests</p>
+                      <p className="mt-2 text-sm text-[var(--stitch-muted)]">New property verification tasks will appear here.</p>
+                    </StitchCard>
+                  ) : (
+                    availableVisits.map((visit) => (
+                      <StitchCard key={visit.id} className="p-6 transition-transform hover:scale-[1.01] active:scale-[0.99]">
+                        <div className="flex flex-col justify-between gap-6 md:flex-row md:items-start">
+                          <div className="space-y-4 flex-1">
+                            <div>
+                              <div className="flex items-center gap-3">
+                                <span className="rounded-full bg-[var(--stitch-ink)] px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-[var(--stitch-bg)]">
+                                  {visit.property_ids?.length || 1} Stop{(visit.property_ids?.length || 1) > 1 ? 's' : ''}
+                                </span>
+                                {visit.distance_km && (
+                                  <span className="text-xs font-bold text-[var(--stitch-muted)]">
+                                    {visit.distance_km} km away
+                                  </span>
+                                )}
+                              </div>
+                              <h3 className="mt-2 font-headline text-2xl font-black uppercase tracking-tight">
+                                {visit.property_title || 'Property Visit'}
+                              </h3>
+                              <p className="text-sm text-[var(--stitch-muted)]">
+                                Estimated duration: {visit.estimated_duration || '30-45 mins'}
+                              </p>
+                            </div>
 
-              <div className="grid grid-cols-3 gap-4">
-                <div className="text-center p-3 bg-[#C6A87C]/10 border border-[#C6A87C]/30">
-                  <p className="text-xs text-[#4A4D53] uppercase">Pending</p>
-                  <p className="text-lg font-medium text-[#1A1C20]">₹{wallet?.pending_earnings || 0}</p>
-                </div>
-                <div className="text-center p-3 bg-[#E6F0EE] border border-[#04473C]/20">
-                  <p className="text-xs text-[#4A4D53] uppercase">Approved</p>
-                  <p className="text-lg font-medium text-[#04473C]">₹{wallet?.approved_earnings || 0}</p>
-                </div>
-                <div className="text-center p-3 bg-[#04473C] border border-[#04473C]">
-                  <p className="text-xs text-white/80 uppercase">Paid Out</p>
-                  <p className="text-lg font-medium text-white">₹{wallet?.paid_earnings || 0}</p>
-                </div>
-              </div>
+                            <div className="flex items-center gap-4 rounded-xl bg-[var(--stitch-soft)] p-3">
+                              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--stitch-ink)] text-white">
+                                <IndianRupee className="h-5 w-5" />
+                              </div>
+                              <div>
+                                <p className="text-xs font-bold uppercase tracking-widest text-[var(--stitch-muted)]">Earnings</p>
+                                <p className="text-xl font-black">₹{visit.total_earnings || 150}</p>
+                              </div>
+                            </div>
+                          </div>
 
-              {wallet?.next_payout_date && (
-                <div className="mt-4 pt-4 border-t border-[#E5E1DB] text-center">
-                  <p className="text-sm text-[#4A4D53]">
-                    Next payout: <span className="font-medium text-[#1A1C20]">{wallet.next_payout_date}</span>
-                  </p>
+                          <div className="flex flex-col gap-3 min-w-[200px]">
+                            <StitchButton onClick={() => handleAcceptVisit(visit.id)} className="w-full justify-center">
+                              Accept Request
+                            </StitchButton>
+                            <StitchButton variant="secondary" className="w-full justify-center">
+                              Decline
+                            </StitchButton>
+                          </div>
+                        </div>
+                      </StitchCard>
+                    ))
+                  )}
                 </div>
               )}
             </div>
+          )}
 
-            {/* Transactions */}
-            <h4 className="font-bold mb-3">Transaction History</h4>
-            {transactions.length === 0 ? (
-              <div className="neo-card p-8 text-center">
-                <FileText className="w-10 h-10 text-[#9CA3AF] mx-auto mb-2" />
-                <p className="text-[#52525B]">No transactions yet</p>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {transactions.map((tx) => (
-                  <div key={tx.id} className="neo-card p-4 flex items-center justify-between">
+          {activeTab === 'tracking' && (
+            <div className="space-y-6">
+              <StitchSectionHeader title="Live GPS Tracking" copy="Real-time location sharing for active visits." />
+              {!isOnline ? (
+                <StitchCard className="p-12 text-center">
+                  <Locate className="mx-auto mb-4 h-12 w-12 text-[var(--stitch-muted)] opacity-20" />
+                  <p className="text-[var(--stitch-muted)]">Go online to enable live tracking.</p>
+                </StitchCard>
+              ) : (
+                <StitchCard className="overflow-hidden p-0 h-[500px]">
+                  <RiderLocationTracker
+                    riderId={user?.id}
+                    riderName={user?.name}
+                    assignedVisits={activeVisit ? [{
+                      id: activeVisit.visit?.id,
+                      properties: activeVisit.properties,
+                      ...activeVisit.visit
+                    }] : []}
+                    onVisitStatusChange={(visitId, status) => {
+                      if (status === 'completed') {
+                        loadAvailableVisits();
+                        loadWallet();
+                      }
+                    }}
+                  />
+                </StitchCard>
+              )}
+            </div>
+          )}
+
+          {activeTab === 'tasks' && (
+            <div className="space-y-6">
+              <StitchSectionHeader 
+                title="ToLet Tasks" 
+                copy="Earn by collecting ToLet boards in your area." 
+                action={
+                  <StitchButton variant="ghost" onClick={loadAvailableTasks}>
+                    <RefreshCw className="h-4 w-4" />
+                  </StitchButton>
+                }
+              />
+              
+              {activeTask ? (
+                <StitchCard className="p-6 space-y-6">
+                  <div className="flex items-start justify-between">
                     <div>
-                      <p className="font-medium">{tx.description}</p>
-                      <p className="text-xs text-[#52525B]">{tx.created_at?.split('T')[0]}</p>
+                      <h3 className="font-headline text-xl font-black uppercase">{activeTask.title}</h3>
+                      <p className="text-sm text-[var(--stitch-muted)]">{activeTask.location}</p>
                     </div>
                     <div className="text-right">
-                      <p className={`font-bold ${tx.type === 'payout' ? 'text-green-600' : 'text-[#111111]'}`}>
-                        {tx.type === 'payout' ? '-' : '+'}₹{tx.amount}
-                      </p>
-                      <span className={`text-xs px-2 py-0.5 rounded-full ${
-                        tx.status === 'paid' ? 'bg-green-100 text-green-700' :
-                        tx.status === 'approved' ? 'bg-[#4ECDC4]/20 text-[#4ECDC4]' :
-                        'bg-[#FFD166]/20 text-yellow-700'
-                      }`}>
-                        {tx.status}
-                      </span>
+                      <p className="text-xl font-black text-[var(--stitch-ink)]">₹{activeTask.rate_per_board}/board</p>
                     </div>
                   </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-      </main>
 
-      {/* Proof Upload Modal */}
-      {showProofUpload && activeVisit && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6">
-              <h3 className="text-xl font-bold mb-4">Upload Visit Proof</h3>
-              <VisitProofUpload
-                visitId={activeVisit.visit?.id}
-                propertyId={currentProofPropertyId}
-                onComplete={() => {
-                  toast.success('Proof uploaded successfully!');
-                  setShowProofUpload(false);
-                }}
-                onCancel={() => setShowProofUpload(false)}
-              />
+                  <div className="grid gap-6 md:grid-cols-2">
+                    <div className="space-y-2">
+                      <label className="stitch-eyebrow">Boards Collected</label>
+                      <StitchInput 
+                        type="number" 
+                        value={taskCompletion.boardsCollected}
+                        onChange={(e) => setTaskCompletion({ ...taskCompletion, boardsCollected: parseInt(e.target.value) || 1 })}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="stitch-eyebrow">Proof Photos</label>
+                      <div className="flex flex-wrap gap-2">
+                        {taskCompletion.proofImages.map((url, i) => (
+                          <div key={i} className="relative h-16 w-16 overflow-hidden rounded-lg border border-[var(--stitch-line)]">
+                            <img src={url} className="h-full w-full object-cover" />
+                            <button 
+                              onClick={() => removeTaskPhoto(i)}
+                              className="absolute right-0 top-0 bg-red-500 p-0.5 text-white"
+                            >
+                              <X className="h-3 w-3" />
+                            </button>
+                          </div>
+                        ))}
+                        <button 
+                          onClick={() => taskFileInputRef.current?.click()}
+                          className="flex h-16 w-16 items-center justify-center rounded-lg border-2 border-dashed border-[var(--stitch-line)] hover:bg-[var(--stitch-soft)]"
+                        >
+                          <Camera className="h-5 w-5 text-[var(--stitch-muted)]" />
+                        </button>
+                        <input ref={taskFileInputRef} type="file" className="hidden" multiple onChange={handleTaskPhotoUpload} />
+                      </div>
+                    </div>
+                  </div>
+
+                  <StitchButton className="w-full justify-center" onClick={handleCompleteTask} disabled={loading}>
+                    {loading ? "Submitting..." : "Complete Task"}
+                  </StitchButton>
+                </StitchCard>
+              ) : (
+                <div className="space-y-4">
+                  {availableTasks.length === 0 ? (
+                    <StitchCard className="p-12 text-center">
+                      <ClipboardList className="mx-auto mb-4 h-12 w-12 text-[var(--stitch-muted)] opacity-20" />
+                      <p className="text-[var(--stitch-muted)]">No ToLet tasks available.</p>
+                    </StitchCard>
+                  ) : (
+                    availableTasks.map(task => (
+                      <StitchCard key={task.id} className="p-6">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <h4 className="font-bold uppercase tracking-tight">{task.title}</h4>
+                            <p className="text-xs text-[var(--stitch-muted)]">{task.location}</p>
+                          </div>
+                          <StitchButton onClick={() => handleAcceptTask(task.id)}>
+                            Accept
+                          </StitchButton>
+                        </div>
+                      </StitchCard>
+                    ))
+                  )}
+                </div>
+              )}
             </div>
+          )}
+
+          {activeTab === 'wallet' && (
+            <div className="space-y-6">
+              <StitchSectionHeader title="My Wallet" copy="Track your earnings and payment history." />
+              <StitchCard className="p-8 text-center">
+                <p className="stitch-eyebrow mb-2">Total Earnings</p>
+                <p className="font-headline text-6xl font-black tracking-tight">₹{wallet?.total_earnings || 0}</p>
+                
+                <div className="mt-8 grid grid-cols-3 gap-4">
+                  <div className="space-y-1 rounded-2xl bg-[var(--stitch-soft)] p-4">
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-[var(--stitch-muted)]">Pending</p>
+                    <p className="font-black">₹{wallet?.pending_earnings || 0}</p>
+                  </div>
+                  <div className="space-y-1 rounded-2xl bg-[var(--stitch-soft)] p-4">
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-[var(--stitch-muted)]">Approved</p>
+                    <p className="font-black text-green-600">₹{wallet?.approved_earnings || 0}</p>
+                  </div>
+                  <div className="space-y-1 rounded-2xl bg-[var(--stitch-ink)] p-4 text-[var(--stitch-bg)]">
+                    <p className="text-[10px] font-bold uppercase tracking-widest opacity-60">Paid Out</p>
+                    <p className="font-black">₹{wallet?.paid_earnings || 0}</p>
+                  </div>
+                </div>
+              </StitchCard>
+
+              <StitchSectionHeader title="Recent Activity" />
+              <div className="overflow-hidden rounded-[28px] border border-[var(--stitch-line)]">
+                {transactions.length === 0 ? (
+                  <div className="p-12 text-center text-[var(--stitch-muted)]">No transactions yet.</div>
+                ) : (
+                  transactions.map((tx, i) => (
+                    <div key={tx.id} className={`flex items-center justify-between p-5 ${i !== transactions.length - 1 ? 'border-b border-[var(--stitch-line)]' : ''}`}>
+                      <div>
+                        <p className="font-bold">{tx.description}</p>
+                        <p className="text-xs text-[var(--stitch-muted)]">{new Date(tx.created_at).toLocaleDateString()}</p>
+                      </div>
+                      <p className={`font-black ${tx.type === 'payout' ? 'text-red-500' : 'text-green-600'}`}>
+                        {tx.type === 'payout' ? '-' : '+'}₹{tx.amount}
+                      </p>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Sidebar / Quick Actions */}
+        <div className="space-y-6">
+          <StitchCard className="p-6">
+            <div className="flex items-center gap-4">
+              <div className="h-16 w-16 overflow-hidden rounded-[20px] border-2 border-[var(--stitch-line)]">
+                <img 
+                  src={user?.profile_photo || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'R')}&background=000&color=fff`} 
+                  className="h-full w-full object-cover"
+                />
+              </div>
+              <div>
+                <p className="stitch-eyebrow">Rider Account</p>
+                <p className="text-lg font-black uppercase tracking-tight">{user?.name}</p>
+              </div>
+            </div>
+            <div className="mt-6 flex flex-col gap-2">
+              <StitchButton variant="secondary" className="justify-center" onClick={() => navigate('/rider/profile')}>
+                <User className="mr-2 h-4 w-4" />
+                Profile & Bank
+              </StitchButton>
+              <StitchButton variant="ghost" className="justify-center text-red-600" onClick={logout}>
+                <LogOut className="mr-2 h-4 w-4" />
+                Logout
+              </StitchButton>
+            </div>
+          </StitchCard>
+
+          <StitchCard className="bg-[var(--stitch-soft)] p-6">
+            <h4 className="font-headline text-sm font-black uppercase tracking-widest">Rider Support</h4>
+            <p className="mt-2 text-xs text-[var(--stitch-muted)] leading-relaxed">
+              Need help with a visit or payment? Our operations team is available 24/7.
+            </p>
+            <StitchButton variant="secondary" className="mt-4 w-full justify-center">
+              <Phone className="mr-2 h-4 w-4" />
+              Contact Ops
+            </StitchButton>
+          </StitchCard>
+        </div>
+      </div>
+
+      <StitchBottomDock 
+        items={[
+          { label: 'Visits', to: '#', icon: Navigation },
+          { label: 'GPS', to: '#', icon: Locate },
+          { label: 'Tasks', to: '#', icon: ClipboardList },
+          { label: 'Wallet', to: '#', icon: Wallet },
+          { label: 'Profile', to: '/rider/profile', icon: User }
+        ]}
+      />
+
+      {/* Modals & Overlays (preserve existing logic) */}
+      <StitchModal open={showProofUpload}>
+        <div className="p-2">
+          <StitchSectionHeader title="Upload Visit Proof" copy="Upload a selfie and a short video at the property location." />
+          <div className="mt-6">
+            <VisitProofUpload
+              visitId={activeVisit?.visit?.id}
+              propertyId={currentProofPropertyId}
+              onComplete={() => {
+                toast.success('Proof uploaded!');
+                setShowProofUpload(false);
+              }}
+              onCancel={() => setShowProofUpload(false)}
+            />
           </div>
         </div>
+      </StitchModal>
+
+      {/* Compliance Modal (Partial Migration) */}
+      {showComplianceModal && (
+        <StitchModal open={true}>
+          <div className="space-y-6">
+            <StitchSectionHeader 
+              title="Compliance Check" 
+              eyebrow="Required" 
+              copy="Answer honestly - violations will result in immediate account termination."
+            />
+            
+            <div className="space-y-6">
+              <div className="space-y-3">
+                <p className="font-bold">1. Were you with the client the entire time?</p>
+                <div className="flex gap-3">
+                  <StitchButton 
+                    variant={complianceAnswers.with_client_all_time === true ? "primary" : "secondary"}
+                    className="flex-1 justify-center"
+                    onClick={() => setComplianceAnswers(prev => ({ ...prev, with_client_all_time: true }))}
+                  >
+                    Yes
+                  </StitchButton>
+                  <StitchButton 
+                    variant={complianceAnswers.with_client_all_time === false ? "primary" : "secondary"}
+                    className="flex-1 justify-center"
+                    onClick={() => setComplianceAnswers(prev => ({ ...prev, with_client_all_time: false }))}
+                  >
+                    No
+                  </StitchButton>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <p className="font-bold">2. Did the client share contact with the owner?</p>
+                <div className="flex gap-3">
+                  <StitchButton 
+                    variant={complianceAnswers.client_shared_contact === true ? "primary" : "secondary"}
+                    className={`flex-1 justify-center ${complianceAnswers.client_shared_contact === true ? 'bg-red-600 border-red-600' : ''}`}
+                    onClick={() => setComplianceAnswers(prev => ({ ...prev, client_shared_contact: true }))}
+                  >
+                    Yes (Violation)
+                  </StitchButton>
+                  <StitchButton 
+                    variant={complianceAnswers.client_shared_contact === false ? "primary" : "secondary"}
+                    className="flex-1 justify-center"
+                    onClick={() => setComplianceAnswers(prev => ({ ...prev, client_shared_contact: false }))}
+                  >
+                    No
+                  </StitchButton>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <p className="font-bold">3. Did you help in direct negotiations?</p>
+                <div className="flex gap-3">
+                  <StitchButton 
+                    variant={complianceAnswers.helped_negotiations === true ? "primary" : "secondary"}
+                    className={`flex-1 justify-center ${complianceAnswers.helped_negotiations === true ? 'bg-red-600 border-red-600' : ''}`}
+                    onClick={() => setComplianceAnswers(prev => ({ ...prev, helped_negotiations: true }))}
+                  >
+                    Yes (Violation)
+                  </StitchButton>
+                  <StitchButton 
+                    variant={complianceAnswers.helped_negotiations === false ? "primary" : "secondary"}
+                    className="flex-1 justify-center"
+                    onClick={() => setComplianceAnswers(prev => ({ ...prev, helped_negotiations: false }))}
+                  >
+                    No
+                  </StitchButton>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-3 pt-6 border-t border-[var(--stitch-line)]">
+              <StitchButton variant="ghost" onClick={() => setShowComplianceModal(false)}>Cancel</StitchButton>
+              <StitchButton 
+                className="flex-1 justify-center" 
+                onClick={handleComplianceSubmit}
+                disabled={complianceAnswers.with_client_all_time === null}
+              >
+                Submit & Continue
+              </StitchButton>
+            </div>
+          </div>
+        </StitchModal>
       )}
 
-      {/* Route Map Modal */}
+      {/* Acceptance Animation Overlay */}
       <AnimatePresence>
-        {showRouteMap && activeVisit && (
+        {showAcceptAnimation && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4"
-            onClick={() => setShowRouteMap(false)}
+            className="fixed inset-0 z-[100] bg-[var(--stitch-ink)] flex flex-col items-center justify-center p-8 text-center"
           >
             <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
+              initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
-              onClick={e => e.stopPropagation()}
+              className="space-y-6"
             >
-              <div className="p-4 border-b border-[#E5E1DB] flex items-center justify-between">
-                <h3 className="text-xl font-bold text-[#04473C]" style={{ fontFamily: 'Playfair Display, serif' }}>
-                  Optimized Visit Route
-                </h3>
-                <button
-                  onClick={() => setShowRouteMap(false)}
-                  className="p-2 hover:bg-[#F5F3F0] rounded-full"
-                >
-                  <X className="w-5 h-5" />
-                </button>
+              <div className="flex h-24 w-24 mx-auto items-center justify-center rounded-full bg-[var(--stitch-bg)] text-[var(--stitch-ink)]">
+                <CheckCircle className="h-12 w-12" />
               </div>
-              <div className="p-4">
-                <MultiVisitRoute
-                  visit={activeVisit.visit}
-                  properties={activeVisit.properties}
-                  optimizedRoute={activeVisit.optimized_route}
-                  customer={activeVisit.customer}
-                  currentStep={activeVisit.visit?.current_step}
-                  onStartVisit={() => handleUpdateStep('start_visit')}
-                  onCompleteProperty={(propId, index) => {
-                    // Handle completing individual property
-                    console.log('Complete property:', propId, index);
-                  }}
-                  onViewMap={() => {
-                    // Open external map with route
-                    if (activeVisit.optimized_route?.visits) {
-                      const firstVisit = activeVisit.optimized_route.visits[0];
-                      if (firstVisit) {
-                        window.open(`https://www.google.com/maps/dir/?api=1&destination=${firstVisit.lat},${firstVisit.lng}`, '_blank');
-                      }
-                    }
-                  }}
-                />
+              <h2 className="font-headline text-4xl font-black uppercase text-[var(--stitch-bg)]">Request Accepted</h2>
+              <p className="text-[var(--stitch-bg)] opacity-70">Prepare for navigation to pickup location.</p>
+              <div className="rounded-2xl bg-white/10 p-6">
+                <p className="text-xs font-bold uppercase tracking-widest text-white/50">Potential Earnings</p>
+                <p className="font-headline text-5xl font-black text-white">₹{acceptedVisitData?.visit?.total_earnings || 150}</p>
               </div>
             </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Terms Acceptance Modal - Blocks dashboard until accepted */}
       <TermsAcceptanceModal
         isOpen={showTermsModal}
         onAccept={async () => {
@@ -1446,562 +1151,15 @@ const RiderDashboard = () => {
             });
             setTermsAccepted(true);
             setShowTermsModal(false);
-            toast.success('Terms accepted! You can now use the platform.');
+            toast.success('Terms accepted!');
           } catch (error) {
-            toast.error('Failed to save terms. Please try again.');
+            toast.error('Failed to save terms.');
           }
         }}
-        onDecline={() => {
-          toast.error('You must accept terms to continue. Logging out...');
-          logout();
-        }}
+        onDecline={() => logout()}
         userType="rider"
-        context="dashboard"
       />
-
-      {/* Compliance Check Modal - After Each Property Visit */}
-      <AnimatePresence>
-        {showComplianceModal && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4"
-          >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-white w-full max-w-lg rounded-lg overflow-hidden"
-            >
-              <div className="p-4 bg-[#04473C] text-white">
-                <div className="flex items-center gap-3">
-                  <Shield className="w-6 h-6" />
-                  <div>
-                    <h3 className="font-semibold text-lg">Compliance Check</h3>
-                    <p className="text-sm text-white/80">Answer honestly - violations will be penalized</p>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="p-6 space-y-6">
-                {/* Question 1 */}
-                <div className="space-y-3">
-                  <p className="font-medium text-[#1A1C20]">
-                    1. Were you with the client the entire time during this property visit?
-                  </p>
-                  <div className="flex gap-3">
-                    <button
-                      onClick={() => setComplianceAnswers(prev => ({ ...prev, with_client_all_time: true }))}
-                      className={`flex-1 py-3 border-2 font-medium transition-colors ${
-                        complianceAnswers.with_client_all_time === true
-                          ? 'border-green-500 bg-green-50 text-green-700'
-                          : 'border-[#E5E1DB] hover:border-green-300'
-                      }`}
-                    >
-                      <CheckCircle className={`w-5 h-5 mx-auto mb-1 ${complianceAnswers.with_client_all_time === true ? 'text-green-600' : 'text-[#9CA3AF]'}`} />
-                      Yes
-                    </button>
-                    <button
-                      onClick={() => setComplianceAnswers(prev => ({ ...prev, with_client_all_time: false }))}
-                      className={`flex-1 py-3 border-2 font-medium transition-colors ${
-                        complianceAnswers.with_client_all_time === false
-                          ? 'border-red-500 bg-red-50 text-red-700'
-                          : 'border-[#E5E1DB] hover:border-red-300'
-                      }`}
-                    >
-                      <XCircle className={`w-5 h-5 mx-auto mb-1 ${complianceAnswers.with_client_all_time === false ? 'text-red-600' : 'text-[#9CA3AF]'}`} />
-                      No
-                    </button>
-                  </div>
-                </div>
-
-                {/* Question 2 - CRITICAL */}
-                <div className="space-y-3">
-                  <div className="flex items-start gap-2">
-                    <AlertTriangle className="w-5 h-5 text-red-500 mt-0.5" />
-                    <p className="font-medium text-[#1A1C20]">
-                      2. Did the client share their contact number with the property owner?
-                    </p>
-                  </div>
-                  <div className="flex gap-3">
-                    <button
-                      onClick={() => setComplianceAnswers(prev => ({ ...prev, client_shared_contact: true }))}
-                      className={`flex-1 py-3 border-2 font-medium transition-colors ${
-                        complianceAnswers.client_shared_contact === true
-                          ? 'border-red-500 bg-red-50 text-red-700'
-                          : 'border-[#E5E1DB] hover:border-red-300'
-                      }`}
-                    >
-                      <AlertTriangle className={`w-5 h-5 mx-auto mb-1 ${complianceAnswers.client_shared_contact === true ? 'text-red-600' : 'text-[#9CA3AF]'}`} />
-                      Yes (Violation!)
-                    </button>
-                    <button
-                      onClick={() => setComplianceAnswers(prev => ({ ...prev, client_shared_contact: false }))}
-                      className={`flex-1 py-3 border-2 font-medium transition-colors ${
-                        complianceAnswers.client_shared_contact === false
-                          ? 'border-green-500 bg-green-50 text-green-700'
-                          : 'border-[#E5E1DB] hover:border-green-300'
-                      }`}
-                    >
-                      <CheckCircle className={`w-5 h-5 mx-auto mb-1 ${complianceAnswers.client_shared_contact === false ? 'text-green-600' : 'text-[#9CA3AF]'}`} />
-                      No
-                    </button>
-                  </div>
-                </div>
-
-                {/* Question 3 - CRITICAL */}
-                <div className="space-y-3">
-                  <div className="flex items-start gap-2">
-                    <AlertTriangle className="w-5 h-5 text-red-500 mt-0.5" />
-                    <p className="font-medium text-[#1A1C20]">
-                      3. Did you help the client in direct negotiations with the owner?
-                    </p>
-                  </div>
-                  <div className="flex gap-3">
-                    <button
-                      onClick={() => setComplianceAnswers(prev => ({ ...prev, helped_negotiations: true }))}
-                      className={`flex-1 py-3 border-2 font-medium transition-colors ${
-                        complianceAnswers.helped_negotiations === true
-                          ? 'border-red-500 bg-red-50 text-red-700'
-                          : 'border-[#E5E1DB] hover:border-red-300'
-                      }`}
-                    >
-                      <AlertTriangle className={`w-5 h-5 mx-auto mb-1 ${complianceAnswers.helped_negotiations === true ? 'text-red-600' : 'text-[#9CA3AF]'}`} />
-                      Yes (Violation!)
-                    </button>
-                    <button
-                      onClick={() => setComplianceAnswers(prev => ({ ...prev, helped_negotiations: false }))}
-                      className={`flex-1 py-3 border-2 font-medium transition-colors ${
-                        complianceAnswers.helped_negotiations === false
-                          ? 'border-green-500 bg-green-50 text-green-700'
-                          : 'border-[#E5E1DB] hover:border-green-300'
-                      }`}
-                    >
-                      <CheckCircle className={`w-5 h-5 mx-auto mb-1 ${complianceAnswers.helped_negotiations === false ? 'text-green-600' : 'text-[#9CA3AF]'}`} />
-                      No
-                    </button>
-                  </div>
-                </div>
-
-                {/* Warning */}
-                {(complianceAnswers.client_shared_contact === true || complianceAnswers.helped_negotiations === true) && (
-                  <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-                    <div className="flex items-start gap-3">
-                      <AlertTriangle className="w-6 h-6 text-red-600 mt-0.5" />
-                      <div>
-                        <p className="font-semibold text-red-800">Terms Violation Detected!</p>
-                        <p className="text-sm text-red-700 mt-1">
-                          This visit will be terminated and flagged for review. 
-                          Penalties may include fines up to ₹1,00,000 and account termination.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              <div className="p-4 border-t border-[#E5E1DB] flex gap-3">
-                <button
-                  onClick={() => {
-                    setShowComplianceModal(false);
-                    setPendingAction(null);
-                    setComplianceAnswers({
-                      with_client_all_time: null,
-                      client_shared_contact: null,
-                      helped_negotiations: null
-                    });
-                  }}
-                  className="flex-1 py-3 border border-[#E5E1DB] text-[#4A4D53] hover:bg-[#F5F3F0] transition-colors font-medium"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleComplianceSubmit}
-                  disabled={
-                    complianceAnswers.with_client_all_time === null ||
-                    complianceAnswers.client_shared_contact === null ||
-                    complianceAnswers.helped_negotiations === null
-                  }
-                  className={`flex-1 py-3 font-medium transition-colors ${
-                    complianceAnswers.client_shared_contact === true || complianceAnswers.helped_negotiations === true
-                      ? 'bg-red-600 hover:bg-red-700 text-white'
-                      : 'bg-[#04473C] hover:bg-[#033830] text-white'
-                  } disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed`}
-                  data-testid="compliance-submit-btn"
-                >
-                  {complianceAnswers.client_shared_contact === true || complianceAnswers.helped_negotiations === true
-                    ? 'Report Violation & End Visit'
-                    : 'Submit & Complete Property'}
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Exciting Accept Animation Modal - Uber Style */}
-      <AnimatePresence>
-        {showAcceptAnimation && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] bg-[#04473C] flex items-center justify-center overflow-hidden"
-          >
-            {/* Animated Background Circles */}
-            <div className="absolute inset-0 overflow-hidden">
-              {[...Array(6)].map((_, i) => (
-                <motion.div
-                  key={i}
-                  className="absolute rounded-full bg-white/5"
-                  initial={{ scale: 0, opacity: 0 }}
-                  animate={{ 
-                    scale: [0, 2, 2.5],
-                    opacity: [0, 0.3, 0],
-                  }}
-                  transition={{
-                    duration: 3,
-                    delay: i * 0.5,
-                    repeat: Infinity,
-                    ease: "easeOut"
-                  }}
-                  style={{
-                    width: '300px',
-                    height: '300px',
-                    left: `${20 + i * 15}%`,
-                    top: `${30 + (i % 3) * 20}%`,
-                  }}
-                />
-              ))}
-            </div>
-
-            {/* Confetti Effect */}
-            {acceptAnimationStep >= 2 && (
-              <div className="absolute inset-0 pointer-events-none">
-                {[...Array(30)].map((_, i) => (
-                  <motion.div
-                    key={i}
-                    className="absolute w-3 h-3"
-                    initial={{ 
-                      y: -20,
-                      x: Math.random() * window.innerWidth,
-                      rotate: 0,
-                      opacity: 1
-                    }}
-                    animate={{ 
-                      y: window.innerHeight + 100,
-                      rotate: 360 * (Math.random() > 0.5 ? 1 : -1),
-                      opacity: [1, 1, 0]
-                    }}
-                    transition={{
-                      duration: 3 + Math.random() * 2,
-                      delay: Math.random() * 0.5,
-                      ease: "linear"
-                    }}
-                    style={{
-                      backgroundColor: ['#FFD700', '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7'][i % 6],
-                      borderRadius: Math.random() > 0.5 ? '50%' : '2px',
-                    }}
-                  />
-                ))}
-              </div>
-            )}
-
-            {/* Main Content */}
-            <div className="relative z-10 text-center px-8 max-w-md mx-auto">
-              
-              {/* Step 1: Accepting... */}
-              <AnimatePresence mode="wait">
-                {acceptAnimationStep === 1 && (
-                  <motion.div
-                    key="step1"
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.8 }}
-                    className="text-white"
-                  >
-                    <motion.div
-                      animate={{ rotate: 360 }}
-                      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                      className="w-20 h-20 border-4 border-white/30 border-t-white rounded-full mx-auto mb-6"
-                    />
-                    <p className="text-2xl font-medium">Accepting Visit...</p>
-                  </motion.div>
-                )}
-
-                {/* Step 2: Accepted! */}
-                {acceptAnimationStep === 2 && (
-                  <motion.div
-                    key="step2"
-                    initial={{ opacity: 0, scale: 0.5 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, y: -50 }}
-                    className="text-white"
-                  >
-                    <motion.div
-                      initial={{ scale: 0 }}
-                      animate={{ scale: [0, 1.3, 1] }}
-                      transition={{ duration: 0.5, times: [0, 0.6, 1] }}
-                      className="w-24 h-24 bg-[#4ECDC4] rounded-full mx-auto mb-6 flex items-center justify-center"
-                    >
-                      <CheckCircle className="w-14 h-14 text-white" strokeWidth={2.5} />
-                    </motion.div>
-                    <motion.h2
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="text-4xl font-bold mb-2"
-                    >
-                      ACCEPTED!
-                    </motion.h2>
-                    <motion.p
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ delay: 0.3 }}
-                      className="text-white/80 text-lg"
-                    >
-                      You got a new ride!
-                    </motion.p>
-                  </motion.div>
-                )}
-
-                {/* Step 3: Show Earnings */}
-                {acceptAnimationStep === 3 && acceptedVisitData && (
-                  <motion.div
-                    key="step3"
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -30 }}
-                    className="text-white"
-                  >
-                    {/* Money Rain Effect */}
-                    <div className="absolute inset-0 pointer-events-none overflow-hidden">
-                      {[...Array(15)].map((_, i) => (
-                        <motion.div
-                          key={i}
-                          className="absolute text-4xl"
-                          initial={{ 
-                            y: -50,
-                            x: Math.random() * 300 + 50,
-                            rotate: 0,
-                            opacity: 1
-                          }}
-                          animate={{ 
-                            y: 800,
-                            rotate: 360,
-                            opacity: [1, 1, 0]
-                          }}
-                          transition={{
-                            duration: 3,
-                            delay: i * 0.2,
-                            ease: "linear"
-                          }}
-                        >
-                          💰
-                        </motion.div>
-                      ))}
-                    </div>
-                    
-                    <motion.div
-                      initial={{ scale: 0.8 }}
-                      animate={{ scale: [0.8, 1.1, 1] }}
-                      className="mb-6"
-                    >
-                      <motion.div
-                        animate={{ 
-                          scale: [1, 1.05, 1],
-                        }}
-                        transition={{ duration: 0.5, repeat: Infinity }}
-                        className="inline-block"
-                      >
-                        <p className="text-xl text-[#4ECDC4] uppercase tracking-wider mb-3 font-bold">💵 You'll Earn 💵</p>
-                      </motion.div>
-                      <div className="flex items-center justify-center gap-2">
-                        <motion.span
-                          initial={{ opacity: 0, x: -20 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          className="text-6xl font-bold text-[#FFD700]"
-                        >
-                          ₹
-                        </motion.span>
-                        <motion.span
-                          initial={{ opacity: 0, scale: 0 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-                          className="text-8xl font-black text-white"
-                          style={{ textShadow: '0 0 30px rgba(78, 205, 196, 0.5)' }}
-                        >
-                          {acceptedVisitData.visit?.total_earnings || (acceptedVisitData.properties?.length || 1) * 100}
-                        </motion.span>
-                      </div>
-                      <motion.p
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: 0.5 }}
-                        className="text-[#4ECDC4] mt-2 text-lg"
-                      >
-                        Cash in your pocket! 🎉
-                      </motion.p>
-                    </motion.div>
-                    
-                    <motion.div
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.4 }}
-                      className="flex items-center justify-center gap-4 text-white/80"
-                    >
-                      <div className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full">
-                        <Home className="w-5 h-5" />
-                        <span>{acceptedVisitData.properties?.length || 1} {(acceptedVisitData.properties?.length || 1) === 1 ? 'Property' : 'Properties'}</span>
-                      </div>
-                      {acceptedVisitData.optimized_route && (
-                        <div className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full">
-                          <Navigation className="w-5 h-5" />
-                          <span>{acceptedVisitData.optimized_route.total_distance_km} km</span>
-                        </div>
-                      )}
-                    </motion.div>
-                  </motion.div>
-                )}
-
-                {/* Step 4: Customer Info */}
-                {acceptAnimationStep === 4 && acceptedVisitData && (
-                  <motion.div
-                    key="step4"
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -30 }}
-                    className="text-white"
-                  >
-                    {/* Pulsing rings around avatar */}
-                    <div className="relative mx-auto w-28 h-28 mb-6">
-                      <motion.div
-                        className="absolute inset-0 rounded-full border-2 border-[#4ECDC4]"
-                        animate={{ scale: [1, 1.5, 1.5], opacity: [0.5, 0, 0] }}
-                        transition={{ duration: 2, repeat: Infinity }}
-                      />
-                      <motion.div
-                        className="absolute inset-0 rounded-full border-2 border-[#4ECDC4]"
-                        animate={{ scale: [1, 1.3, 1.3], opacity: [0.5, 0, 0] }}
-                        transition={{ duration: 2, repeat: Infinity, delay: 0.5 }}
-                      />
-                      <motion.div
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        className="w-28 h-28 bg-gradient-to-br from-[#4ECDC4] to-[#44A08D] rounded-full flex items-center justify-center shadow-lg"
-                      >
-                        <User className="w-14 h-14" />
-                      </motion.div>
-                    </div>
-                    
-                    <motion.p
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      className="text-[#4ECDC4] uppercase tracking-wider mb-2 font-medium"
-                    >
-                      🎯 Your Customer
-                    </motion.p>
-                    
-                    <motion.h3
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.2 }}
-                      className="text-4xl font-bold mb-4"
-                    >
-                      {acceptedVisitData.customer?.name || acceptedVisitData.visit?.customer_name || 'Customer'}
-                    </motion.h3>
-                    
-                    <motion.div
-                      initial={{ opacity: 0, scale: 0.9 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ delay: 0.4 }}
-                      className="bg-white/10 backdrop-blur-sm rounded-2xl p-5 mt-4 border border-white/20"
-                    >
-                      <div className="flex items-center gap-3 mb-3">
-                        <div className="w-10 h-10 bg-[#FF5A5F] rounded-full flex items-center justify-center">
-                          <MapPin className="w-5 h-5" />
-                        </div>
-                        <p className="text-sm text-white/70 uppercase tracking-wider">Pickup Location</p>
-                      </div>
-                      <p className="text-lg text-left">
-                        {acceptedVisitData.visit?.pickup_location || 'Location will be shown after navigation starts'}
-                      </p>
-                    </motion.div>
-                    
-                    {/* Phone Number */}
-                    {(acceptedVisitData.customer?.phone || acceptedVisitData.visit?.customer_phone) && (
-                      <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: 0.6 }}
-                        className="mt-4 flex items-center justify-center gap-2 text-[#4ECDC4]"
-                      >
-                        <Phone className="w-5 h-5" />
-                        <span className="text-lg">{acceptedVisitData.customer?.phone || acceptedVisitData.visit?.customer_phone}</span>
-                      </motion.div>
-                    )}
-                  </motion.div>
-                )}
-
-                {/* Step 5: Starting Navigation */}
-                {acceptAnimationStep === 5 && (
-                  <motion.div
-                    key="step5"
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="text-white"
-                  >
-                    <motion.div
-                      animate={{ 
-                        scale: [1, 1.2, 1],
-                        rotate: [0, 10, -10, 0]
-                      }}
-                      transition={{ duration: 0.8, repeat: Infinity }}
-                      className="w-24 h-24 bg-[#1a73e8] rounded-full mx-auto mb-6 flex items-center justify-center"
-                    >
-                      <Navigation className="w-12 h-12" />
-                    </motion.div>
-                    
-                    <motion.h2
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      className="text-2xl font-bold mb-2"
-                    >
-                      Opening Google Maps...
-                    </motion.h2>
-                    
-                    <motion.p
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: [0, 1, 0] }}
-                      transition={{ duration: 1.5, repeat: Infinity }}
-                      className="text-white/80"
-                    >
-                      Get ready to drive!
-                    </motion.p>
-                    
-                    {/* Animated dots */}
-                    <div className="flex justify-center gap-2 mt-4">
-                      {[0, 1, 2].map((i) => (
-                        <motion.div
-                          key={i}
-                          className="w-3 h-3 bg-white rounded-full"
-                          animate={{ opacity: [0.3, 1, 0.3] }}
-                          transition={{
-                            duration: 1,
-                            delay: i * 0.2,
-                            repeat: Infinity,
-                          }}
-                        />
-                      ))}
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
+    </StitchShell>
   );
 };
 

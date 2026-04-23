@@ -77,7 +77,7 @@ const VisitProofUpload = ({ visitId, onComplete }) => {
 
       {/* Selfie Upload */}
       <div>
-        <label className="block text-sm font-medium text-[#264653] mb-2">
+        <label className="block text-sm font-medium text-[var(--stitch-ink)] mb-2">
           Selfie with Customer
         </label>
         <div className="proof-upload">
@@ -106,9 +106,9 @@ const VisitProofUpload = ({ visitId, onComplete }) => {
           ) : (
             <label htmlFor="selfie-input" className="cursor-pointer block">
               <div className="flex flex-col items-center py-8">
-                <Camera className="w-12 h-12 text-[#E07A5F] mb-3" />
-                <p className="text-sm font-medium text-[#264653]">Take Selfie with Customer</p>
-                <p className="text-xs text-[#4A626C] mt-1">Tap to open camera</p>
+                <Camera className="w-12 h-12 text-[var(--stitch-ink)] mb-3" />
+                <p className="text-sm font-medium text-[var(--stitch-ink)]">Take Selfie with Customer</p>
+                <p className="text-xs text-[var(--stitch-muted)] mt-1">Tap to open camera</p>
               </div>
             </label>
           )}
@@ -117,7 +117,7 @@ const VisitProofUpload = ({ visitId, onComplete }) => {
 
       {/* Video Upload */}
       <div>
-        <label className="block text-sm font-medium text-[#264653] mb-2">
+        <label className="block text-sm font-medium text-[var(--stitch-ink)] mb-2">
           Property Video (10-15 seconds)
         </label>
         <div className="proof-upload">
@@ -140,15 +140,15 @@ const VisitProofUpload = ({ visitId, onComplete }) => {
                 htmlFor="video-input"
                 className="absolute top-2 right-2 bg-white/90 p-2 rounded-lg cursor-pointer"
               >
-                <Video className="w-5 h-5 text-[#E07A5F]" />
+                <Video className="w-5 h-5 text-[var(--stitch-ink)]" />
               </label>
             </div>
           ) : (
             <label htmlFor="video-input" className="cursor-pointer block">
               <div className="flex flex-col items-center py-8">
-                <Video className="w-12 h-12 text-[#E07A5F] mb-3" />
-                <p className="text-sm font-medium text-[#264653]">Record Property Video</p>
-                <p className="text-xs text-[#4A626C] mt-1">10-15 seconds walkthrough</p>
+                <Video className="w-12 h-12 text-[var(--stitch-ink)] mb-3" />
+                <p className="text-sm font-medium text-[var(--stitch-ink)]">Record Property Video</p>
+                <p className="text-xs text-[var(--stitch-muted)] mt-1">10-15 seconds walkthrough</p>
               </div>
             </label>
           )}
@@ -159,7 +159,7 @@ const VisitProofUpload = ({ visitId, onComplete }) => {
       <button
         onClick={handleUpload}
         disabled={uploading || !selfieFile || !videoFile}
-        className="btn-primary w-full flex items-center justify-center gap-2"
+        className="stitch-button w-full flex items-center justify-center gap-2"
         data-testid="upload-proof-button"
       >
         {uploading ? (
@@ -175,8 +175,8 @@ const VisitProofUpload = ({ visitId, onComplete }) => {
         )}
       </button>
 
-      <div className="bg-[#FFF5F2] rounded-lg p-4 text-sm text-[#4A626C]">
-        <p className="font-medium text-[#E07A5F] mb-2">Requirements:</p>
+      <div className="bg-[var(--stitch-soft)] rounded-lg p-4 text-sm text-[var(--stitch-muted)]">
+        <p className="font-medium text-[var(--stitch-ink)] mb-2">Requirements:</p>
         <ul className="space-y-1">
           <li>• Selfie must clearly show you and the customer</li>
           <li>• Video should be 10-15 seconds</li>

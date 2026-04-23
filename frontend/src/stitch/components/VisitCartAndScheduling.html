@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Checkout - APNAGHR</title>
+<!-- Google Fonts: Inter & Material Symbols -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Configuration (from Design System) -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-tertiary": "#e5e2e1",
+                    "on-surface": "#1a1c1c",
+                    "on-tertiary-container": "#ffffff",
+                    "surface-dim": "#dadada",
+                    "surface-tint": "#5e5e5e",
+                    "on-tertiary-fixed-variant": "#e5e2e1",
+                    "error": "#ba1a1a",
+                    "secondary": "#5e5e5e",
+                    "primary-container": "#3b3b3b",
+                    "on-secondary-fixed-variant": "#3b3b3b",
+                    "tertiary-container": "#757474",
+                    "secondary-fixed-dim": "#ababab",
+                    "error-container": "#ffdad6",
+                    "outline": "#777777",
+                    "surface-container": "#eeeeee",
+                    "on-secondary-container": "#1b1b1b",
+                    "secondary-fixed": "#c6c6c6",
+                    "on-error": "#ffffff",
+                    "inverse-primary": "#c6c6c6",
+                    "tertiary-fixed-dim": "#474746",
+                    "background": "#f9f9f9",
+                    "on-surface-variant": "#474747",
+                    "outline-variant": "#c6c6c6",
+                    "inverse-on-surface": "#f0f1f1",
+                    "on-error-container": "#410002",
+                    "on-primary-fixed": "#ffffff",
+                    "tertiary": "#3c3b3b",
+                    "surface-variant": "#e2e2e2",
+                    "surface-container-highest": "#e2e2e2",
+                    "on-primary": "#e2e2e2",
+                    "surface-container-lowest": "#ffffff",
+                    "secondary-container": "#d4d4d4",
+                    "inverse-surface": "#2f3131",
+                    "on-secondary": "#ffffff",
+                    "on-background": "#1a1c1c",
+                    "primary-fixed": "#5e5e5e",
+                    "surface-bright": "#f9f9f9",
+                    "surface-container-low": "#f3f3f4",
+                    "primary-fixed-dim": "#474747",
+                    "on-primary-container": "#ffffff",
+                    "surface": "#f9f9f9",
+                    "primary": "#000000",
+                    "on-secondary-fixed": "#1b1b1b",
+                    "on-primary-fixed-variant": "#e2e2e2",
+                    "tertiary-fixed": "#5f5e5e",
+                    "surface-container-high": "#e8e8e8",
+                    "on-tertiary-fixed": "#ffffff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "1rem",
+                    "lg": "2rem",
+                    "xl": "3rem",
+                    "full": "9999px",
+                    "sm": "0.5rem",
+                    "none": "0px"
+            },
+            "spacing": {},
+            "fontFamily": {
+                    "headline": ["Inter", "sans-serif"],
+                    "body": ["Inter", "sans-serif"],
+                    "label": ["Inter", "sans-serif"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        /* Kinetic Utilitarianism typography tweaks */
+        .display-lg { font-size: 3.5rem; font-weight: 800; letter-spacing: -0.02em; line-height: 1; }
+        .headline-sm { font-size: 1.5rem; font-weight: 600; letter-spacing: -0.01em; }
+        .body-lg { font-size: 1rem; font-weight: 400; line-height: 1.6; }
+        .label-md { font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col antialiased selection:bg-primary selection:text-on-primary">
+<!-- Transactional TopAppBar (Simplified from JSON for Checkout Flow) -->
+<header class="w-full top-0 sticky bg-background border-b border-outline-variant z-50">
+<div class="flex justify-between items-center px-8 py-6 w-full max-w-[1440px] mx-auto">
+<div class="text-2xl font-black tracking-tighter text-primary">APNAGHR</div>
+<div class="flex items-center gap-2 text-outline">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">lock</span>
+<span class="label-md">Secure Checkout</span>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow w-full max-w-[1440px] mx-auto px-4 md:px-8 py-12 lg:py-24">
+<div class="mb-16">
+<h1 class="display-lg text-primary mb-4">LOGISTICS <br/> &amp; CHECKOUT</h1>
+</div>
+<div class="flex flex-col lg:flex-row gap-16 xl:gap-24 items-start">
+<!-- Left Column: Process Flow -->
+<div class="w-full lg:w-2/3 flex flex-col gap-16">
+<!-- Section: Selected Properties -->
+<section>
+<h2 class="headline-sm text-primary mb-8 border-b border-outline-variant pb-4">TARGET ASSETS</h2>
+<div class="flex flex-col gap-0 border-b border-outline-variant">
+<!-- Property Item 1 -->
+<div class="flex items-center justify-between py-6 border-t border-outline-variant group">
+<div class="flex items-center gap-6">
+<div class="w-20 h-20 bg-surface-container-low overflow-hidden rounded-none">
+<img alt="Apartment building exterior" class="w-full h-full object-cover grayscale opacity-80 mix-blend-multiply" data-alt="monochrome architectural photography of brutalist concrete residential building against clear sky high contrast" src="https://lh3.googleusercontent.com/aida-public/AB6AXuASvjaObc_DoYjbM0ACyu1YNH4tnKlh8EQHr6fxOnSrAqnNBcAmB_c_i6H7VkWuRrsinVwD5KaIJUv4ZSi0fbvP-QRSPRe8YCqdlSo2Aiw3bMwhlOVlt857egqrUTG98xeLjVE_EP_T--SwLnCPk6kjwXxcTYeAZ8YIBfF8Q80WaYfGUR7tYt3ILnZLo-ACKBwQxm4ru54iaAnL4NxlJrryvOEUkTyMdGeiChfKzkAMTzf5gOchh4zPH09VW1KxiUUVlEQgL59x7ZIg"/>
+</div>
+<div>
+<h3 class="font-bold text-lg text-primary">Sector 45 Core Block</h3>
+<p class="text-surface-tint text-sm flex items-center gap-1 mt-1">
+<span class="material-symbols-outlined text-[16px]">location_on</span>
+                                        Cyber District, Zone C
+                                    </p>
+</div>
+</div>
+<button aria-label="Remove item" class="text-outline hover:text-primary transition-colors p-2">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<!-- Property Item 2 -->
+<div class="flex items-center justify-between py-6 border-t border-outline-variant group">
+<div class="flex items-center gap-6">
+<div class="w-20 h-20 bg-surface-container-low overflow-hidden rounded-none">
+<img alt="Modern house exterior" class="w-full h-full object-cover grayscale opacity-80 mix-blend-multiply" data-alt="stark black and white photo of modern minimalist geometric house facade sharp angles" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB3GI0GFsjH6zXo6C4JGcxpVocI9fPxzrHYzcETPjtXZQcqZqfzcGAizg3oUnZDL8w45WtOY6JDRmajLJyP6zzW-4OxEDQNnxLaXo7qTxv5rilGDQ242NtYpzltksNgTbdqZy0HbZQAZXjYJTxLXiu_Sf8elYGIQKrNcmsCnQfPaYQtYWpVGIhzGnaB5Z7SS5l_48Lg12MKoro_kqXdfX96gwCMvRGjepAXYGuJPsIEVhlY6DDo9MWK0RvbiNSGOghRLrk3_N4ex9A8"/>
+</div>
+<div>
+<h3 class="font-bold text-lg text-primary">Unit 802 Alpha</h3>
+<p class="text-surface-tint text-sm flex items-center gap-1 mt-1">
+<span class="material-symbols-outlined text-[16px]">location_on</span>
+                                        Transit Hub Adjacent
+                                    </p>
+</div>
+</div>
+<button aria-label="Remove item" class="text-outline hover:text-primary transition-colors p-2">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+</div>
+</section>
+<!-- Section: Package Selection -->
+<section>
+<h2 class="headline-sm text-primary mb-8 border-b border-outline-variant pb-4">VISIT ALLOCATION</h2>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- Package 1 -->
+<label class="relative cursor-pointer">
+<input class="peer sr-only" name="package" type="radio" value="1"/>
+<div class="p-8 border-2 border-transparent bg-surface-container-low peer-checked:bg-surface peer-checked:border-primary transition-all flex flex-col h-full rounded-none">
+<div class="label-md text-surface-tint mb-4">BASE</div>
+<div class="text-3xl font-black text-primary mb-1">1 VISIT</div>
+<div class="text-xl font-bold text-outline-variant mb-8 line-through">₹250</div>
+<div class="mt-auto pt-8 border-t border-outline-variant flex items-end justify-between">
+<span class="label-md text-primary">TOTAL</span>
+<span class="text-2xl font-black text-primary">₹200</span>
+</div>
+</div>
+</label>
+<!-- Package 2 (Active/Selected) -->
+<label class="relative cursor-pointer">
+<input checked="" class="peer sr-only" name="package" type="radio" value="3"/>
+<div class="p-8 border-2 border-transparent bg-surface-container-low peer-checked:bg-surface peer-checked:border-primary transition-all flex flex-col h-full rounded-none">
+<div class="label-md text-primary mb-4 flex justify-between items-center w-full">
+                                    OPTIMAL 
+                                    <span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<div class="text-3xl font-black text-primary mb-1">3 VISITS</div>
+<div class="text-xl font-bold text-outline-variant mb-8 line-through">₹600</div>
+<div class="mt-auto pt-8 border-t border-outline-variant flex items-end justify-between">
+<span class="label-md text-primary">TOTAL</span>
+<span class="text-2xl font-black text-primary">₹350</span>
+</div>
+</div>
+</label>
+<!-- Package 3 -->
+<label class="relative cursor-pointer">
+<input class="peer sr-only" name="package" type="radio" value="5"/>
+<div class="p-8 border-2 border-transparent bg-surface-container-low peer-checked:bg-surface peer-checked:border-primary transition-all flex flex-col h-full rounded-none">
+<div class="label-md text-surface-tint mb-4">MAXIMUM</div>
+<div class="text-3xl font-black text-primary mb-1">5 VISITS</div>
+<div class="text-xl font-bold text-outline-variant mb-8 line-through">₹1000</div>
+<div class="mt-auto pt-8 border-t border-outline-variant flex items-end justify-between">
+<span class="label-md text-primary">TOTAL</span>
+<span class="text-2xl font-black text-primary">₹500</span>
+</div>
+</div>
+</label>
+</div>
+</section>
+<!-- Section: Scheduling Form -->
+<section>
+<h2 class="headline-sm text-primary mb-8 border-b border-outline-variant pb-4">DEPLOYMENT PARAMETERS</h2>
+<div class="flex flex-col gap-8">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<!-- Date Input -->
+<div class="flex flex-col gap-2">
+<label class="label-md text-primary" for="date">EXECUTION DATE</label>
+<div class="relative">
+<input class="w-full bg-surface-container-low text-on-surface border-0 border-b-2 border-transparent focus:border-primary focus:ring-0 rounded-sm p-4 text-lg font-bold appearance-none transition-colors" id="date" type="date"/>
+</div>
+</div>
+<!-- Time Input -->
+<div class="flex flex-col gap-2">
+<label class="label-md text-primary" for="time">TIME WINDOW</label>
+<div class="relative">
+<select class="w-full bg-surface-container-low text-on-surface border-0 border-b-2 border-transparent focus:border-primary focus:ring-0 rounded-sm p-4 text-lg font-bold appearance-none transition-colors" id="time">
+<option disabled="" selected="" value="">Select Slot</option>
+<option value="morning">09:00 - 12:00</option>
+<option value="afternoon">13:00 - 16:00</option>
+<option value="evening">17:00 - 19:00</option>
+</select>
+<span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-outline">arrow_drop_down</span>
+</div>
+</div>
+</div>
+<!-- Location Input with GPS -->
+<div class="flex flex-col gap-2">
+<label class="label-md text-primary flex justify-between items-end" for="location">
+                                EXTRACTION POINT
+                                <span class="text-[10px] text-surface-tint lowercase normal-case">Where should we pick you up?</span>
+</label>
+<div class="flex relative group">
+<input class="w-full bg-surface-container-low text-on-surface border-0 border-b-2 border-transparent focus:border-primary focus:ring-0 rounded-sm p-4 pr-16 text-lg placeholder-outline-variant transition-colors" id="location" placeholder="Enter full address or building name" type="text"/>
+<button aria-label="Fetch GPS Location" class="absolute right-0 top-0 bottom-0 px-4 flex items-center justify-center text-primary hover:bg-surface-variant transition-colors border-b-2 border-transparent group-focus-within:border-primary rounded-r-sm" type="button">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">my_location</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Right Column: The Weight (Order Summary) -->
+<div class="w-full lg:w-1/3 lg:sticky lg:top-32">
+<div class="bg-surface-container-low p-8 flex flex-col rounded-none border border-outline-variant/50">
+<h2 class="headline-sm text-primary mb-8 border-b border-outline-variant pb-4">SUMMARY</h2>
+<div class="flex flex-col gap-4 mb-8 body-lg">
+<div class="flex justify-between items-center">
+<span class="text-surface-tint">Base Allocation (3 Visits)</span>
+<span class="font-bold text-primary">₹350</span>
+</div>
+<div class="flex justify-between items-center">
+<span class="text-surface-tint">Logistics Surcharge</span>
+<span class="font-bold text-primary">₹0</span>
+</div>
+<div class="flex justify-between items-center">
+<span class="text-surface-tint">Taxes (18% GST)</span>
+<span class="font-bold text-primary">₹63</span>
+</div>
+</div>
+<div class="flex justify-between items-end border-t border-outline-variant pt-8 mb-12">
+<span class="label-md text-primary">AUTHORIZATION TOTAL</span>
+<span class="text-4xl font-black text-primary tracking-tighter">₹413</span>
+</div>
+<div class="flex flex-col gap-6">
+<label class="flex items-start gap-4 cursor-pointer group">
+<div class="relative flex items-start pt-1">
+<input class="peer sr-only" required="" type="checkbox"/>
+<div class="w-5 h-5 border-2 border-primary bg-transparent peer-checked:bg-primary transition-colors flex items-center justify-center">
+<span class="material-symbols-outlined text-[16px] text-on-primary opacity-0 peer-checked:opacity-100 font-bold">check</span>
+</div>
+</div>
+<span class="text-sm text-surface-tint leading-tight group-hover:text-primary transition-colors">
+                                I confirm the logistics parameters and agree to the <a class="text-primary underline font-bold hover:text-outline transition-colors" href="#">Terms of Engagement</a> and <a class="text-primary underline font-bold hover:text-outline transition-colors" href="#">Cancellation Policy</a>.
+                            </span>
+</label>
+<button class="w-full bg-primary text-on-primary rounded-full py-6 px-12 text-lg font-black uppercase tracking-widest hover:bg-primary-container transition-all flex items-center justify-center gap-4 group">
+                            INITIALIZE PAYMENT
+                            <span class="material-symbols-outlined group-hover:translate-x-2 transition-transform">arrow_forward</span>
+</button>
+<div class="flex items-center justify-center gap-2 text-surface-tint label-md mt-2">
+<span class="material-symbols-outlined text-[14px]">lock</span>
+                            256-BIT ENCRYPTED CHANNEL
+                        </div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>

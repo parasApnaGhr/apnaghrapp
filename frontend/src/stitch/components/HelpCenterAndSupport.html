@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Help Center - Kinetic Utilitarianism</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "secondary-fixed-dim": "#ababab",
+                    "surface-container-high": "#e8e8e8",
+                    "outline-variant": "#c6c6c6",
+                    "primary-fixed": "#5e5e5e",
+                    "on-secondary-fixed-variant": "#3b3b3b",
+                    "surface-container": "#eeeeee",
+                    "on-primary-fixed": "#ffffff",
+                    "inverse-primary": "#c6c6c6",
+                    "primary": "#000000",
+                    "surface-variant": "#e2e2e2",
+                    "tertiary-fixed": "#5f5e5e",
+                    "surface-container-lowest": "#ffffff",
+                    "secondary-container": "#d4d4d4",
+                    "surface-container-highest": "#e2e2e2",
+                    "on-secondary-container": "#1b1b1b",
+                    "on-error-container": "#410002",
+                    "secondary-fixed": "#c6c6c6",
+                    "on-secondary": "#ffffff",
+                    "on-tertiary-fixed-variant": "#e5e2e1",
+                    "primary-container": "#3b3b3b",
+                    "error-container": "#ffdad6",
+                    "surface-dim": "#dadada",
+                    "secondary": "#5e5e5e",
+                    "surface-container-low": "#f3f3f4",
+                    "surface": "#f9f9f9",
+                    "on-secondary-fixed": "#1b1b1b",
+                    "tertiary-fixed-dim": "#474746",
+                    "surface-bright": "#f9f9f9",
+                    "on-primary-fixed-variant": "#e2e2e2",
+                    "surface-tint": "#5e5e5e",
+                    "primary-fixed-dim": "#474747",
+                    "on-tertiary-fixed": "#ffffff",
+                    "on-surface": "#1a1c1c",
+                    "on-primary-container": "#ffffff",
+                    "tertiary-container": "#757474",
+                    "error": "#ba1a1a",
+                    "on-primary": "#e2e2e2",
+                    "on-tertiary-container": "#ffffff",
+                    "on-surface-variant": "#474747",
+                    "on-background": "#1a1c1c",
+                    "on-tertiary": "#e5e2e1",
+                    "inverse-surface": "#2f3131",
+                    "tertiary": "#3c3b3b",
+                    "outline": "#777777",
+                    "on-error": "#ffffff",
+                    "inverse-on-surface": "#f0f1f1",
+                    "background": "#f9f9f9"
+            },
+            "borderRadius": {
+                    "DEFAULT": "1rem",
+                    "lg": "2rem",
+                    "xl": "3rem",
+                    "full": "9999px",
+                    "none": "0",
+                    "sm": "0.5rem"
+            },
+            "spacing": {},
+            "fontFamily": {
+                    "headline": ["Inter"],
+                    "body": ["Inter"],
+                    "label": ["Inter"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface antialiased flex">
+<!-- SideNavBar -->
+<nav class="hidden md:flex bg-[#F3F3F4] dark:bg-zinc-900 text-black dark:text-white h-screen w-72 flex-col fixed left-0 top-0 border-r border-zinc-200 dark:border-zinc-800 flex flex-col p-6 gap-8">
+<div>
+<div class="text-lg font-black text-black dark:text-white uppercase mb-1">CONTROL</div>
+<div class="text-xs font-bold uppercase tracking-widest text-zinc-500">v1.0.4-STABLE</div>
+</div>
+<div class="flex-1 overflow-y-auto space-y-2">
+<a class="text-zinc-500 dark:text-zinc-400 px-6 py-3 my-1 flex items-center gap-4 hover:bg-zinc-200 dark:hover:bg-zinc-800 rounded-full transition-all" href="#">
+<span class="material-symbols-outlined">radar</span>
+<span class="font-['Inter'] text-sm font-bold uppercase tracking-widest">Live Tracking</span>
+</a>
+<a class="text-zinc-500 dark:text-zinc-400 px-6 py-3 my-1 flex items-center gap-4 hover:bg-zinc-200 dark:hover:bg-zinc-800 rounded-full transition-all" href="#">
+<span class="material-symbols-outlined">add_business</span>
+<span class="font-['Inter'] text-sm font-bold uppercase tracking-widest">Property Manager</span>
+</a>
+<a class="text-zinc-500 dark:text-zinc-400 px-6 py-3 my-1 flex items-center gap-4 hover:bg-zinc-200 dark:hover:bg-zinc-800 rounded-full transition-all" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-['Inter'] text-sm font-bold uppercase tracking-widest">Analytics</span>
+</a>
+<a class="text-zinc-500 dark:text-zinc-400 px-6 py-3 my-1 flex items-center gap-4 hover:bg-zinc-200 dark:hover:bg-zinc-800 rounded-full transition-all" href="#">
+<span class="material-symbols-outlined">task_alt</span>
+<span class="font-['Inter'] text-sm font-bold uppercase tracking-widest">Approval Queues</span>
+</a>
+<a class="text-zinc-500 dark:text-zinc-400 px-6 py-3 my-1 flex items-center gap-4 hover:bg-zinc-200 dark:hover:bg-zinc-800 rounded-full transition-all" href="#">
+<span class="material-symbols-outlined">group_add</span>
+<span class="font-['Inter'] text-sm font-bold uppercase tracking-widest">Lead Management</span>
+</a>
+<a class="text-zinc-500 dark:text-zinc-400 px-6 py-3 my-1 flex items-center gap-4 hover:bg-zinc-200 dark:hover:bg-zinc-800 rounded-full transition-all" href="#">
+<span class="material-symbols-outlined">style</span>
+<span class="font-['Inter'] text-sm font-bold uppercase tracking-widest">Design System</span>
+</a>
+<a class="text-zinc-500 dark:text-zinc-400 px-6 py-3 my-1 flex items-center gap-4 hover:bg-zinc-200 dark:hover:bg-zinc-800 rounded-full transition-all" href="#">
+<span class="material-symbols-outlined">terminal</span>
+<span class="font-['Inter'] text-sm font-bold uppercase tracking-widest">Global Logs</span>
+</a>
+</div>
+<div class="space-y-2 pt-4 border-t border-zinc-200 dark:border-zinc-800">
+<a class="bg-black dark:bg-white text-white dark:text-black rounded-full px-6 py-3 my-1 flex items-center gap-4" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">help_center</span>
+<span class="font-['Inter'] text-sm font-bold uppercase tracking-widest">Help Center</span>
+</a>
+<a class="text-zinc-500 dark:text-zinc-400 px-6 py-3 my-1 flex items-center gap-4 hover:bg-zinc-200 dark:hover:bg-zinc-800 rounded-full transition-all" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-['Inter'] text-sm font-bold uppercase tracking-widest">Settings</span>
+</a>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="flex-1 md:ml-72 min-h-screen pb-24 md:pb-0">
+<!-- TopNavBar (Mobile) -->
+<header class="md:hidden bg-[#F9F9F9] dark:bg-zinc-950 text-black dark:text-white font-['Inter'] tracking-tighter font-bold uppercase docked full-width top-0 z-50 border-b border-zinc-200 dark:border-zinc-800 shadow-none flex justify-between items-center w-full px-8 h-16 sticky">
+<div class="text-xl font-black tracking-tighter text-black dark:text-white uppercase">UTILITY // CORE</div>
+<div class="flex gap-4">
+<span class="material-symbols-outlined cursor-pointer hover:text-black dark:hover:text-white transition-colors duration-200 text-zinc-400 dark:text-zinc-600">notifications</span>
+<span class="material-symbols-outlined cursor-pointer hover:text-black dark:hover:text-white transition-colors duration-200 text-zinc-400 dark:text-zinc-600">account_circle</span>
+</div>
+</header>
+<div class="max-w-6xl mx-auto px-6 py-16 md:py-32">
+<!-- Hero Search Section -->
+<div class="mb-24 md:mb-32">
+<h1 class="text-5xl md:text-7xl font-bold tracking-tighter text-primary mb-8 leading-none" style="letter-spacing: -0.02em;">HOW CAN WE<br/>ASSIST YOU.</h1>
+<div class="relative max-w-3xl">
+<span class="material-symbols-outlined absolute left-6 top-1/2 transform -translate-y-1/2 text-outline text-2xl">search</span>
+<input class="w-full bg-surface-container-low text-on-surface text-xl md:text-2xl font-bold py-6 pl-16 pr-8 rounded-sm border-none focus:ring-0 border-b-2 border-transparent focus:border-primary transition-colors placeholder:text-outline" placeholder="Search for answers..." style="border-radius: 0.5rem; outline: 1px solid rgba(119,119,119,0.2);" type="text"/>
+</div>
+</div>
+<!-- Categories Bento Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-24 md:mb-32">
+<a class="group block bg-surface-container-low p-8 rounded-sm hover:bg-surface-container-highest transition-colors min-h-[240px] flex flex-col justify-between" href="#" style="border-radius: 0.5rem;">
+<span class="material-symbols-outlined text-4xl text-primary mb-8" style="font-variation-settings: 'FILL' 1;">rocket_launch</span>
+<div>
+<h3 class="text-2xl font-bold text-primary mb-2">Getting Started</h3>
+<p class="text-on-surface-variant font-regular leading-relaxed">Basic setup and account initialization procedures.</p>
+</div>
+</a>
+<a class="group block bg-surface-container-low p-8 rounded-sm hover:bg-surface-container-highest transition-colors min-h-[240px] flex flex-col justify-between" href="#" style="border-radius: 0.5rem;">
+<span class="material-symbols-outlined text-4xl text-primary mb-8" style="font-variation-settings: 'FILL' 1;">credit_card</span>
+<div>
+<h3 class="text-2xl font-bold text-primary mb-2">Payments</h3>
+<p class="text-on-surface-variant font-regular leading-relaxed">Billing cycles, payment methods, and transaction logs.</p>
+</div>
+</a>
+<a class="group block bg-surface-container-low p-8 rounded-sm hover:bg-surface-container-highest transition-colors min-h-[240px] flex flex-col justify-between" href="#" style="border-radius: 0.5rem;">
+<span class="material-symbols-outlined text-4xl text-primary mb-8" style="font-variation-settings: 'FILL' 1;">directions_car</span>
+<div>
+<h3 class="text-2xl font-bold text-primary mb-2">Rider Guide</h3>
+<p class="text-on-surface-variant font-regular leading-relaxed">Navigation protocols, safety metrics, and operational standards.</p>
+</div>
+</a>
+<a class="group block bg-surface-container-low p-8 rounded-sm hover:bg-surface-container-highest transition-colors min-h-[240px] flex flex-col justify-between" href="#" style="border-radius: 0.5rem;">
+<span class="material-symbols-outlined text-4xl text-primary mb-8" style="font-variation-settings: 'FILL' 1;">storefront</span>
+<div>
+<h3 class="text-2xl font-bold text-primary mb-2">Seller FAQ</h3>
+<p class="text-on-surface-variant font-regular leading-relaxed">Inventory management, payout schedules, and dispute resolution.</p>
+</div>
+</a>
+</div>
+<!-- Popular Articles List -->
+<div class="mb-24 md:mb-32 max-w-4xl">
+<h2 class="text-3xl font-bold text-primary mb-12 tracking-tight">FREQUENTLY ACCESSED</h2>
+<div class="flex flex-col">
+<div class="py-6 border-b border-outline-variant flex justify-between items-center group cursor-pointer hover:bg-surface-container-low px-4 -mx-4 transition-colors">
+<span class="text-xl font-bold text-primary">How to reset administrator credentials</span>
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors">arrow_forward</span>
+</div>
+<div class="py-6 border-b border-outline-variant flex justify-between items-center group cursor-pointer hover:bg-surface-container-low px-4 -mx-4 transition-colors">
+<span class="text-xl font-bold text-primary">Configuring automated payout schedules</span>
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors">arrow_forward</span>
+</div>
+<div class="py-6 border-b border-outline-variant flex justify-between items-center group cursor-pointer hover:bg-surface-container-low px-4 -mx-4 transition-colors">
+<span class="text-xl font-bold text-primary">Understanding live tracking latency metrics</span>
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors">arrow_forward</span>
+</div>
+<div class="py-6 border-b border-outline-variant flex justify-between items-center group cursor-pointer hover:bg-surface-container-low px-4 -mx-4 transition-colors">
+<span class="text-xl font-bold text-primary">Disputing a flagged transaction</span>
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors">arrow_forward</span>
+</div>
+</div>
+</div>
+<!-- Contact CTA -->
+<div class="bg-primary-container p-12 md:p-24 flex flex-col items-start" style="border-radius: 0.5rem;">
+<h2 class="text-4xl md:text-5xl font-bold text-on-primary mb-6 tracking-tighter">STILL NEED ASSISTANCE?</h2>
+<p class="text-on-primary text-xl mb-12 max-w-2xl leading-relaxed">If our repository did not resolve your issue, escalate to our human support team for priority handling.</p>
+<button class="bg-primary text-on-primary font-bold rounded-full py-6 px-12 hover:scale-[1.02] transition-transform active:scale-95 flex items-center gap-4 uppercase tracking-widest text-sm">
+<span>Contact Support</span>
+<span class="material-symbols-outlined">support_agent</span>
+</button>
+</div>
+</div>
+</main>
+</body></html>

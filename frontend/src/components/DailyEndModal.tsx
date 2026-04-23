@@ -99,7 +99,7 @@ const DailyEndModal = ({
           <div className={`p-6 text-white rounded-t-2xl ${
             isPending 
               ? 'bg-gradient-to-r from-orange-500 to-orange-600'
-              : 'bg-gradient-to-r from-[#04473C] to-[#065f4e]'
+              : 'bg-gradient-to-r from-[var(--stitch-ink)] to-[var(--stitch-ink)]'
           }`}>
             <div className="flex items-center gap-3">
               <div className="p-2 bg-white/20 rounded-lg">
@@ -128,10 +128,10 @@ const DailyEndModal = ({
                 animate={{ opacity: 1, scale: 1 }}
                 className="text-center py-6"
               >
-                <div className="w-24 h-24 mx-auto mb-4 rounded-full bg-gradient-to-br from-[#04473C] to-[#065f4e] flex items-center justify-center">
-                  <Trophy className="w-12 h-12 text-[#C6A87C]" />
+                <div className="w-24 h-24 mx-auto mb-4 rounded-full bg-gradient-to-br from-[var(--stitch-ink)] to-[var(--stitch-ink)] flex items-center justify-center">
+                  <Trophy className="w-12 h-12 text-[var(--stitch-muted)]" />
                 </div>
-                <h3 className="text-2xl font-bold text-[#1A1C20] mb-2">
+                <h3 className="text-2xl font-bold text-[var(--stitch-ink)] mb-2">
                   Today's Score: {scoreResult.final_score}
                 </h3>
                 
@@ -178,7 +178,7 @@ const DailyEndModal = ({
 
                 {/* Clients Called */}
                 <div>
-                  <label className="block text-sm font-semibold text-[#1A1C20] mb-2">
+                  <label className="block text-sm font-semibold text-[var(--stitch-ink)] mb-2">
                     <Phone className="w-4 h-4 inline mr-1" />
                     Clients Called
                   </label>
@@ -187,7 +187,7 @@ const DailyEndModal = ({
                     min="0"
                     value={formData.clients_called}
                     onChange={(e) => setFormData({ ...formData, clients_called: parseInt(e.target.value) || 0 })}
-                    className="w-full px-4 py-3 border border-[#E5E1DB] rounded-xl focus:ring-2 focus:ring-[#04473C]/20"
+                    className="w-full px-4 py-3 border border-[var(--stitch-line)] rounded-xl focus:ring-2 focus:ring-[var(--stitch-ink)]/20"
                     placeholder="How many clients did you call?"
                   />
                   {formData.clients_called < 60 && formData.clients_called > 0 && (
@@ -197,7 +197,7 @@ const DailyEndModal = ({
 
                 {/* Properties Shared */}
                 <div>
-                  <label className="block text-sm font-semibold text-[#1A1C20] mb-2">
+                  <label className="block text-sm font-semibold text-[var(--stitch-ink)] mb-2">
                     <Share2 className="w-4 h-4 inline mr-1" />
                     Properties Shared/Referred
                   </label>
@@ -206,7 +206,7 @@ const DailyEndModal = ({
                     min="0"
                     value={formData.properties_shared}
                     onChange={(e) => setFormData({ ...formData, properties_shared: parseInt(e.target.value) || 0 })}
-                    className="w-full px-4 py-3 border border-[#E5E1DB] rounded-xl focus:ring-2 focus:ring-[#04473C]/20"
+                    className="w-full px-4 py-3 border border-[var(--stitch-line)] rounded-xl focus:ring-2 focus:ring-[var(--stitch-ink)]/20"
                     placeholder="Properties shared via referral links"
                   />
                   {formData.properties_shared < 20 && formData.properties_shared > 0 && (
@@ -216,7 +216,7 @@ const DailyEndModal = ({
 
                 {/* Visits Booked */}
                 <div>
-                  <label className="block text-sm font-semibold text-[#1A1C20] mb-2">
+                  <label className="block text-sm font-semibold text-[var(--stitch-ink)] mb-2">
                     <Calendar className="w-4 h-4 inline mr-1" />
                     Visits Booked Today
                   </label>
@@ -225,7 +225,7 @@ const DailyEndModal = ({
                     min="0"
                     value={formData.visits_booked}
                     onChange={(e) => setFormData({ ...formData, visits_booked: parseInt(e.target.value) || 0 })}
-                    className="w-full px-4 py-3 border border-[#E5E1DB] rounded-xl focus:ring-2 focus:ring-[#04473C]/20"
+                    className="w-full px-4 py-3 border border-[var(--stitch-line)] rounded-xl focus:ring-2 focus:ring-[var(--stitch-ink)]/20"
                     placeholder="Site visits you scheduled"
                   />
                   {formData.visits_booked >= 5 && (
@@ -235,7 +235,7 @@ const DailyEndModal = ({
 
                 {/* Deals Closed */}
                 <div>
-                  <label className="block text-sm font-semibold text-[#1A1C20] mb-2">
+                  <label className="block text-sm font-semibold text-[var(--stitch-ink)] mb-2">
                     <Handshake className="w-4 h-4 inline mr-1" />
                     Deals Closed Today
                   </label>
@@ -244,7 +244,7 @@ const DailyEndModal = ({
                     min="0"
                     value={formData.deals_closed}
                     onChange={(e) => setFormData({ ...formData, deals_closed: parseInt(e.target.value) || 0 })}
-                    className="w-full px-4 py-3 border border-[#E5E1DB] rounded-xl focus:ring-2 focus:ring-[#04473C]/20"
+                    className="w-full px-4 py-3 border border-[var(--stitch-line)] rounded-xl focus:ring-2 focus:ring-[var(--stitch-ink)]/20"
                     placeholder="Deals finalized today"
                   />
                   {formData.deals_closed >= 1 && (
@@ -254,7 +254,7 @@ const DailyEndModal = ({
 
                 {/* Tomorrow's Planned Visits */}
                 <div>
-                  <label className="block text-sm font-semibold text-[#1A1C20] mb-2">
+                  <label className="block text-sm font-semibold text-[var(--stitch-ink)] mb-2">
                     <ArrowRight className="w-4 h-4 inline mr-1" />
                     Tomorrow's Planned Visits
                   </label>
@@ -263,20 +263,20 @@ const DailyEndModal = ({
                     min="0"
                     value={formData.tomorrow_visits}
                     onChange={(e) => setFormData({ ...formData, tomorrow_visits: parseInt(e.target.value) || 0 })}
-                    className="w-full px-4 py-3 border border-[#E5E1DB] rounded-xl focus:ring-2 focus:ring-[#04473C]/20"
+                    className="w-full px-4 py-3 border border-[var(--stitch-line)] rounded-xl focus:ring-2 focus:ring-[var(--stitch-ink)]/20"
                     placeholder="Visits scheduled for tomorrow"
                   />
                 </div>
 
                 {/* Live Score Preview */}
-                <div className="bg-[#04473C]/5 rounded-xl p-4">
-                  <p className="text-sm font-semibold text-[#04473C] mb-2">Estimated Score Preview</p>
+                <div className="bg-black/5 rounded-xl p-4">
+                  <p className="text-sm font-semibold text-[var(--stitch-ink)] mb-2">Estimated Score Preview</p>
                   <div className="flex items-center gap-4">
                     <div>
-                      <span className="text-2xl font-bold text-[#04473C]">
+                      <span className="text-2xl font-bold text-[var(--stitch-ink)]">
                         {(formData.properties_shared * 1) + (formData.visits_booked * 5) + (formData.deals_closed * 20)}
                       </span>
-                      <span className="text-sm text-[#4A4D53] ml-1">base</span>
+                      <span className="text-sm text-[var(--stitch-muted)] ml-1">base</span>
                     </div>
                     {formData.properties_shared >= 20 && (
                       <span className="text-green-600 text-sm">+10</span>
@@ -297,7 +297,7 @@ const DailyEndModal = ({
                 <button
                   onClick={handleSubmit}
                   disabled={submitting}
-                  className="w-full py-4 bg-gradient-to-r from-[#04473C] to-[#065f4e] text-white rounded-xl font-semibold hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  className="w-full py-4 bg-gradient-to-r from-[var(--stitch-ink)] to-[var(--stitch-ink)] text-white rounded-xl font-semibold hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                   {submitting ? (
                     <>
@@ -317,7 +317,7 @@ const DailyEndModal = ({
                   <button
                     onClick={handleDismiss}
                     disabled={submitting}
-                    className="w-full py-3 mt-2 border border-gray-300 text-gray-600 rounded-xl font-medium hover:bg-gray-50 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full py-3 mt-2 border border-gray-300 text-[var(--stitch-muted)] rounded-xl font-medium hover:bg-[var(--stitch-soft)] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Skip (Apply -100 penalty)
                   </button>

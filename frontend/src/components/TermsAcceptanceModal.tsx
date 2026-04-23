@@ -114,7 +114,7 @@ const TermsAcceptanceModal = ({
           className="bg-white rounded-xl max-w-lg w-full max-h-[90vh] overflow-hidden flex flex-col"
         >
           {/* Header */}
-          <div className="bg-[#04473C] text-white p-4 flex items-center justify-between">
+          <div className="bg-[var(--stitch-ink)] text-white p-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
                 <FileText className="w-5 h-5" />
@@ -170,20 +170,20 @@ const TermsAcceptanceModal = ({
             {/* Expandable Full Terms */}
             <button
               onClick={() => setShowFullTerms(!showFullTerms)}
-              className="w-full flex items-center justify-between p-3 bg-[#F5F3F0] rounded-lg mb-4"
+              className="w-full flex items-center justify-between p-3 bg-[var(--stitch-soft)] rounded-lg mb-4"
             >
-              <span className="text-sm font-medium text-[#04473C]">
+              <span className="text-sm font-medium text-[var(--stitch-ink)]">
                 View Full Terms & Conditions
               </span>
               {showFullTerms ? (
-                <ChevronUp className="w-5 h-5 text-[#4A4D53]" />
+                <ChevronUp className="w-5 h-5 text-[var(--stitch-muted)]" />
               ) : (
-                <ChevronDown className="w-5 h-5 text-[#4A4D53]" />
+                <ChevronDown className="w-5 h-5 text-[var(--stitch-muted)]" />
               )}
             </button>
 
             {showFullTerms && (
-              <div className="bg-[#F5F3F0] rounded-lg p-4 mb-4 text-sm text-[#4A4D53] space-y-3">
+              <div className="bg-[var(--stitch-soft)] rounded-lg p-4 mb-4 text-sm text-[var(--stitch-muted)] space-y-3">
                 <p><strong>1. Privacy Policy:</strong> We collect name, phone, email, location data for service delivery and tracking.</p>
                 <p><strong>2. Terms:</strong> All deals must happen through ApnaGhr. Bypassing is prohibited.</p>
                 <p><strong>3. Location Tracking:</strong> Agents are tracked in real-time. Customers can view agent ETA.</p>
@@ -194,7 +194,7 @@ const TermsAcceptanceModal = ({
                 <Link 
                   to="/legal" 
                   target="_blank"
-                  className="flex items-center gap-2 text-[#04473C] hover:underline font-medium"
+                  className="flex items-center gap-2 text-[var(--stitch-ink)] hover:underline font-medium"
                 >
                   Read Complete Policies <ExternalLink className="w-4 h-4" />
                 </Link>
@@ -208,9 +208,9 @@ const TermsAcceptanceModal = ({
                   type="checkbox"
                   checked={checkboxes.terms}
                   onChange={() => toggleCheckbox('terms')}
-                  className="mt-1 w-5 h-5 rounded border-gray-300 text-[#04473C] focus:ring-[#04473C]"
+                  className="mt-1 w-5 h-5 rounded border-gray-300 text-[var(--stitch-ink)] focus:ring-[var(--stitch-ink)]"
                 />
-                <span className="text-sm text-[#4A4D53]">
+                <span className="text-sm text-[var(--stitch-muted)]">
                   I have read and agree to the <strong>Terms & Conditions</strong>
                 </span>
               </label>
@@ -220,9 +220,9 @@ const TermsAcceptanceModal = ({
                   type="checkbox"
                   checked={checkboxes.privacy}
                   onChange={() => toggleCheckbox('privacy')}
-                  className="mt-1 w-5 h-5 rounded border-gray-300 text-[#04473C] focus:ring-[#04473C]"
+                  className="mt-1 w-5 h-5 rounded border-gray-300 text-[var(--stitch-ink)] focus:ring-[var(--stitch-ink)]"
                 />
-                <span className="text-sm text-[#4A4D53]">
+                <span className="text-sm text-[var(--stitch-muted)]">
                   I consent to <strong>location tracking</strong> and <strong>data collection</strong> as per Privacy Policy
                 </span>
               </label>
@@ -242,14 +242,14 @@ const TermsAcceptanceModal = ({
           </div>
 
           {/* Footer */}
-          <div className="p-4 border-t border-[#E5E1DB] bg-[#F5F3F0]">
+          <div className="p-4 border-t border-[var(--stitch-line)] bg-[var(--stitch-soft)]">
             <button
               onClick={onAccept}
               disabled={!allChecked}
               className={`w-full py-3 rounded-lg font-semibold flex items-center justify-center gap-2 transition-colors ${
                 allChecked
-                  ? 'bg-[#04473C] text-white hover:bg-[#033830]'
-                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  ? 'bg-[var(--stitch-ink)] text-white hover:bg-[#033830]'
+                  : 'bg-gray-300 text-[var(--stitch-muted)] cursor-not-allowed'
               }`}
             >
               <CheckCircle className="w-5 h-5" />
@@ -257,7 +257,7 @@ const TermsAcceptanceModal = ({
             </button>
             
             {!allChecked && (
-              <p className="text-xs text-center text-[#4A4D53] mt-2">
+              <p className="text-xs text-center text-[var(--stitch-muted)] mt-2">
                 Please check all boxes to continue
               </p>
             )}

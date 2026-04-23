@@ -103,7 +103,7 @@ const LeadsPanel = () => {
       case 'not_interested': return 'bg-red-100 text-red-700';
       case 'converted': return 'bg-purple-100 text-purple-700';
       case 'closed': return 'bg-gray-100 text-gray-700';
-      default: return 'bg-gray-100 text-gray-600';
+      default: return 'bg-gray-100 text-[var(--stitch-muted)]';
     }
   };
 
@@ -123,34 +123,34 @@ const LeadsPanel = () => {
       {/* Stats Cards */}
       {stats && (
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-          <div className="bg-white border border-[#E5E1DB] p-4 text-center">
-            <div className="text-3xl font-bold text-[#04473C]">{stats.total || 0}</div>
-            <div className="text-xs text-[#4A4D53]">Total Leads</div>
+          <div className="bg-white border border-[var(--stitch-line)] p-4 text-center">
+            <div className="text-3xl font-bold text-[var(--stitch-ink)]">{stats.total || 0}</div>
+            <div className="text-xs text-[var(--stitch-muted)]">Total Leads</div>
           </div>
-          <div className="bg-white border border-[#E5E1DB] p-4 text-center">
+          <div className="bg-white border border-[var(--stitch-line)] p-4 text-center">
             <div className="text-3xl font-bold text-blue-600">{stats.today || 0}</div>
-            <div className="text-xs text-[#4A4D53]">Today</div>
+            <div className="text-xs text-[var(--stitch-muted)]">Today</div>
           </div>
-          <div className="bg-white border border-[#E5E1DB] p-4 text-center">
+          <div className="bg-white border border-[var(--stitch-line)] p-4 text-center">
             <div className="text-3xl font-bold text-green-600">{stats.by_status?.interested || 0}</div>
-            <div className="text-xs text-[#4A4D53]">Interested</div>
+            <div className="text-xs text-[var(--stitch-muted)]">Interested</div>
           </div>
-          <div className="bg-white border border-[#E5E1DB] p-4 text-center">
+          <div className="bg-white border border-[var(--stitch-line)] p-4 text-center">
             <div className="text-3xl font-bold text-purple-600">{stats.by_status?.converted || 0}</div>
-            <div className="text-xs text-[#4A4D53]">Converted</div>
+            <div className="text-xs text-[var(--stitch-muted)]">Converted</div>
           </div>
-          <div className="bg-white border border-[#E5E1DB] p-4 text-center">
-            <div className="text-3xl font-bold text-[#C6A87C]">{stats.seller_referrals || 0}</div>
-            <div className="text-xs text-[#4A4D53]">Seller Referrals</div>
+          <div className="bg-white border border-[var(--stitch-line)] p-4 text-center">
+            <div className="text-3xl font-bold text-[var(--stitch-muted)]">{stats.seller_referrals || 0}</div>
+            <div className="text-xs text-[var(--stitch-muted)]">Seller Referrals</div>
           </div>
         </div>
       )}
 
       {/* Source Breakdown */}
       {stats?.by_source && (
-        <div className="bg-white border border-[#E5E1DB] p-4">
+        <div className="bg-white border border-[var(--stitch-line)] p-4">
           <h3 className="font-bold mb-3 flex items-center gap-2">
-            <TrendingUp className="w-5 h-5 text-[#04473C]" />
+            <TrendingUp className="w-5 h-5 text-[var(--stitch-ink)]" />
             Lead Sources
           </h3>
           <div className="flex flex-wrap gap-3">
@@ -159,7 +159,7 @@ const LeadsPanel = () => {
                 key={source}
                 onClick={() => setFilter({...filter, source: filter.source === source ? '' : source})}
                 className={`flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer transition-all ${
-                  filter.source === source ? 'bg-[#04473C] text-white' : 'bg-[#F5F3F0] hover:bg-[#E5E1DB]'
+                  filter.source === source ? 'bg-[var(--stitch-ink)] text-white' : 'bg-[var(--stitch-soft)] hover:bg-[var(--stitch-line)]'
                 }`}
               >
                 {getSourceIcon(source)}
@@ -172,7 +172,7 @@ const LeadsPanel = () => {
       )}
 
       {/* Filters & Search */}
-      <div className="bg-white border border-[#E5E1DB] p-4">
+      <div className="bg-white border border-[var(--stitch-line)] p-4">
         <div className="flex flex-col md:flex-row gap-4">
           <div className="flex-1 relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -181,13 +181,13 @@ const LeadsPanel = () => {
               placeholder="Search by name, phone, property, or seller..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-[#E5E1DB] rounded-lg focus:ring-2 focus:ring-[#04473C] focus:border-transparent"
+              className="w-full pl-10 pr-4 py-2 border border-[var(--stitch-line)] rounded-lg focus:ring-2 focus:ring-[var(--stitch-ink)] focus:border-transparent"
             />
           </div>
           <select
             value={filter.status}
             onChange={(e) => setFilter({...filter, status: e.target.value})}
-            className="px-4 py-2 border border-[#E5E1DB] rounded-lg focus:ring-2 focus:ring-[#04473C]"
+            className="px-4 py-2 border border-[var(--stitch-line)] rounded-lg focus:ring-2 focus:ring-[var(--stitch-ink)]"
           >
             <option value="">All Status</option>
             <option value="new">New</option>
@@ -199,7 +199,7 @@ const LeadsPanel = () => {
           </select>
           <button
             onClick={() => { setFilter({ source: '', status: '' }); setSearchQuery(''); }}
-            className="px-4 py-2 text-[#04473C] hover:bg-[#F5F3F0] rounded-lg"
+            className="px-4 py-2 text-[var(--stitch-ink)] hover:bg-[var(--stitch-soft)] rounded-lg"
           >
             Clear Filters
           </button>
@@ -209,11 +209,11 @@ const LeadsPanel = () => {
       {/* Leads List */}
       <div className="space-y-3">
         {loading ? (
-          <div className="text-center py-12 text-[#4A4D53]">Loading leads...</div>
+          <div className="text-center py-12 text-[var(--stitch-muted)]">Loading leads...</div>
         ) : filteredLeads.length === 0 ? (
-          <div className="bg-white border border-[#E5E1DB] p-12 text-center">
-            <Users className="w-12 h-12 text-[#D0C9C0] mx-auto mb-3" />
-            <p className="text-[#4A4D53]">No leads found</p>
+          <div className="bg-white border border-[var(--stitch-line)] p-12 text-center">
+            <Users className="w-12 h-12 text-[var(--stitch-muted)] mx-auto mb-3" />
+            <p className="text-[var(--stitch-muted)]">No leads found</p>
           </div>
         ) : (
           filteredLeads.map((lead) => (
@@ -221,20 +221,20 @@ const LeadsPanel = () => {
               key={lead.id}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="bg-white border border-[#E5E1DB] overflow-hidden"
+              className="bg-white border border-[var(--stitch-line)] overflow-hidden"
             >
               {/* Lead Header */}
               <div 
-                className="p-4 cursor-pointer hover:bg-[#F5F3F0]/50"
+                className="p-4 cursor-pointer hover:bg-[var(--stitch-soft)]/50"
                 onClick={() => setExpandedLead(expandedLead === lead.id ? null : lead.id)}
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
                     {/* Source Badge */}
                     <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                      lead.source === 'seller_referral' ? 'bg-[#C6A87C]/20 text-[#C6A87C]' :
+                      lead.source === 'seller_referral' ? 'bg-[var(--stitch-muted)]/20 text-[var(--stitch-muted)]' :
                       lead.source === 'visit_booking' ? 'bg-green-100 text-green-600' :
-                      'bg-[#04473C]/10 text-[#04473C]'
+                      'bg-black/10 text-[var(--stitch-ink)]'
                     }`}>
                       {getSourceIcon(lead.source)}
                     </div>
@@ -246,9 +246,9 @@ const LeadsPanel = () => {
                           {lead.status?.toUpperCase()}
                         </span>
                       </div>
-                      <div className="flex items-center gap-4 text-sm text-[#4A4D53]">
+                      <div className="flex items-center gap-4 text-sm text-[var(--stitch-muted)]">
                         {lead.phone && (
-                          <a href={`tel:${lead.phone}`} className="flex items-center gap-1 hover:text-[#04473C]">
+                          <a href={`tel:${lead.phone}`} className="flex items-center gap-1 hover:text-[var(--stitch-ink)]">
                             <Phone className="w-3 h-3" />
                             {lead.phone}
                           </a>
@@ -264,15 +264,15 @@ const LeadsPanel = () => {
                   <div className="flex items-center gap-4">
                     {/* Seller Referral Badge */}
                     {lead.referred_by_seller_name && (
-                      <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-[#C6A87C]/20 rounded-lg">
-                        <Share2 className="w-4 h-4 text-[#C6A87C]" />
+                      <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-[var(--stitch-muted)]/20 rounded-lg">
+                        <Share2 className="w-4 h-4 text-[var(--stitch-muted)]" />
                         <span className="text-sm font-medium text-[#8B6914]">
                           via {lead.referred_by_seller_name}
                         </span>
                       </div>
                     )}
                     
-                    <div className="text-right text-xs text-[#4A4D53]">
+                    <div className="text-right text-xs text-[var(--stitch-muted)]">
                       <Clock className="w-3 h-3 inline mr-1" />
                       {new Date(lead.created_at).toLocaleDateString()}
                     </div>
@@ -290,33 +290,33 @@ const LeadsPanel = () => {
                 <motion.div
                   initial={{ height: 0, opacity: 0 }}
                   animate={{ height: 'auto', opacity: 1 }}
-                  className="border-t border-[#E5E1DB] p-4 bg-[#F5F3F0]/30"
+                  className="border-t border-[var(--stitch-line)] p-4 bg-[var(--stitch-soft)]/30"
                 >
                   <div className="grid md:grid-cols-2 gap-6">
                     {/* Lead Details */}
                     <div className="space-y-4">
-                      <h4 className="font-bold text-sm text-[#04473C]">Lead Details</h4>
+                      <h4 className="font-bold text-sm text-[var(--stitch-ink)]">Lead Details</h4>
                       
                       {lead.property_title && (
-                        <div className="bg-white p-3 rounded-lg border border-[#E5E1DB]">
+                        <div className="bg-white p-3 rounded-lg border border-[var(--stitch-line)]">
                           <div className="flex items-center gap-2 text-sm">
-                            <Home className="w-4 h-4 text-[#04473C]" />
+                            <Home className="w-4 h-4 text-[var(--stitch-ink)]" />
                             <span className="font-medium">{lead.property_title}</span>
                           </div>
                           {lead.property_city && (
-                            <p className="text-xs text-[#4A4D53] mt-1">{lead.property_city}</p>
+                            <p className="text-xs text-[var(--stitch-muted)] mt-1">{lead.property_city}</p>
                           )}
                         </div>
                       )}
                       
                       {lead.referred_by_seller_name && (
-                        <div className="bg-[#C6A87C]/10 p-3 rounded-lg border border-[#C6A87C]/30">
+                        <div className="bg-[var(--stitch-muted)]/10 p-3 rounded-lg border border-[var(--stitch-muted)]/30">
                           <div className="flex items-center gap-2 text-sm">
-                            <Share2 className="w-4 h-4 text-[#C6A87C]" />
+                            <Share2 className="w-4 h-4 text-[var(--stitch-muted)]" />
                             <span className="font-medium">Referred by: {lead.referred_by_seller_name}</span>
                           </div>
                           {lead.seller_referral_code && (
-                            <p className="text-xs text-[#4A4D53] mt-1">Code: {lead.seller_referral_code}</p>
+                            <p className="text-xs text-[var(--stitch-muted)] mt-1">Code: {lead.seller_referral_code}</p>
                           )}
                         </div>
                       )}
@@ -328,7 +328,7 @@ const LeadsPanel = () => {
                             <span className="font-medium">Visit Booked</span>
                           </div>
                           {lead.visit_date && (
-                            <p className="text-xs text-[#4A4D53] mt-1">Date: {lead.visit_date}</p>
+                            <p className="text-xs text-[var(--stitch-muted)] mt-1">Date: {lead.visit_date}</p>
                           )}
                           {lead.visit_status && (
                             <p className="text-xs text-green-600 mt-1">Status: {lead.visit_status}</p>
@@ -336,7 +336,7 @@ const LeadsPanel = () => {
                         </div>
                       )}
                       
-                      <div className="text-xs text-[#4A4D53] space-y-1">
+                      <div className="text-xs text-[var(--stitch-muted)] space-y-1">
                         {lead.device_info && <p>Device: {lead.device_info}</p>}
                         {lead.page_url && <p>Page: {lead.page_url}</p>}
                         {lead.ip_address && <p>IP: {lead.ip_address}</p>}
@@ -345,7 +345,7 @@ const LeadsPanel = () => {
                     
                     {/* Actions */}
                     <div className="space-y-4">
-                      <h4 className="font-bold text-sm text-[#04473C]">Actions</h4>
+                      <h4 className="font-bold text-sm text-[var(--stitch-ink)]">Actions</h4>
                       
                       {editingLead === lead.id ? (
                         <div className="space-y-3">
@@ -354,32 +354,32 @@ const LeadsPanel = () => {
                             placeholder="Name"
                             value={editForm.name || ''}
                             onChange={(e) => setEditForm({...editForm, name: e.target.value})}
-                            className="w-full px-3 py-2 border border-[#E5E1DB] rounded-lg"
+                            className="w-full px-3 py-2 border border-[var(--stitch-line)] rounded-lg"
                           />
                           <input
                             type="tel"
                             placeholder="Phone"
                             value={editForm.phone || ''}
                             onChange={(e) => setEditForm({...editForm, phone: e.target.value})}
-                            className="w-full px-3 py-2 border border-[#E5E1DB] rounded-lg"
+                            className="w-full px-3 py-2 border border-[var(--stitch-line)] rounded-lg"
                           />
                           <textarea
                             placeholder="Notes"
                             value={editForm.notes || ''}
                             onChange={(e) => setEditForm({...editForm, notes: e.target.value})}
-                            className="w-full px-3 py-2 border border-[#E5E1DB] rounded-lg"
+                            className="w-full px-3 py-2 border border-[var(--stitch-line)] rounded-lg"
                             rows={2}
                           />
                           <div className="flex gap-2">
                             <button
                               onClick={() => updateLead(lead.id, editForm)}
-                              className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-[#04473C] text-white rounded-lg hover:bg-[#033530]"
+                              className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-[var(--stitch-ink)] text-white rounded-lg hover:bg-[var(--stitch-ink)]"
                             >
                               <Save className="w-4 h-4" /> Save
                             </button>
                             <button
                               onClick={() => setEditingLead(null)}
-                              className="px-4 py-2 border border-[#E5E1DB] rounded-lg hover:bg-[#F5F3F0]"
+                              className="px-4 py-2 border border-[var(--stitch-line)] rounded-lg hover:bg-[var(--stitch-soft)]"
                             >
                               <X className="w-4 h-4" />
                             </button>
@@ -396,7 +396,7 @@ const LeadsPanel = () => {
                                 className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-all ${
                                   lead.status === status 
                                     ? getStatusColor(status)
-                                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                    : 'bg-gray-100 text-[var(--stitch-muted)] hover:bg-gray-200'
                                 }`}
                               >
                                 {status.replace('_', ' ').toUpperCase()}
@@ -432,7 +432,7 @@ const LeadsPanel = () => {
                                 setEditingLead(lead.id);
                                 setEditForm({ name: lead.name, phone: lead.phone, notes: lead.notes });
                               }}
-                              className="flex-1 flex items-center justify-center gap-2 px-4 py-2 border border-[#E5E1DB] rounded-lg hover:bg-[#F5F3F0]"
+                              className="flex-1 flex items-center justify-center gap-2 px-4 py-2 border border-[var(--stitch-line)] rounded-lg hover:bg-[var(--stitch-soft)]"
                             >
                               <Edit2 className="w-4 h-4" /> Edit
                             </button>

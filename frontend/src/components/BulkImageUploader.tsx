@@ -153,9 +153,9 @@ const BulkImageUploader = ({ onClose }) => {
     const imageCount = (property.images || []).length;
     const hasVideo = !!property.video_url;
     
-    if (imageCount >= 10 && hasVideo) return { status: 'complete', color: '#04473C', text: 'Complete' };
-    if (imageCount >= 5) return { status: 'good', color: '#C6A87C', text: 'Good' };
-    if (imageCount >= 1) return { status: 'partial', color: '#C6A87C', text: 'Needs More' };
+    if (imageCount >= 10 && hasVideo) return { status: 'complete', color: 'var(--stitch-ink)', text: 'Complete' };
+    if (imageCount >= 5) return { status: 'good', color: 'var(--stitch-muted)', text: 'Good' };
+    if (imageCount >= 1) return { status: 'partial', color: 'var(--stitch-muted)', text: 'Needs More' };
     return { status: 'empty', color: '#8F2727', text: 'No Images' };
   };
 
@@ -167,10 +167,10 @@ const BulkImageUploader = ({ onClose }) => {
         className="bg-white w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col"
       >
         {/* Header */}
-        <div className="bg-[#04473C] p-6">
+        <div className="bg-[var(--stitch-ink)] p-6">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-2xl font-medium text-white" style={{ fontFamily: 'Playfair Display, serif' }}>
+              <h2 className="text-2xl font-medium text-white" >
                 Bulk Image Uploader
               </h2>
               <p className="text-white/70 mt-1">Upload multiple property photos at once</p>
@@ -205,12 +205,12 @@ const BulkImageUploader = ({ onClose }) => {
         </div>
 
         {/* Instructions */}
-        <div className="bg-[#C6A87C]/10 p-4 border-b border-[#E5E1DB]">
+        <div className="bg-[var(--stitch-muted)]/10 p-4 border-b border-[var(--stitch-line)]">
           <div className="flex items-start gap-3">
-            <Camera className="w-5 h-5 text-[#C6A87C] mt-0.5" />
+            <Camera className="w-5 h-5 text-[var(--stitch-muted)] mt-0.5" />
             <div>
-              <p className="font-medium text-[#1A1C20]">How to upload:</p>
-              <p className="text-sm text-[#4A4D53]">
+              <p className="font-medium text-[var(--stitch-ink)]">How to upload:</p>
+              <p className="text-sm text-[var(--stitch-muted)]">
                 Click on a property → Click "Upload Images" → Select multiple photos (10-14 recommended per property)
               </p>
             </div>
@@ -221,7 +221,7 @@ const BulkImageUploader = ({ onClose }) => {
         <div className="flex-1 overflow-y-auto p-4">
           {loading ? (
             <div className="flex items-center justify-center py-12">
-              <RefreshCw className="w-8 h-8 animate-spin text-[#04473C]" />
+              <RefreshCw className="w-8 h-8 animate-spin text-[var(--stitch-ink)]" />
             </div>
           ) : (
             <div className="space-y-3">
@@ -236,7 +236,7 @@ const BulkImageUploader = ({ onClose }) => {
                   <div
                     key={property.id}
                     className={`border transition-all ${
-                      isExpanded ? 'border-[#04473C] bg-[#E6F0EE]' : 'border-[#E5E1DB] hover:border-[#D0C9C0]'
+                      isExpanded ? 'border-[var(--stitch-ink)] bg-[var(--stitch-soft)]' : 'border-[var(--stitch-line)] hover:border-[var(--stitch-muted)]'
                     }`}
                   >
                     {/* Property Header */}
@@ -251,8 +251,8 @@ const BulkImageUploader = ({ onClose }) => {
                             style={{ backgroundColor: status.color }}
                           />
                           <div>
-                            <h3 className="font-medium text-[#1A1C20]">{property.title}</h3>
-                            <p className="text-sm text-[#4A4D53]">
+                            <h3 className="font-medium text-[var(--stitch-ink)]">{property.title}</h3>
+                            <p className="text-sm text-[var(--stitch-muted)]">
                               {property.area_name} • {imageCount} images • {property.video_url ? '1 video' : 'No video'}
                             </p>
                           </div>
@@ -265,9 +265,9 @@ const BulkImageUploader = ({ onClose }) => {
                             {status.text}
                           </span>
                           {isExpanded ? (
-                            <ChevronUp className="w-5 h-5 text-[#4A4D53]" />
+                            <ChevronUp className="w-5 h-5 text-[var(--stitch-muted)]" />
                           ) : (
-                            <ChevronDown className="w-5 h-5 text-[#4A4D53]" />
+                            <ChevronDown className="w-5 h-5 text-[var(--stitch-muted)]" />
                           )}
                         </div>
                       </div>
@@ -282,29 +282,29 @@ const BulkImageUploader = ({ onClose }) => {
                           exit={{ height: 0, opacity: 0 }}
                           className="overflow-hidden"
                         >
-                          <div className="p-4 pt-0 border-t border-[#E5E1DB]">
+                          <div className="p-4 pt-0 border-t border-[var(--stitch-line)]">
                             {/* Upload Progress */}
                             {progress && (
-                              <div className="mb-4 p-3 bg-[#04473C]/10 border border-[#04473C]/20">
+                              <div className="mb-4 p-3 bg-black/10 border border-[var(--stitch-ink)]/20">
                                 <div className="flex items-center gap-2 mb-2">
-                                  <RefreshCw className="w-4 h-4 animate-spin text-[#04473C]" />
-                                  <span className="text-sm font-medium text-[#04473C]">
+                                  <RefreshCw className="w-4 h-4 animate-spin text-[var(--stitch-ink)]" />
+                                  <span className="text-sm font-medium text-[var(--stitch-ink)]">
                                     Uploading {progress.current}/{progress.total}...
                                   </span>
                                 </div>
-                                <div className="h-2 bg-[#E5E1DB] overflow-hidden">
+                                <div className="h-2 bg-[var(--stitch-line)] overflow-hidden">
                                   <div 
-                                    className="h-full bg-[#04473C] transition-all"
+                                    className="h-full bg-[var(--stitch-ink)] transition-all"
                                     style={{ width: `${(progress.current / progress.total) * 100}%` }}
                                   />
                                 </div>
-                                <p className="text-xs text-[#4A4D53] mt-1">{progress.fileName}</p>
+                                <p className="text-xs text-[var(--stitch-muted)] mt-1">{progress.fileName}</p>
                               </div>
                             )}
 
                             {/* Current Images */}
                             <div className="mb-4">
-                              <p className="text-sm font-medium text-[#4A4D53] mb-2 uppercase tracking-wide">
+                              <p className="text-sm font-medium text-[var(--stitch-muted)] mb-2 uppercase tracking-wide">
                                 Current Images ({imageCount})
                               </p>
                               {imageCount > 0 ? (
@@ -314,7 +314,7 @@ const BulkImageUploader = ({ onClose }) => {
                                       <img
                                         src={getMediaUrl(img)}
                                         alt=""
-                                        className="w-full h-full object-cover border border-[#E5E1DB]"
+                                        className="w-full h-full object-cover border border-[var(--stitch-line)]"
                                         onError={(e) => e.target.src = 'https://via.placeholder.com/100?text=Error'}
                                       />
                                       <button
@@ -327,22 +327,22 @@ const BulkImageUploader = ({ onClose }) => {
                                   ))}
                                 </div>
                               ) : (
-                                <p className="text-sm text-[#4A4D53] italic">No images uploaded yet</p>
+                                <p className="text-sm text-[var(--stitch-muted)] italic">No images uploaded yet</p>
                               )}
                             </div>
 
                             {/* Video */}
                             <div className="mb-4">
-                              <p className="text-sm font-medium text-[#4A4D53] mb-2 uppercase tracking-wide">
+                              <p className="text-sm font-medium text-[var(--stitch-muted)] mb-2 uppercase tracking-wide">
                                 Video
                               </p>
                               {property.video_url ? (
                                 <div className="flex items-center gap-3">
-                                  <div className="w-24 h-16 bg-[#1A1C20] flex items-center justify-center">
+                                  <div className="w-24 h-16 bg-[var(--stitch-ink)] flex items-center justify-center">
                                     <Video className="w-6 h-6 text-white" />
                                   </div>
                                   <div className="flex-1">
-                                    <p className="text-sm text-[#1A1C20] truncate">{property.video_url}</p>
+                                    <p className="text-sm text-[var(--stitch-ink)] truncate">{property.video_url}</p>
                                     <button
                                       onClick={() => removeVideo(property.id)}
                                       className="text-xs text-red-500 hover:underline mt-1"
@@ -352,7 +352,7 @@ const BulkImageUploader = ({ onClose }) => {
                                   </div>
                                 </div>
                               ) : (
-                                <p className="text-sm text-[#4A4D53] italic">No video uploaded</p>
+                                <p className="text-sm text-[var(--stitch-muted)] italic">No video uploaded</p>
                               )}
                             </div>
 
@@ -369,7 +369,7 @@ const BulkImageUploader = ({ onClose }) => {
                               <button
                                 onClick={() => fileInputRef.current[property.id]?.click()}
                                 disabled={isUploading}
-                                className="flex-1 btn-primary flex items-center justify-center gap-2 disabled:opacity-50"
+                                className="flex-1 stitch-button flex items-center justify-center gap-2 disabled:opacity-50"
                               >
                                 {isUploading ? (
                                   <RefreshCw className="w-4 h-4 animate-spin" />
@@ -389,7 +389,7 @@ const BulkImageUploader = ({ onClose }) => {
                               <button
                                 onClick={() => videoInputRef.current[property.id]?.click()}
                                 disabled={uploading[`${property.id}_video`]}
-                                className="btn-secondary flex items-center gap-2 disabled:opacity-50"
+                                className="stitch-button stitch-button-secondary flex items-center gap-2 disabled:opacity-50"
                               >
                                 <Video className="w-4 h-4" />
                                 {uploading[`${property.id}_video`] ? 'Uploading...' : 'Upload Video'}
@@ -397,7 +397,7 @@ const BulkImageUploader = ({ onClose }) => {
                             </div>
 
                             {/* Tip */}
-                            <p className="text-xs text-[#4A4D53] mt-3">
+                            <p className="text-xs text-[var(--stitch-muted)] mt-3">
                               💡 Tip: Select 10-14 images at once for best results. Hold Ctrl/Cmd to select multiple files.
                             </p>
                           </div>
@@ -412,11 +412,11 @@ const BulkImageUploader = ({ onClose }) => {
         </div>
 
         {/* Footer */}
-        <div className="p-4 border-t border-[#E5E1DB] bg-[#F5F3F0] flex justify-between items-center">
-          <p className="text-sm text-[#4A4D53]">
+        <div className="p-4 border-t border-[var(--stitch-line)] bg-[var(--stitch-soft)] flex justify-between items-center">
+          <p className="text-sm text-[var(--stitch-muted)]">
             Images are stored permanently in MongoDB GridFS
           </p>
-          <button onClick={onClose} className="btn-secondary">
+          <button onClick={onClose} className="stitch-button stitch-button-secondary">
             Done
           </button>
         </div>

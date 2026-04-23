@@ -200,16 +200,16 @@ const AIPropertyValidator = ({
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-gradient-to-br from-[#04473C]/5 to-[#C6A87C]/10 rounded-xl p-4 border border-[#04473C]/20"
+      className="bg-gradient-to-br from-[var(--stitch-ink)]/5 to-[var(--stitch-muted)]/10 rounded-xl p-4 border border-[var(--stitch-ink)]/20"
     >
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
-          <Sparkles className="w-5 h-5 text-[#C6A87C]" />
-          <span className="font-semibold text-[#04473C]">AI Property Analysis</span>
+          <Sparkles className="w-5 h-5 text-[var(--stitch-muted)]" />
+          <span className="font-semibold text-[var(--stitch-ink)]">AI Property Analysis</span>
         </div>
         
         {isAnalyzing ? (
-          <div className="flex items-center gap-2 text-sm text-[#4A4D53]">
+          <div className="flex items-center gap-2 text-sm text-[var(--stitch-muted)]">
             <Loader2 className="w-4 h-4 animate-spin" />
             Analyzing...
           </div>
@@ -231,14 +231,14 @@ const AIPropertyValidator = ({
             {/* Detected Property Type */}
             {analysis.detected_type && (
               <div className="flex items-center gap-2">
-                <span className="text-sm text-[#4A4D53]">Detected Type:</span>
+                <span className="text-sm text-[var(--stitch-muted)]">Detected Type:</span>
                 <span className={`px-2 py-1 rounded-full text-xs font-medium flex items-center gap-1 ${PROPERTY_TYPES[analysis.detected_type]?.color || 'bg-gray-100 text-gray-700'}`}>
                   {PROPERTY_TYPES[analysis.detected_type]?.icon && 
                     React.createElement(PROPERTY_TYPES[analysis.detected_type].icon, { className: 'w-3 h-3' })}
                   {PROPERTY_TYPES[analysis.detected_type]?.label || analysis.detected_type}
                 </span>
                 {analysis.type_confidence && (
-                  <span className="text-xs text-[#8A8D91]">
+                  <span className="text-xs text-[var(--stitch-muted)]">
                     ({Math.round(analysis.type_confidence * 100)}% confident)
                   </span>
                 )}
@@ -248,7 +248,7 @@ const AIPropertyValidator = ({
             {/* Description Quality */}
             {analysis.description_quality && (
               <div className="flex items-center gap-2">
-                <span className="text-sm text-[#4A4D53]">Description:</span>
+                <span className="text-sm text-[var(--stitch-muted)]">Description:</span>
                 {(() => {
                   const badge = getQualityBadge(analysis.description_quality);
                   return (

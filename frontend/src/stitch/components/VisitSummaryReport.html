@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ApnaGhr - Visit Summary Report</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Config injected from Design System -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-low": "#f3f3f4",
+                        "surface-container-high": "#e8e8e8",
+                        "on-secondary-fixed-variant": "#3b3b3b",
+                        "secondary": "#5e5e5e",
+                        "on-primary-container": "#ffffff",
+                        "on-surface": "#1a1c1c",
+                        "on-tertiary-fixed-variant": "#e5e2e1",
+                        "primary": "#000000",
+                        "background": "#f9f9f9",
+                        "secondary-fixed": "#c6c6c6",
+                        "primary-container": "#3b3b3b",
+                        "on-primary-fixed": "#ffffff",
+                        "on-primary": "#e2e2e2",
+                        "secondary-fixed-dim": "#ababab",
+                        "on-tertiary-container": "#ffffff",
+                        "surface-variant": "#e2e2e2",
+                        "on-tertiary": "#e5e2e1",
+                        "surface-tint": "#5e5e5e",
+                        "inverse-primary": "#c6c6c6",
+                        "error": "#ba1a1a",
+                        "primary-fixed": "#5e5e5e",
+                        "surface-container-highest": "#e2e2e2",
+                        "on-error-container": "#410002",
+                        "surface": "#f9f9f9",
+                        "inverse-on-surface": "#f0f1f1",
+                        "tertiary-fixed-dim": "#474746",
+                        "surface-bright": "#f9f9f9",
+                        "on-tertiary-fixed": "#ffffff",
+                        "surface-container": "#eeeeee",
+                        "on-background": "#1a1c1c",
+                        "primary-fixed-dim": "#474747",
+                        "on-error": "#ffffff",
+                        "surface-dim": "#dadada",
+                        "outline": "#777777",
+                        "on-secondary-container": "#1b1b1b",
+                        "on-secondary": "#ffffff",
+                        "secondary-container": "#d4d4d4",
+                        "on-primary-fixed-variant": "#e2e2e2",
+                        "on-secondary-fixed": "#1b1b1b",
+                        "inverse-surface": "#2f3131",
+                        "tertiary-container": "#757474",
+                        "outline-variant": "#c6c6c6",
+                        "on-surface-variant": "#474747",
+                        "error-container": "#ffdad6",
+                        "tertiary": "#3c3b3b",
+                        "surface-container-lowest": "#ffffff",
+                        "tertiary-fixed": "#5f5e5e"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {},
+                    "fontFamily": {
+                        "headline": ["Inter", "sans-serif"],
+                        "body": ["Inter", "sans-serif"],
+                        "label": ["Inter", "sans-serif"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        /* Import Inter font directly to ensure availability */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
+        
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        
+        /* Utilitarian print-like setup */
+        @media print {
+            body { background: white; }
+            .no-print { display: none; }
+            .print-sheet { box-shadow: none; padding: 0; width: 100%; max-width: none; }
+        }
+    </style>
+</head>
+<body class="bg-surface-container-low text-on-surface font-body antialiased min-h-screen flex flex-col items-center py-6 px-4 md:py-12 md:px-8 selection:bg-primary selection:text-on-primary">
+<!-- Task/Context Bar (No Global Nav based on Shell mandate for transactional/details screens) -->
+<div class="w-full max-w-4xl flex justify-between items-center mb-8 no-print">
+<a class="flex items-center gap-2 text-primary hover:text-outline transition-colors group" href="#">
+<span class="material-symbols-outlined text-xl group-hover:-translate-x-1 transition-transform">arrow_back</span>
+<span class="font-label text-xs uppercase tracking-widest font-bold">Return to Map</span>
+</a>
+<button class="bg-primary hover:bg-primary-container text-on-primary font-label text-xs uppercase tracking-widest font-bold py-4 px-8 rounded-full flex items-center gap-3 transition-transform scale-100 active:scale-95 shadow-none border-none">
+<span class="material-symbols-outlined text-lg" style="font-variation-settings: 'FILL' 1;">download</span>
+            Download PDF
+        </button>
+</div>
+<!-- The Document Canvas -->
+<main class="print-sheet bg-surface-container-lowest w-full max-w-4xl flex flex-col shadow-none ring-1 ring-outline-variant/30">
+<!-- Header -->
+<header class="p-8 md:p-16 flex flex-col gap-12">
+<div class="flex justify-between items-start w-full border-b border-outline-variant pb-8">
+<div class="flex flex-col">
+<span class="font-headline font-black text-2xl tracking-tighter uppercase text-primary">APNAGHR</span>
+<span class="font-label text-xs text-secondary tracking-widest uppercase mt-1">Terminal Output // v2.0</span>
+</div>
+<div class="text-right flex flex-col gap-1">
+<span class="font-label text-xs text-primary tracking-widest uppercase font-bold">REF: AG-9042-X</span>
+<span class="font-label text-[10px] text-secondary tracking-wider uppercase">Generated: OCT 24, 2023 - 14:32</span>
+</div>
+</div>
+<div class="flex flex-col w-full max-w-2xl">
+<h1 class="font-headline text-5xl md:text-7xl font-bold text-primary tracking-[-0.03em] uppercase leading-[0.9]">
+                    Visit<br/>Summary
+                </h1>
+<p class="font-body text-lg text-on-surface-variant leading-relaxed mt-6">
+                    Field inspection report for target acquisition site. Preliminary analysis indicates high structural integrity with significant modernization required in tertiary zones.
+                </p>
+</div>
+</header>
+<!-- Hero Asset -->
+<div class="w-full h-64 md:h-[400px] bg-surface-container-high relative overflow-hidden">
+<img alt="Property exterior" class="w-full h-full object-cover grayscale contrast-125" data-alt="Stark, high-contrast monochrome architectural photography of a modern concrete house exterior. Sharp shadows, utilitarian geometry, bright daylight." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDFGHpTurLOtK0S6HF1W4roou5njU7rnVhJxDNyW_QgCtbc-rtR2aOoYNCZsfHCg0b_KNHp9v647YVJBkUA62WfihFHVmfanZB66rJH-MXEsn5jljcb9cXrWX0SPM4IDQ-bnc_Wp8RbSsl7ZieMCmjemXD4NwGoUk1DPZPr-g6z91V8PK-ZXC5kYADQOHy1Z4Nr4j1mE1qSwFeuiqxrbM2S2c4IBdzybXYk-NshXy7poVgCdibluGTP_HAhloWy0BWTtzLRKu24nFr2"/>
+<div class="absolute bottom-4 right-4 bg-primary text-on-primary font-label text-[10px] uppercase tracking-widest px-3 py-1 font-bold">
+                Asset Primary View
+            </div>
+</div>
+<!-- Data Grid (Bento Style with 1px internal lines) -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-[1px] bg-outline-variant w-full border-y border-outline-variant">
+<div class="bg-surface-container-lowest p-6 md:p-8 flex flex-col gap-2">
+<span class="font-label text-[10px] uppercase tracking-widest text-secondary font-bold">Target Yield</span>
+<span class="font-headline text-3xl font-bold text-primary tracking-tighter">8.4%</span>
+</div>
+<div class="bg-surface-container-lowest p-6 md:p-8 flex flex-col gap-2">
+<span class="font-label text-[10px] uppercase tracking-widest text-secondary font-bold">Condition</span>
+<span class="font-headline text-3xl font-bold text-primary tracking-tighter uppercase">Grade B</span>
+</div>
+<div class="bg-surface-container-lowest p-6 md:p-8 flex flex-col gap-2">
+<span class="font-label text-[10px] uppercase tracking-widest text-secondary font-bold">Zoning</span>
+<span class="font-headline text-3xl font-bold text-primary tracking-tighter uppercase">Mixed-U</span>
+</div>
+<div class="bg-surface-container-lowest p-6 md:p-8 flex flex-col gap-2">
+<span class="font-label text-[10px] uppercase tracking-widest text-secondary font-bold">Est. CapEx</span>
+<span class="font-headline text-3xl font-bold text-primary tracking-tighter">45K</span>
+</div>
+</div>
+<!-- Main Body / Notes Section -->
+<div class="p-8 md:p-16 flex flex-col md:flex-row gap-12 md:gap-24 w-full">
+<!-- Left Column: Structural Anchor -->
+<div class="w-full md:w-1/3 flex flex-col gap-8">
+<div>
+<h2 class="font-headline text-sm font-bold text-primary tracking-widest uppercase mb-4">Location Matrix</h2>
+<div class="w-full h-48 bg-surface-container-low border border-outline-variant grayscale flex items-center justify-center overflow-hidden">
+<img alt="Map context" class="w-full h-full object-cover opacity-80 mix-blend-multiply" data-alt="Abstract overhead street map view in stark black and white, minimal labels, high contrast concrete texture." data-location="Urban Grid" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBKRxdhfrPL7UHCJk7RH0xn5LAp1boMFyMUCb6gTNSDUsva9RMhKPllMW4ZQ460gCAVCiLHH9XHTQnm_5q2ORESyAuBukTWK7D5xN8cE7N-wzy-xrHtbW-v7US1E2EonfY3dfy_IBYe6hjq4_PGRN3JIEfT_4hkaBSiXYdidFTzjmYgF0Iv6c3nQb9xAYy6rwdKN3idWNdPJVrM5trkQnxJ_Xv6tzYuvlH2x1uth8ywTxNSvJ7rVwcP8UsOosAQekSbNh49QI9Fz4SG"/>
+</div>
+</div>
+<ul class="flex flex-col gap-3 font-label text-xs uppercase tracking-widest text-secondary">
+<li class="flex justify-between border-b border-outline-variant border-opacity-30 pb-2">
+<span>Proximity to Transit</span>
+<span class="text-primary font-bold">0.4 Miles</span>
+</li>
+<li class="flex justify-between border-b border-outline-variant border-opacity-30 pb-2">
+<span>Flood Zone</span>
+<span class="text-primary font-bold">Zone X</span>
+</li>
+<li class="flex justify-between border-b border-outline-variant border-opacity-30 pb-2">
+<span>Year Built</span>
+<span class="text-primary font-bold">1998</span>
+</li>
+</ul>
+</div>
+<!-- Right Column: Narrative Space -->
+<div class="w-full md:w-2/3 flex flex-col gap-8">
+<h2 class="font-headline text-sm font-bold text-primary tracking-widest uppercase border-b border-primary pb-4 inline-block max-w-fit">Inspector Notes</h2>
+<div class="font-body text-base text-on-surface leading-[1.8]">
+<p class="mb-6">The primary superstructure presents without visible deflection. Foundation lines observed from the exterior perimeter appear sound, though access to the sub-grade mechanical room was restricted during this initial assessment.</p>
+<p class="mb-6">Internal compartmentalization allows for immediate pivot to high-density utilization without compromising load-bearing walls. The roof membrane, while functional, exhibits UV degradation consistent with end-of-lifecycle projections. Immediate CapEx allocation recommended for Q3.</p>
+</div>
+<div class="bg-surface p-6 border-l-4 border-primary mt-4">
+<span class="font-label text-[10px] uppercase tracking-widest text-primary font-bold block mb-2 flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">warning</span> Critical Observation
+                    </span>
+<p class="font-body text-sm text-on-surface-variant leading-relaxed">HVAC main lines require complete pressure testing. Initial visual inspection noted oxidation on primary condensation returns.</p>
+</div>
+</div>
+</div>
+<!-- Footer / Sign-off -->
+<footer class="p-8 md:p-16 border-t border-outline-variant mt-auto w-full flex flex-col md:flex-row justify-between items-start md:items-end gap-8 bg-surface-container-low">
+<div class="flex flex-col gap-1">
+<span class="font-label text-[10px] uppercase tracking-widest text-secondary">Authorized Signature</span>
+<div class="h-12 w-48 border-b border-primary mt-4 relative">
+<!-- Faux signature scribble using text -->
+<span class="font-headline text-2xl absolute bottom-1 left-2 text-primary opacity-80" style="font-family: 'Times New Roman', serif; font-style: italic;">J. Doe</span>
+</div>
+<span class="font-label text-xs uppercase tracking-wider text-primary font-bold mt-2">Operative 04</span>
+</div>
+<div class="text-left md:text-right flex flex-col gap-1">
+<span class="font-headline font-black text-xl tracking-tighter uppercase text-primary">APNAGHR SYSTEM</span>
+<span class="font-label text-[10px] text-secondary tracking-widest uppercase">Internal Use Only. Confidential.</span>
+</div>
+</footer>
+</main>
+</body></html>

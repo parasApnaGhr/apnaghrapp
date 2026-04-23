@@ -217,7 +217,7 @@ const VoiceSearch = ({ onSearch, placeholder = "Try: 'Show Patiala flats' or '2B
           font-medium transition-all duration-300 shadow-lg
           ${isListening 
             ? 'bg-red-500 text-white animate-pulse' 
-            : 'bg-gradient-to-r from-[#04473C] to-[#065f4e] text-white hover:shadow-xl'
+            : 'bg-gradient-to-r from-[var(--stitch-ink)] to-[var(--stitch-ink)] text-white hover:shadow-xl'
           }
           ${isProcessing ? 'opacity-70 cursor-wait' : ''}
         `}
@@ -257,19 +257,19 @@ const VoiceSearch = ({ onSearch, placeholder = "Try: 'Show Patiala flats' or '2B
             exit={{ opacity: 0, y: 10, scale: 0.95 }}
             className="absolute top-full left-0 right-0 mt-2 z-50"
           >
-            <div className="bg-white rounded-xl shadow-2xl border border-[#E5E1DB] p-4 min-w-[280px]">
+            <div className="bg-white rounded-xl shadow-2xl border border-[var(--stitch-line)] p-4 min-w-[280px]">
               <div className="flex items-center gap-2 mb-2">
-                <Volume2 className={`w-4 h-4 ${isListening ? 'text-red-500 animate-pulse' : 'text-[#04473C]'}`} />
-                <span className="text-sm font-medium text-[#1A1C20]">
+                <Volume2 className={`w-4 h-4 ${isListening ? 'text-red-500 animate-pulse' : 'text-[var(--stitch-ink)]'}`} />
+                <span className="text-sm font-medium text-[var(--stitch-ink)]">
                   {isListening ? 'Listening...' : 'Heard:'}
                 </span>
               </div>
               
-              <p className="text-[#4A4D53] min-h-[24px]">
+              <p className="text-[var(--stitch-muted)] min-h-[24px]">
                 {transcript || (isListening ? 'Speak now...' : '')}
               </p>
               
-              <p className="text-xs text-[#8A8D91] mt-2 italic">
+              <p className="text-xs text-[var(--stitch-muted)] mt-2 italic">
                 {placeholder}
               </p>
               

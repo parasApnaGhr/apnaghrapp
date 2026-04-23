@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Admin - Payout Review</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-high": "#e8e8e8",
+                        "on-primary-container": "#ffffff",
+                        "outline": "#777777",
+                        "background": "#f9f9f9",
+                        "outline-variant": "#c6c6c6",
+                        "on-tertiary-fixed-variant": "#e5e2e1",
+                        "on-error-container": "#410002",
+                        "surface-container": "#eeeeee",
+                        "surface-bright": "#f9f9f9",
+                        "tertiary": "#3c3b3b",
+                        "surface-variant": "#e2e2e2",
+                        "inverse-surface": "#2f3131",
+                        "surface-container-low": "#f3f3f4",
+                        "on-primary-fixed": "#ffffff",
+                        "inverse-on-surface": "#f0f1f1",
+                        "error-container": "#ffdad6",
+                        "surface-container-highest": "#e2e2e2",
+                        "error": "#ba1a1a",
+                        "primary-fixed-dim": "#474747",
+                        "on-primary-fixed-variant": "#e2e2e2",
+                        "surface-tint": "#5e5e5e",
+                        "surface": "#f9f9f9",
+                        "primary-container": "#3b3b3b",
+                        "on-surface-variant": "#474747",
+                        "tertiary-fixed-dim": "#474746",
+                        "secondary": "#5e5e5e",
+                        "on-secondary": "#ffffff",
+                        "primary-fixed": "#5e5e5e",
+                        "on-primary": "#e2e2e2",
+                        "inverse-primary": "#c6c6c6",
+                        "surface-dim": "#dadada",
+                        "secondary-fixed": "#c6c6c6",
+                        "secondary-fixed-dim": "#ababab",
+                        "tertiary-fixed": "#5f5e5e",
+                        "surface-container-lowest": "#ffffff",
+                        "on-surface": "#1a1c1c",
+                        "on-tertiary": "#e5e2e1",
+                        "primary": "#000000",
+                        "tertiary-container": "#757474",
+                        "on-tertiary-fixed": "#ffffff",
+                        "on-tertiary-container": "#ffffff",
+                        "on-error": "#ffffff",
+                        "secondary-container": "#d4d4d4",
+                        "on-secondary-fixed": "#1b1b1b",
+                        "on-background": "#1a1c1c",
+                        "on-secondary-fixed-variant": "#3b3b3b",
+                        "on-secondary-container": "#1b1b1b"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {},
+                    "fontFamily": {
+                        "headline": ["Inter"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        /* Hide scrollbar for a cleaner look */
+        ::-webkit-scrollbar { width: 0px; background: transparent; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface h-screen w-full overflow-hidden flex antialiased">
+<!-- SideNavBar Component -->
+<nav class="bg-[#F9F9F9] dark:bg-black text-black dark:text-[#E2E2E2] font-['Inter'] font-semibold uppercase tracking-widest text-[10px] h-screen w-64 border-r border-[#C6C6C6] dark:border-[#3B3B3B] fixed left-0 top-0 flex flex-col py-8 z-40">
+<!-- Header -->
+<div class="px-6 mb-8 flex flex-col">
+<div class="font-black text-xl tracking-tighter mb-8">OPERATIONS</div>
+<div class="flex items-center gap-3">
+<img alt="System Operator" class="w-10 h-10 rounded-full grayscale object-cover" data-alt="close up portrait of a serious man in dark high-tech operator environment, cinematic lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAbscHmqlY6RiLTs1B4QbdvX5-Y_nLTOLgDIQHI8YoxXpfHuUBpdnKa_pZts5TsZnDCuEJjQd7DPKPpnr79m8zBUbe36cegwchdn5ZVgKanPBVaRCbEGauLxm3N00eypuAKxhS8r3dc_1ZpsXsCfmRReFKuwfodjm4pfteZHDT0Ft9uFnI6-s1NuoYNVfJM4YaDxJ2-ZpoCl3FnwIMwpLtxUFnUDRYRj2VY6fU8jN_UdoMIcAmfB9lcK4TLmUgcH35ui9KNbyEglqOl"/>
+<div>
+<div class="font-bold text-on-surface text-xs leading-tight">System Operator</div>
+<div class="text-outline text-[9px] leading-tight mt-1">Terminal v2.0.4</div>
+</div>
+</div>
+</div>
+<!-- CTA -->
+<div class="px-6 mb-8">
+<button class="w-full bg-primary text-on-primary py-3 px-4 rounded-full font-bold text-xs hover:bg-[#F3F3F4] hover:text-black dark:hover:bg-[#1A1C1C] dark:hover:text-white transition-all">
+                New Transaction
+            </button>
+</div>
+<!-- Main Navigation Tabs -->
+<div class="flex-1 flex flex-col gap-1 overflow-y-auto px-2">
+<a class="flex items-center gap-4 text-[#777777] dark:text-[#E2E2E2] px-4 py-3 hover:text-black dark:hover:text-white hover:bg-[#F3F3F4] dark:hover:bg-[#1A1C1C] transition-all rounded-full mx-2 my-1" href="#">
+<span class="material-symbols-outlined text-[18px]">dashboard</span>
+<span>Command</span>
+</a>
+<a class="flex items-center gap-4 text-[#777777] dark:text-[#E2E2E2] px-4 py-3 hover:text-black dark:hover:text-white hover:bg-[#F3F3F4] dark:hover:bg-[#1A1C1C] transition-all rounded-full mx-2 my-1" href="#">
+<span class="material-symbols-outlined text-[18px]">domain</span>
+<span>Inventory</span>
+</a>
+<a class="flex items-center gap-4 bg-black text-white dark:bg-[#E2E2E2] dark:text-black rounded-full mx-2 my-1 px-4 py-3 font-bold" href="#" style="font-variation-settings: 'FILL' 1;">
+<span class="material-symbols-outlined text-[18px]">handshake</span>
+<span>Escrow</span>
+</a>
+<a class="flex items-center gap-4 text-[#777777] dark:text-[#E2E2E2] px-4 py-3 hover:text-black dark:hover:text-white hover:bg-[#F3F3F4] dark:hover:bg-[#1A1C1C] transition-all rounded-full mx-2 my-1" href="#">
+<span class="material-symbols-outlined text-[18px]">local_shipping</span>
+<span>Fleet</span>
+</a>
+<a class="flex items-center gap-4 text-[#777777] dark:text-[#E2E2E2] px-4 py-3 hover:text-black dark:hover:text-white hover:bg-[#F3F3F4] dark:hover:bg-[#1A1C1C] transition-all rounded-full mx-2 my-1" href="#">
+<span class="material-symbols-outlined text-[18px]">account_balance</span>
+<span>Vault</span>
+</a>
+<a class="flex items-center gap-4 text-[#777777] dark:text-[#E2E2E2] px-4 py-3 hover:text-black dark:hover:text-white hover:bg-[#F3F3F4] dark:hover:bg-[#1A1C1C] transition-all rounded-full mx-2 my-1" href="#">
+<span class="material-symbols-outlined text-[18px]">settings</span>
+<span>Settings</span>
+</a>
+</div>
+<!-- Footer Navigation Tabs -->
+<div class="px-2 pt-4 border-t border-outline-variant/30 mt-auto">
+<a class="flex items-center gap-4 text-[#777777] dark:text-[#E2E2E2] px-4 py-3 hover:text-black dark:hover:text-white hover:bg-[#F3F3F4] dark:hover:bg-[#1A1C1C] transition-all rounded-full mx-2 my-1" href="#">
+<span class="material-symbols-outlined text-[18px]">inventory_2</span>
+<span>Archive</span>
+</a>
+<a class="flex items-center gap-4 text-[#777777] dark:text-[#E2E2E2] px-4 py-3 hover:text-black dark:hover:text-white hover:bg-[#F3F3F4] dark:hover:bg-[#1A1C1C] transition-all rounded-full mx-2 my-1" href="#">
+<span class="material-symbols-outlined text-[18px]">terminal</span>
+<span>System Log</span>
+</a>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="ml-64 flex-1 h-screen overflow-y-auto bg-surface pb-24">
+<!-- Header & Action Section (Extreme Spatial Cadence) -->
+<div class="px-16 pt-24 pb-16 flex flex-col lg:flex-row justify-between items-start lg:items-end gap-12">
+<div>
+<p class="font-label text-outline uppercase tracking-widest text-xs mb-4 font-bold">Escrow Operations</p>
+<h1 class="font-headline text-[3.5rem] leading-[1.1] font-bold text-primary tracking-[-0.02em] uppercase">Bulk Payout<br/>Review</h1>
+</div>
+<!-- The "Massive Solid" Button -->
+<button class="bg-primary text-on-primary hover:bg-primary-container transition-transform duration-200 hover:scale-[1.02] rounded-full py-6 px-12 flex items-center justify-center gap-4 shadow-none">
+<span class="font-headline font-bold text-lg uppercase tracking-tight">Approve Selected Payouts</span>
+<span class="material-symbols-outlined text-[24px]">payments</span>
+</button>
+</div>
+<!-- Data Table Section -->
+<div class="px-16">
+<!-- High-Precision Filter Tray -->
+<div class="bg-surface-container-low rounded-sm p-4 mb-8 flex flex-col md:flex-row gap-4 items-center justify-between border border-transparent focus-within:border-primary/20 transition-colors">
+<div class="flex items-center gap-4 w-full md:w-auto">
+<div class="relative w-full md:w-80">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline text-lg">search</span>
+<input class="w-full bg-surface-container-lowest border-0 border-b-2 border-outline/20 focus:border-primary focus:ring-0 rounded-none pl-12 pr-4 py-3 text-sm font-body text-on-surface placeholder-outline transition-colors shadow-none" placeholder="Search by Rider Name or ID..." type="text"/>
+</div>
+</div>
+<div class="flex gap-2">
+<button class="px-6 py-2 rounded-full bg-surface-container-lowest text-primary font-bold text-xs uppercase tracking-wide border border-outline-variant hover:bg-surface-container-highest transition-colors">Pending (12)</button>
+<button class="px-6 py-2 rounded-full bg-surface-container-lowest text-outline font-bold text-xs uppercase tracking-wide border border-transparent hover:bg-surface-container-highest transition-colors">Processing</button>
+</div>
+</div>
+<!-- The Table (Borderless Container, Surgical Dividers) -->
+<div class="w-full overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr>
+<th class="py-4 px-6 border-b border-outline-variant w-16 text-center">
+<input class="w-5 h-5 rounded-sm border-2 border-outline text-primary focus:ring-primary focus:ring-offset-surface bg-surface cursor-pointer" type="checkbox"/>
+</th>
+<th class="py-4 px-6 border-b border-outline-variant font-label text-xs uppercase tracking-widest text-outline">Rider Name</th>
+<th class="py-4 px-6 border-b border-outline-variant font-label text-xs uppercase tracking-widest text-outline text-right">Total Earned</th>
+<th class="py-4 px-6 border-b border-outline-variant font-label text-xs uppercase tracking-widest text-outline">Status</th>
+<th class="py-4 px-6 border-b border-outline-variant font-label text-xs uppercase tracking-widest text-outline">Last Payout</th>
+<th class="py-4 px-6 border-b border-outline-variant w-16"></th>
+</tr>
+</thead>
+<tbody class="font-body">
+<!-- Row 1 -->
+<tr class="hover:bg-surface-container-low transition-colors group cursor-pointer">
+<td class="py-6 px-6 border-b border-outline-variant text-center">
+<input checked="" class="w-5 h-5 rounded-sm border-2 border-primary text-primary focus:ring-primary focus:ring-offset-surface bg-primary cursor-pointer" type="checkbox"/>
+</td>
+<td class="py-6 px-6 border-b border-outline-variant">
+<div class="flex items-center gap-4">
+<img alt="Rider" class="w-12 h-12 rounded-sm grayscale object-cover" data-alt="black and white headshot portrait of a focused man in athletic wear looking slightly off camera" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCkFjl8lX6UiFcX84HzYve2HmUsypZfzzzQETRU0DVUiTONFgBIM0Rcv7sjRdyZIuMDXsPToxR9ZPRY9FOpMAqgHs_BOhIapJ5o5DLtwX0kdARVJiuualG6GC8-q5aQyH0oE7ocJ5IBrIfSf1EDlhO_1J0z57-5gPDGQlP_-paxr7JhbsUdCCvYptGN7arx809hX4vCWh-SPbQpQa1kx6-fA175xem0LwIUMNxN4L_uTPWc-7wn-4_iSu94CLY1XhbTBmnZGAMGIXyk"/>
+<div>
+<div class="font-bold text-on-surface text-base">Marcus Chen</div>
+<div class="text-outline text-xs mt-1 font-label uppercase tracking-wider">ID: RDR-8472</div>
+</div>
+</div>
+</td>
+<td class="py-6 px-6 border-b border-outline-variant text-right">
+<div class="font-headline font-bold text-xl text-primary">$1,245.50</div>
+<div class="text-outline text-xs mt-1">42 Deliveries</div>
+</td>
+<td class="py-6 px-6 border-b border-outline-variant">
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-primary"></div>
+<span class="font-bold text-xs uppercase tracking-wide text-primary">Ready</span>
+</div>
+</td>
+<td class="py-6 px-6 border-b border-outline-variant text-on-surface-variant text-sm">
+                                Oct 12, 2023
+                            </td>
+<td class="py-6 px-6 border-b border-outline-variant text-right">
+<button class="text-outline hover:text-primary transition-colors opacity-0 group-hover:opacity-100">
+<span class="material-symbols-outlined">more_horiz</span>
+</button>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-surface-container-low transition-colors group cursor-pointer">
+<td class="py-6 px-6 border-b border-outline-variant text-center">
+<input checked="" class="w-5 h-5 rounded-sm border-2 border-primary text-primary focus:ring-primary focus:ring-offset-surface bg-primary cursor-pointer" type="checkbox"/>
+</td>
+<td class="py-6 px-6 border-b border-outline-variant">
+<div class="flex items-center gap-4">
+<img alt="Rider" class="w-12 h-12 rounded-sm grayscale object-cover" data-alt="monochrome close up portrait of a young woman with intense expression, neutral background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBFkqMNBQFM5e9YN3ZKIz9oMXHK_igFHan_R3PxjUNK8Jy8t8c7Q_Ij2byKm3jZ-E-Bx_JluU-jJp9QIgY1L0aBrCwv7v0NhORUiTGxKhMvqL3p0igWvqmrZztWMCOEjHPHqfREIBxnfxg5adJv1772Gr_WgSplZpuEfsKFeEH9vk1982cETRHFeu-qgBuWD8Il1F7Y9u22eymc6U96YITeHVRpCXmt8SvYm0zt8S7Avt5wetnW5qZ_QLYGIlG68Lcs05CjQ-xDGcXu"/>
+<div>
+<div class="font-bold text-on-surface text-base">Sarah Jenkins</div>
+<div class="text-outline text-xs mt-1 font-label uppercase tracking-wider">ID: RDR-3910</div>
+</div>
+</div>
+</td>
+<td class="py-6 px-6 border-b border-outline-variant text-right">
+<div class="font-headline font-bold text-xl text-primary">$890.00</div>
+<div class="text-outline text-xs mt-1">28 Deliveries</div>
+</td>
+<td class="py-6 px-6 border-b border-outline-variant">
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-primary"></div>
+<span class="font-bold text-xs uppercase tracking-wide text-primary">Ready</span>
+</div>
+</td>
+<td class="py-6 px-6 border-b border-outline-variant text-on-surface-variant text-sm">
+                                Oct 05, 2023
+                            </td>
+<td class="py-6 px-6 border-b border-outline-variant text-right">
+<button class="text-outline hover:text-primary transition-colors opacity-0 group-hover:opacity-100">
+<span class="material-symbols-outlined">more_horiz</span>
+</button>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-surface-container-low transition-colors group cursor-pointer">
+<td class="py-6 px-6 border-b border-outline-variant text-center">
+<input class="w-5 h-5 rounded-sm border-2 border-outline text-primary focus:ring-primary focus:ring-offset-surface bg-surface cursor-pointer" type="checkbox"/>
+</td>
+<td class="py-6 px-6 border-b border-outline-variant">
+<div class="flex items-center gap-4">
+<img alt="Rider" class="w-12 h-12 rounded-sm grayscale object-cover" data-alt="desaturated portrait of a male courier with a shaved head looking straight ahead, stark lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBti2E477tbzy3NOdEPf-ccTPxUcZSDiqQVsodaZ2Q8QwICeDxhY0PTeZAZxVmJLIQT4Q3HyEu9DuMCjuGc1nALXk4jz1PUyI0-agOMXciCpy8oQ8AkqBJiREix8yxz91AJFTQ-Xgx-oPrtnblOtNQughqQfbbfmhtk2UadhCZrW0kmO_MBxCtgQpD8-2i4sa1SnwDs1S0JV7-I7Un5OWyuloSMZ88jOoHGyiPFXD06ChZlwdpLLrXvsAAEFAvHT8pGgKdF-jPgdMJp"/>
+<div>
+<div class="font-bold text-on-surface text-base">David Kalu</div>
+<div class="text-outline text-xs mt-1 font-label uppercase tracking-wider">ID: RDR-1102</div>
+</div>
+</div>
+</td>
+<td class="py-6 px-6 border-b border-outline-variant text-right">
+<div class="font-headline font-bold text-xl text-primary">$2,150.25</div>
+<div class="text-outline text-xs mt-1">65 Deliveries</div>
+</td>
+<td class="py-6 px-6 border-b border-outline-variant">
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-outline-variant"></div>
+<span class="font-bold text-xs uppercase tracking-wide text-outline">Hold</span>
+</div>
+</td>
+<td class="py-6 px-6 border-b border-outline-variant text-on-surface-variant text-sm">
+                                Sep 28, 2023
+                            </td>
+<td class="py-6 px-6 border-b border-outline-variant text-right">
+<button class="text-outline hover:text-primary transition-colors opacity-0 group-hover:opacity-100">
+<span class="material-symbols-outlined">more_horiz</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Simple Pagination / Status -->
+<div class="mt-8 flex justify-between items-center text-xs font-bold font-label uppercase tracking-widest text-outline">
+<span>Showing 1-3 of 12 Pending</span>
+<div class="flex gap-4">
+<button class="hover:text-primary transition-colors disabled:opacity-50" disabled="">Prev</button>
+<button class="hover:text-primary transition-colors text-primary">Next</button>
+</div>
+</div>
+</div>
+</main>
+</body></html>

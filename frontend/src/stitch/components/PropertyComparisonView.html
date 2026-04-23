@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Property Comparison - ApnaGhr</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Config injected from Design System -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container-high": "#e8e8e8",
+                    "on-primary-container": "#ffffff",
+                    "outline": "#777777",
+                    "background": "#f9f9f9",
+                    "outline-variant": "#c6c6c6",
+                    "on-tertiary-fixed-variant": "#e5e2e1",
+                    "on-error-container": "#410002",
+                    "surface-container": "#eeeeee",
+                    "surface-bright": "#f9f9f9",
+                    "tertiary": "#3c3b3b",
+                    "surface-variant": "#e2e2e2",
+                    "inverse-surface": "#2f3131",
+                    "surface-container-low": "#f3f3f4",
+                    "on-primary-fixed": "#ffffff",
+                    "inverse-on-surface": "#f0f1f1",
+                    "error-container": "#ffdad6",
+                    "surface-container-highest": "#e2e2e2",
+                    "error": "#ba1a1a",
+                    "primary-fixed-dim": "#474747",
+                    "on-primary-fixed-variant": "#e2e2e2",
+                    "surface-tint": "#5e5e5e",
+                    "surface": "#f9f9f9",
+                    "primary-container": "#3b3b3b",
+                    "on-surface-variant": "#474747",
+                    "tertiary-fixed-dim": "#474746",
+                    "secondary": "#5e5e5e",
+                    "on-secondary": "#ffffff",
+                    "primary-fixed": "#5e5e5e",
+                    "on-primary": "#e2e2e2",
+                    "inverse-primary": "#c6c6c6",
+                    "surface-dim": "#dadada",
+                    "secondary-fixed": "#c6c6c6",
+                    "secondary-fixed-dim": "#ababab",
+                    "tertiary-fixed": "#5f5e5e",
+                    "surface-container-lowest": "#ffffff",
+                    "on-surface": "#1a1c1c",
+                    "on-tertiary": "#e5e2e1",
+                    "primary": "#000000",
+                    "tertiary-container": "#757474",
+                    "on-tertiary-fixed": "#ffffff",
+                    "on-tertiary-container": "#ffffff",
+                    "on-error": "#ffffff",
+                    "secondary-container": "#d4d4d4",
+                    "on-secondary-fixed": "#1b1b1b",
+                    "on-background": "#1a1c1c",
+                    "on-secondary-fixed-variant": "#3b3b3b",
+                    "on-secondary-container": "#1b1b1b"
+            },
+            "borderRadius": {
+                    "DEFAULT": "1rem",
+                    "lg": "2rem",
+                    "xl": "3rem",
+                    "full": "9999px",
+                    "none": "0",
+                    "sm": "0.5rem"
+            },
+            "spacing": {},
+            "fontFamily": {
+                    "headline": ["Inter", "sans-serif"],
+                    "body": ["Inter", "sans-serif"],
+                    "label": ["Inter", "sans-serif"]
+            }
+          },
+        },
+      }
+    </script>
+</head>
+<body class="bg-surface text-on-surface font-body antialiased min-h-screen flex flex-col selection:bg-primary selection:text-on-primary">
+<!-- TopNavBar: Adhering to Shared Components JSON & Conflict Resolution Rules -->
+<!-- Shell Border Ban applied: using tonal shift (surface-container-lowest) instead of border-b -->
+<header class="w-full top-0 bg-surface-container-lowest z-50 sticky shadow-[0_1px_3px_rgba(0,0,0,0.05)]">
+<div class="flex justify-between items-center px-12 py-6 w-full max-w-[1920px] mx-auto">
+<!-- Brand Logo -->
+<div class="flex items-center gap-4">
+<span class="text-2xl font-black tracking-tighter text-primary font-headline">ARCHITECT</span>
+</div>
+<!-- Search Bar (on_left as per JSON) -> Translating to a functional input tray -->
+<div class="hidden md:flex flex-1 max-w-md mx-12">
+<div class="relative w-full">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline-variant">search</span>
+<input class="w-full bg-surface-container-low rounded-sm py-3 pl-12 pr-4 text-sm font-body text-on-surface focus:outline-none border-b-2 border-transparent focus:border-primary transition-colors placeholder:text-outline-variant" placeholder="Search properties..." type="text"/>
+</div>
+</div>
+<!-- Navigation Links -->
+<nav class="hidden md:flex items-center gap-8 font-headline font-bold tracking-tight uppercase text-xs">
+<!-- Active Item: Listings (Comparison is part of listings flow) -->
+<a class="text-primary border-b-2 border-primary pb-1 scale-102-hover transition-transform duration-200 ease-in-out" href="#">Listings</a>
+<a class="text-outline hover:text-primary transition-colors scale-102-hover transition-transform duration-200 ease-in-out hover:bg-surface-container-highest px-2 py-1 -mx-2 rounded-sm duration-200" href="#">Analytics</a>
+<a class="text-outline hover:text-primary transition-colors scale-102-hover transition-transform duration-200 ease-in-out hover:bg-surface-container-highest px-2 py-1 -mx-2 rounded-sm duration-200" href="#">Logistics</a>
+<a class="text-outline hover:text-primary transition-colors scale-102-hover transition-transform duration-200 ease-in-out hover:bg-surface-container-highest px-2 py-1 -mx-2 rounded-sm duration-200" href="#">Network</a>
+</nav>
+<!-- Trailing Actions -->
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-4 text-primary">
+<button class="hover:bg-surface-container-highest p-2 rounded-full transition-colors duration-200">
+<span class="material-symbols-outlined block">notifications</span>
+</button>
+<!-- Search icon duplicated for mobile if needed, but per JSON trailing_icon_actions includes search -->
+<button class="md:hidden hover:bg-surface-container-highest p-2 rounded-full transition-colors duration-200">
+<span class="material-symbols-outlined block">search</span>
+</button>
+</div>
+<div class="hidden lg:flex items-center gap-4">
+<a class="font-headline font-bold text-xs uppercase tracking-tight text-outline hover:text-primary transition-colors" href="#">Support</a>
+<button class="bg-primary text-on-primary font-headline font-bold uppercase tracking-tight text-xs px-6 py-3 rounded-full hover:scale-[1.02] transition-transform duration-200">
+                        Create Listing
+                    </button>
+</div>
+<!-- Profile Avatar -->
+<div class="w-10 h-10 rounded-full overflow-hidden border border-outline-variant ml-2 shrink-0 bg-surface-container-low">
+<img alt="User profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBI7xbk-zL4zETMhbsNjHtyVF-iVMaPCaeJB31qWjxnA7HXQNsMnbzsc-R0hd9lMxAUDzUN7qMUQYDcgZZzT_6zZXuRXgNqIhH_pZsba-GnmoKdTXtmpdv5nN4gihfBThwoNGtV04vcLg5Luep3PJ7mQ1r4ajDbZIevo8uTsnAYljxRHe4n0QC3tYR3gByQjbJftTmuDgTjubSD1YjiXsVXKU4k_XDOosyknJIk9nadoBi8wN9u5FH54qyuN38e-dzvCSEBlmEREQ_W"/>
+</div>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-1 w-full max-w-[1920px] mx-auto px-6 md:px-12 py-16 flex flex-col relative">
+<!-- Header Section -->
+<div class="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-8">
+<div class="flex flex-col gap-4 max-w-2xl">
+<a class="flex items-center gap-2 text-sm font-label uppercase text-outline hover:text-primary transition-colors w-fit" href="#">
+<span class="material-symbols-outlined" style="font-size: 16px;">arrow_back</span>
+                    Back to Catalog
+                </a>
+<h1 class="font-headline font-bold text-5xl tracking-[-0.02em] leading-none text-primary">
+                    COMPARE PROPERTIES
+                </h1>
+<p class="font-body text-lg text-on-surface-variant leading-relaxed mt-2">
+                    A definitive, side-by-side analysis of structural assets. Identify the optimal spatial configuration for your operational requirements.
+                </p>
+</div>
+<div class="flex gap-4 shrink-0">
+<button class="bg-surface-container-low text-primary font-label uppercase px-8 py-4 rounded-sm border border-outline-variant hover:border-primary transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined" style="font-size: 18px;">download</span>
+                    Export Data
+                </button>
+</div>
+</div>
+<!-- The Comparison Matrix (Neo-Brutalist Grid) -->
+<div class="w-full overflow-x-auto pb-12">
+<!-- Grid Container: Using stark borders to enforce functionalist aesthetic -->
+<div class="min-w-[1200px] border-t-2 border-l-2 border-primary grid grid-cols-[300px_1fr_1fr_1fr] bg-surface relative">
+<!-- STICKY HEADER ROW -->
+<div class="col-span-4 grid grid-cols-[subgrid] sticky top-[88px] z-40 bg-surface shadow-[0_2px_0_0_#000000]">
+<!-- Empty Corner -->
+<div class="border-r border-b border-outline-variant bg-surface-container-low p-6 flex flex-col justify-end">
+<span class="font-label uppercase text-outline text-xs tracking-widest">Select Parameters</span>
+</div>
+<!-- Property 1 Header -->
+<div class="border-r border-b border-outline-variant p-8 flex flex-col relative group bg-surface">
+<!-- Badge: Best Value -->
+<div class="absolute top-4 left-4 z-10 bg-primary text-on-primary font-label text-[10px] px-3 py-1.5 flex items-center gap-1 shadow-sm">
+<span class="material-symbols-outlined" data-weight="fill" style="font-size: 14px;">star</span>
+                            BEST VALUE
+                        </div>
+<!-- Thumbnail -->
+<div class="w-full aspect-[4/3] bg-surface-container-low mb-6 overflow-hidden relative">
+<img alt="modern luxury mansion exterior with sharp geometric lines large windows and concrete finishes during golden hour" class="w-full h-full object-cover grayscale opacity-90 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500" data-alt="modern luxury mansion exterior with sharp geometric lines large windows and concrete finishes during golden hour" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBfCajD4TmCe-JT0owypUSn0N2-EUKdirA94eTsTblcDGe3eJcmHou4guGl8ttO0ErGKHbC7Cfr0jFOGNCzMQii9qa2MAVs-iZx96O1hdckQAsC1glESnbHYuyypHsQ1E-2fLZ6a_TRn4SI40N9qsFMjRljjp2Nom7q7PZztawAGUTaEIkPzAsHHhW8jIRBfkv6uSWvV0-V9vsiniLJUIEfSwvHlANpY0BBJ4xEFmUyNqeoT2vGquYsUt7loHs1Yfl_RYjZp-71ROWp"/>
+</div>
+<h3 class="font-headline font-bold text-2xl tracking-tight text-primary leading-tight mb-2">Vertex Protocol</h3>
+<p class="font-body text-sm text-outline mb-8">Sector 42, Orbital Ring</p>
+<button class="mt-auto w-full bg-surface-container-low text-primary font-label uppercase py-4 rounded-none border border-outline-variant hover:bg-primary hover:text-on-primary transition-colors text-center block">
+                            Analyze
+                        </button>
+</div>
+<!-- Property 2 Header -->
+<div class="border-r border-b border-outline-variant p-8 flex flex-col relative group bg-surface">
+<!-- Thumbnail -->
+<div class="w-full aspect-[4/3] bg-surface-container-low mb-6 overflow-hidden relative">
+<img alt="minimalist brutalist concrete residential building exterior under a clear blue sky with stark shadows" class="w-full h-full object-cover grayscale opacity-90 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500" data-alt="minimalist brutalist concrete residential building exterior under a clear blue sky with stark shadows" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAj8NzLZ5Ox-dS5owvlfuo7_OFmB9stwt4MQkv8K2Nn1TdVlFAaPdq9UHrMaTr8XXGUPkr7kA3LMgPZAxKiy4Uo1BJVUN08pFVjkfcpiIZmv2NR4pLdUPCI0e0UbQlE5J7uMTXmYBNdACDnxWqk3TBrp024vzD7GZ7nWilY2_B0XQQ6_ISfNOSE0xdDf2B2oK4Gh7pFPikf2h2sHnrNiCmu7u04ZBxYgGDUwFV4ITZBErt5P5sggKinaogyD1OYcFTjUwLJJl1ytVcd"/>
+</div>
+<h3 class="font-headline font-bold text-2xl tracking-tight text-primary leading-tight mb-2">Zenith Block</h3>
+<p class="font-body text-sm text-outline mb-8">District 9, Industrial Zone</p>
+<button class="mt-auto w-full bg-surface-container-low text-primary font-label uppercase py-4 rounded-none border border-outline-variant hover:bg-primary hover:text-on-primary transition-colors text-center block">
+                            Analyze
+                        </button>
+</div>
+<!-- Property 3 Header -->
+<div class="border-r border-b border-outline-variant p-8 flex flex-col relative group bg-surface">
+<!-- Badge: Most Spacious -->
+<div class="absolute top-4 left-4 z-10 bg-primary text-on-primary font-label text-[10px] px-3 py-1.5 flex items-center gap-1 shadow-sm">
+<span class="material-symbols-outlined" data-weight="fill" style="font-size: 14px;">aspect_ratio</span>
+                            MOST SPACIOUS
+                        </div>
+<!-- Thumbnail -->
+<div class="w-full aspect-[4/3] bg-surface-container-low mb-6 overflow-hidden relative">
+<img alt="high-end spacious open-plan interior with massive floor-to-ceiling windows overlooking a dense urban cityscape" class="w-full h-full object-cover grayscale opacity-90 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500" data-alt="high-end spacious open-plan interior with massive floor-to-ceiling windows overlooking a dense urban cityscape" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAF__ZXL3dFZB5XHRmdzs0zC1xmraWQyP1NmHMkhfg6stkEmCIBhakegHkQmfebcunTwg3F9VAPr-D6x9aMj6VIZL5Mhbxy9CKx01AfT5CeVCdaD8N6cIk2L66gjuHH7o3JtTc93Co-amENV85YCYDFn2mVb6L4scP7uAbIdpqgaC5YzARaq329ukZfIcpGNZC0SGEcv19f_we2thEKROJy24dF9Dcpe8WpKo00axZcaeubr3ZkbnkCSDYg5UpZ_PR2kzzu65FRqF25"/>
+</div>
+<h3 class="font-headline font-bold text-2xl tracking-tight text-primary leading-tight mb-2">Aether Void</h3>
+<p class="font-body text-sm text-outline mb-8">High Altitude Habitat 01</p>
+<button class="mt-auto w-full bg-surface-container-low text-primary font-label uppercase py-4 rounded-none border border-outline-variant hover:bg-primary hover:text-on-primary transition-colors text-center block">
+                            Analyze
+                        </button>
+</div>
+</div>
+<!-- DATA ROWS -->
+<!-- Price Row -->
+<div class="col-span-4 grid grid-cols-[subgrid] hover:bg-surface-container-lowest transition-colors">
+<div class="border-r border-b border-outline-variant bg-surface-container-low p-6 flex items-center">
+<span class="font-label uppercase text-on-surface tracking-widest text-sm flex items-center gap-3">
+<span class="material-symbols-outlined text-outline">payments</span>
+                            Acquisition Cost
+                        </span>
+</div>
+<div class="border-r border-b border-outline-variant p-6 flex items-center justify-center">
+<span class="font-headline font-bold text-2xl text-primary">₹ 4.2 Cr</span>
+</div>
+<div class="border-r border-b border-outline-variant p-6 flex items-center justify-center">
+<span class="font-headline font-bold text-2xl text-primary">₹ 2.8 Cr</span>
+</div>
+<div class="border-r border-b border-outline-variant p-6 flex items-center justify-center bg-surface-container-low/30">
+<span class="font-headline font-bold text-2xl text-primary">₹ 6.5 Cr</span>
+</div>
+</div>
+<!-- Area Row -->
+<div class="col-span-4 grid grid-cols-[subgrid] hover:bg-surface-container-lowest transition-colors">
+<div class="border-r border-b border-outline-variant bg-surface-container-low p-6 flex items-center">
+<span class="font-label uppercase text-on-surface tracking-widest text-sm flex items-center gap-3">
+<span class="material-symbols-outlined text-outline">square_foot</span>
+                            Floor Plan Area
+                        </span>
+</div>
+<div class="border-r border-b border-outline-variant p-6 flex flex-col items-center justify-center">
+<span class="font-body text-xl text-primary">2,400 Sq.Ft</span>
+<span class="font-label text-outline text-[10px] mt-1">Carpet Area: 1,980 Sq.Ft</span>
+</div>
+<div class="border-r border-b border-outline-variant p-6 flex flex-col items-center justify-center">
+<span class="font-body text-xl text-primary">1,650 Sq.Ft</span>
+<span class="font-label text-outline text-[10px] mt-1">Carpet Area: 1,300 Sq.Ft</span>
+</div>
+<div class="border-r border-b border-outline-variant p-6 flex flex-col items-center justify-center bg-surface-container-low/30">
+<span class="font-body text-xl text-primary font-bold">4,100 Sq.Ft</span>
+<span class="font-label text-outline text-[10px] mt-1">Carpet Area: 3,600 Sq.Ft</span>
+</div>
+</div>
+<!-- Topology (BHK) Row -->
+<div class="col-span-4 grid grid-cols-[subgrid] hover:bg-surface-container-lowest transition-colors">
+<div class="border-r border-b border-outline-variant bg-surface-container-low p-6 flex items-center">
+<span class="font-label uppercase text-on-surface tracking-widest text-sm flex items-center gap-3">
+<span class="material-symbols-outlined text-outline">view_quilt</span>
+                            Spatial Topology
+                        </span>
+</div>
+<div class="border-r border-b border-outline-variant p-6 flex items-center justify-center">
+<span class="font-body text-lg text-primary">3 BHK + Utility</span>
+</div>
+<div class="border-r border-b border-outline-variant p-6 flex items-center justify-center">
+<span class="font-body text-lg text-primary">2 BHK</span>
+</div>
+<div class="border-r border-b border-outline-variant p-6 flex items-center justify-center">
+<span class="font-body text-lg text-primary">4 BHK + Sub-level</span>
+</div>
+</div>
+<!-- Status Row -->
+<div class="col-span-4 grid grid-cols-[subgrid] hover:bg-surface-container-lowest transition-colors">
+<div class="border-r border-b border-outline-variant bg-surface-container-low p-6 flex items-center">
+<span class="font-label uppercase text-on-surface tracking-widest text-sm flex items-center gap-3">
+<span class="material-symbols-outlined text-outline">construction</span>
+                            Development Status
+                        </span>
+</div>
+<div class="border-r border-b border-outline-variant p-6 flex items-center justify-center gap-2">
+<div class="w-2 h-2 rounded-full bg-primary"></div>
+<span class="font-body text-lg text-primary">Ready for Deployment</span>
+</div>
+<div class="border-r border-b border-outline-variant p-6 flex items-center justify-center gap-2">
+<div class="w-2 h-2 rounded-none bg-outline-variant border border-primary"></div>
+<span class="font-body text-lg text-outline">Q3 2025 Completion</span>
+</div>
+<div class="border-r border-b border-outline-variant p-6 flex items-center justify-center gap-2">
+<div class="w-2 h-2 rounded-full bg-primary"></div>
+<span class="font-body text-lg text-primary">Ready for Deployment</span>
+</div>
+</div>
+<!-- Core Systems (Amenities) Row -->
+<div class="col-span-4 grid grid-cols-[subgrid] hover:bg-surface-container-lowest transition-colors">
+<div class="border-r border-b border-outline-variant bg-surface-container-low p-6 flex items-start pt-8">
+<span class="font-label uppercase text-on-surface tracking-widest text-sm flex items-center gap-3">
+<span class="material-symbols-outlined text-outline">memory</span>
+                            Core Systems
+                        </span>
+</div>
+<div class="border-r border-b border-outline-variant p-8 flex flex-col gap-4">
+<div class="flex items-center gap-3"><span class="material-symbols-outlined text-primary" style="font-size: 20px;">check</span> <span class="font-body text-sm">Automated Climate Control</span></div>
+<div class="flex items-center gap-3"><span class="material-symbols-outlined text-primary" style="font-size: 20px;">check</span> <span class="font-body text-sm">High-speed Elevator</span></div>
+<div class="flex items-center gap-3"><span class="material-symbols-outlined text-primary" style="font-size: 20px;">check</span> <span class="font-body text-sm">Level 3 Security Grid</span></div>
+<div class="flex items-center gap-3 text-outline"><span class="material-symbols-outlined" style="font-size: 20px;">close</span> <span class="font-body text-sm line-through">Helipad Access</span></div>
+</div>
+<div class="border-r border-b border-outline-variant p-8 flex flex-col gap-4">
+<div class="flex items-center gap-3"><span class="material-symbols-outlined text-primary" style="font-size: 20px;">check</span> <span class="font-body text-sm">Standard HVAC</span></div>
+<div class="flex items-center gap-3"><span class="material-symbols-outlined text-outline" style="font-size: 20px;">close</span> <span class="font-body text-sm text-outline line-through">High-speed Elevator</span></div>
+<div class="flex items-center gap-3"><span class="material-symbols-outlined text-primary" style="font-size: 20px;">check</span> <span class="font-body text-sm">Level 1 Security Grid</span></div>
+<div class="flex items-center gap-3 text-outline"><span class="material-symbols-outlined" style="font-size: 20px;">close</span> <span class="font-body text-sm line-through">Helipad Access</span></div>
+</div>
+<div class="border-r border-b border-outline-variant p-8 flex flex-col gap-4">
+<div class="flex items-center gap-3"><span class="material-symbols-outlined text-primary" style="font-size: 20px;">check</span> <span class="font-body text-sm">Atmospheric Scrubber</span></div>
+<div class="flex items-center gap-3"><span class="material-symbols-outlined text-primary" style="font-size: 20px;">check</span> <span class="font-body text-sm">Private Mag-lev Terminal</span></div>
+<div class="flex items-center gap-3"><span class="material-symbols-outlined text-primary" style="font-size: 20px;">check</span> <span class="font-body text-sm">Level 5 Security Grid</span></div>
+<div class="flex items-center gap-3"><span class="material-symbols-outlined text-primary" style="font-size: 20px;">check</span> <span class="font-body text-sm font-bold">Helipad Access</span></div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>

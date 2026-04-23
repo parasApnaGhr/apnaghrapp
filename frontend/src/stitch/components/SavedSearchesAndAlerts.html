@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Saved Searches &amp; Alerts - Architect</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-high": "#e8e8e8",
+                        "on-primary-container": "#ffffff",
+                        "outline": "#777777",
+                        "background": "#f9f9f9",
+                        "outline-variant": "#c6c6c6",
+                        "on-tertiary-fixed-variant": "#e5e2e1",
+                        "on-error-container": "#410002",
+                        "surface-container": "#eeeeee",
+                        "surface-bright": "#f9f9f9",
+                        "tertiary": "#3c3b3b",
+                        "surface-variant": "#e2e2e2",
+                        "inverse-surface": "#2f3131",
+                        "surface-container-low": "#f3f3f4",
+                        "on-primary-fixed": "#ffffff",
+                        "inverse-on-surface": "#f0f1f1",
+                        "error-container": "#ffdad6",
+                        "surface-container-highest": "#e2e2e2",
+                        "error": "#ba1a1a",
+                        "primary-fixed-dim": "#474747",
+                        "on-primary-fixed-variant": "#e2e2e2",
+                        "surface-tint": "#5e5e5e",
+                        "surface": "#f9f9f9",
+                        "primary-container": "#3b3b3b",
+                        "on-surface-variant": "#474747",
+                        "tertiary-fixed-dim": "#474746",
+                        "secondary": "#5e5e5e",
+                        "on-secondary": "#ffffff",
+                        "primary-fixed": "#5e5e5e",
+                        "on-primary": "#e2e2e2",
+                        "inverse-primary": "#c6c6c6",
+                        "surface-dim": "#dadada",
+                        "secondary-fixed": "#c6c6c6",
+                        "secondary-fixed-dim": "#ababab",
+                        "tertiary-fixed": "#5f5e5e",
+                        "surface-container-lowest": "#ffffff",
+                        "on-surface": "#1a1c1c",
+                        "on-tertiary": "#e5e2e1",
+                        "primary": "#000000",
+                        "tertiary-container": "#757474",
+                        "on-tertiary-fixed": "#ffffff",
+                        "on-tertiary-container": "#ffffff",
+                        "on-error": "#ffffff",
+                        "secondary-container": "#d4d4d4",
+                        "on-secondary-fixed": "#1b1b1b",
+                        "on-background": "#1a1c1c",
+                        "on-secondary-fixed-variant": "#3b3b3b",
+                        "on-secondary-container": "#1b1b1b"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {},
+                    "fontFamily": {
+                        "headline": ["Inter"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface min-h-screen pb-24 md:pb-0">
+<!-- TopNavBar (Web) -->
+<nav class="hidden md:flex justify-between items-center px-12 py-6 w-full max-w-[1920px] mx-auto bg-[#F9F9F9] dark:bg-black w-full top-0 border-b border-[#C6C6C6] dark:border-[#3B3B3B] z-50 sticky">
+<!-- Search left -> empty div for balance if needed, or place search here. JSON says "search_bar": "on_left" -->
+<div class="flex items-center gap-8">
+<div class="text-2xl font-black tracking-tighter text-black dark:text-white">
+                ARCHITECT
+            </div>
+<!-- Implied left search bar -->
+<div class="relative hidden lg:block w-64 group">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-sm">search</span>
+<input class="w-full bg-surface-container-low border-b-2 border-transparent focus:border-primary focus:ring-0 px-10 py-2 text-sm font-label uppercase tracking-widest text-on-surface placeholder:text-outline transition-colors outline-none h-10 rounded-sm" placeholder="Search..." type="text"/>
+</div>
+</div>
+<ul class="flex items-center gap-8 font-['Inter'] font-bold tracking-tight uppercase text-xs">
+<li><a class="text-black dark:text-white border-b-2 border-black dark:border-white pb-1 scale-102-hover transition-transform duration-200 ease-in-out" href="#">Listings</a></li>
+<li><a class="text-[#777777] hover:text-black dark:hover:text-white transition-colors hover:bg-[#E2E2E2] dark:hover:bg-[#3B3B3B] duration-200 px-2 py-1 rounded-sm" href="#">Analytics</a></li>
+<li><a class="text-[#777777] hover:text-black dark:hover:text-white transition-colors hover:bg-[#E2E2E2] dark:hover:bg-[#3B3B3B] duration-200 px-2 py-1 rounded-sm" href="#">Logistics</a></li>
+<li><a class="text-[#777777] hover:text-black dark:hover:text-white transition-colors hover:bg-[#E2E2E2] dark:hover:bg-[#3B3B3B] duration-200 px-2 py-1 rounded-sm" href="#">Network</a></li>
+</ul>
+<div class="flex items-center gap-6">
+<button class="font-['Inter'] font-bold tracking-tight uppercase text-xs text-[#777777] hover:text-black dark:hover:text-white transition-colors">Support</button>
+<button class="bg-primary text-on-primary rounded-full px-6 py-3 font-['Inter'] font-bold tracking-tight uppercase text-xs scale-102-hover transition-transform duration-200 ease-in-out">Create Listing</button>
+<div class="flex items-center gap-4 text-black dark:text-[#E2E2E2]">
+<button class="hover:bg-[#E2E2E2] dark:hover:bg-[#3B3B3B] duration-200 p-2 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-xl">notifications</span>
+</button>
+<div class="w-10 h-10 rounded-full bg-surface-container-low overflow-hidden border border-outline-variant">
+<img alt="User profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCwLLPIm0XFKNBNsyiSfdd442vucdmmqxoum136WAGQlajX4cI7lx-NmblbA21Ke7y2DhILgLrDCXZP7AbFrNi__iA0YxxVn38yowN94MYLbNGNGknQ5R3ItKpJi-EIFUjVI6tLYEw-1qPh8y0MOcRSbHOPMMZgEQekTa1P-mMSIfmv5YUPkVYsys3rsoY3kb_a4yPdKAOz6KdjJj63PkBgoDfDTw0aeKRj3XR38x1O1c5479nky7vjXx-upAHONYvqXlHxhOkIwaxX"/>
+</div>
+</div>
+</div>
+</nav>
+<!-- Main Canvas -->
+<main class="max-w-[1920px] mx-auto px-4 md:px-12 py-16 md:py-24 flex flex-col gap-24">
+<!-- Header Section -->
+<header class="flex flex-col md:flex-row md:items-end justify-between gap-8 border-b border-surface-container-high pb-12">
+<div class="flex flex-col gap-4 max-w-3xl">
+<p class="font-label text-xs font-bold uppercase tracking-widest text-outline">Control Center</p>
+<h1 class="font-headline text-[3rem] md:text-[4rem] font-bold tracking-[-0.03em] leading-none text-primary">
+                    Saved Searches<br/>&amp; Alerts
+                </h1>
+</div>
+<button class="bg-primary text-on-primary rounded-full px-12 py-6 font-label font-bold uppercase tracking-widest text-xs hover:scale-[1.02] transition-transform self-start md:self-auto shrink-0 shadow-none border-none">
+                Create New Rule
+            </button>
+</header>
+<!-- Active Alerts Section -->
+<section class="flex flex-col gap-12">
+<div class="flex items-center justify-between">
+<h2 class="font-headline text-2xl md:text-3xl font-bold tracking-tight text-primary">Active Directives</h2>
+<span class="font-label text-xs font-bold uppercase tracking-widest text-outline bg-surface-container-low px-4 py-2 rounded-full">4 Rules Active</span>
+</div>
+<div class="flex flex-col gap-6">
+<!-- Alert Card 1 -->
+<div class="bg-surface-container-low p-6 md:p-10 flex flex-col lg:flex-row lg:items-center justify-between gap-8 rounded-none md:rounded-sm">
+<div class="flex flex-col gap-2">
+<h3 class="font-headline text-2xl font-bold tracking-tight text-primary">3BHK in Gurgaon</h3>
+<div class="flex items-center gap-4 text-sm font-body text-outline mt-2">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">map</span> Sector 50+</span>
+<span class="w-1 h-1 bg-outline-variant rounded-full"></span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">payments</span> &lt; ₹4.5 Cr</span>
+<span class="w-1 h-1 bg-outline-variant rounded-full"></span>
+<span>Updated 2h ago</span>
+</div>
+</div>
+<div class="flex items-center gap-8 self-start lg:self-auto border-t lg:border-t-0 border-outline-variant pt-6 lg:pt-0 w-full lg:w-auto">
+<div class="flex items-center gap-4">
+<span class="font-label text-xs font-bold uppercase tracking-widest text-primary">Email</span>
+<!-- Toggle ON -->
+<button aria-label="Toggle Email" class="w-12 h-6 bg-primary rounded-full relative transition-colors">
+<span class="absolute right-1 top-1 w-4 h-4 bg-on-primary rounded-full shadow-none"></span>
+</button>
+</div>
+<div class="flex items-center gap-4">
+<span class="font-label text-xs font-bold uppercase tracking-widest text-outline">SMS</span>
+<!-- Toggle OFF -->
+<button aria-label="Toggle SMS" class="w-12 h-6 bg-surface-variant rounded-full relative transition-colors">
+<span class="absolute left-1 top-1 w-4 h-4 bg-surface rounded-full shadow-none border border-outline-variant"></span>
+</button>
+</div>
+<button aria-label="Delete Rule" class="ml-4 text-outline hover:text-error transition-colors">
+<span class="material-symbols-outlined">delete</span>
+</button>
+</div>
+</div>
+<!-- Alert Card 2 -->
+<div class="bg-surface-container-low p-6 md:p-10 flex flex-col lg:flex-row lg:items-center justify-between gap-8 rounded-none md:rounded-sm border-l-4 border-primary">
+<div class="flex flex-col gap-2">
+<div class="flex items-center gap-3">
+<h3 class="font-headline text-2xl font-bold tracking-tight text-primary">Commercial Space, BLR</h3>
+<span class="bg-primary text-on-primary font-label text-[10px] uppercase tracking-widest px-2 py-1 rounded-sm">High Priority</span>
+</div>
+<div class="flex items-center gap-4 text-sm font-body text-outline mt-2">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">domain</span> Indiranagar</span>
+<span class="w-1 h-1 bg-outline-variant rounded-full"></span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">aspect_ratio</span> 2000+ sqft</span>
+</div>
+</div>
+<div class="flex items-center gap-8 self-start lg:self-auto border-t lg:border-t-0 border-outline-variant pt-6 lg:pt-0 w-full lg:w-auto">
+<div class="flex items-center gap-4">
+<span class="font-label text-xs font-bold uppercase tracking-widest text-primary">Email</span>
+<button aria-label="Toggle Email" class="w-12 h-6 bg-primary rounded-full relative transition-colors">
+<span class="absolute right-1 top-1 w-4 h-4 bg-on-primary rounded-full shadow-none"></span>
+</button>
+</div>
+<div class="flex items-center gap-4">
+<span class="font-label text-xs font-bold uppercase tracking-widest text-primary">SMS</span>
+<button aria-label="Toggle SMS" class="w-12 h-6 bg-primary rounded-full relative transition-colors">
+<span class="absolute right-1 top-1 w-4 h-4 bg-on-primary rounded-full shadow-none"></span>
+</button>
+</div>
+<button aria-label="Delete Rule" class="ml-4 text-outline hover:text-error transition-colors">
+<span class="material-symbols-outlined">delete</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Recent Matches Section -->
+<section class="flex flex-col gap-12 mt-12">
+<div class="flex items-center justify-between border-b border-outline-variant pb-6">
+<h2 class="font-headline text-2xl md:text-3xl font-bold tracking-tight text-primary">Recent Influx</h2>
+<button class="font-label text-xs font-bold uppercase tracking-widest text-primary hover:bg-surface-container-low px-4 py-2 rounded-sm transition-colors flex items-center gap-2">
+                    View All <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16">
+<!-- Match 1 -->
+<article class="flex flex-col gap-4 group cursor-pointer">
+<div class="aspect-[4/3] w-full relative overflow-hidden bg-surface-container-low rounded-none">
+<img alt="Property match" class="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500 ease-out" data-alt="Modern stark white concrete villa with sharp angular geometry and large black framed windows surrounded by minimalist landscaping" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAAcm8cnsLOC6prwwKIBVj6YgzxejfPCJL89ps0iSXNrxVvpUz6WBzDpCF8Srlk3--Mb0gZJbjgNPfc5iOho4FyHQaimANylQJZyQE7aYNmaT43jFYPvFb0DrZwHN1IuKrWkw5HUYnuF0FaCWRinZ7zod7BrUVZ9Mf9JPu1SNq14fZ60XF1zvt6s-1U0hz4aPGeF533GQRowEytRSjJOf4W48N9i_vJFjDHtrdGAgjWDTtpOKHiJti6i0_EMNhy3bR5gskzdBw3ztgM"/>
+<div class="absolute top-4 left-4 bg-primary text-on-primary font-label text-[10px] uppercase tracking-widest px-3 py-1.5 rounded-sm">
+                            New Match
+                        </div>
+</div>
+<div class="flex flex-col gap-1 mt-2">
+<div class="flex justify-between items-start">
+<h4 class="font-headline text-2xl font-bold text-primary">₹4.2 Cr</h4>
+<span class="material-symbols-outlined text-outline">bookmark_border</span>
+</div>
+<p class="font-body text-lg font-semibold text-primary">3BHK • 2,450 sqft</p>
+<p class="font-body text-sm text-outline mt-1">Sector 54, Golf Course Road, Gurgaon</p>
+</div>
+</article>
+<!-- Match 2 -->
+<article class="flex flex-col gap-4 group cursor-pointer">
+<div class="aspect-[4/3] w-full relative overflow-hidden bg-surface-container-low rounded-none">
+<img alt="Property match" class="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500 ease-out" data-alt="Monolithic luxury apartment building interior showcasing minimal raw materials concrete walls and expansive city views through floor to ceiling glass" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD5Dnh4Dwr1xbRyMv-4a99SHRIBP6q2a9uFZc58PDWYBiuD6d-W2zY85Do2MDRBAP6pca3v3YBpNEb5I2sozFHclXSp2sHudeR3aWjAjbVpfDzepNqB0_z-Aen6u7hBAieAfErTPO85QbLOykrcTfCe7KrJ-BBYv7tpb5fFFZ3TmSOPjBR-3o0-d7dd5JnlYotoQUad6bg5M7x4VHusI46_55LH9VEn_YxIGlDtyCd2IEnblWj5_m-s4qP_x95JZsp-X7lKbhFEe4Ga"/>
+</div>
+<div class="flex flex-col gap-1 mt-2">
+<div class="flex justify-between items-start">
+<h4 class="font-headline text-2xl font-bold text-primary">₹3.8 Cr</h4>
+<span class="material-symbols-outlined text-outline">bookmark_border</span>
+</div>
+<p class="font-body text-lg font-semibold text-primary">3BHK • 2,100 sqft</p>
+<p class="font-body text-sm text-outline mt-1">Sector 50, Nirvana Country, Gurgaon</p>
+</div>
+</article>
+<!-- Match 3 -->
+<article class="flex flex-col gap-4 group cursor-pointer hidden lg:flex">
+<div class="aspect-[4/3] w-full relative overflow-hidden bg-surface-container-low rounded-none">
+<img alt="Property match" class="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500 ease-out" data-alt="High contrast architectural facade of a commercial office space with rigid grid windows and exposed steel structural elements in monochrome styling" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBFA57tFfQ163puJgTg1pcbPwmR_8dz_94IHD_oEfQHYSkMWalknLM_UoJec7dVCnghxHM33PakHATdxkVVj8npRAyBm5Yc54_ijVLUTGgfbcakqVRI3VGkR4rWwqbKtf2sxG7Uis2R43044NNqRRtaeukwFIHL_Pqtb4h7sZdWAFpXvn5zgEhuLjC9Sn1vVoZINsvp-lT5YfvNMNcjCRjiD45m6jLk1rcUWSVU3X72qxUTHwDabmC5iAVyf5z19ukEtfzFZVZg8mQV"/>
+</div>
+<div class="flex flex-col gap-1 mt-2">
+<div class="flex justify-between items-start">
+<h4 class="font-headline text-2xl font-bold text-primary">₹12.5 Cr</h4>
+<span class="material-symbols-outlined text-outline">bookmark_border</span>
+</div>
+<p class="font-body text-lg font-semibold text-primary">Commercial • 3,200 sqft</p>
+<p class="font-body text-sm text-outline mt-1">100ft Road, Indiranagar, Bangalore</p>
+</div>
+</article>
+</div>
+</section>
+</main>
+<!-- BottomNavBar (Mobile) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-3 pb-safe-bottom bg-[#F9F9F9]/80 dark:bg-black/80 backdrop-blur-xl fixed bottom-0 w-full border-t border-[#C6C6C6] dark:border-[#3B3B3B]">
+<button class="flex flex-col items-center justify-center text-[#777777] active:bg-[#E2E2E2] transition-colors rounded-full p-2 Tactile 0.98x scale on press">
+<span class="material-symbols-outlined text-2xl mb-1">explore</span>
+<span class="font-['Inter'] font-bold text-[10px] uppercase tracking-tighter">Explore</span>
+</button>
+<button class="flex flex-col items-center justify-center text-[#777777] active:bg-[#E2E2E2] transition-colors rounded-full p-2 Tactile 0.98x scale on press">
+<span class="material-symbols-outlined text-2xl mb-1">gavel</span>
+<span class="font-['Inter'] font-bold text-[10px] uppercase tracking-tighter">Bids</span>
+</button>
+<button class="flex flex-col items-center justify-center text-[#777777] active:bg-[#E2E2E2] transition-colors rounded-full p-2 Tactile 0.98x scale on press">
+<span class="material-symbols-outlined text-2xl mb-1">map</span>
+<span class="font-['Inter'] font-bold text-[10px] uppercase tracking-tighter">Trips</span>
+</button>
+<button class="flex flex-col items-center justify-center bg-black text-white dark:bg-white dark:text-black rounded-full px-6 py-2 active:bg-[#E2E2E2] transition-colors Tactile 0.98x scale on press">
+<span class="material-symbols-outlined text-2xl mb-1" style="font-variation-settings: 'FILL' 1;">person</span>
+<span class="font-['Inter'] font-bold text-[10px] uppercase tracking-tighter">Account</span>
+</button>
+</nav>
+</body></html>

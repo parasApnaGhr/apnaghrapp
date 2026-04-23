@@ -94,7 +94,7 @@ const PropertyAnalyticsPanel = () => {
   };
 
   if (loading) {
-    return <div className="flex justify-center py-12"><div className="w-8 h-8 border-4 border-[#E07A5F] border-t-transparent rounded-full animate-spin"></div></div>;
+    return <div className="flex justify-center py-12"><div className="w-8 h-8 border-4 border-[var(--stitch-ink)] border-t-transparent rounded-full animate-spin"></div></div>;
   }
 
   return (
@@ -104,7 +104,7 @@ const PropertyAnalyticsPanel = () => {
         <div className="flex gap-2">
           <button
             onClick={handleAutoMarkHot}
-            className="btn-secondary flex items-center gap-2"
+            className="stitch-button stitch-button-secondary flex items-center gap-2"
             data-testid="auto-mark-hot"
           >
             <Flame className="w-4 h-4" />
@@ -112,7 +112,7 @@ const PropertyAnalyticsPanel = () => {
           </button>
           <button
             onClick={loadAnalytics}
-            className="btn-primary flex items-center gap-2"
+            className="stitch-button flex items-center gap-2"
             data-testid="refresh-analytics"
           >
             <RefreshCw className="w-4 h-4" />
@@ -123,8 +123,8 @@ const PropertyAnalyticsPanel = () => {
 
       {/* Summary Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-6">
-        <div className="bg-white rounded-xl border border-[#E5E3D8] p-4">
-          <p className="text-sm text-[#4A626C]">Total Properties</p>
+        <div className="bg-white rounded-xl border border-[var(--stitch-line)] p-4">
+          <p className="text-sm text-[var(--stitch-muted)]">Total Properties</p>
           <p className="text-2xl font-bold" style={{ fontFamily: 'Outfit' }}>{analytics.summary.total_properties || 0}</p>
         </div>
         <div className="bg-green-50 border border-green-200 rounded-xl p-4">
@@ -153,7 +153,7 @@ const PropertyAnalyticsPanel = () => {
       <div className="flex flex-wrap gap-4 mb-6">
         <div className="flex-1 min-w-[200px]">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#4A626C]" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--stitch-muted)]" />
             <input
               type="text"
               placeholder="Search properties..."
@@ -170,8 +170,8 @@ const PropertyAnalyticsPanel = () => {
               onClick={() => setFilter(f)}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
                 filter === f
-                  ? 'bg-[#E07A5F] text-white'
-                  : 'bg-[#F3F2EB] text-[#4A626C] hover:bg-[#E5E3D8]'
+                  ? 'bg-[var(--stitch-ink)] text-white'
+                  : 'bg-[#F3F2EB] text-[var(--stitch-muted)] hover:bg-[var(--stitch-line)]'
               }`}
             >
               {f === 'needs_check' ? 'Needs Check' : f.charAt(0).toUpperCase() + f.slice(1)}
@@ -183,9 +183,9 @@ const PropertyAnalyticsPanel = () => {
       {/* Properties List */}
       <div className="space-y-4">
         {filteredProperties.length === 0 ? (
-          <div className="text-center py-12 bg-white rounded-xl border border-[#E5E3D8]">
-            <Home className="w-12 h-12 text-[#4A626C] mx-auto mb-3 opacity-50" />
-            <p className="text-[#4A626C]">No properties match the filter</p>
+          <div className="text-center py-12 bg-white rounded-xl border border-[var(--stitch-line)]">
+            <Home className="w-12 h-12 text-[var(--stitch-muted)] mx-auto mb-3 opacity-50" />
+            <p className="text-[var(--stitch-muted)]">No properties match the filter</p>
           </div>
         ) : (
           filteredProperties.map(property => {
@@ -196,7 +196,7 @@ const PropertyAnalyticsPanel = () => {
               <div 
                 key={property.id} 
                 className={`bg-white rounded-xl border-2 p-4 ${
-                  property.needs_verification ? 'border-amber-300' : 'border-[#E5E3D8]'
+                  property.needs_verification ? 'border-amber-300' : 'border-[var(--stitch-line)]'
                 }`}
               >
                 <div className="flex items-start gap-4">
@@ -206,7 +206,7 @@ const PropertyAnalyticsPanel = () => {
                       <img src={getMediaUrl(property.images[0])} alt="" className="w-full h-full object-cover" />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
-                        <Home className="w-8 h-8 text-[#4A626C]" />
+                        <Home className="w-8 h-8 text-[var(--stitch-muted)]" />
                       </div>
                     )}
                   </div>
@@ -223,7 +223,7 @@ const PropertyAnalyticsPanel = () => {
                             </span>
                           )}
                         </div>
-                        <p className="text-sm text-[#4A626C] flex items-center gap-1">
+                        <p className="text-sm text-[var(--stitch-muted)] flex items-center gap-1">
                           <MapPin className="w-3 h-3" />
                           {property.area_name}, {property.city}
                         </p>
@@ -236,7 +236,7 @@ const PropertyAnalyticsPanel = () => {
 
                     <div className="flex items-center gap-6 text-sm mb-3">
                       <span className="flex items-center gap-1">
-                        <IndianRupee className="w-4 h-4 text-[#E07A5F]" />
+                        <IndianRupee className="w-4 h-4 text-[var(--stitch-ink)]" />
                         <strong>₹{property.rent?.toLocaleString()}</strong>/mo
                       </span>
                       <span>{property.bhk} BHK • {property.furnishing}</span>
@@ -253,7 +253,7 @@ const PropertyAnalyticsPanel = () => {
                         <span>{property.visit_count || 0} total visits</span>
                       </div>
                       {property.last_status_check && (
-                        <div className="flex items-center gap-1 text-[#4A626C]">
+                        <div className="flex items-center gap-1 text-[var(--stitch-muted)]">
                           <Clock className="w-4 h-4" />
                           <span>Checked: {new Date(property.last_status_check).toLocaleDateString()}</span>
                         </div>
@@ -268,7 +268,7 @@ const PropertyAnalyticsPanel = () => {
                       className={`px-3 py-2 rounded-lg text-sm font-medium flex items-center gap-1 ${
                         property.needs_verification
                           ? 'bg-amber-500 text-white hover:bg-amber-600'
-                          : 'bg-[#F3F2EB] text-[#4A626C] hover:bg-[#E5E3D8]'
+                          : 'bg-[#F3F2EB] text-[var(--stitch-muted)] hover:bg-[var(--stitch-line)]'
                       }`}
                       data-testid={`verify-${property.id}`}
                     >
@@ -280,7 +280,7 @@ const PropertyAnalyticsPanel = () => {
                       className={`px-3 py-2 rounded-lg text-sm font-medium flex items-center gap-1 ${
                         property.is_hot
                           ? 'bg-orange-500 text-white hover:bg-orange-600'
-                          : 'bg-[#F3F2EB] text-[#4A626C] hover:bg-[#E5E3D8]'
+                          : 'bg-[#F3F2EB] text-[var(--stitch-muted)] hover:bg-[var(--stitch-line)]'
                       }`}
                       data-testid={`toggle-hot-${property.id}`}
                     >
@@ -310,7 +310,7 @@ const PropertyAnalyticsPanel = () => {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl max-w-md w-full p-6">
             <h3 className="text-xl font-bold mb-4">Update Property Status</h3>
-            <p className="text-sm text-[#4A626C] mb-4">{statusModal.title}</p>
+            <p className="text-sm text-[var(--stitch-muted)] mb-4">{statusModal.title}</p>
 
             <div className="space-y-3 mb-4">
               <button
@@ -360,7 +360,7 @@ const PropertyAnalyticsPanel = () => {
 
             <button
               onClick={() => { setStatusModal(null); setStatusNotes(''); }}
-              className="w-full btn-secondary"
+              className="w-full stitch-button stitch-button-secondary"
             >
               Cancel
             </button>

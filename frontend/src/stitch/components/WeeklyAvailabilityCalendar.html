@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Availability Calendar</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-high": "#e8e8e8",
+                        "on-primary-container": "#ffffff",
+                        "outline": "#777777",
+                        "background": "#f9f9f9",
+                        "outline-variant": "#c6c6c6",
+                        "on-tertiary-fixed-variant": "#e5e2e1",
+                        "on-error-container": "#410002",
+                        "surface-container": "#eeeeee",
+                        "surface-bright": "#f9f9f9",
+                        "tertiary": "#3c3b3b",
+                        "surface-variant": "#e2e2e2",
+                        "inverse-surface": "#2f3131",
+                        "surface-container-low": "#f3f3f4",
+                        "on-primary-fixed": "#ffffff",
+                        "inverse-on-surface": "#f0f1f1",
+                        "error-container": "#ffdad6",
+                        "surface-container-highest": "#e2e2e2",
+                        "error": "#ba1a1a",
+                        "primary-fixed-dim": "#474747",
+                        "on-primary-fixed-variant": "#e2e2e2",
+                        "surface-tint": "#5e5e5e",
+                        "surface": "#f9f9f9",
+                        "primary-container": "#3b3b3b",
+                        "on-surface-variant": "#474747",
+                        "tertiary-fixed-dim": "#474746",
+                        "secondary": "#5e5e5e",
+                        "on-secondary": "#ffffff",
+                        "primary-fixed": "#5e5e5e",
+                        "on-primary": "#e2e2e2",
+                        "inverse-primary": "#c6c6c6",
+                        "surface-dim": "#dadada",
+                        "secondary-fixed": "#c6c6c6",
+                        "secondary-fixed-dim": "#ababab",
+                        "tertiary-fixed": "#5f5e5e",
+                        "surface-container-lowest": "#ffffff",
+                        "on-surface": "#1a1c1c",
+                        "on-tertiary": "#e5e2e1",
+                        "primary": "#000000",
+                        "tertiary-container": "#757474",
+                        "on-tertiary-fixed": "#ffffff",
+                        "on-tertiary-container": "#ffffff",
+                        "on-error": "#ffffff",
+                        "secondary-container": "#d4d4d4",
+                        "on-secondary-fixed": "#1b1b1b",
+                        "on-background": "#1a1c1c",
+                        "on-secondary-fixed-variant": "#3b3b3b",
+                        "on-secondary-container": "#1b1b1b"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px",
+                        "sm": "0.5rem",
+                        "none": "0px"
+                    },
+                    "spacing": {},
+                    "fontFamily": {
+                        "headline": ["Inter"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-surface text-on-surface font-body antialiased selection:bg-primary selection:text-on-primary overflow-x-hidden">
+<!-- Shared Component: SideNavBar (Desktop) -->
+<nav class="hidden md:flex flex-col bg-[#F9F9F9] dark:bg-black text-black dark:text-[#E2E2E2] font-['Inter'] font-semibold uppercase tracking-widest text-[10px] h-screen w-64 border-r border-[#C6C6C6] dark:border-[#3B3B3B] fixed left-0 top-0 py-8 z-40">
+<div class="px-8 mb-12">
+<h1 class="font-black text-xl tracking-tighter mb-8">OPERATIONS</h1>
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-container-highest overflow-hidden">
+<img alt="System Operator" class="w-full h-full object-cover" data-alt="close up black and white portrait of a serious young man with short hair looking directly at camera against a plain background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAGS7GvTRCrH62NG1GFgzxiSTGGEPrLETB9kzQ5EwBiNLf-iOAEqDYOLJLsnekG9Xmd1VLH8T3kPbGpfYNvGX8JAp01bVUvM_acujSjoq6p53ubmEXoMNUANvWxtdVhdwPgT3Dw12kyUirwd5omeavPsyY6OXa22Llb3CUvWO5ps0bD5HGGt4vn4Yocjgr7CKyRe3B9-LcixA9c3SJJUtQ9ksaMIdh-gNfNGhifx-x9AYEPY1KSeA0GbobR-JX4Jx_gzzrAwG61GO7A"/>
+</div>
+<div>
+<div class="font-bold text-on-surface">System Operator</div>
+<div class="text-outline text-[9px] mt-0.5">Terminal v2.0.4</div>
+</div>
+</div>
+</div>
+<ul class="flex flex-col flex-grow gap-1">
+<li class="flex items-center gap-4 text-[#777777] dark:text-[#E2E2E2] px-4 py-3 hover:text-black dark:hover:text-white hover:bg-[#F3F3F4] dark:hover:bg-[#1A1C1C] transition-all cursor-pointer">
+<span class="material-symbols-outlined text-[20px]">dashboard</span>
+                Command
+            </li>
+<li class="flex items-center gap-4 text-[#777777] dark:text-[#E2E2E2] px-4 py-3 hover:text-black dark:hover:text-white hover:bg-[#F3F3F4] dark:hover:bg-[#1A1C1C] transition-all cursor-pointer">
+<span class="material-symbols-outlined text-[20px]">domain</span>
+                Inventory
+            </li>
+<li class="flex items-center gap-4 text-[#777777] dark:text-[#E2E2E2] px-4 py-3 hover:text-black dark:hover:text-white hover:bg-[#F3F3F4] dark:hover:bg-[#1A1C1C] transition-all cursor-pointer">
+<span class="material-symbols-outlined text-[20px]">handshake</span>
+                Escrow
+            </li>
+<!-- Active State: Fleet -->
+<li class="flex items-center gap-4 bg-black text-white dark:bg-[#E2E2E2] dark:text-black rounded-full mx-2 my-1 px-4 py-3 cursor-pointer">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">local_shipping</span>
+                Fleet
+            </li>
+<li class="flex items-center gap-4 text-[#777777] dark:text-[#E2E2E2] px-4 py-3 hover:text-black dark:hover:text-white hover:bg-[#F3F3F4] dark:hover:bg-[#1A1C1C] transition-all cursor-pointer">
+<span class="material-symbols-outlined text-[20px]">account_balance</span>
+                Vault
+            </li>
+<li class="flex items-center gap-4 text-[#777777] dark:text-[#E2E2E2] px-4 py-3 hover:text-black dark:hover:text-white hover:bg-[#F3F3F4] dark:hover:bg-[#1A1C1C] transition-all cursor-pointer">
+<span class="material-symbols-outlined text-[20px]">settings</span>
+                Settings
+            </li>
+</ul>
+<div class="px-4 mt-auto mb-8">
+<button class="w-full bg-primary text-on-primary py-4 rounded-full font-label text-[10px] uppercase font-bold tracking-widest hover:scale-[1.02] transition-transform">
+                New Transaction
+            </button>
+</div>
+<ul class="flex flex-col gap-1 border-t border-outline-variant pt-4 px-2">
+<li class="flex items-center gap-4 text-[#777777] dark:text-[#E2E2E2] px-4 py-3 hover:text-black dark:hover:text-white hover:bg-[#F3F3F4] dark:hover:bg-[#1A1C1C] transition-all cursor-pointer">
+<span class="material-symbols-outlined text-[20px]">inventory_2</span>
+                Archive
+            </li>
+<li class="flex items-center gap-4 text-[#777777] dark:text-[#E2E2E2] px-4 py-3 hover:text-black dark:hover:text-white hover:bg-[#F3F3F4] dark:hover:bg-[#1A1C1C] transition-all cursor-pointer">
+<span class="material-symbols-outlined text-[20px]">terminal</span>
+                System Log
+            </li>
+</ul>
+</nav>
+<!-- Main Content Canvas -->
+<main class="md:ml-64 p-6 md:p-16 min-h-screen pb-32 md:pb-16 flex flex-col gap-12 max-w-[1920px] mx-auto">
+<!-- Header -->
+<header class="max-w-4xl">
+<h1 class="font-headline text-5xl md:text-7xl font-bold tracking-tighter text-primary">Availability</h1>
+<p class="font-body text-lg text-on-surface-variant mt-4 max-w-2xl leading-relaxed">Select your operational windows for the upcoming cycle. High-density zones require confirmed commitment 48 hours prior to deployment.</p>
+</header>
+<!-- Asymmetric Layout: Grid + Earnings -->
+<div class="flex flex-col xl:flex-row gap-8 xl:gap-16 items-start">
+<!-- Left: Calendar Grid View -->
+<section class="flex-1 w-full bg-surface-container-lowest p-6 md:p-8 rounded-none border border-surface-variant shadow-none">
+<div class="flex justify-between items-center mb-8">
+<h2 class="font-headline text-xl font-bold tracking-tight">Week 42 Cycle</h2>
+<div class="flex gap-4">
+<div class="flex items-center gap-2">
+<div class="w-4 h-4 bg-surface-container-high border border-surface-variant rounded-sm"></div>
+<span class="font-label text-xs uppercase text-outline">Available</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-4 h-4 bg-primary rounded-sm"></div>
+<span class="font-label text-xs uppercase text-primary">Committed</span>
+</div>
+</div>
+</div>
+<div class="w-full overflow-x-auto pb-4">
+<div class="min-w-[700px]">
+<!-- Grid Header -->
+<div class="grid grid-cols-[80px_repeat(7,1fr)] gap-2 mb-4">
+<div></div> <!-- Empty top left -->
+<div class="text-center font-label text-xs font-bold uppercase text-on-surface-variant">Mon</div>
+<div class="text-center font-label text-xs font-bold uppercase text-on-surface-variant">Tue</div>
+<div class="text-center font-label text-xs font-bold uppercase text-on-surface-variant">Wed</div>
+<div class="text-center font-label text-xs font-bold uppercase text-on-surface-variant text-primary border-b-2 border-primary pb-1">Thu</div>
+<div class="text-center font-label text-xs font-bold uppercase text-on-surface-variant">Fri</div>
+<div class="text-center font-label text-xs font-bold uppercase text-on-surface-variant">Sat</div>
+<div class="text-center font-label text-xs font-bold uppercase text-on-surface-variant">Sun</div>
+</div>
+<!-- Grid Rows -->
+<div class="flex flex-col gap-2">
+<!-- Block 1 -->
+<div class="grid grid-cols-[80px_repeat(7,1fr)] gap-2 items-center">
+<div class="text-right pr-4 font-label text-[10px] text-outline font-bold">04:00<br/>08:00</div>
+<div class="h-16 bg-surface-container-high rounded-sm cursor-pointer hover:bg-surface-variant transition-colors border border-transparent hover:border-outline-variant"></div>
+<div class="h-16 bg-surface-container-high rounded-sm cursor-pointer hover:bg-surface-variant transition-colors border border-transparent hover:border-outline-variant"></div>
+<div class="h-16 bg-primary text-on-primary rounded-sm cursor-pointer flex items-center justify-center transition-transform hover:scale-[1.02]">
+<span class="material-symbols-outlined text-[20px]">check</span>
+</div>
+<div class="h-16 bg-primary text-on-primary rounded-sm cursor-pointer flex items-center justify-center transition-transform hover:scale-[1.02]">
+<span class="material-symbols-outlined text-[20px]">check</span>
+</div>
+<div class="h-16 bg-surface-container-high rounded-sm cursor-pointer hover:bg-surface-variant transition-colors border border-transparent hover:border-outline-variant"></div>
+<div class="h-16 bg-surface-container-high rounded-sm cursor-pointer hover:bg-surface-variant transition-colors border border-transparent hover:border-outline-variant"></div>
+<div class="h-16 bg-surface-container-high rounded-sm cursor-pointer hover:bg-surface-variant transition-colors border border-transparent hover:border-outline-variant"></div>
+</div>
+<!-- Block 2 -->
+<div class="grid grid-cols-[80px_repeat(7,1fr)] gap-2 items-center">
+<div class="text-right pr-4 font-label text-[10px] text-outline font-bold">08:00<br/>12:00</div>
+<div class="h-16 bg-primary text-on-primary rounded-sm cursor-pointer flex items-center justify-center transition-transform hover:scale-[1.02]">
+<span class="material-symbols-outlined text-[20px]">check</span>
+</div>
+<div class="h-16 bg-primary text-on-primary rounded-sm cursor-pointer flex items-center justify-center transition-transform hover:scale-[1.02]">
+<span class="material-symbols-outlined text-[20px]">check</span>
+</div>
+<div class="h-16 bg-primary text-on-primary rounded-sm cursor-pointer flex items-center justify-center transition-transform hover:scale-[1.02]">
+<span class="material-symbols-outlined text-[20px]">check</span>
+</div>
+<div class="h-16 bg-primary text-on-primary rounded-sm cursor-pointer flex items-center justify-center transition-transform hover:scale-[1.02]">
+<span class="material-symbols-outlined text-[20px]">check</span>
+</div>
+<div class="h-16 bg-primary text-on-primary rounded-sm cursor-pointer flex items-center justify-center transition-transform hover:scale-[1.02]">
+<span class="material-symbols-outlined text-[20px]">check</span>
+</div>
+<div class="h-16 bg-surface-container-high rounded-sm cursor-pointer hover:bg-surface-variant transition-colors border border-transparent hover:border-outline-variant"></div>
+<div class="h-16 bg-surface-container-high rounded-sm cursor-pointer hover:bg-surface-variant transition-colors border border-transparent hover:border-outline-variant"></div>
+</div>
+<!-- Block 3 -->
+<div class="grid grid-cols-[80px_repeat(7,1fr)] gap-2 items-center">
+<div class="text-right pr-4 font-label text-[10px] text-outline font-bold">12:00<br/>16:00</div>
+<div class="h-16 bg-primary text-on-primary rounded-sm cursor-pointer flex items-center justify-center transition-transform hover:scale-[1.02]">
+<span class="material-symbols-outlined text-[20px]">check</span>
+</div>
+<div class="h-16 bg-primary text-on-primary rounded-sm cursor-pointer flex items-center justify-center transition-transform hover:scale-[1.02]">
+<span class="material-symbols-outlined text-[20px]">check</span>
+</div>
+<div class="h-16 bg-surface-container-high rounded-sm cursor-pointer hover:bg-surface-variant transition-colors border border-transparent hover:border-outline-variant"></div>
+<div class="h-16 bg-surface-container-high rounded-sm cursor-pointer hover:bg-surface-variant transition-colors border border-transparent hover:border-outline-variant"></div>
+<div class="h-16 bg-primary text-on-primary rounded-sm cursor-pointer flex items-center justify-center transition-transform hover:scale-[1.02]">
+<span class="material-symbols-outlined text-[20px]">check</span>
+</div>
+<div class="h-16 bg-primary text-on-primary rounded-sm cursor-pointer flex items-center justify-center transition-transform hover:scale-[1.02]">
+<span class="material-symbols-outlined text-[20px]">check</span>
+</div>
+<div class="h-16 bg-surface-container-high rounded-sm cursor-pointer hover:bg-surface-variant transition-colors border border-transparent hover:border-outline-variant"></div>
+</div>
+<!-- Block 4 -->
+<div class="grid grid-cols-[80px_repeat(7,1fr)] gap-2 items-center">
+<div class="text-right pr-4 font-label text-[10px] text-outline font-bold">16:00<br/>20:00</div>
+<div class="h-16 bg-surface-container-high rounded-sm cursor-pointer hover:bg-surface-variant transition-colors border border-transparent hover:border-outline-variant"></div>
+<div class="h-16 bg-surface-container-high rounded-sm cursor-pointer hover:bg-surface-variant transition-colors border border-transparent hover:border-outline-variant"></div>
+<div class="h-16 bg-surface-container-high rounded-sm cursor-pointer hover:bg-surface-variant transition-colors border border-transparent hover:border-outline-variant"></div>
+<div class="h-16 bg-surface-container-high rounded-sm cursor-pointer hover:bg-surface-variant transition-colors border border-transparent hover:border-outline-variant"></div>
+<div class="h-16 bg-surface-container-high rounded-sm cursor-pointer hover:bg-surface-variant transition-colors border border-transparent hover:border-outline-variant"></div>
+<div class="h-16 bg-primary text-on-primary rounded-sm cursor-pointer flex items-center justify-center transition-transform hover:scale-[1.02]">
+<span class="material-symbols-outlined text-[20px]">check</span>
+</div>
+<div class="h-16 bg-primary text-on-primary rounded-sm cursor-pointer flex items-center justify-center transition-transform hover:scale-[1.02]">
+<span class="material-symbols-outlined text-[20px]">check</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Right: Projected Earnings & CTA -->
+<aside class="w-full xl:w-[400px] flex flex-col gap-8 flex-shrink-0">
+<div class="bg-surface-container-low p-8 rounded-none border border-surface-variant shadow-none flex flex-col relative overflow-hidden">
+<!-- Decorative background element for texture -->
+<div class="absolute -right-16 -top-16 opacity-5 pointer-events-none">
+<span class="material-symbols-outlined text-[200px]" style="font-variation-settings: 'FILL' 1;">payments</span>
+</div>
+<h3 class="font-label text-xs font-bold uppercase text-outline tracking-widest mb-6">Projected Yield</h3>
+<div class="mb-8">
+<div class="flex items-baseline gap-2">
+<span class="text-3xl font-headline font-bold text-primary-container">$</span>
+<span class="text-6xl md:text-7xl font-headline font-bold tracking-tighter text-primary -ml-1">1,480</span>
+<span class="text-xl font-headline font-bold text-outline">.00</span>
+</div>
+<p class="font-body text-sm text-on-surface-variant mt-2">Estimated based on 32 committed hours at peak volume multipliers.</p>
+</div>
+<div class="flex flex-col gap-4 border-t border-outline-variant pt-6 mb-8">
+<div class="flex justify-between items-center">
+<span class="font-label text-xs uppercase text-on-surface-variant">Base Rate</span>
+<span class="font-body font-bold text-on-surface">$800.00</span>
+</div>
+<div class="flex justify-between items-center">
+<span class="font-label text-xs uppercase text-on-surface-variant">Surge Multiplier</span>
+<span class="font-body font-bold text-on-surface">1.85x</span>
+</div>
+<div class="flex justify-between items-center">
+<span class="font-label text-xs uppercase text-on-surface-variant">Status Bonus</span>
+<span class="font-body font-bold text-on-surface">+$120.00</span>
+</div>
+</div>
+<button class="w-full bg-primary text-on-primary py-5 px-8 rounded-full font-label text-sm font-bold uppercase tracking-widest hover:scale-[1.02] transition-transform flex items-center justify-center gap-3 mt-auto">
+                        Commit Schedule
+                        <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</button>
+</div>
+<div class="p-6 bg-surface-container-lowest border border-outline-variant/30 flex items-start gap-4">
+<span class="material-symbols-outlined text-outline">info</span>
+<p class="font-body text-xs text-on-surface-variant leading-relaxed">
+                         Cancellations within 24 hours of a committed block will result in a penalty to your tier standing. Ensure your availability is accurate.
+                     </p>
+</div>
+</aside>
+</div>
+</main>
+<!-- Shared Component: BottomNavBar (Mobile) -->
+<nav class="md:hidden bg-[#F9F9F9]/80 dark:bg-black/80 backdrop-blur-xl text-black dark:text-[#E2E2E2] font-['Inter'] font-bold text-[10px] uppercase tracking-tighter fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-3 pb-safe-bottom border-t border-[#C6C6C6] dark:border-[#3B3B3B]">
+<div class="flex flex-col items-center justify-center text-[#777777] active:bg-[#E2E2E2] transition-colors p-2 rounded-lg cursor-pointer">
+<span class="material-symbols-outlined text-[24px] mb-1">explore</span>
+            Explore
+        </div>
+<div class="flex flex-col items-center justify-center text-[#777777] active:bg-[#E2E2E2] transition-colors p-2 rounded-lg cursor-pointer">
+<span class="material-symbols-outlined text-[24px] mb-1">gavel</span>
+            Bids
+        </div>
+<div class="flex flex-col items-center justify-center text-[#777777] active:bg-[#E2E2E2] transition-colors p-2 rounded-lg cursor-pointer">
+<span class="material-symbols-outlined text-[24px] mb-1">map</span>
+            Trips
+        </div>
+<!-- Active State: Account (Assume availability is managed here on mobile) -->
+<div class="flex flex-col items-center justify-center bg-black text-white dark:bg-white dark:text-black rounded-full px-6 py-2 active:bg-[#E2E2E2] transition-colors cursor-pointer">
+<span class="material-symbols-outlined text-[24px] mb-1" style="font-variation-settings: 'FILL' 1;">person</span>
+            Account
+        </div>
+</nav>
+</body></html>

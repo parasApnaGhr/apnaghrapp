@@ -24,7 +24,7 @@
 
 .stat-card {
   background: white;
-  border: 1px solid #E5E3D8;
+  border: 1px solid var(--stitch-line);
   border-radius: 12px;
   padding: 20px;
   transition: all 0.2s ease;
@@ -37,7 +37,7 @@
 
 .visit-request-card {
   background: white;
-  border: 2px solid #E07A5F;
+  border: 2px solid var(--stitch-ink);
   border-radius: 12px;
   padding: 20px;
   margin-bottom: 16px;
@@ -46,7 +46,7 @@
 
 @keyframes pulse {
   0%, 100% {
-    border-color: #E07A5F;
+    border-color: var(--stitch-ink);
   }
   50% {
     border-color: #F4A261;
@@ -54,7 +54,7 @@
 }
 
 .proof-upload {
-  border: 2px dashed #E5E3D8;
+  border: 2px dashed var(--stitch-line);
   border-radius: 12px;
   padding: 24px;
   text-align: center;
@@ -63,8 +63,8 @@
 }
 
 .proof-upload:hover {
-  border-color: #E07A5F;
-  background: #FFF5F2;
+  border-color: var(--stitch-ink);
+  background: var(--stitch-soft);
 }
 
 .locked-property {

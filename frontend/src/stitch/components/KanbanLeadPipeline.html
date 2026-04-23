@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Lead Pipeline - Kanban</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "surface-container-high": "#e8e8e8",
+                        "on-primary-container": "#ffffff",
+                        "outline": "#777777",
+                        "background": "#f9f9f9",
+                        "outline-variant": "#c6c6c6",
+                        "on-tertiary-fixed-variant": "#e5e2e1",
+                        "on-error-container": "#410002",
+                        "surface-container": "#eeeeee",
+                        "surface-bright": "#f9f9f9",
+                        "tertiary": "#3c3b3b",
+                        "surface-variant": "#e2e2e2",
+                        "inverse-surface": "#2f3131",
+                        "surface-container-low": "#f3f3f4",
+                        "on-primary-fixed": "#ffffff",
+                        "inverse-on-surface": "#f0f1f1",
+                        "error-container": "#ffdad6",
+                        "surface-container-highest": "#e2e2e2",
+                        "error": "#ba1a1a",
+                        "primary-fixed-dim": "#474747",
+                        "on-primary-fixed-variant": "#e2e2e2",
+                        "surface-tint": "#5e5e5e",
+                        "surface": "#f9f9f9",
+                        "primary-container": "#3b3b3b",
+                        "on-surface-variant": "#474747",
+                        "tertiary-fixed-dim": "#474746",
+                        "secondary": "#5e5e5e",
+                        "on-secondary": "#ffffff",
+                        "primary-fixed": "#5e5e5e",
+                        "on-primary": "#e2e2e2",
+                        "inverse-primary": "#c6c6c6",
+                        "surface-dim": "#dadada",
+                        "secondary-fixed": "#c6c6c6",
+                        "secondary-fixed-dim": "#ababab",
+                        "tertiary-fixed": "#5f5e5e",
+                        "surface-container-lowest": "#ffffff",
+                        "on-surface": "#1a1c1c",
+                        "on-tertiary": "#e5e2e1",
+                        "primary": "#000000",
+                        "tertiary-container": "#757474",
+                        "on-tertiary-fixed": "#ffffff",
+                        "on-tertiary-container": "#ffffff",
+                        "on-error": "#ffffff",
+                        "secondary-container": "#d4d4d4",
+                        "on-secondary-fixed": "#1b1b1b",
+                        "on-background": "#1a1c1c",
+                        "on-secondary-fixed-variant": "#3b3b3b",
+                        "on-secondary-container": "#1b1b1b"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    fontFamily: {
+                        "headline": ["Inter", "sans-serif"],
+                        "body": ["Inter", "sans-serif"],
+                        "label": ["Inter", "sans-serif"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        /* Hide scrollbar for kanban board but keep functionality */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface flex min-h-screen antialiased selection:bg-primary selection:text-on-primary">
+<!-- SideNavBar (from JSON) -->
+<nav class="hidden md:flex flex-col bg-[#F9F9F9] dark:bg-black text-black dark:text-[#E2E2E2] h-screen w-64 border-r border-[#C6C6C6] dark:border-[#3B3B3B] fixed left-0 top-0 py-8 z-50">
+<div class="px-8 mb-12">
+<h1 class="font-black text-xl tracking-tighter mb-1 uppercase">OPERATIONS</h1>
+<p class="text-[10px] uppercase tracking-widest text-[#777777]">Terminal v2.0.4</p>
+</div>
+<div class="flex-1 px-4 flex flex-col gap-2 font-['Inter'] font-semibold uppercase tracking-widest text-[10px]">
+<!-- Inactive -->
+<a class="flex items-center gap-4 text-[#777777] dark:text-[#E2E2E2] px-4 py-3 hover:text-black dark:hover:text-white hover:bg-[#F3F3F4] dark:hover:bg-[#1A1C1C] transition-all rounded-full" href="#">
+<span class="material-symbols-outlined text-[18px]">dashboard</span>
+                Command
+            </a>
+<!-- Inactive -->
+<a class="flex items-center gap-4 text-[#777777] dark:text-[#E2E2E2] px-4 py-3 hover:text-black dark:hover:text-white hover:bg-[#F3F3F4] dark:hover:bg-[#1A1C1C] transition-all rounded-full" href="#">
+<span class="material-symbols-outlined text-[18px]">domain</span>
+                Inventory
+            </a>
+<!-- Active (Escrow chosen as closest to Deals/Pipeline) -->
+<a class="flex items-center gap-4 bg-black text-white dark:bg-[#E2E2E2] dark:text-black rounded-full mx-2 my-1 px-4 py-3 font-bold massive-solid-weight" href="#">
+<span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">handshake</span>
+                Escrow
+            </a>
+<!-- Inactive -->
+<a class="flex items-center gap-4 text-[#777777] dark:text-[#E2E2E2] px-4 py-3 hover:text-black dark:hover:text-white hover:bg-[#F3F3F4] dark:hover:bg-[#1A1C1C] transition-all rounded-full" href="#">
+<span class="material-symbols-outlined text-[18px]">local_shipping</span>
+                Fleet
+            </a>
+<!-- Inactive -->
+<a class="flex items-center gap-4 text-[#777777] dark:text-[#E2E2E2] px-4 py-3 hover:text-black dark:hover:text-white hover:bg-[#F3F3F4] dark:hover:bg-[#1A1C1C] transition-all rounded-full" href="#">
+<span class="material-symbols-outlined text-[18px]">account_balance</span>
+                Vault
+            </a>
+<!-- Inactive -->
+<a class="flex items-center gap-4 text-[#777777] dark:text-[#E2E2E2] px-4 py-3 hover:text-black dark:hover:text-white hover:bg-[#F3F3F4] dark:hover:bg-[#1A1C1C] transition-all rounded-full" href="#">
+<span class="material-symbols-outlined text-[18px]">settings</span>
+                Settings
+            </a>
+</div>
+<div class="px-6 mt-auto flex flex-col gap-4">
+<button class="w-full bg-black text-white dark:bg-white dark:text-black py-4 px-6 rounded-full font-bold text-[10px] uppercase tracking-widest hover:scale-[1.02] transition-transform flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[16px]">add</span>
+                New Transaction
+            </button>
+<div class="h-[1px] w-full bg-[#C6C6C6] dark:bg-[#3B3B3B] my-2"></div>
+<div class="flex flex-col gap-2 font-['Inter'] font-semibold uppercase tracking-widest text-[10px]">
+<a class="flex items-center gap-4 text-[#777777] dark:text-[#E2E2E2] px-4 py-2 hover:text-black dark:hover:text-white hover:bg-[#F3F3F4] dark:hover:bg-[#1A1C1C] transition-all rounded-full" href="#">
+<span class="material-symbols-outlined text-[16px]">inventory_2</span>
+                    Archive
+                </a>
+<a class="flex items-center gap-4 text-[#777777] dark:text-[#E2E2E2] px-4 py-2 hover:text-black dark:hover:text-white hover:bg-[#F3F3F4] dark:hover:bg-[#1A1C1C] transition-all rounded-full" href="#">
+<span class="material-symbols-outlined text-[16px]">terminal</span>
+                    System Log
+                </a>
+</div>
+<div class="flex items-center gap-3 px-4 pt-4 mt-2">
+<div class="w-8 h-8 rounded-full bg-[#E2E2E2] flex items-center justify-center overflow-hidden">
+<span class="material-symbols-outlined text-[#777777]">person</span>
+</div>
+</div>
+</div>
+</nav>
+<!-- Main Canvas -->
+<main class="flex-1 md:ml-64 h-screen flex flex-col bg-surface overflow-hidden">
+<!-- Header Section -->
+<header class="px-12 py-10 flex justify-between items-end shrink-0">
+<div>
+<p class="text-xs font-bold uppercase tracking-widest text-secondary mb-2">Q3 Seller Pipeline</p>
+<h2 class="text-[3.5rem] font-bold tracking-[-0.02em] leading-none text-primary uppercase">Active Leads</h2>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-4 bg-surface-container-low px-4 py-3 rounded-sm border border-outline/20 focus-within:border-primary transition-colors">
+<span class="material-symbols-outlined text-outline">search</span>
+<input class="bg-transparent border-none outline-none text-sm font-semibold placeholder:text-outline/50 w-48 text-primary" placeholder="Search parameters..." type="text"/>
+</div>
+<button class="bg-primary text-on-primary rounded-full px-12 py-5 font-bold uppercase tracking-widest text-xs hover:scale-[1.02] transition-transform flex items-center gap-3">
+<span class="material-symbols-outlined text-lg">add</span>
+                    Ingest Lead
+                </button>
+</div>
+</header>
+<!-- Kanban Board Area -->
+<div class="flex-1 overflow-x-auto no-scrollbar px-12 pb-12 flex gap-8 items-start">
+<!-- Column 1: New Lead -->
+<div class="min-w-[340px] w-[340px] flex flex-col bg-surface-container-low rounded-sm p-4 h-full max-h-full">
+<div class="flex justify-between items-center mb-6 px-2">
+<h3 class="text-xs font-bold uppercase tracking-widest text-primary flex items-center gap-2">
+<div class="w-2 h-2 bg-primary rounded-full"></div>
+                        New Lead
+                    </h3>
+<span class="text-xs font-bold text-outline">3</span>
+</div>
+<div class="flex-1 overflow-y-auto no-scrollbar flex flex-col gap-4 pb-4">
+<!-- Card -->
+<div class="bg-surface-container-lowest p-6 rounded-sm cursor-pointer group hover:bg-surface-container-highest transition-colors flex flex-col gap-5 border border-outline-variant/30">
+<div class="flex justify-between items-start">
+<div>
+<h4 class="text-xl font-bold leading-tight text-primary mb-1">Apex Dynamics</h4>
+<p class="text-sm font-semibold text-secondary">Manufacturing Dept</p>
+</div>
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors">more_horiz</span>
+</div>
+<div class="h-[1px] w-full bg-outline-variant"></div>
+<div class="flex justify-between items-end">
+<div>
+<p class="text-[10px] uppercase tracking-widest text-secondary font-bold mb-1">Est. Value</p>
+<p class="text-lg font-black text-primary">$1.2M</p>
+</div>
+<div class="flex gap-3 text-outline">
+<span class="material-symbols-outlined hover:text-primary transition-colors text-[20px]">mail</span>
+<span class="material-symbols-outlined hover:text-primary transition-colors text-[20px]">phone</span>
+</div>
+</div>
+</div>
+<!-- Card -->
+<div class="bg-surface-container-lowest p-6 rounded-sm cursor-pointer group hover:bg-surface-container-highest transition-colors flex flex-col gap-5 border border-outline-variant/30">
+<div class="flex justify-between items-start">
+<div>
+<h4 class="text-xl font-bold leading-tight text-primary mb-1">Nexus Logic</h4>
+<p class="text-sm font-semibold text-secondary">Enterprise IT</p>
+</div>
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors">more_horiz</span>
+</div>
+<div class="h-[1px] w-full bg-outline-variant"></div>
+<div class="flex justify-between items-end">
+<div>
+<p class="text-[10px] uppercase tracking-widest text-secondary font-bold mb-1">Est. Value</p>
+<p class="text-lg font-black text-primary">$850K</p>
+</div>
+<div class="flex gap-3 text-outline">
+<span class="material-symbols-outlined hover:text-primary transition-colors text-[20px]">mail</span>
+<span class="material-symbols-outlined hover:text-primary transition-colors text-[20px]">phone</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Column 2: Contacted -->
+<div class="min-w-[340px] w-[340px] flex flex-col bg-surface-container-low rounded-sm p-4 h-full max-h-full">
+<div class="flex justify-between items-center mb-6 px-2">
+<h3 class="text-xs font-bold uppercase tracking-widest text-primary flex items-center gap-2">
+<div class="w-2 h-2 bg-secondary rounded-full"></div>
+                        Contacted
+                    </h3>
+<span class="text-xs font-bold text-outline">2</span>
+</div>
+<div class="flex-1 overflow-y-auto no-scrollbar flex flex-col gap-4 pb-4">
+<!-- Card -->
+<div class="bg-surface-container-lowest p-6 rounded-sm cursor-pointer group hover:bg-surface-container-highest transition-colors flex flex-col gap-5 border border-outline-variant/30">
+<div class="flex justify-between items-start">
+<div>
+<h4 class="text-xl font-bold leading-tight text-primary mb-1">Stratos Financial</h4>
+<p class="text-sm font-semibold text-secondary">Wealth Management</p>
+</div>
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors">more_horiz</span>
+</div>
+<div class="h-[1px] w-full bg-outline-variant"></div>
+<div class="flex justify-between items-end">
+<div>
+<p class="text-[10px] uppercase tracking-widest text-secondary font-bold mb-1">Est. Value</p>
+<p class="text-lg font-black text-primary">$2.4M</p>
+</div>
+<div class="flex gap-3 text-outline">
+<span class="material-symbols-outlined text-primary text-[20px]">forum</span>
+<span class="material-symbols-outlined hover:text-primary transition-colors text-[20px]">mail</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Column 3: Interested -->
+<div class="min-w-[340px] w-[340px] flex flex-col bg-surface-container-low rounded-sm p-4 h-full max-h-full">
+<div class="flex justify-between items-center mb-6 px-2">
+<h3 class="text-xs font-bold uppercase tracking-widest text-primary flex items-center gap-2">
+<div class="w-2 h-2 bg-primary-fixed-dim rounded-full border border-primary"></div>
+                        Interested
+                    </h3>
+<span class="text-xs font-bold text-outline">1</span>
+</div>
+<div class="flex-1 overflow-y-auto no-scrollbar flex flex-col gap-4 pb-4">
+<!-- Card -->
+<div class="bg-surface-container-lowest p-6 rounded-sm cursor-pointer group hover:bg-surface-container-highest transition-colors flex flex-col gap-5 border border-outline-variant/30">
+<div class="flex justify-between items-start">
+<div>
+<h4 class="text-xl font-bold leading-tight text-primary mb-1">Vanguard Health</h4>
+<p class="text-sm font-semibold text-secondary">Procurement</p>
+</div>
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors">more_horiz</span>
+</div>
+<div class="h-[1px] w-full bg-outline-variant"></div>
+<div class="flex justify-between items-end">
+<div>
+<p class="text-[10px] uppercase tracking-widest text-secondary font-bold mb-1">Est. Value</p>
+<p class="text-lg font-black text-primary">$5.1M</p>
+</div>
+<div class="flex gap-3 text-outline">
+<span class="material-symbols-outlined hover:text-primary transition-colors text-[20px]">description</span>
+<span class="material-symbols-outlined hover:text-primary transition-colors text-[20px]">video_call</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Column 4: Negotiating -->
+<div class="min-w-[340px] w-[340px] flex flex-col bg-surface-container-low rounded-sm p-4 h-full max-h-full opacity-60 hover:opacity-100 transition-opacity">
+<div class="flex justify-between items-center mb-6 px-2">
+<h3 class="text-xs font-bold uppercase tracking-widest text-primary flex items-center gap-2">
+<div class="w-2 h-2 bg-transparent border-2 border-primary rounded-full"></div>
+                        Negotiating
+                    </h3>
+<span class="text-xs font-bold text-outline">0</span>
+</div>
+<div class="flex-1 flex items-center justify-center border-2 border-dashed border-outline-variant/50 rounded-sm">
+<p class="text-sm font-bold text-outline/50 uppercase tracking-widest">Drop Here</p>
+</div>
+</div>
+<!-- Column 5: Closed Won -->
+<div class="min-w-[340px] w-[340px] flex flex-col bg-surface-container-low rounded-sm p-4 h-full max-h-full">
+<div class="flex justify-between items-center mb-6 px-2">
+<h3 class="text-xs font-bold uppercase tracking-widest text-primary flex items-center gap-2">
+<span class="material-symbols-outlined text-[14px] text-primary" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+                        Closed Won
+                    </h3>
+<span class="text-xs font-bold text-outline">1</span>
+</div>
+<div class="flex-1 overflow-y-auto no-scrollbar flex flex-col gap-4 pb-4">
+<!-- Card (Won state) -->
+<div class="bg-primary-container p-6 rounded-sm cursor-pointer group flex flex-col gap-5 border border-primary">
+<div class="flex justify-between items-start">
+<div>
+<h4 class="text-xl font-bold leading-tight text-on-primary-container mb-1">OmniCorp Global</h4>
+<p class="text-sm font-semibold text-outline-variant">Q2 Expansion</p>
+</div>
+<span class="material-symbols-outlined text-outline-variant group-hover:text-white transition-colors">verified</span>
+</div>
+<div class="h-[1px] w-full bg-outline-variant/30"></div>
+<div class="flex justify-between items-end">
+<div>
+<p class="text-[10px] uppercase tracking-widest text-outline-variant font-bold mb-1">Final Contract</p>
+<p class="text-lg font-black text-on-primary-container">$12.5M</p>
+</div>
+<div class="bg-surface-container-lowest text-primary text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-sm">
+                                Cleared
+                            </div>
+</div>
+</div>
+</div>
+</div>
+<!-- Spacer for horizontal scroll padding -->
+<div class="min-w-[24px]"></div>
+</div>
+</main>
+</body></html>

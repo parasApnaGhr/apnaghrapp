@@ -1,174 +1,141 @@
 // @ts-nocheck
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
-import api from '../utils/api';
-import { 
-  ArrowLeft, Bell, Check, Calendar, MapPin, 
-  CreditCard, User, AlertTriangle, Trash2
-} from 'lucide-react';
-import { toast } from 'sonner';
+import React, { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { AlertTriangle, ArrowLeft, Bell, Calendar, CheckCircle2, CreditCard, MapPin, User2 } from "lucide-react";
+import { toast } from "sonner";
+import api from "../utils/api";
+import { StitchCard, StitchLoadingPage, StitchSectionHeader, StitchShell } from "../stitch/components/StitchPrimitives";
 
-const CustomerNotifications = () => {
+const typeIcons = {
+  visit_booked: Calendar,
+  visit_scheduled: Calendar,
+  rider_assigned: MapPin,
+  rider_arriving: MapPin,
+  payment_success: CreditCard,
+  payout_processed: CreditCard,
+  visit_completed: CheckCircle2,
+  admin_notification: User2,
+  warning: AlertTriangle,
+};
+
+const formatTime = (value) => {
+  if (!value) return "";
+  const date = new Date(value);
+  const diff = Date.now() - date.getTime();
+  if (diff < 60000) return "Just now";
+  if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
+  if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`;
+  if (diff < 604800000) return `${Math.floor(diff / 86400000)}d ago`;
+  return date.toLocaleDateString("en-IN", { day: "numeric", month: "short" });
+};
+
+export default function CustomerNotifications() {
   const navigate = useNavigate();
   const [notifications, setNotifications] = useState([]);
-  const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
+    const loadNotifications = async () => {
+      try {
+        const response = await api.get("/notifications");
+        setNotifications(response.data?.notifications || []);
+        setUnreadCount(response.data?.unread_count || 0);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     loadNotifications();
   }, []);
 
-  const loadNotifications = async () => {
-    try {
-      const response = await api.get('/notifications');
-      setNotifications(response.data.notifications || []);
-      setUnreadCount(response.data.unread_count || 0);
-    } catch (error) {
-      console.error('Error loading notifications:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const groups = useMemo(() => {
+    return notifications.reduce((acc, notification) => {
+      const key = notification.read ? "Earlier" : "Unread";
+      acc[key] = acc[key] || [];
+      acc[key].push(notification);
+      return acc;
+    }, {});
+  }, [notifications]);
 
   const markAllAsRead = async () => {
     try {
-      await api.post('/notifications/mark-read');
-      setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+      await api.post("/notifications/mark-read");
+      setNotifications((current) => current.map((item) => ({ ...item, read: true })));
       setUnreadCount(0);
-      toast.success('All notifications marked as read');
-    } catch (error) {
-      toast.error('Failed to mark notifications as read');
+      toast.success("Marked all as read");
+    } catch {
+      toast.error("Failed to update notifications");
     }
   };
 
-  const getNotificationIcon = (type) => {
-    switch (type) {
-      case 'visit_booked':
-      case 'visit_scheduled':
-        return <Calendar className="w-5 h-5 text-[#04473C]" />;
-      case 'rider_assigned':
-      case 'rider_arriving':
-        return <MapPin className="w-5 h-5 text-blue-600" />;
-      case 'payment_success':
-      case 'payout_processed':
-        return <CreditCard className="w-5 h-5 text-green-600" />;
-      case 'visit_completed':
-        return <Check className="w-5 h-5 text-green-600" />;
-      case 'admin_notification':
-        return <User className="w-5 h-5 text-purple-600" />;
-      case 'warning':
-        return <AlertTriangle className="w-5 h-5 text-amber-600" />;
-      default:
-        return <Bell className="w-5 h-5 text-[#04473C]" />;
-    }
-  };
-
-  const formatDate = (dateStr) => {
-    if (!dateStr) return '';
-    const date = new Date(dateStr);
-    const now = new Date();
-    const diff = now - date;
-    
-    if (diff < 60000) return 'Just now';
-    if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
-    if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`;
-    if (diff < 604800000) return `${Math.floor(diff / 86400000)}d ago`;
-    
-    return date.toLocaleDateString('en-IN', {
-      day: 'numeric',
-      month: 'short'
-    });
-  };
+  if (loading) {
+    return <StitchLoadingPage label="Loading notifications" />;
+  }
 
   return (
-    <div className="min-h-screen bg-[#FDFCFB] pb-24">
-      {/* Header */}
-      <header className="glass-header sticky top-0 z-50">
-        <div className="max-w-2xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <button
-                onClick={() => navigate('/customer/profile')}
-                className="p-2 hover:bg-[#F5F3F0] transition-colors"
-              >
-                <ArrowLeft className="w-5 h-5 text-[#1A1C20]" strokeWidth={1.5} />
-              </button>
-              <div>
-                <h1 className="text-xl font-medium" style={{ fontFamily: 'Playfair Display, serif' }}>
-                  Notifications
-                </h1>
-                <p className="text-sm text-[#4A4D53]">
-                  {unreadCount > 0 ? `${unreadCount} unread` : 'All caught up'}
-                </p>
-              </div>
+    <StitchShell
+      title="Notifications"
+      eyebrow="Inbox"
+      actions={
+        <>
+          <button onClick={() => navigate("/customer/profile")} className="stitch-button stitch-button-secondary">
+            <ArrowLeft className="h-4 w-4" />
+            Back
+          </button>
+          {unreadCount > 0 ? (
+            <button onClick={markAllAsRead} className="stitch-button stitch-button-ghost">
+              Mark all read
+            </button>
+          ) : null}
+        </>
+      }
+    >
+      <div className="mx-auto w-full max-w-4xl">
+        <StitchCard className="p-6 md:p-8">
+          <StitchSectionHeader title={unreadCount > 0 ? `${unreadCount} unread` : "All caught up"} />
+          {notifications.length === 0 ? (
+            <div className="mt-8 rounded-[28px] border border-dashed border-[var(--stitch-line-strong)] p-10 text-center">
+              <Bell className="mx-auto h-8 w-8 text-[var(--stitch-muted)]" />
+              <p className="mt-4 text-sm text-[var(--stitch-muted)]">No notifications.</p>
             </div>
-            {unreadCount > 0 && (
-              <button
-                onClick={markAllAsRead}
-                className="text-[#04473C] text-sm font-medium hover:underline"
-              >
-                Mark all read
-              </button>
-            )}
-          </div>
-        </div>
-      </header>
-
-      <main className="max-w-2xl mx-auto px-6 py-8">
-        {loading ? (
-          <div className="flex items-center justify-center py-20">
-            <div className="w-8 h-8 border-2 border-[#04473C] border-t-transparent rounded-full animate-spin" />
-          </div>
-        ) : notifications.length === 0 ? (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center py-20"
-          >
-            <div className="w-20 h-20 mx-auto mb-6 bg-[#F5F3F0] flex items-center justify-center">
-              <Bell className="w-10 h-10 text-[#D0C9C0]" strokeWidth={1} />
-            </div>
-            <h2 className="text-xl mb-2" style={{ fontFamily: 'Playfair Display, serif' }}>
-              No notifications
-            </h2>
-            <p className="text-[#4A4D53]">You're all caught up!</p>
-          </motion.div>
-        ) : (
-          <div className="space-y-3">
-            {notifications.map((notification, index) => (
-              <motion.div
-                key={notification.id || index}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: index * 0.03 }}
-                className={`bg-white border p-4 flex gap-4 ${
-                  notification.read ? 'border-[#E5E1DB]' : 'border-[#04473C] bg-[#F8FAF9]'
-                }`}
-              >
-                <div className={`w-10 h-10 flex items-center justify-center flex-shrink-0 ${
-                  notification.read ? 'bg-[#F5F3F0]' : 'bg-[#E6F0EE]'
-                }`}>
-                  {getNotificationIcon(notification.type)}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-start justify-between gap-2">
-                    <p className={`font-medium ${notification.read ? 'text-[#4A4D53]' : 'text-[#1A1C20]'}`}>
-                      {notification.title}
-                    </p>
-                    <span className="text-xs text-[#9A9A9A] whitespace-nowrap">
-                      {formatDate(notification.created_at)}
-                    </span>
+          ) : (
+            <div className="mt-6 space-y-8">
+              {Object.entries(groups).map(([label, items]) => (
+                <div key={label}>
+                  <p className="text-xs font-bold uppercase tracking-[0.18em] text-[var(--stitch-muted)]">{label}</p>
+                  <div className="mt-3 space-y-3">
+                    {items.map((notification, index) => {
+                      const Icon = typeIcons[notification.type] || Bell;
+                      return (
+                        <div
+                          key={notification.id || index}
+                          className={`rounded-[28px] border p-5 ${notification.read ? "border-[var(--stitch-line)] bg-white" : "border-black bg-[var(--stitch-soft)]"}`}
+                        >
+                          <div className="flex gap-4">
+                            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-white">
+                              <Icon className="h-5 w-5" />
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-start justify-between gap-3">
+                                <p className="text-base font-black uppercase tracking-[0.08em]">{notification.title}</p>
+                                <span className="shrink-0 text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--stitch-muted)]">
+                                  {formatTime(notification.created_at)}
+                                </span>
+                              </div>
+                              <p className="mt-2 text-sm leading-7 text-[var(--stitch-muted)]">{notification.message}</p>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
-                  <p className="text-sm text-[#4A4D53] mt-1">{notification.message}</p>
                 </div>
-              </motion.div>
-            ))}
-          </div>
-        )}
-      </main>
-    </div>
+              ))}
+            </div>
+          )}
+        </StitchCard>
+      </div>
+    </StitchShell>
   );
-};
-
-export default CustomerNotifications;
+}

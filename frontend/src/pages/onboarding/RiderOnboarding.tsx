@@ -233,21 +233,21 @@ const RiderOnboarding = () => {
   // Render success state
   if (submitted) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-[var(--stitch-soft)] flex items-center justify-center p-4">
         <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full text-center">
           <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
             <CheckCircle2 className="w-10 h-10 text-green-600" />
           </div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Application Submitted!</h1>
-          <p className="text-gray-600 mb-6">
+          <h1 className="text-2xl font-bold text-[var(--stitch-ink)] mb-2">Application Submitted!</h1>
+          <p className="text-[var(--stitch-muted)] mb-6">
             Thank you for applying to join ApnaGhr as a Property Rider. Our team will review your application and activate your account within 24-48 hours.
           </p>
-          <p className="text-sm text-gray-500 mb-6">
+          <p className="text-sm text-[var(--stitch-muted)] mb-6">
             You will receive an SMS on <strong>{formData.mobile}</strong> once your application is approved.
           </p>
           <Link
             to="/"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-[#04473C] text-white rounded-xl font-medium hover:bg-[#033530]"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-black text-white rounded-xl font-medium hover:bg-gray-900"
           >
             <Home className="w-5 h-5" />
             Go to Homepage
@@ -263,11 +263,11 @@ const RiderOnboarding = () => {
       case 1:
         return (
           <div className="space-y-6">
-            <h2 className="text-xl font-bold text-gray-900">Basic Details</h2>
-            <p className="text-gray-600">Let's start with your personal information</p>
+            <h2 className="text-xl font-bold text-[var(--stitch-ink)]">Basic Details</h2>
+            <p className="text-[var(--stitch-muted)]">Let's start with your personal information</p>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Full Name *</label>
+              <label className="block text-sm font-medium text-[var(--stitch-muted)] mb-1">Full Name *</label>
               <div className="relative">
                 <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
@@ -276,31 +276,31 @@ const RiderOnboarding = () => {
                   value={formData.full_name}
                   onChange={handleChange}
                   placeholder="Enter your full name"
-                  className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#04473C] focus:border-transparent ${errors.full_name ? 'border-red-500' : 'border-gray-300'}`}
+                  className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-black focus:border-transparent ${errors.full_name ? 'border-red-500' : 'border-[var(--stitch-line)]'}`}
                 />
               </div>
               {errors.full_name && <p className="text-red-500 text-sm mt-1">{errors.full_name}</p>}
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Mobile Number *</label>
+              <label className="block text-sm font-medium text-[var(--stitch-muted)] mb-1">Mobile Number *</label>
               <div className="relative">
                 <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <span className="absolute left-10 top-1/2 -translate-y-1/2 text-gray-500 border-r border-gray-300 pr-2">+91</span>
+                <span className="absolute left-10 top-1/2 -translate-y-1/2 text-[var(--stitch-muted)] border-r border-[var(--stitch-line)] pr-2">+91</span>
                 <input
                   type="tel"
                   name="mobile"
                   value={formData.mobile}
                   onChange={(e) => handleChange({ target: { name: 'mobile', value: e.target.value.replace(/\D/g, '').slice(0, 10) } })}
                   placeholder="Enter 10-digit number"
-                  className={`w-full pl-24 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#04473C] focus:border-transparent ${errors.mobile ? 'border-red-500' : 'border-gray-300'}`}
+                  className={`w-full pl-24 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-black focus:border-transparent ${errors.mobile ? 'border-red-500' : 'border-[var(--stitch-line)]'}`}
                 />
               </div>
               {errors.mobile && <p className="text-red-500 text-sm mt-1">{errors.mobile}</p>}
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">WhatsApp Number (Optional)</label>
+              <label className="block text-sm font-medium text-[var(--stitch-muted)] mb-1">WhatsApp Number (Optional)</label>
               <div className="relative">
                 <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
@@ -309,13 +309,13 @@ const RiderOnboarding = () => {
                   value={formData.whatsapp}
                   onChange={(e) => handleChange({ target: { name: 'whatsapp', value: e.target.value.replace(/\D/g, '').slice(0, 10) } })}
                   placeholder="Same as mobile if empty"
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#04473C] focus:border-transparent"
+                  className="w-full pl-10 pr-4 py-3 border border-[var(--stitch-line)] rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">City *</label>
+              <label className="block text-sm font-medium text-[var(--stitch-muted)] mb-1">City *</label>
               <div className="relative">
                 <Building className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <select
@@ -325,7 +325,7 @@ const RiderOnboarding = () => {
                     handleChange(e);
                     setFormData(prev => ({ ...prev, areas: [] })); // Reset areas
                   }}
-                  className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#04473C] focus:border-transparent appearance-none bg-white ${errors.city ? 'border-red-500' : 'border-gray-300'}`}
+                  className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-black focus:border-transparent appearance-none bg-white ${errors.city ? 'border-red-500' : 'border-[var(--stitch-line)]'}`}
                 >
                   <option value="">Select your city</option>
                   {CITIES.map(city => (
@@ -338,7 +338,7 @@ const RiderOnboarding = () => {
 
             {formData.city && AREAS_BY_CITY[formData.city] && (
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Select Areas (Optional)</label>
+                <label className="block text-sm font-medium text-[var(--stitch-muted)] mb-2">Select Areas (Optional)</label>
                 <div className="flex flex-wrap gap-2">
                   {AREAS_BY_CITY[formData.city].map(area => (
                     <button
@@ -347,8 +347,8 @@ const RiderOnboarding = () => {
                       onClick={() => handleAreaToggle(area)}
                       className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
                         formData.areas.includes(area)
-                          ? 'bg-[#04473C] text-white'
-                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                          ? 'bg-black text-white'
+                          : 'bg-gray-100 text-[var(--stitch-muted)] hover:bg-gray-200'
                       }`}
                     >
                       {area}
@@ -363,26 +363,26 @@ const RiderOnboarding = () => {
       case 2:
         return (
           <div className="space-y-6">
-            <h2 className="text-xl font-bold text-gray-900">KYC Verification</h2>
-            <p className="text-gray-600">Upload your identity documents for verification</p>
+            <h2 className="text-xl font-bold text-[var(--stitch-ink)]">KYC Verification</h2>
+            <p className="text-[var(--stitch-muted)]">Upload your identity documents for verification</p>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Aadhaar Card *</label>
-              <div className={`border-2 border-dashed rounded-xl p-6 text-center ${formData.aadhaar_url ? 'border-green-500 bg-green-50' : errors.aadhaar_url ? 'border-red-500' : 'border-gray-300'}`}>
+              <label className="block text-sm font-medium text-[var(--stitch-muted)] mb-2">Aadhaar Card *</label>
+              <div className={`border-2 border-dashed rounded-xl p-6 text-center ${formData.aadhaar_url ? 'border-green-500 bg-green-50' : errors.aadhaar_url ? 'border-red-500' : 'border-[var(--stitch-line)]'}`}>
                 {formData.aadhaar_url ? (
                   <div className="flex items-center justify-center gap-2 text-green-600">
                     <CheckCircle2 className="w-6 h-6" />
                     <span>Aadhaar Card Uploaded</span>
                   </div>
                 ) : uploadingFile === 'aadhaar_url' ? (
-                  <div className="flex items-center justify-center gap-2 text-gray-500">
+                  <div className="flex items-center justify-center gap-2 text-[var(--stitch-muted)]">
                     <Loader2 className="w-6 h-6 animate-spin" />
                     <span>Uploading...</span>
                   </div>
                 ) : (
                   <label className="cursor-pointer">
                     <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                    <span className="text-gray-600">Click to upload Aadhaar Card</span>
+                    <span className="text-[var(--stitch-muted)]">Click to upload Aadhaar Card</span>
                     <input
                       type="file"
                       accept="image/*,.pdf"
@@ -396,22 +396,22 @@ const RiderOnboarding = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">PAN Card (Optional)</label>
-              <div className={`border-2 border-dashed rounded-xl p-6 text-center ${formData.pan_url ? 'border-green-500 bg-green-50' : 'border-gray-300'}`}>
+              <label className="block text-sm font-medium text-[var(--stitch-muted)] mb-2">PAN Card (Optional)</label>
+              <div className={`border-2 border-dashed rounded-xl p-6 text-center ${formData.pan_url ? 'border-green-500 bg-green-50' : 'border-[var(--stitch-line)]'}`}>
                 {formData.pan_url ? (
                   <div className="flex items-center justify-center gap-2 text-green-600">
                     <CheckCircle2 className="w-6 h-6" />
                     <span>PAN Card Uploaded</span>
                   </div>
                 ) : uploadingFile === 'pan_url' ? (
-                  <div className="flex items-center justify-center gap-2 text-gray-500">
+                  <div className="flex items-center justify-center gap-2 text-[var(--stitch-muted)]">
                     <Loader2 className="w-6 h-6 animate-spin" />
                     <span>Uploading...</span>
                   </div>
                 ) : (
                   <label className="cursor-pointer">
                     <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                    <span className="text-gray-600">Click to upload PAN Card</span>
+                    <span className="text-[var(--stitch-muted)]">Click to upload PAN Card</span>
                     <input
                       type="file"
                       accept="image/*,.pdf"
@@ -424,22 +424,22 @@ const RiderOnboarding = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Selfie Photo *</label>
-              <div className={`border-2 border-dashed rounded-xl p-6 text-center ${formData.selfie_url ? 'border-green-500 bg-green-50' : errors.selfie_url ? 'border-red-500' : 'border-gray-300'}`}>
+              <label className="block text-sm font-medium text-[var(--stitch-muted)] mb-2">Selfie Photo *</label>
+              <div className={`border-2 border-dashed rounded-xl p-6 text-center ${formData.selfie_url ? 'border-green-500 bg-green-50' : errors.selfie_url ? 'border-red-500' : 'border-[var(--stitch-line)]'}`}>
                 {formData.selfie_url ? (
                   <div className="flex items-center justify-center gap-2 text-green-600">
                     <CheckCircle2 className="w-6 h-6" />
                     <span>Selfie Uploaded</span>
                   </div>
                 ) : uploadingFile === 'selfie_url' ? (
-                  <div className="flex items-center justify-center gap-2 text-gray-500">
+                  <div className="flex items-center justify-center gap-2 text-[var(--stitch-muted)]">
                     <Loader2 className="w-6 h-6 animate-spin" />
                     <span>Uploading...</span>
                   </div>
                 ) : (
                   <label className="cursor-pointer">
                     <Camera className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                    <span className="text-gray-600">Click to upload a clear selfie</span>
+                    <span className="text-[var(--stitch-muted)]">Click to upload a clear selfie</span>
                     <input
                       type="file"
                       accept="image/*"
@@ -457,43 +457,43 @@ const RiderOnboarding = () => {
       case 3:
         return (
           <div className="space-y-6">
-            <h2 className="text-xl font-bold text-gray-900">Work Details</h2>
-            <p className="text-gray-600">Tell us about your work preferences</p>
+            <h2 className="text-xl font-bold text-[var(--stitch-ink)]">Work Details</h2>
+            <p className="text-[var(--stitch-muted)]">Tell us about your work preferences</p>
 
             <div>
-              <label className="flex items-center gap-3 cursor-pointer p-4 border border-gray-300 rounded-xl hover:bg-gray-50">
+              <label className="flex items-center gap-3 cursor-pointer p-4 border border-[var(--stitch-line)] rounded-xl hover:bg-[var(--stitch-soft)]">
                 <input
                   type="checkbox"
                   name="has_vehicle"
                   checked={formData.has_vehicle}
                   onChange={handleChange}
-                  className="w-5 h-5 rounded border-gray-300 text-[#04473C] focus:ring-[#04473C]"
+                  className="w-5 h-5 rounded border-[var(--stitch-line)] text-black focus:ring-black"
                 />
                 <div>
-                  <span className="font-medium text-gray-900">I have a two-wheeler (bike/scooter)</span>
-                  <p className="text-sm text-gray-500">Required for property visits</p>
+                  <span className="font-medium text-[var(--stitch-ink)]">I have a two-wheeler (bike/scooter)</span>
+                  <p className="text-sm text-[var(--stitch-muted)]">Required for property visits</p>
                 </div>
               </label>
             </div>
 
             {formData.has_vehicle && (
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Driving License *</label>
-                <div className={`border-2 border-dashed rounded-xl p-6 text-center ${formData.driving_license_url ? 'border-green-500 bg-green-50' : errors.driving_license_url ? 'border-red-500' : 'border-gray-300'}`}>
+                <label className="block text-sm font-medium text-[var(--stitch-muted)] mb-2">Driving License *</label>
+                <div className={`border-2 border-dashed rounded-xl p-6 text-center ${formData.driving_license_url ? 'border-green-500 bg-green-50' : errors.driving_license_url ? 'border-red-500' : 'border-[var(--stitch-line)]'}`}>
                   {formData.driving_license_url ? (
                     <div className="flex items-center justify-center gap-2 text-green-600">
                       <CheckCircle2 className="w-6 h-6" />
                       <span>Driving License Uploaded</span>
                     </div>
                   ) : uploadingFile === 'driving_license_url' ? (
-                    <div className="flex items-center justify-center gap-2 text-gray-500">
+                    <div className="flex items-center justify-center gap-2 text-[var(--stitch-muted)]">
                       <Loader2 className="w-6 h-6 animate-spin" />
                       <span>Uploading...</span>
                     </div>
                   ) : (
                     <label className="cursor-pointer">
                       <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                      <span className="text-gray-600">Click to upload Driving License</span>
+                      <span className="text-[var(--stitch-muted)]">Click to upload Driving License</span>
                       <input
                         type="file"
                         accept="image/*,.pdf"
@@ -508,19 +508,19 @@ const RiderOnboarding = () => {
             )}
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Experience (Optional)</label>
+              <label className="block text-sm font-medium text-[var(--stitch-muted)] mb-1">Experience (Optional)</label>
               <textarea
                 name="experience"
                 value={formData.experience}
                 onChange={handleChange}
                 placeholder="Any relevant experience in real estate, customer service, delivery, etc."
                 rows={3}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#04473C] focus:border-transparent"
+                className="w-full px-4 py-3 border border-[var(--stitch-line)] rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Availability</label>
+              <label className="block text-sm font-medium text-[var(--stitch-muted)] mb-2">Availability</label>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 {[
                   { value: 'full_time', label: 'Full Time', desc: '8+ hours/day' },
@@ -531,8 +531,8 @@ const RiderOnboarding = () => {
                     key={option.value}
                     className={`cursor-pointer p-4 border rounded-xl text-center transition-colors ${
                       formData.availability === option.value
-                        ? 'border-[#04473C] bg-[#04473C]/5'
-                        : 'border-gray-300 hover:bg-gray-50'
+                        ? 'border-black bg-black/5'
+                        : 'border-[var(--stitch-line)] hover:bg-[var(--stitch-soft)]'
                     }`}
                   >
                     <input
@@ -543,8 +543,8 @@ const RiderOnboarding = () => {
                       onChange={handleChange}
                       className="sr-only"
                     />
-                    <span className="font-medium text-gray-900 block">{option.label}</span>
-                    <span className="text-sm text-gray-500">{option.desc}</span>
+                    <span className="font-medium text-[var(--stitch-ink)] block">{option.label}</span>
+                    <span className="text-sm text-[var(--stitch-muted)]">{option.desc}</span>
                   </label>
                 ))}
               </div>
@@ -555,11 +555,11 @@ const RiderOnboarding = () => {
       case 4:
         return (
           <div className="space-y-6">
-            <h2 className="text-xl font-bold text-gray-900">Payment Details</h2>
-            <p className="text-gray-600">How would you like to receive your earnings?</p>
+            <h2 className="text-xl font-bold text-[var(--stitch-ink)]">Payment Details</h2>
+            <p className="text-[var(--stitch-muted)]">How would you like to receive your earnings?</p>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">UPI ID *</label>
+              <label className="block text-sm font-medium text-[var(--stitch-muted)] mb-1">UPI ID *</label>
               <div className="relative">
                 <Wallet className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
@@ -568,61 +568,61 @@ const RiderOnboarding = () => {
                   value={formData.upi_id}
                   onChange={handleChange}
                   placeholder="yourname@upi"
-                  className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#04473C] focus:border-transparent ${errors.upi_id ? 'border-red-500' : 'border-gray-300'}`}
+                  className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-black focus:border-transparent ${errors.upi_id ? 'border-red-500' : 'border-[var(--stitch-line)]'}`}
                 />
               </div>
               {errors.upi_id && <p className="text-red-500 text-sm mt-1">{errors.upi_id}</p>}
             </div>
 
-            <div className="border-t border-gray-200 pt-4">
-              <p className="text-sm text-gray-500 mb-4">Bank Details (Optional - for larger withdrawals)</p>
+            <div className="border-t border-[var(--stitch-line)] pt-4">
+              <p className="text-sm text-[var(--stitch-muted)] mb-4">Bank Details (Optional - for larger withdrawals)</p>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Bank Name</label>
+                  <label className="block text-sm font-medium text-[var(--stitch-muted)] mb-1">Bank Name</label>
                   <input
                     type="text"
                     name="bank_name"
                     value={formData.bank_name}
                     onChange={handleChange}
                     placeholder="e.g., HDFC Bank"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#04473C] focus:border-transparent"
+                    className="w-full px-4 py-3 border border-[var(--stitch-line)] rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
                   />
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Account Number</label>
+                  <label className="block text-sm font-medium text-[var(--stitch-muted)] mb-1">Account Number</label>
                   <input
                     type="text"
                     name="account_number"
                     value={formData.account_number}
                     onChange={handleChange}
                     placeholder="Enter account number"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#04473C] focus:border-transparent"
+                    className="w-full px-4 py-3 border border-[var(--stitch-line)] rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
                   />
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">IFSC Code</label>
+                  <label className="block text-sm font-medium text-[var(--stitch-muted)] mb-1">IFSC Code</label>
                   <input
                     type="text"
                     name="ifsc_code"
                     value={formData.ifsc_code}
                     onChange={handleChange}
                     placeholder="e.g., HDFC0001234"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#04473C] focus:border-transparent"
+                    className="w-full px-4 py-3 border border-[var(--stitch-line)] rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
                   />
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Account Holder Name</label>
+                  <label className="block text-sm font-medium text-[var(--stitch-muted)] mb-1">Account Holder Name</label>
                   <input
                     type="text"
                     name="account_holder_name"
                     value={formData.account_holder_name}
                     onChange={handleChange}
                     placeholder="As per bank records"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#04473C] focus:border-transparent"
+                    className="w-full px-4 py-3 border border-[var(--stitch-line)] rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
                   />
                 </div>
               </div>
@@ -633,8 +633,8 @@ const RiderOnboarding = () => {
       case 5:
         return (
           <div className="space-y-6">
-            <h2 className="text-xl font-bold text-gray-900">Legal Agreements</h2>
-            <p className="text-gray-600">Please read and accept the following agreements to continue</p>
+            <h2 className="text-xl font-bold text-[var(--stitch-ink)]">Legal Agreements</h2>
+            <p className="text-[var(--stitch-muted)]">Please read and accept the following agreements to continue</p>
 
             <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4">
               <div className="flex items-start gap-3">
@@ -650,92 +650,92 @@ const RiderOnboarding = () => {
             </div>
 
             <div className="space-y-4">
-              <label className={`flex items-start gap-3 p-4 border rounded-xl cursor-pointer ${formData.non_circumvention ? 'border-[#04473C] bg-[#04473C]/5' : errors.non_circumvention ? 'border-red-500' : 'border-gray-300'}`}>
+              <label className={`flex items-start gap-3 p-4 border rounded-xl cursor-pointer ${formData.non_circumvention ? 'border-black bg-black/5' : errors.non_circumvention ? 'border-red-500' : 'border-[var(--stitch-line)]'}`}>
                 <input
                   type="checkbox"
                   name="non_circumvention"
                   checked={formData.non_circumvention}
                   onChange={handleChange}
-                  className="w-5 h-5 mt-0.5 rounded border-gray-300 text-[#04473C] focus:ring-[#04473C]"
+                  className="w-5 h-5 mt-0.5 rounded border-[var(--stitch-line)] text-black focus:ring-black"
                 />
                 <div>
-                  <span className="font-medium text-gray-900">Non-Circumvention Agreement *</span>
-                  <p className="text-sm text-gray-600 mt-1">
+                  <span className="font-medium text-[var(--stitch-ink)]">Non-Circumvention Agreement *</span>
+                  <p className="text-sm text-[var(--stitch-muted)] mt-1">
                     I agree not to directly deal with any customer, property owner, or builder outside the platform.
                   </p>
                 </div>
               </label>
 
-              <label className={`flex items-start gap-3 p-4 border rounded-xl cursor-pointer ${formData.commission_protection ? 'border-[#04473C] bg-[#04473C]/5' : errors.commission_protection ? 'border-red-500' : 'border-gray-300'}`}>
+              <label className={`flex items-start gap-3 p-4 border rounded-xl cursor-pointer ${formData.commission_protection ? 'border-black bg-black/5' : errors.commission_protection ? 'border-red-500' : 'border-[var(--stitch-line)]'}`}>
                 <input
                   type="checkbox"
                   name="commission_protection"
                   checked={formData.commission_protection}
                   onChange={handleChange}
-                  className="w-5 h-5 mt-0.5 rounded border-gray-300 text-[#04473C] focus:ring-[#04473C]"
+                  className="w-5 h-5 mt-0.5 rounded border-[var(--stitch-line)] text-black focus:ring-black"
                 />
                 <div>
-                  <span className="font-medium text-gray-900">Commission Protection *</span>
-                  <p className="text-sm text-gray-600 mt-1">
+                  <span className="font-medium text-[var(--stitch-ink)]">Commission Protection *</span>
+                  <p className="text-sm text-[var(--stitch-muted)] mt-1">
                     All deals and earnings must go through ApnaGhr only. I will not accept direct payments from customers.
                   </p>
                 </div>
               </label>
 
-              <label className={`flex items-start gap-3 p-4 border rounded-xl cursor-pointer ${formData.penalty_clause ? 'border-[#04473C] bg-[#04473C]/5' : errors.penalty_clause ? 'border-red-500' : 'border-gray-300'}`}>
+              <label className={`flex items-start gap-3 p-4 border rounded-xl cursor-pointer ${formData.penalty_clause ? 'border-black bg-black/5' : errors.penalty_clause ? 'border-red-500' : 'border-[var(--stitch-line)]'}`}>
                 <input
                   type="checkbox"
                   name="penalty_clause"
                   checked={formData.penalty_clause}
                   onChange={handleChange}
-                  className="w-5 h-5 mt-0.5 rounded border-gray-300 text-[#04473C] focus:ring-[#04473C]"
+                  className="w-5 h-5 mt-0.5 rounded border-[var(--stitch-line)] text-black focus:ring-black"
                 />
                 <div>
-                  <span className="font-medium text-gray-900">Penalty Clause *</span>
-                  <p className="text-sm text-gray-600 mt-1">
+                  <span className="font-medium text-[var(--stitch-ink)]">Penalty Clause *</span>
+                  <p className="text-sm text-[var(--stitch-muted)] mt-1">
                     I understand that violation may result in permanent ban and penalty up to ₹50,000+ with legal action.
                   </p>
                 </div>
               </label>
 
-              <label className={`flex items-start gap-3 p-4 border rounded-xl cursor-pointer ${formData.work_compliance ? 'border-[#04473C] bg-[#04473C]/5' : errors.work_compliance ? 'border-red-500' : 'border-gray-300'}`}>
+              <label className={`flex items-start gap-3 p-4 border rounded-xl cursor-pointer ${formData.work_compliance ? 'border-black bg-black/5' : errors.work_compliance ? 'border-red-500' : 'border-[var(--stitch-line)]'}`}>
                 <input
                   type="checkbox"
                   name="work_compliance"
                   checked={formData.work_compliance}
                   onChange={handleChange}
-                  className="w-5 h-5 mt-0.5 rounded border-gray-300 text-[#04473C] focus:ring-[#04473C]"
+                  className="w-5 h-5 mt-0.5 rounded border-[var(--stitch-line)] text-black focus:ring-black"
                 />
                 <div>
-                  <span className="font-medium text-gray-900">Work Compliance *</span>
-                  <p className="text-sm text-gray-600 mt-1">
+                  <span className="font-medium text-[var(--stitch-ink)]">Work Compliance *</span>
+                  <p className="text-sm text-[var(--stitch-muted)] mt-1">
                     I agree to follow company rules and visit guidelines, maintain professionalism, and provide quality service.
                   </p>
                 </div>
               </label>
 
-              <label className={`flex items-start gap-3 p-4 border rounded-xl cursor-pointer ${formData.payment_terms ? 'border-[#04473C] bg-[#04473C]/5' : errors.payment_terms ? 'border-red-500' : 'border-gray-300'}`}>
+              <label className={`flex items-start gap-3 p-4 border rounded-xl cursor-pointer ${formData.payment_terms ? 'border-black bg-black/5' : errors.payment_terms ? 'border-red-500' : 'border-[var(--stitch-line)]'}`}>
                 <input
                   type="checkbox"
                   name="payment_terms"
                   checked={formData.payment_terms}
                   onChange={handleChange}
-                  className="w-5 h-5 mt-0.5 rounded border-gray-300 text-[#04473C] focus:ring-[#04473C]"
+                  className="w-5 h-5 mt-0.5 rounded border-[var(--stitch-line)] text-black focus:ring-black"
                 />
                 <div>
-                  <span className="font-medium text-gray-900">Payment Terms *</span>
-                  <p className="text-sm text-gray-600 mt-1">
+                  <span className="font-medium text-[var(--stitch-ink)]">Payment Terms *</span>
+                  <p className="text-sm text-[var(--stitch-muted)] mt-1">
                     I understand payments are based on per visit or per deal basis as defined by the platform.
                   </p>
                 </div>
               </label>
             </div>
 
-            <div className="flex gap-2 text-sm text-gray-500">
+            <div className="flex gap-2 text-sm text-[var(--stitch-muted)]">
               <span>By continuing, you also agree to our</span>
-              <Link to="/privacy-policy-riders" className="text-[#04473C] underline">Privacy Policy</Link>
+              <Link to="/privacy-policy-riders" className="text-black underline">Privacy Policy</Link>
               <span>and</span>
-              <Link to="/legal" className="text-[#04473C] underline">Terms of Service</Link>
+              <Link to="/legal" className="text-black underline">Terms of Service</Link>
             </div>
           </div>
         );
@@ -743,60 +743,60 @@ const RiderOnboarding = () => {
       case 6:
         return (
           <div className="space-y-6">
-            <h2 className="text-xl font-bold text-gray-900">Review & Submit</h2>
-            <p className="text-gray-600">Please review your information before submitting</p>
+            <h2 className="text-xl font-bold text-[var(--stitch-ink)]">Review & Submit</h2>
+            <p className="text-[var(--stitch-muted)]">Please review your information before submitting</p>
 
-            <div className="bg-gray-50 rounded-xl p-6 space-y-4">
+            <div className="bg-[var(--stitch-soft)] rounded-xl p-6 space-y-4">
               <div>
-                <h3 className="font-semibold text-gray-900 mb-2">Basic Details</h3>
+                <h3 className="font-semibold text-[var(--stitch-ink)] mb-2">Basic Details</h3>
                 <div className="grid grid-cols-2 gap-2 text-sm">
-                  <span className="text-gray-500">Name:</span>
-                  <span className="text-gray-900">{formData.full_name}</span>
-                  <span className="text-gray-500">Mobile:</span>
-                  <span className="text-gray-900">+91 {formData.mobile}</span>
-                  <span className="text-gray-500">City:</span>
-                  <span className="text-gray-900">{formData.city}</span>
+                  <span className="text-[var(--stitch-muted)]">Name:</span>
+                  <span className="text-[var(--stitch-ink)]">{formData.full_name}</span>
+                  <span className="text-[var(--stitch-muted)]">Mobile:</span>
+                  <span className="text-[var(--stitch-ink)]">+91 {formData.mobile}</span>
+                  <span className="text-[var(--stitch-muted)]">City:</span>
+                  <span className="text-[var(--stitch-ink)]">{formData.city}</span>
                   {formData.areas.length > 0 && (
                     <>
-                      <span className="text-gray-500">Areas:</span>
-                      <span className="text-gray-900">{formData.areas.join(', ')}</span>
+                      <span className="text-[var(--stitch-muted)]">Areas:</span>
+                      <span className="text-[var(--stitch-ink)]">{formData.areas.join(', ')}</span>
                     </>
                   )}
                 </div>
               </div>
 
-              <div className="border-t border-gray-200 pt-4">
-                <h3 className="font-semibold text-gray-900 mb-2">Documents</h3>
+              <div className="border-t border-[var(--stitch-line)] pt-4">
+                <h3 className="font-semibold text-[var(--stitch-ink)] mb-2">Documents</h3>
                 <div className="grid grid-cols-2 gap-2 text-sm">
-                  <span className="text-gray-500">Aadhaar:</span>
+                  <span className="text-[var(--stitch-muted)]">Aadhaar:</span>
                   <span className={formData.aadhaar_url ? 'text-green-600' : 'text-red-600'}>
                     {formData.aadhaar_url ? '✓ Uploaded' : '✗ Missing'}
                   </span>
-                  <span className="text-gray-500">PAN:</span>
-                  <span className={formData.pan_url ? 'text-green-600' : 'text-gray-500'}>
+                  <span className="text-[var(--stitch-muted)]">PAN:</span>
+                  <span className={formData.pan_url ? 'text-green-600' : 'text-[var(--stitch-muted)]'}>
                     {formData.pan_url ? '✓ Uploaded' : 'Not provided'}
                   </span>
-                  <span className="text-gray-500">Selfie:</span>
+                  <span className="text-[var(--stitch-muted)]">Selfie:</span>
                   <span className={formData.selfie_url ? 'text-green-600' : 'text-red-600'}>
                     {formData.selfie_url ? '✓ Uploaded' : '✗ Missing'}
                   </span>
                 </div>
               </div>
 
-              <div className="border-t border-gray-200 pt-4">
-                <h3 className="font-semibold text-gray-900 mb-2">Work & Payment</h3>
+              <div className="border-t border-[var(--stitch-line)] pt-4">
+                <h3 className="font-semibold text-[var(--stitch-ink)] mb-2">Work & Payment</h3>
                 <div className="grid grid-cols-2 gap-2 text-sm">
-                  <span className="text-gray-500">Vehicle:</span>
-                  <span className="text-gray-900">{formData.has_vehicle ? 'Yes' : 'No'}</span>
-                  <span className="text-gray-500">Availability:</span>
-                  <span className="text-gray-900">{formData.availability.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}</span>
-                  <span className="text-gray-500">UPI ID:</span>
-                  <span className="text-gray-900">{formData.upi_id}</span>
+                  <span className="text-[var(--stitch-muted)]">Vehicle:</span>
+                  <span className="text-[var(--stitch-ink)]">{formData.has_vehicle ? 'Yes' : 'No'}</span>
+                  <span className="text-[var(--stitch-muted)]">Availability:</span>
+                  <span className="text-[var(--stitch-ink)]">{formData.availability.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}</span>
+                  <span className="text-[var(--stitch-muted)]">UPI ID:</span>
+                  <span className="text-[var(--stitch-ink)]">{formData.upi_id}</span>
                 </div>
               </div>
 
-              <div className="border-t border-gray-200 pt-4">
-                <h3 className="font-semibold text-gray-900 mb-2">Legal Agreements</h3>
+              <div className="border-t border-[var(--stitch-line)] pt-4">
+                <h3 className="font-semibold text-[var(--stitch-ink)] mb-2">Legal Agreements</h3>
                 <div className="flex flex-wrap gap-2">
                   {formData.non_circumvention && <span className="px-2 py-1 bg-green-100 text-green-700 rounded text-xs">Non-Circumvention ✓</span>}
                   {formData.commission_protection && <span className="px-2 py-1 bg-green-100 text-green-700 rounded text-xs">Commission Protection ✓</span>}
@@ -815,16 +815,16 @@ const RiderOnboarding = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[var(--stitch-soft)]">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
+      <header className="bg-white border-b border-[var(--stitch-line)] sticky top-0 z-40">
         <div className="max-w-4xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <Link to="/" className="flex items-center gap-2">
-              <Home className="w-6 h-6 text-[#04473C]" />
-              <span className="font-bold text-xl text-[#04473C]">ApnaGhr</span>
+              <Home className="w-6 h-6 text-black" />
+              <span className="font-bold text-xl text-black">ApnaGhr</span>
             </Link>
-            <span className="text-sm text-gray-500">Rider Application</span>
+            <span className="text-sm text-[var(--stitch-muted)]">Rider Application</span>
           </div>
         </div>
       </header>
@@ -840,8 +840,8 @@ const RiderOnboarding = () => {
                     currentStep > step.id
                       ? 'bg-green-500 text-white'
                       : currentStep === step.id
-                      ? 'bg-[#04473C] text-white'
-                      : 'bg-gray-200 text-gray-500'
+                      ? 'bg-black text-white'
+                      : 'bg-gray-200 text-[var(--stitch-muted)]'
                   }`}>
                     {currentStep > step.id ? (
                       <Check className="w-5 h-5" />
@@ -849,7 +849,7 @@ const RiderOnboarding = () => {
                       <step.icon className="w-5 h-5" />
                     )}
                   </div>
-                  <span className={`text-xs mt-2 hidden md:block ${currentStep >= step.id ? 'text-gray-900' : 'text-gray-500'}`}>
+                  <span className={`text-xs mt-2 hidden md:block ${currentStep >= step.id ? 'text-[var(--stitch-ink)]' : 'text-[var(--stitch-muted)]'}`}>
                     {step.title}
                   </span>
                 </div>
@@ -866,7 +866,7 @@ const RiderOnboarding = () => {
           {renderStepContent()}
 
           {/* Navigation Buttons */}
-          <div className="flex justify-between mt-8 pt-6 border-t border-gray-200">
+          <div className="flex justify-between mt-8 pt-6 border-t border-[var(--stitch-line)]">
             <button
               type="button"
               onClick={prevStep}
@@ -874,7 +874,7 @@ const RiderOnboarding = () => {
               className={`flex items-center gap-2 px-6 py-3 rounded-xl font-medium ${
                 currentStep === 1
                   ? 'text-gray-400 cursor-not-allowed'
-                  : 'text-gray-700 hover:bg-gray-100'
+                  : 'text-[var(--stitch-muted)] hover:bg-gray-100'
               }`}
             >
               <ChevronLeft className="w-5 h-5" />
@@ -885,7 +885,7 @@ const RiderOnboarding = () => {
               <button
                 type="button"
                 onClick={nextStep}
-                className="flex items-center gap-2 px-6 py-3 bg-[#04473C] text-white rounded-xl font-medium hover:bg-[#033530]"
+                className="flex items-center gap-2 px-6 py-3 bg-black text-white rounded-xl font-medium hover:bg-gray-900"
               >
                 Next
                 <ChevronRight className="w-5 h-5" />
@@ -895,7 +895,7 @@ const RiderOnboarding = () => {
                 type="button"
                 onClick={handleSubmit}
                 disabled={loading}
-                className="flex items-center gap-2 px-8 py-3 bg-[#04473C] text-white rounded-xl font-medium hover:bg-[#033530] disabled:opacity-50"
+                className="flex items-center gap-2 px-8 py-3 bg-black text-white rounded-xl font-medium hover:bg-gray-900 disabled:opacity-50"
               >
                 {loading ? (
                   <>

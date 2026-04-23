@@ -73,7 +73,7 @@ const InventoryUserDashboard = ({ sessionId, onLogout }) => {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="w-8 h-8 border-3 border-[#C6A87C]/30 border-t-[#C6A87C] rounded-full animate-spin" />
+        <div className="w-8 h-8 border-3 border-[var(--stitch-muted)]/30 border-t-[var(--stitch-muted)] rounded-full animate-spin" />
       </div>
     );
   }
@@ -88,13 +88,13 @@ const InventoryUserDashboard = ({ sessionId, onLogout }) => {
       className="space-y-6"
     >
       {/* Header with User Info */}
-      <div className="bg-gradient-to-r from-[#C6A87C] to-[#B8956C] text-white p-6 rounded-xl relative overflow-hidden">
+      <div className="bg-gradient-to-r from-[var(--stitch-muted)] to-[var(--stitch-muted)] text-white p-6 rounded-xl relative overflow-hidden">
         <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2" />
         
         <div className="relative z-10 flex justify-between items-start">
           <div>
             <p className="text-white/80 text-sm">Inventory Session</p>
-            <h2 className="text-2xl font-semibold mt-1" style={{ fontFamily: 'Playfair Display, serif' }}>
+            <h2 className="text-2xl font-semibold mt-1" >
               Welcome, {stats?.user_name}!
             </h2>
             <div className="flex items-center gap-4 mt-3 text-sm text-white/90">
@@ -132,15 +132,15 @@ const InventoryUserDashboard = ({ sessionId, onLogout }) => {
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.1 }}
-          className="bg-white border border-[#E5E1DB] rounded-xl p-4"
+          className="bg-white border border-[var(--stitch-line)] rounded-xl p-4"
         >
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-[#04473C]/10 flex items-center justify-center">
-              <Package className="w-5 h-5 text-[#04473C]" />
+            <div className="w-10 h-10 rounded-full bg-black/10 flex items-center justify-center">
+              <Package className="w-5 h-5 text-[var(--stitch-ink)]" />
             </div>
             <div>
-              <p className="text-xs text-[#4A4D53]">Added Today</p>
-              <p className="text-2xl font-bold text-[#1A1C20]">{stats?.properties_added || 0}</p>
+              <p className="text-xs text-[var(--stitch-muted)]">Added Today</p>
+              <p className="text-2xl font-bold text-[var(--stitch-ink)]">{stats?.properties_added || 0}</p>
             </div>
           </div>
         </motion.div>
@@ -149,15 +149,15 @@ const InventoryUserDashboard = ({ sessionId, onLogout }) => {
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.2 }}
-          className="bg-white border border-[#E5E1DB] rounded-xl p-4"
+          className="bg-white border border-[var(--stitch-line)] rounded-xl p-4"
         >
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-[#C6A87C]/10 flex items-center justify-center">
-              <Target className="w-5 h-5 text-[#C6A87C]" />
+            <div className="w-10 h-10 rounded-full bg-[var(--stitch-muted)]/10 flex items-center justify-center">
+              <Target className="w-5 h-5 text-[var(--stitch-muted)]" />
             </div>
             <div>
-              <p className="text-xs text-[#4A4D53]">Target</p>
-              <p className="text-2xl font-bold text-[#1A1C20]">{stats?.total_target || 0}</p>
+              <p className="text-xs text-[var(--stitch-muted)]">Target</p>
+              <p className="text-2xl font-bold text-[var(--stitch-ink)]">{stats?.total_target || 0}</p>
             </div>
           </div>
         </motion.div>
@@ -166,14 +166,14 @@ const InventoryUserDashboard = ({ sessionId, onLogout }) => {
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.3 }}
-          className="bg-white border border-[#E5E1DB] rounded-xl p-4"
+          className="bg-white border border-[var(--stitch-line)] rounded-xl p-4"
         >
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
               <Award className="w-5 h-5 text-green-600" />
             </div>
             <div>
-              <p className="text-xs text-[#4A4D53]">Points Earned</p>
+              <p className="text-xs text-[var(--stitch-muted)]">Points Earned</p>
               <p className="text-2xl font-bold text-green-600">{stats?.points_earned || 0}</p>
             </div>
           </div>
@@ -183,50 +183,50 @@ const InventoryUserDashboard = ({ sessionId, onLogout }) => {
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.4 }}
-          className="bg-white border border-[#E5E1DB] rounded-xl p-4"
+          className="bg-white border border-[var(--stitch-line)] rounded-xl p-4"
         >
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
               <MapPin className="w-5 h-5 text-blue-600" />
             </div>
             <div>
-              <p className="text-xs text-[#4A4D53]">Cities</p>
-              <p className="text-2xl font-bold text-[#1A1C20]">{stats?.selected_cities?.length || 0}</p>
+              <p className="text-xs text-[var(--stitch-muted)]">Cities</p>
+              <p className="text-2xl font-bold text-[var(--stitch-ink)]">{stats?.selected_cities?.length || 0}</p>
             </div>
           </div>
         </motion.div>
       </div>
 
       {/* Progress Section */}
-      <div className="bg-white border border-[#E5E1DB] rounded-xl p-6">
+      <div className="bg-white border border-[var(--stitch-line)] rounded-xl p-6">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="font-semibold text-[#1A1C20]">Target Progress</h3>
+          <h3 className="font-semibold text-[var(--stitch-ink)]">Target Progress</h3>
           <button
             onClick={fetchStats}
-            className="text-[#4A4D53] hover:text-[#1A1C20] transition-colors"
+            className="text-[var(--stitch-muted)] hover:text-[var(--stitch-ink)] transition-colors"
           >
             <RefreshCw className="w-4 h-4" />
           </button>
         </div>
 
         {/* Progress Bar */}
-        <div className="relative h-4 bg-[#F5F3F0] rounded-full overflow-hidden mb-3">
+        <div className="relative h-4 bg-[var(--stitch-soft)] rounded-full overflow-hidden mb-3">
           <motion.div
             initial={{ width: 0 }}
             animate={{ width: `${Math.min(achievementPercentage, 100)}%` }}
             transition={{ duration: 0.5 }}
             className={`absolute inset-y-0 left-0 rounded-full ${
-              achievementPercentage >= 100 ? 'bg-green-500' : achievementPercentage >= 50 ? 'bg-[#C6A87C]' : 'bg-orange-400'
+              achievementPercentage >= 100 ? 'bg-green-500' : achievementPercentage >= 50 ? 'bg-[var(--stitch-muted)]' : 'bg-orange-400'
             }`}
           />
         </div>
 
         <div className="flex justify-between text-sm">
-          <span className="text-[#4A4D53]">
+          <span className="text-[var(--stitch-muted)]">
             {stats?.properties_added || 0} / {stats?.total_target || 0} properties
           </span>
           <span className={`font-medium ${
-            achievementPercentage >= 100 ? 'text-green-600' : 'text-[#C6A87C]'
+            achievementPercentage >= 100 ? 'text-green-600' : 'text-[var(--stitch-muted)]'
           }`}>
             {achievementPercentage.toFixed(0)}%
           </span>
@@ -259,8 +259,8 @@ const InventoryUserDashboard = ({ sessionId, onLogout }) => {
       </div>
 
       {/* City Breakdown */}
-      <div className="bg-white border border-[#E5E1DB] rounded-xl p-6">
-        <h3 className="font-semibold text-[#1A1C20] mb-4">City-wise Breakdown</h3>
+      <div className="bg-white border border-[var(--stitch-line)] rounded-xl p-6">
+        <h3 className="font-semibold text-[var(--stitch-ink)] mb-4">City-wise Breakdown</h3>
         
         <div className="space-y-3">
           {stats?.selected_cities?.map((city) => {
@@ -270,16 +270,16 @@ const InventoryUserDashboard = ({ sessionId, onLogout }) => {
 
             return (
               <div key={city} className="flex items-center gap-4">
-                <div className="w-24 text-sm font-medium text-[#1A1C20] truncate">{city}</div>
-                <div className="flex-1 h-2 bg-[#F5F3F0] rounded-full overflow-hidden">
+                <div className="w-24 text-sm font-medium text-[var(--stitch-ink)] truncate">{city}</div>
+                <div className="flex-1 h-2 bg-[var(--stitch-soft)] rounded-full overflow-hidden">
                   <div
                     className={`h-full rounded-full transition-all ${
-                      progress >= 100 ? 'bg-green-500' : 'bg-[#C6A87C]'
+                      progress >= 100 ? 'bg-green-500' : 'bg-[var(--stitch-muted)]'
                     }`}
                     style={{ width: `${Math.min(progress, 100)}%` }}
                   />
                 </div>
-                <div className="text-sm text-[#4A4D53] w-16 text-right">
+                <div className="text-sm text-[var(--stitch-muted)] w-16 text-right">
                   {added} / {target}
                 </div>
               </div>

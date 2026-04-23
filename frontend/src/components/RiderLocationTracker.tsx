@@ -287,8 +287,8 @@ const RiderLocationTracker = ({
   const getStatusColor = (status) => {
     switch (status) {
       case 'completed': return 'bg-green-500';
-      case 'reached': return 'bg-[#C6A87C]';
-      case 'on_the_way': return 'bg-[#04473C]';
+      case 'reached': return 'bg-[var(--stitch-muted)]';
+      case 'on_the_way': return 'bg-[var(--stitch-ink)]';
       case 'accepted': return 'bg-blue-500';
       default: return 'bg-gray-400';
     }
@@ -297,10 +297,10 @@ const RiderLocationTracker = ({
   return (
     <div className="space-y-4">
       {/* Connection Status */}
-      <div className="flex items-center justify-between p-4 bg-white rounded-lg border border-[#E5E1DB]">
+      <div className="flex items-center justify-between p-4 bg-white rounded-lg border border-[var(--stitch-line)]">
         <div className="flex items-center gap-3">
           <div className={`w-3 h-3 rounded-full ${isConnected ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`} />
-          <span className="text-sm text-[#4A4D53]">
+          <span className="text-sm text-[var(--stitch-muted)]">
             {isConnected ? 'Connected to server' : 'Disconnected'}
           </span>
         </div>
@@ -315,7 +315,7 @@ const RiderLocationTracker = ({
               }`} />
               <span className={`${
                 dbSyncStatus === 'synced' ? 'text-green-600' : 
-                dbSyncStatus === 'error' ? 'text-red-600' : 'text-[#4A4D53]'
+                dbSyncStatus === 'error' ? 'text-red-600' : 'text-[var(--stitch-muted)]'
               }`}>
                 {dbSyncStatus === 'synced' ? 'DB Synced' : 
                  dbSyncStatus === 'syncing' ? 'Syncing...' : 
@@ -323,7 +323,7 @@ const RiderLocationTracker = ({
               </span>
             </div>
           )}
-          <div className="flex items-center gap-2 text-sm text-[#4A4D53]">
+          <div className="flex items-center gap-2 text-sm text-[var(--stitch-muted)]">
             <Signal className="w-4 h-4" />
             <span>GPS {currentLocation ? 'Active' : 'Inactive'}</span>
           </div>
@@ -331,11 +331,11 @@ const RiderLocationTracker = ({
       </div>
 
       {/* Tracking Control */}
-      <div className="p-4 bg-white rounded-lg border border-[#E5E1DB]">
+      <div className="p-4 bg-white rounded-lg border border-[var(--stitch-line)]">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="font-medium text-[#04473C]">Location Tracking</h3>
-            <p className="text-sm text-[#4A4D53]">
+            <h3 className="font-medium text-[var(--stitch-ink)]">Location Tracking</h3>
+            <p className="text-sm text-[var(--stitch-muted)]">
               {isTracking ? (
                 <>
                   Sharing your location
@@ -351,7 +351,7 @@ const RiderLocationTracker = ({
             className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-colors ${
               isTracking 
                 ? 'bg-red-500 text-white hover:bg-red-600' 
-                : 'bg-[#04473C] text-white hover:bg-[#033830]'
+                : 'bg-[var(--stitch-ink)] text-white hover:bg-[#033830]'
             }`}
             data-testid="tracking-toggle-button"
           >
@@ -377,14 +377,14 @@ const RiderLocationTracker = ({
         )}
 
         {currentLocation && (
-          <div className="mt-3 p-3 bg-[#F5F3F0] rounded-lg">
+          <div className="mt-3 p-3 bg-[var(--stitch-soft)] rounded-lg">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 text-sm text-[#4A4D53]">
+              <div className="flex items-center gap-2 text-sm text-[var(--stitch-muted)]">
                 <MapPin className="w-4 h-4" />
                 <span>{currentLocation.lat.toFixed(6)}, {currentLocation.lng.toFixed(6)}</span>
               </div>
               {currentLocation.speed && (
-                <span className="text-sm font-medium text-[#04473C]">
+                <span className="text-sm font-medium text-[var(--stitch-ink)]">
                   {Math.round(currentLocation.speed)} km/h
                 </span>
               )}
@@ -395,15 +395,15 @@ const RiderLocationTracker = ({
 
       {/* Assigned Visits */}
       {assignedVisits.length > 0 && (
-        <div className="bg-white rounded-lg border border-[#E5E1DB]">
-          <div className="p-4 border-b border-[#E5E1DB] flex items-center justify-between">
-            <h3 className="font-medium text-[#04473C]">
+        <div className="bg-white rounded-lg border border-[var(--stitch-line)]">
+          <div className="p-4 border-b border-[var(--stitch-line)] flex items-center justify-between">
+            <h3 className="font-medium text-[var(--stitch-ink)]">
               Assigned Visits ({assignedVisits.length})
             </h3>
             {currentLocation && (
               <button
                 onClick={optimizeRoute}
-                className="text-sm text-[#04473C] hover:underline flex items-center gap-1"
+                className="text-sm text-[var(--stitch-ink)] hover:underline flex items-center gap-1"
               >
                 <Navigation className="w-4 h-4" />
                 Optimize Route
@@ -411,7 +411,7 @@ const RiderLocationTracker = ({
             )}
           </div>
 
-          <div className="divide-y divide-[#E5E1DB]">
+          <div className="divide-y divide-[var(--stitch-line)]">
             {(optimizedRoute.length > 0 ? optimizedRoute : assignedVisits).map((visit, index) => {
               const status = visitStatuses[visit.id] || 'assigned';
               const isCurrentVisit = currentVisit?.id === visit.id;
@@ -420,17 +420,17 @@ const RiderLocationTracker = ({
                 <motion.div
                   key={visit.id}
                   layout
-                  className={`p-4 ${isCurrentVisit ? 'bg-[#F5F3F0]' : ''}`}
+                  className={`p-4 ${isCurrentVisit ? 'bg-[var(--stitch-soft)]' : ''}`}
                 >
                   <div className="flex items-start gap-3">
                     <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-medium ${getStatusColor(status)}`}>
                       {visit.order || index + 1}
                     </div>
                     <div className="flex-1">
-                      <p className="font-medium text-[#04473C]">
+                      <p className="font-medium text-[var(--stitch-ink)]">
                         {visit.property?.title || visit.title || `Visit ${index + 1}`}
                       </p>
-                      <p className="text-sm text-[#4A4D53]">
+                      <p className="text-sm text-[var(--stitch-muted)]">
                         {visit.property?.address || visit.address}
                       </p>
                       <div className="mt-2 flex items-center gap-2">
@@ -438,7 +438,7 @@ const RiderLocationTracker = ({
                           {status.replace('_', ' ')}
                         </span>
                         {isCurrentVisit && eta && (
-                          <span className="text-xs text-[#4A4D53] flex items-center gap-1">
+                          <span className="text-xs text-[var(--stitch-muted)] flex items-center gap-1">
                             <Clock className="w-3 h-3" />
                             ETA: {eta.eta_text}
                           </span>
@@ -459,7 +459,7 @@ const RiderLocationTracker = ({
                       {status === 'accepted' && (
                         <button
                           onClick={() => handleVisitStatusUpdate(visit.id, 'on_the_way')}
-                          className="text-xs px-3 py-1 bg-[#04473C] text-white rounded hover:bg-[#033830]"
+                          className="text-xs px-3 py-1 bg-[var(--stitch-ink)] text-white rounded hover:bg-[#033830]"
                         >
                           Start
                         </button>
@@ -467,7 +467,7 @@ const RiderLocationTracker = ({
                       {status === 'on_the_way' && (
                         <button
                           onClick={() => handleVisitStatusUpdate(visit.id, 'reached')}
-                          className="text-xs px-3 py-1 bg-[#C6A87C] text-white rounded hover:bg-[#B89A6E]"
+                          className="text-xs px-3 py-1 bg-[var(--stitch-muted)] text-white rounded hover:bg-[#B89A6E]"
                         >
                           Reached
                         </button>
@@ -492,7 +492,7 @@ const RiderLocationTracker = ({
       {/* View Map Button */}
       <button
         onClick={() => setShowMap(true)}
-        className="w-full p-4 bg-[#04473C] text-white rounded-lg flex items-center justify-center gap-2 hover:bg-[#033830] transition-colors"
+        className="w-full p-4 bg-[var(--stitch-ink)] text-white rounded-lg flex items-center justify-center gap-2 hover:bg-[#033830] transition-colors"
       >
         <Navigation className="w-5 h-5" />
         View Live Map

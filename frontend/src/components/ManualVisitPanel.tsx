@@ -171,16 +171,16 @@ const ManualVisitPanel = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold" style={{ fontFamily: 'Playfair Display, serif' }}>
+          <h2 className="text-2xl font-bold" >
             Manual Visit Creation
           </h2>
-          <p className="text-sm text-[#4A4D53]">Create visits for customers who paid via QR code or cash</p>
+          <p className="text-sm text-[var(--stitch-muted)]">Create visits for customers who paid via QR code or cash</p>
         </div>
         <motion.button
           onClick={() => setShowCreateForm(true)}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          className="btn-primary flex items-center gap-2"
+          className="stitch-button flex items-center gap-2"
         >
           <Plus className="w-4 h-4" />
           Create New Visit
@@ -188,11 +188,11 @@ const ManualVisitPanel = () => {
       </div>
 
       {/* Info Banner */}
-      <div className="bg-[#E6F0EE] border border-[#04473C]/20 p-4 flex items-start gap-3">
-        <QrCode className="w-6 h-6 text-[#04473C] flex-shrink-0" />
+      <div className="bg-[var(--stitch-soft)] border border-[var(--stitch-ink)]/20 p-4 flex items-start gap-3">
+        <QrCode className="w-6 h-6 text-[var(--stitch-ink)] flex-shrink-0" />
         <div className="text-sm">
-          <p className="font-medium text-[#04473C]">QR Code / Offline Payment Flow:</p>
-          <ol className="text-[#4A4D53] mt-1 list-decimal list-inside space-y-1">
+          <p className="font-medium text-[var(--stitch-ink)]">QR Code / Offline Payment Flow:</p>
+          <ol className="text-[var(--stitch-muted)] mt-1 list-decimal list-inside space-y-1">
             <li>Customer pays via QR code or cash and shares payment screenshot</li>
             <li>Admin creates visit here with customer details and selected properties</li>
             <li>Customer receives SMS/notification and can track rider in their app</li>
@@ -217,23 +217,23 @@ const ManualVisitPanel = () => {
               exit={{ scale: 0.95, opacity: 0 }}
               className="bg-white w-full max-w-4xl max-h-[90vh] overflow-y-auto"
             >
-              <div className="sticky top-0 bg-white border-b border-[#E5E1DB] p-6 flex items-center justify-between">
+              <div className="sticky top-0 bg-white border-b border-[var(--stitch-line)] p-6 flex items-center justify-between">
                 <div>
-                  <h3 className="text-xl font-bold" style={{ fontFamily: 'Playfair Display, serif' }}>
+                  <h3 className="text-xl font-bold" >
                     Create Manual Visit
                   </h3>
-                  <p className="text-sm text-[#4A4D53]">For QR code or cash payments</p>
+                  <p className="text-sm text-[var(--stitch-muted)]">For QR code or cash payments</p>
                 </div>
-                <button onClick={() => setShowCreateForm(false)} className="p-2 hover:bg-[#F5F3F0]">
+                <button onClick={() => setShowCreateForm(false)} className="p-2 hover:bg-[var(--stitch-soft)]">
                   <X className="w-5 h-5" />
                 </button>
               </div>
 
               <form onSubmit={handleSubmit} className="p-6 space-y-6">
                 {/* Customer Details */}
-                <div className="bg-[#F5F3F0] p-4 space-y-4">
+                <div className="bg-[var(--stitch-soft)] p-4 space-y-4">
                   <h4 className="font-medium flex items-center gap-2">
-                    <User className="w-4 h-4 text-[#04473C]" />
+                    <User className="w-4 h-4 text-[var(--stitch-ink)]" />
                     Customer Details
                   </h4>
                   
@@ -241,7 +241,7 @@ const ManualVisitPanel = () => {
                     <div className="relative">
                       <label className="block text-sm font-medium mb-1">Phone Number *</label>
                       <div className="relative">
-                        <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#4A4D53]" />
+                        <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--stitch-muted)]" />
                         <input
                           type="tel"
                           value={formData.customer_phone}
@@ -250,7 +250,7 @@ const ManualVisitPanel = () => {
                             setFormData({ ...formData, customer_phone: phone });
                             if (phone.length >= 5) searchCustomerByPhone(phone);
                           }}
-                          className="premium-input pl-10"
+                          className="stitch-input pl-10"
                           placeholder="10 digit mobile number"
                           required
                         />
@@ -258,20 +258,20 @@ const ManualVisitPanel = () => {
                       
                       {/* Customer Search Results */}
                       {customers.length > 0 && (
-                        <div className="absolute z-10 w-full mt-1 bg-white border border-[#E5E1DB] shadow-lg max-h-40 overflow-y-auto">
+                        <div className="absolute z-10 w-full mt-1 bg-white border border-[var(--stitch-line)] shadow-lg max-h-40 overflow-y-auto">
                           {customers.map((c) => (
                             <button
                               key={c.id}
                               type="button"
                               onClick={() => selectCustomer(c)}
-                              className="w-full p-3 text-left hover:bg-[#F5F3F0] flex items-center gap-3"
+                              className="w-full p-3 text-left hover:bg-[var(--stitch-soft)] flex items-center gap-3"
                             >
-                              <div className="w-8 h-8 bg-[#04473C] text-white flex items-center justify-center text-sm font-medium">
+                              <div className="w-8 h-8 bg-[var(--stitch-ink)] text-white flex items-center justify-center text-sm font-medium">
                                 {c.name?.[0] || '?'}
                               </div>
                               <div>
                                 <p className="font-medium text-sm">{c.name}</p>
-                                <p className="text-xs text-[#4A4D53]">{c.phone}</p>
+                                <p className="text-xs text-[var(--stitch-muted)]">{c.phone}</p>
                               </div>
                             </button>
                           ))}
@@ -285,7 +285,7 @@ const ManualVisitPanel = () => {
                         type="text"
                         value={formData.customer_name}
                         onChange={(e) => setFormData({ ...formData, customer_name: e.target.value })}
-                        className="premium-input"
+                        className="stitch-input"
                         placeholder="Full name"
                         required
                       />
@@ -294,9 +294,9 @@ const ManualVisitPanel = () => {
                 </div>
 
                 {/* Pickup Location */}
-                <div className="bg-[#E6F0EE] p-4 space-y-4 border border-[#04473C]/20">
+                <div className="bg-[var(--stitch-soft)] p-4 space-y-4 border border-[var(--stitch-ink)]/20">
                   <h4 className="font-medium flex items-center gap-2">
-                    <MapPin className="w-4 h-4 text-[#04473C]" />
+                    <MapPin className="w-4 h-4 text-[var(--stitch-ink)]" />
                     Pickup Location (for GPS Navigation)
                   </h4>
                   <div>
@@ -304,10 +304,10 @@ const ManualVisitPanel = () => {
                       type="text"
                       value={formData.pickup_location}
                       onChange={(e) => setFormData({ ...formData, pickup_location: e.target.value })}
-                      className="premium-input"
+                      className="stitch-input"
                       placeholder="Enter customer pickup address (e.g., Sector 17, Chandigarh)"
                     />
-                    <p className="text-xs text-[#4A4D53] mt-1">
+                    <p className="text-xs text-[var(--stitch-muted)] mt-1">
                       If left empty, rider will navigate to the first property address
                     </p>
                   </div>
@@ -329,7 +329,7 @@ const ManualVisitPanel = () => {
                         );
                       }
                     }}
-                    className="text-sm text-[#04473C] hover:underline flex items-center gap-1"
+                    className="text-sm text-[var(--stitch-ink)] hover:underline flex items-center gap-1"
                   >
                     <MapPin className="w-3 h-3" /> Use Current Location
                   </button>
@@ -339,16 +339,16 @@ const ManualVisitPanel = () => {
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <h4 className="font-medium flex items-center gap-2">
-                      <Home className="w-4 h-4 text-[#04473C]" />
+                      <Home className="w-4 h-4 text-[var(--stitch-ink)]" />
                       Select Properties ({formData.property_ids.length}/5)
                     </h4>
                     <div className="relative w-64">
-                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#4A4D53]" />
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--stitch-muted)]" />
                       <input
                         type="text"
                         value={searchProperty}
                         onChange={(e) => setSearchProperty(e.target.value)}
-                        className="premium-input pl-10 py-2 text-sm"
+                        className="stitch-input pl-10 py-2 text-sm"
                         placeholder="Search properties..."
                       />
                     </div>
@@ -366,18 +366,18 @@ const ManualVisitPanel = () => {
                           whileTap={{ scale: 0.98 }}
                           className={`p-3 text-left border transition-all ${
                             isSelected 
-                              ? 'border-[#04473C] bg-[#E6F0EE]' 
-                              : 'border-[#E5E1DB] hover:border-[#04473C]/50'
+                              ? 'border-[var(--stitch-ink)] bg-[var(--stitch-soft)]' 
+                              : 'border-[var(--stitch-line)] hover:border-[var(--stitch-ink)]/50'
                           }`}
                         >
                           <div className="flex items-start justify-between">
                             <div className="flex-1 min-w-0">
                               <p className="font-medium text-sm truncate">{property.title}</p>
-                              <p className="text-xs text-[#4A4D53] truncate">{property.area_name}, {property.city}</p>
-                              <p className="text-xs font-medium text-[#04473C]">₹{property.rent?.toLocaleString()}/mo</p>
+                              <p className="text-xs text-[var(--stitch-muted)] truncate">{property.area_name}, {property.city}</p>
+                              <p className="text-xs font-medium text-[var(--stitch-ink)]">₹{property.rent?.toLocaleString()}/mo</p>
                             </div>
                             {isSelected && (
-                              <Check className="w-5 h-5 text-[#04473C] flex-shrink-0" />
+                              <Check className="w-5 h-5 text-[var(--stitch-ink)] flex-shrink-0" />
                             )}
                           </div>
                         </motion.button>
@@ -386,7 +386,7 @@ const ManualVisitPanel = () => {
                   </div>
                   
                   {formData.property_ids.length > 0 && (
-                    <div className="bg-[#04473C] text-white p-3 flex items-center justify-between">
+                    <div className="bg-[var(--stitch-ink)] text-white p-3 flex items-center justify-between">
                       <span>{formData.property_ids.length} properties selected</span>
                       <span className="font-bold">Amount: ₹{calculateAmount()}</span>
                     </div>
@@ -396,9 +396,9 @@ const ManualVisitPanel = () => {
                 {/* Schedule & Payment */}
                 <div className="grid md:grid-cols-2 gap-6">
                   {/* Schedule */}
-                  <div className="bg-[#F5F3F0] p-4 space-y-4">
+                  <div className="bg-[var(--stitch-soft)] p-4 space-y-4">
                     <h4 className="font-medium flex items-center gap-2">
-                      <Calendar className="w-4 h-4 text-[#04473C]" />
+                      <Calendar className="w-4 h-4 text-[var(--stitch-ink)]" />
                       Visit Schedule
                     </h4>
                     
@@ -410,7 +410,7 @@ const ManualVisitPanel = () => {
                           value={formData.preferred_date}
                           onChange={(e) => setFormData({ ...formData, preferred_date: e.target.value })}
                           min={getMinDate()}
-                          className="premium-input"
+                          className="stitch-input"
                           required
                         />
                       </div>
@@ -420,7 +420,7 @@ const ManualVisitPanel = () => {
                         <select
                           value={formData.preferred_time}
                           onChange={(e) => setFormData({ ...formData, preferred_time: e.target.value })}
-                          className="premium-input"
+                          className="stitch-input"
                         >
                           <option value="09:00">9:00 AM - 11:00 AM</option>
                           <option value="11:00">11:00 AM - 1:00 PM</option>
@@ -432,9 +432,9 @@ const ManualVisitPanel = () => {
                   </div>
 
                   {/* Payment */}
-                  <div className="bg-[#F5F3F0] p-4 space-y-4">
+                  <div className="bg-[var(--stitch-soft)] p-4 space-y-4">
                     <h4 className="font-medium flex items-center gap-2">
-                      <CreditCard className="w-4 h-4 text-[#04473C]" />
+                      <CreditCard className="w-4 h-4 text-[var(--stitch-ink)]" />
                       Payment Details
                     </h4>
                     
@@ -444,7 +444,7 @@ const ManualVisitPanel = () => {
                         <select
                           value={formData.payment_method}
                           onChange={(e) => setFormData({ ...formData, payment_method: e.target.value })}
-                          className="premium-input"
+                          className="stitch-input"
                         >
                           <option value="qr_code">QR Code Payment</option>
                           <option value="cash">Cash</option>
@@ -456,12 +456,12 @@ const ManualVisitPanel = () => {
                       <div>
                         <label className="block text-sm font-medium mb-1">Amount Received (₹)</label>
                         <div className="relative">
-                          <IndianRupee className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#4A4D53]" />
+                          <IndianRupee className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--stitch-muted)]" />
                           <input
                             type="number"
                             value={formData.payment_amount || calculateAmount()}
                             onChange={(e) => setFormData({ ...formData, payment_amount: e.target.value })}
-                            className="premium-input pl-10"
+                            className="stitch-input pl-10"
                             placeholder={calculateAmount().toString()}
                           />
                         </div>
@@ -473,7 +473,7 @@ const ManualVisitPanel = () => {
                           type="text"
                           value={formData.payment_reference}
                           onChange={(e) => setFormData({ ...formData, payment_reference: e.target.value })}
-                          className="premium-input"
+                          className="stitch-input"
                           placeholder="UPI ref or receipt number"
                         />
                       </div>
@@ -484,7 +484,7 @@ const ManualVisitPanel = () => {
                 {/* Rider Assignment (Optional) */}
                 <div className="space-y-4">
                   <h4 className="font-medium flex items-center gap-2">
-                    <Bike className="w-4 h-4 text-[#04473C]" />
+                    <Bike className="w-4 h-4 text-[var(--stitch-ink)]" />
                     Assign Rider (Optional)
                   </h4>
                   
@@ -494,12 +494,12 @@ const ManualVisitPanel = () => {
                       onClick={() => setFormData({ ...formData, assigned_rider_id: '' })}
                       className={`p-3 border text-center transition-all ${
                         !formData.assigned_rider_id 
-                          ? 'border-[#04473C] bg-[#E6F0EE]' 
-                          : 'border-[#E5E1DB] hover:border-[#04473C]/50'
+                          ? 'border-[var(--stitch-ink)] bg-[var(--stitch-soft)]' 
+                          : 'border-[var(--stitch-line)] hover:border-[var(--stitch-ink)]/50'
                       }`}
                     >
                       <p className="font-medium text-sm">Auto Assign</p>
-                      <p className="text-xs text-[#4A4D53]">System will assign</p>
+                      <p className="text-xs text-[var(--stitch-muted)]">System will assign</p>
                     </button>
                     
                     {riders.slice(0, 7).map((rider) => (
@@ -509,12 +509,12 @@ const ManualVisitPanel = () => {
                         onClick={() => setFormData({ ...formData, assigned_rider_id: rider.id })}
                         className={`p-3 border text-left transition-all ${
                           formData.assigned_rider_id === rider.id 
-                            ? 'border-[#04473C] bg-[#E6F0EE]' 
-                            : 'border-[#E5E1DB] hover:border-[#04473C]/50'
+                            ? 'border-[var(--stitch-ink)] bg-[var(--stitch-soft)]' 
+                            : 'border-[var(--stitch-line)] hover:border-[var(--stitch-ink)]/50'
                         }`}
                       >
                         <p className="font-medium text-sm truncate">{rider.name}</p>
-                        <p className="text-xs text-[#4A4D53]">{rider.phone}</p>
+                        <p className="text-xs text-[var(--stitch-muted)]">{rider.phone}</p>
                         <p className="text-xs text-green-600">● Online</p>
                       </button>
                     ))}
@@ -527,15 +527,15 @@ const ManualVisitPanel = () => {
                   <textarea
                     value={formData.notes}
                     onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                    className="premium-input"
+                    className="stitch-input"
                     rows={2}
                     placeholder="Any special instructions or notes..."
                   />
                 </div>
 
                 {/* Submit */}
-                <div className="flex items-center justify-between pt-4 border-t border-[#E5E1DB]">
-                  <div className="text-sm text-[#4A4D53]">
+                <div className="flex items-center justify-between pt-4 border-t border-[var(--stitch-line)]">
+                  <div className="text-sm text-[var(--stitch-muted)]">
                     <AlertCircle className="w-4 h-4 inline mr-1" />
                     Customer will receive SMS notification after creation
                   </div>
@@ -543,7 +543,7 @@ const ManualVisitPanel = () => {
                     <button
                       type="button"
                       onClick={() => setShowCreateForm(false)}
-                      className="btn-secondary"
+                      className="stitch-button stitch-button-secondary"
                     >
                       Cancel
                     </button>
@@ -552,7 +552,7 @@ const ManualVisitPanel = () => {
                       disabled={loading}
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
-                      className="btn-primary flex items-center gap-2"
+                      className="stitch-button flex items-center gap-2"
                     >
                       {loading ? (
                         <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -570,28 +570,28 @@ const ManualVisitPanel = () => {
       </AnimatePresence>
 
       {/* Recent Manual Visits */}
-      <div className="bg-white border border-[#E5E1DB]">
-        <div className="p-4 border-b border-[#E5E1DB]">
+      <div className="bg-white border border-[var(--stitch-line)]">
+        <div className="p-4 border-b border-[var(--stitch-line)]">
           <h3 className="font-medium">Recent Manual Visits</h3>
         </div>
         
         {recentVisits.length > 0 ? (
-          <div className="divide-y divide-[#E5E1DB]">
+          <div className="divide-y divide-[var(--stitch-line)]">
             {recentVisits.map((visit) => (
               <div key={visit.id} className="p-4 flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 bg-[#04473C] text-white flex items-center justify-center font-medium">
+                  <div className="w-10 h-10 bg-[var(--stitch-ink)] text-white flex items-center justify-center font-medium">
                     {visit.customer_name?.[0] || '?'}
                   </div>
                   <div>
                     <p className="font-medium">{visit.customer_name}</p>
-                    <p className="text-sm text-[#4A4D53]">
+                    <p className="text-sm text-[var(--stitch-muted)]">
                       {visit.property_count} properties • {visit.preferred_date}
                     </p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="font-medium text-[#04473C]">₹{visit.payment_amount}</p>
+                  <p className="font-medium text-[var(--stitch-ink)]">₹{visit.payment_amount}</p>
                   <p className={`text-xs ${
                     visit.status === 'completed' ? 'text-green-600' :
                     visit.status === 'assigned' ? 'text-blue-600' : 'text-orange-600'
@@ -603,7 +603,7 @@ const ManualVisitPanel = () => {
             ))}
           </div>
         ) : (
-          <div className="p-8 text-center text-[#4A4D53]">
+          <div className="p-8 text-center text-[var(--stitch-muted)]">
             <QrCode className="w-12 h-12 mx-auto mb-2 opacity-30" />
             <p>No manual visits created yet</p>
             <p className="text-sm">Create visits for QR code payments here</p>

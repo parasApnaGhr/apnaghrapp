@@ -126,8 +126,8 @@ const RiderApplicationsPanel = () => {
       {/* Stats Cards */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
         <div className="bg-white rounded-xl p-4 border border-gray-200">
-          <div className="text-2xl font-bold text-gray-900">{stats?.total || 0}</div>
-          <div className="text-sm text-gray-500">Total Applications</div>
+          <div className="text-2xl font-bold text-[var(--stitch-ink)]">{stats?.total || 0}</div>
+          <div className="text-sm text-[var(--stitch-muted)]">Total Applications</div>
         </div>
         <div className="bg-yellow-50 rounded-xl p-4 border border-yellow-200">
           <div className="text-2xl font-bold text-yellow-700">{stats?.by_status?.pending || 0}</div>
@@ -143,7 +143,7 @@ const RiderApplicationsPanel = () => {
         </div>
         <div className="bg-gray-100 rounded-xl p-4 border border-gray-300">
           <div className="text-2xl font-bold text-gray-700">{stats?.by_status?.banned || 0}</div>
-          <div className="text-sm text-gray-600">Banned</div>
+          <div className="text-sm text-[var(--stitch-muted)]">Banned</div>
         </div>
       </div>
 
@@ -158,7 +158,7 @@ const RiderApplicationsPanel = () => {
                 placeholder="Search by name, phone, city..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#04473C] focus:border-transparent"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--stitch-ink)] focus:border-transparent"
               />
             </div>
           </div>
@@ -166,7 +166,7 @@ const RiderApplicationsPanel = () => {
           <select
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#04473C] bg-white"
+            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--stitch-ink)] bg-white"
           >
             <option value="all">All Status</option>
             <option value="pending">Pending</option>
@@ -181,12 +181,12 @@ const RiderApplicationsPanel = () => {
             placeholder="Filter by city"
             value={cityFilter}
             onChange={(e) => setCityFilter(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#04473C] w-40"
+            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--stitch-ink)] w-40"
           />
 
           <button
             onClick={() => { fetchApplications(); fetchStats(); }}
-            className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg"
+            className="p-2 text-[var(--stitch-muted)] hover:bg-gray-100 rounded-lg"
             title="Refresh"
           >
             <RefreshCw className="w-5 h-5" />
@@ -198,16 +198,16 @@ const RiderApplicationsPanel = () => {
       <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
         {loading ? (
           <div className="flex items-center justify-center py-12">
-            <Loader2 className="w-8 h-8 animate-spin text-[#04473C]" />
+            <Loader2 className="w-8 h-8 animate-spin text-[var(--stitch-ink)]" />
           </div>
         ) : filteredApps.length === 0 ? (
-          <div className="text-center py-12 text-gray-500">
+          <div className="text-center py-12 text-[var(--stitch-muted)]">
             No applications found
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
+              <thead className="bg-[var(--stitch-soft)] border-b border-gray-200">
                 <tr>
                   <th className="text-left px-4 py-3 text-sm font-semibold text-gray-700">Applicant</th>
                   <th className="text-left px-4 py-3 text-sm font-semibold text-gray-700">Contact</th>
@@ -220,7 +220,7 @@ const RiderApplicationsPanel = () => {
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {filteredApps.map((app) => (
-                  <tr key={app.id} className="hover:bg-gray-50">
+                  <tr key={app.id} className="hover:bg-[var(--stitch-soft)]">
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
                         {app.selfie_url ? (
@@ -231,17 +231,17 @@ const RiderApplicationsPanel = () => {
                           />
                         ) : (
                           <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
-                            <Users className="w-5 h-5 text-gray-500" />
+                            <Users className="w-5 h-5 text-[var(--stitch-muted)]" />
                           </div>
                         )}
                         <div>
-                          <div className="font-medium text-gray-900">{app.full_name}</div>
-                          <div className="text-sm text-gray-500">{app.availability?.replace('_', ' ')}</div>
+                          <div className="font-medium text-[var(--stitch-ink)]">{app.full_name}</div>
+                          <div className="text-sm text-[var(--stitch-muted)]">{app.availability?.replace('_', ' ')}</div>
                         </div>
                       </div>
                     </td>
                     <td className="px-4 py-3">
-                      <div className="text-sm text-gray-900">+91 {app.mobile}</div>
+                      <div className="text-sm text-[var(--stitch-ink)]">+91 {app.mobile}</div>
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-1 text-sm text-gray-700">
@@ -250,21 +250,21 @@ const RiderApplicationsPanel = () => {
                       </div>
                     </td>
                     <td className="px-4 py-3">
-                      <span className={`text-sm ${app.has_vehicle ? 'text-green-600' : 'text-gray-500'}`}>
+                      <span className={`text-sm ${app.has_vehicle ? 'text-green-600' : 'text-[var(--stitch-muted)]'}`}>
                         {app.has_vehicle ? 'Yes' : 'No'}
                       </span>
                     </td>
                     <td className="px-4 py-3">
                       <StatusBadge status={app.status} />
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-500">
+                    <td className="px-4 py-3 text-sm text-[var(--stitch-muted)]">
                       {new Date(app.created_at).toLocaleDateString()}
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center justify-end gap-2">
                         <button
                           onClick={() => setSelectedApp(app)}
-                          className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg"
+                          className="p-2 text-[var(--stitch-muted)] hover:bg-gray-100 rounded-lg"
                           title="View Details"
                         >
                           <Eye className="w-4 h-4" />
@@ -297,7 +297,7 @@ const RiderApplicationsPanel = () => {
                           <button
                             onClick={() => handleBan(app.id)}
                             disabled={actionLoading === app.id}
-                            className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg"
+                            className="p-2 text-[var(--stitch-muted)] hover:bg-gray-100 rounded-lg"
                             title="Ban Rider"
                           >
                             <Ban className="w-4 h-4" />
@@ -318,7 +318,7 @@ const RiderApplicationsPanel = () => {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="sticky top-0 bg-white border-b border-gray-200 p-4 flex items-center justify-between">
-              <h2 className="text-xl font-bold text-gray-900">Application Details</h2>
+              <h2 className="text-xl font-bold text-[var(--stitch-ink)]">Application Details</h2>
               <button
                 onClick={() => setSelectedApp(null)}
                 className="p-2 hover:bg-gray-100 rounded-lg"
@@ -342,38 +342,38 @@ const RiderApplicationsPanel = () => {
                   </div>
                 )}
                 <div>
-                  <h3 className="text-xl font-bold text-gray-900">{selectedApp.full_name}</h3>
-                  <p className="text-gray-600">{selectedApp.city}</p>
+                  <h3 className="text-xl font-bold text-[var(--stitch-ink)]">{selectedApp.full_name}</h3>
+                  <p className="text-[var(--stitch-muted)]">{selectedApp.city}</p>
                   <StatusBadge status={selectedApp.status} />
                 </div>
               </div>
 
               {/* Contact */}
-              <div className="bg-gray-50 rounded-xl p-4">
-                <h4 className="font-semibold text-gray-900 mb-3">Contact Information</h4>
+              <div className="bg-[var(--stitch-soft)] rounded-xl p-4">
+                <h4 className="font-semibold text-[var(--stitch-ink)] mb-3">Contact Information</h4>
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
-                    <span className="text-gray-500">Mobile:</span>
-                    <span className="ml-2 text-gray-900">+91 {selectedApp.mobile}</span>
+                    <span className="text-[var(--stitch-muted)]">Mobile:</span>
+                    <span className="ml-2 text-[var(--stitch-ink)]">+91 {selectedApp.mobile}</span>
                   </div>
                   <div>
-                    <span className="text-gray-500">WhatsApp:</span>
-                    <span className="ml-2 text-gray-900">{selectedApp.whatsapp || 'Same as mobile'}</span>
+                    <span className="text-[var(--stitch-muted)]">WhatsApp:</span>
+                    <span className="ml-2 text-[var(--stitch-ink)]">{selectedApp.whatsapp || 'Same as mobile'}</span>
                   </div>
                   <div>
-                    <span className="text-gray-500">City:</span>
-                    <span className="ml-2 text-gray-900">{selectedApp.city}</span>
+                    <span className="text-[var(--stitch-muted)]">City:</span>
+                    <span className="ml-2 text-[var(--stitch-ink)]">{selectedApp.city}</span>
                   </div>
                   <div>
-                    <span className="text-gray-500">Areas:</span>
-                    <span className="ml-2 text-gray-900">{selectedApp.areas?.join(', ') || 'All areas'}</span>
+                    <span className="text-[var(--stitch-muted)]">Areas:</span>
+                    <span className="ml-2 text-[var(--stitch-ink)]">{selectedApp.areas?.join(', ') || 'All areas'}</span>
                   </div>
                 </div>
               </div>
 
               {/* Documents */}
-              <div className="bg-gray-50 rounded-xl p-4">
-                <h4 className="font-semibold text-gray-900 mb-3">Documents</h4>
+              <div className="bg-[var(--stitch-soft)] rounded-xl p-4">
+                <h4 className="font-semibold text-[var(--stitch-ink)] mb-3">Documents</h4>
                 <div className="grid grid-cols-2 gap-4">
                   {selectedApp.aadhaar_url && (
                     <a
@@ -427,50 +427,50 @@ const RiderApplicationsPanel = () => {
               </div>
 
               {/* Work Details */}
-              <div className="bg-gray-50 rounded-xl p-4">
-                <h4 className="font-semibold text-gray-900 mb-3">Work Details</h4>
+              <div className="bg-[var(--stitch-soft)] rounded-xl p-4">
+                <h4 className="font-semibold text-[var(--stitch-ink)] mb-3">Work Details</h4>
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
-                    <span className="text-gray-500">Vehicle:</span>
-                    <span className={`ml-2 ${selectedApp.has_vehicle ? 'text-green-600' : 'text-gray-900'}`}>
+                    <span className="text-[var(--stitch-muted)]">Vehicle:</span>
+                    <span className={`ml-2 ${selectedApp.has_vehicle ? 'text-green-600' : 'text-[var(--stitch-ink)]'}`}>
                       {selectedApp.has_vehicle ? 'Yes' : 'No'}
                     </span>
                   </div>
                   <div>
-                    <span className="text-gray-500">Availability:</span>
-                    <span className="ml-2 text-gray-900">
+                    <span className="text-[var(--stitch-muted)]">Availability:</span>
+                    <span className="ml-2 text-[var(--stitch-ink)]">
                       {selectedApp.availability?.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
                     </span>
                   </div>
                   {selectedApp.experience && (
                     <div className="col-span-2">
-                      <span className="text-gray-500">Experience:</span>
-                      <p className="mt-1 text-gray-900">{selectedApp.experience}</p>
+                      <span className="text-[var(--stitch-muted)]">Experience:</span>
+                      <p className="mt-1 text-[var(--stitch-ink)]">{selectedApp.experience}</p>
                     </div>
                   )}
                 </div>
               </div>
 
               {/* Payment Details */}
-              <div className="bg-gray-50 rounded-xl p-4">
-                <h4 className="font-semibold text-gray-900 mb-3">Payment Details</h4>
+              <div className="bg-[var(--stitch-soft)] rounded-xl p-4">
+                <h4 className="font-semibold text-[var(--stitch-ink)] mb-3">Payment Details</h4>
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
-                    <span className="text-gray-500">UPI ID:</span>
-                    <span className="ml-2 text-gray-900">{selectedApp.upi_id}</span>
+                    <span className="text-[var(--stitch-muted)]">UPI ID:</span>
+                    <span className="ml-2 text-[var(--stitch-ink)]">{selectedApp.upi_id}</span>
                   </div>
                   {selectedApp.bank_name && (
                     <div>
-                      <span className="text-gray-500">Bank:</span>
-                      <span className="ml-2 text-gray-900">{selectedApp.bank_name}</span>
+                      <span className="text-[var(--stitch-muted)]">Bank:</span>
+                      <span className="ml-2 text-[var(--stitch-ink)]">{selectedApp.bank_name}</span>
                     </div>
                   )}
                 </div>
               </div>
 
               {/* Legal Agreements */}
-              <div className="bg-gray-50 rounded-xl p-4">
-                <h4 className="font-semibold text-gray-900 mb-3">Legal Agreements</h4>
+              <div className="bg-[var(--stitch-soft)] rounded-xl p-4">
+                <h4 className="font-semibold text-[var(--stitch-ink)] mb-3">Legal Agreements</h4>
                 <div className="flex flex-wrap gap-2">
                   {selectedApp.legal_agreements?.non_circumvention && (
                     <span className="px-2 py-1 bg-green-100 text-green-700 rounded text-xs">Non-Circumvention ✓</span>
@@ -489,7 +489,7 @@ const RiderApplicationsPanel = () => {
                   )}
                 </div>
                 {selectedApp.legal_agreements?.agreed_at && (
-                  <p className="text-xs text-gray-500 mt-2">
+                  <p className="text-xs text-[var(--stitch-muted)] mt-2">
                     Agreed on: {new Date(selectedApp.legal_agreements.agreed_at).toLocaleString()}
                   </p>
                 )}

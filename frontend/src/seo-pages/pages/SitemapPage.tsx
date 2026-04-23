@@ -42,19 +42,19 @@ const SitemapPage = () => {
           <div className="max-w-7xl mx-auto px-4 py-4">
             <div className="flex items-center justify-between">
               <Link to="/" className="flex items-center gap-2">
-                <Home className="w-6 h-6 text-[#04473C]" />
-                <span className="font-bold text-xl text-[#04473C]">ApnaGhr</span>
+                <Home className="w-6 h-6 text-[var(--stitch-ink)]" />
+                <span className="font-bold text-xl text-[var(--stitch-ink)]">ApnaGhr</span>
               </Link>
               
               <nav className="hidden md:flex items-center gap-6">
-                <Link to="/rent/flats-in-mohali" className="text-gray-600 hover:text-[#04473C]">Rent</Link>
-                <Link to="/buy/flats-in-mohali" className="text-gray-600 hover:text-[#04473C]">Buy</Link>
-                <Link to="/blogs" className="text-gray-600 hover:text-[#04473C]">Blog</Link>
+                <Link to="/rent/flats-in-mohali" className="text-gray-600 hover:text-[var(--stitch-ink)]">Rent</Link>
+                <Link to="/buy/flats-in-mohali" className="text-gray-600 hover:text-[var(--stitch-ink)]">Buy</Link>
+                <Link to="/blogs" className="text-gray-600 hover:text-[var(--stitch-ink)]">Blog</Link>
               </nav>
 
               <Link
                 to="/"
-                className="px-4 py-2 bg-[#04473C] text-white rounded-lg text-sm font-medium hover:bg-[#033530]"
+                className="px-4 py-2 bg-[var(--stitch-ink)] text-white rounded-lg text-sm font-medium hover:bg-[var(--stitch-ink)]"
               >
                 Book Visit
               </Link>
@@ -88,7 +88,7 @@ const SitemapPage = () => {
                 onClick={() => setActiveTab(type.slug)}
                 className={`px-4 py-3 font-medium text-sm border-b-2 transition-colors ${
                   activeTab === type.slug
-                    ? 'border-[#04473C] text-[#04473C]'
+                    ? 'border-[var(--stitch-ink)] text-[var(--stitch-ink)]'
                     : 'border-transparent text-gray-500 hover:text-gray-700'
                 }`}
               >
@@ -99,7 +99,7 @@ const SitemapPage = () => {
               onClick={() => setActiveTab('blogs')}
               className={`px-4 py-3 font-medium text-sm border-b-2 transition-colors ${
                 activeTab === 'blogs'
-                  ? 'border-[#04473C] text-[#04473C]'
+                  ? 'border-[var(--stitch-ink)] text-[var(--stitch-ink)]'
                   : 'border-transparent text-gray-500 hover:text-gray-700'
               }`}
             >
@@ -111,7 +111,7 @@ const SitemapPage = () => {
           {activeTab === 'blogs' ? (
             <div className="bg-white rounded-xl border border-gray-200 p-6">
               <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <FileText className="w-5 h-5 text-[#04473C]" />
+                <FileText className="w-5 h-5 text-[var(--stitch-ink)]" />
                 Blog Articles ({BLOGS.length})
               </h2>
 
@@ -128,7 +128,7 @@ const SitemapPage = () => {
                           <li key={blog.id}>
                             <Link
                               to={`/blogs/${blog.slug}`}
-                              className="text-[#04473C] hover:underline text-sm flex items-center gap-1"
+                              className="text-[var(--stitch-ink)] hover:underline text-sm flex items-center gap-1"
                             >
                               <ChevronRight className="w-3 h-3" />
                               {blog.title}
@@ -153,8 +153,8 @@ const SitemapPage = () => {
                     className="w-full p-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-[#04473C]/10 rounded-lg flex items-center justify-center">
-                        <MapPin className="w-5 h-5 text-[#04473C]" />
+                      <div className="w-10 h-10 bg-[var(--stitch-ink)]/10 rounded-lg flex items-center justify-center">
+                        <MapPin className="w-5 h-5 text-[var(--stitch-ink)]" />
                       </div>
                       <div className="text-left">
                         <h3 className="font-semibold text-gray-900">{city.name}</h3>
@@ -172,7 +172,7 @@ const SitemapPage = () => {
                       <div>
                         <Link
                           to={`/${activeTab}/flats-in-${city.slug}`}
-                          className="text-[#04473C] font-medium hover:underline flex items-center gap-1"
+                          className="text-[var(--stitch-ink)] font-medium hover:underline flex items-center gap-1"
                         >
                           <Building className="w-4 h-4" />
                           All Flats in {city.name}
@@ -187,7 +187,7 @@ const SitemapPage = () => {
                             <li key={propType.slug}>
                               <Link
                                 to={`/${activeTab}/${propType.slug}-in-${city.slug}`}
-                                className="text-sm text-[#04473C] hover:underline flex items-center gap-1"
+                                className="text-sm text-[var(--stitch-ink)] hover:underline flex items-center gap-1"
                               >
                                 <ChevronRight className="w-3 h-3" />
                                 {propType.name} in {city.name}
@@ -206,7 +206,7 @@ const SitemapPage = () => {
                               <li key={area.slug}>
                                 <Link
                                   to={`/${activeTab}/flats-in-${area.slug}-${city.slug}`}
-                                  className="text-sm text-[#04473C] hover:underline flex items-center gap-1"
+                                  className="text-sm text-[var(--stitch-ink)] hover:underline flex items-center gap-1"
                                 >
                                   <ChevronRight className="w-3 h-3" />
                                   {area.name}
@@ -229,25 +229,25 @@ const SitemapPage = () => {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <Link
                 to="/rent/flats-in-mohali"
-                className="p-3 bg-gray-50 rounded-lg hover:bg-[#04473C]/5 transition-colors text-center"
+                className="p-3 bg-gray-50 rounded-lg hover:bg-[var(--stitch-ink)]/5 transition-colors text-center"
               >
                 <span className="block font-medium text-gray-900">Rent in Mohali</span>
               </Link>
               <Link
                 to="/buy/flats-in-mohali"
-                className="p-3 bg-gray-50 rounded-lg hover:bg-[#04473C]/5 transition-colors text-center"
+                className="p-3 bg-gray-50 rounded-lg hover:bg-[var(--stitch-ink)]/5 transition-colors text-center"
               >
                 <span className="block font-medium text-gray-900">Buy in Mohali</span>
               </Link>
               <Link
                 to="/rent/flats-in-chandigarh"
-                className="p-3 bg-gray-50 rounded-lg hover:bg-[#04473C]/5 transition-colors text-center"
+                className="p-3 bg-gray-50 rounded-lg hover:bg-[var(--stitch-ink)]/5 transition-colors text-center"
               >
                 <span className="block font-medium text-gray-900">Rent in Chandigarh</span>
               </Link>
               <Link
                 to="/blogs"
-                className="p-3 bg-gray-50 rounded-lg hover:bg-[#04473C]/5 transition-colors text-center"
+                className="p-3 bg-gray-50 rounded-lg hover:bg-[var(--stitch-ink)]/5 transition-colors text-center"
               >
                 <span className="block font-medium text-gray-900">Real Estate Blog</span>
               </Link>

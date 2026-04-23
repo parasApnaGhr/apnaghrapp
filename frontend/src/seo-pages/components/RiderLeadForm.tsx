@@ -100,7 +100,7 @@ const RiderLeadForm = ({ source = 'seo_page', city = null }) => {
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               placeholder="Enter your full name"
-              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#04473C] focus:border-transparent"
+              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--stitch-ink)] focus:border-transparent"
               required
             />
           </div>
@@ -121,7 +121,7 @@ const RiderLeadForm = ({ source = 'seo_page', city = null }) => {
               value={formData.phone}
               onChange={(e) => setFormData({ ...formData, phone: e.target.value.replace(/\D/g, '').slice(0, 10) })}
               placeholder="Enter 10-digit number"
-              className="w-full pl-24 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#04473C] focus:border-transparent"
+              className="w-full pl-24 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--stitch-ink)] focus:border-transparent"
               required
             />
           </div>
@@ -137,7 +137,7 @@ const RiderLeadForm = ({ source = 'seo_page', city = null }) => {
             <select
               value={formData.city}
               onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#04473C] focus:border-transparent appearance-none bg-white"
+              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--stitch-ink)] focus:border-transparent appearance-none bg-white"
               required
             >
               <option value="">Select your city</option>
@@ -247,7 +247,7 @@ const RiderLeadForm = ({ source = 'seo_page', city = null }) => {
               type="checkbox"
               checked={formData.hasVehicle}
               onChange={(e) => setFormData({ ...formData, hasVehicle: e.target.checked })}
-              className="w-5 h-5 rounded border-gray-300 text-[#04473C] focus:ring-[#04473C]"
+              className="w-5 h-5 rounded border-gray-300 text-[var(--stitch-ink)] focus:ring-[var(--stitch-ink)]"
             />
             <span className="text-gray-700">I have a two-wheeler (bike/scooter)</span>
           </label>
@@ -257,7 +257,7 @@ const RiderLeadForm = ({ source = 'seo_page', city = null }) => {
               type="checkbox"
               checked={formData.hasLicense}
               onChange={(e) => setFormData({ ...formData, hasLicense: e.target.checked })}
-              className="w-5 h-5 rounded border-gray-300 text-[#04473C] focus:ring-[#04473C]"
+              className="w-5 h-5 rounded border-gray-300 text-[var(--stitch-ink)] focus:ring-[var(--stitch-ink)]"
             />
             <span className="text-gray-700">I have a valid driving license</span>
           </label>
@@ -267,7 +267,7 @@ const RiderLeadForm = ({ source = 'seo_page', city = null }) => {
         <button
           type="submit"
           disabled={status === 'loading'}
-          className="w-full py-4 bg-[#04473C] text-white rounded-xl font-bold text-lg hover:bg-[#033530] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          className="w-full py-4 bg-[var(--stitch-ink)] text-white rounded-xl font-bold text-lg hover:bg-[var(--stitch-ink)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
         >
           {status === 'loading' ? (
             <>
