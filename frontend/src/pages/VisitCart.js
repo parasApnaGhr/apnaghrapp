@@ -1,15 +1,33 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { paymentAPI, getMediaUrl, authAPI } from '../utils/api';
+import { paymentAPI, getMediaUrl, authAPI, visitAPI } from '../utils/api';
 import { initiateCashfreePayment } from '../utils/cashfree';
-import { 
-  ArrowLeft, Trash2, MapPin, Home, Calendar, Clock, 
-  ShoppingCart, CreditCard, Check, ChevronRight, AlertTriangle, FileText, Shield
+import {
+  ArrowLeft, Trash2, MapPin, Home, Calendar, Clock,
+  ShoppingCart, CreditCard, Check, ChevronRight, AlertTriangle, FileText, Shield, Bike, Car,
+  Navigation
 } from 'lucide-react';
 import { toast } from 'sonner';
 import TermsAcceptanceModal from '../components/TermsAcceptanceModal';
+import LocationAutocomplete from '../components/LocationAutocomplete';
+
+// Convert a date (yyyy-mm-dd) + time label ("03:00 PM") into an IST ISO8601
+// string. Matches how the backend parses `scheduled_at`.
+const buildScheduledIso = (dateStr, timeLabel) => {
+  if (!dateStr || !timeLabel) return null;
+  const match = timeLabel.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+  if (!match) return null;
+  let hour = parseInt(match[1], 10);
+  const minute = parseInt(match[2], 10);
+  const period = match[3].toUpperCase();
+  if (period === 'PM' && hour !== 12) hour += 12;
+  if (period === 'AM' && hour === 12) hour = 0;
+  const hh = String(hour).padStart(2, '0');
+  const mm = String(minute).padStart(2, '0');
+  return `${dateStr}T${hh}:${mm}:00+05:30`;
+};
 
 const VisitCart = () => {
   const navigate = useNavigate();
@@ -25,15 +43,25 @@ const VisitCart = () => {
     scheduled_time: '',
     pickup_location: '',
     pickup_lat: null,
-    pickup_lng: null
+    pickup_lng: null,
+    visit_purpose: 'navigate_only'
   });
   
   const [loading, setLoading] = useState(false);
-  const [selectedPackage, setSelectedPackage] = useState(null);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [showTermsModal, setShowTermsModal] = useState(false);
   const [checkingTerms, setCheckingTerms] = useState(true);
-  const [gettingLocation, setGettingLocation] = useState(false);
+  const [sortingRoute, setSortingRoute] = useState(false);
+  const [distanceMap, setDistanceMap] = useState({});
+  const [estimate, setEstimate] = useState(null);
+  const [estimating, setEstimating] = useState(false);
+  const [estimateError, setEstimateError] = useState(null);
+  const sortedKeyRef = useRef(null);
+  const estimateKeyRef = useRef(null);
+  const useFakePaymentFlow =
+    process.env.REACT_APP_FAKE_PAYMENT_FLOW === 'true' ||
+    window.location.hostname === 'localhost' ||
+    window.location.hostname === '127.0.0.1';
 
   // Check terms status from database on mount
   useEffect(() => {
@@ -69,23 +97,124 @@ const VisitCart = () => {
   }, [cart]);
 
   useEffect(() => {
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
+    const today = new Date();
     setBookingData(prev => ({
       ...prev,
-      scheduled_date: tomorrow.toISOString().split('T')[0]
+      scheduled_date: today.toISOString().split('T')[0]
     }));
   }, []);
 
+  // Smart routing: reorder cart so the property nearest to the pickup is visited first.
+  // Runs whenever pickup coordinates or the set of cart property IDs changes.
   useEffect(() => {
-    if (cart.length === 1) {
-      setSelectedPackage('single_visit');
-    } else if (cart.length <= 3) {
-      setSelectedPackage('three_visits');
-    } else {
-      setSelectedPackage('five_visits');
+    const { pickup_lat, pickup_lng } = bookingData;
+    if (!pickup_lat || !pickup_lng || cart.length < 2) return;
+
+    const cartIds = cart.map(p => p.id).sort().join('|');
+    const key = `${pickup_lat.toFixed(5)}:${pickup_lng.toFixed(5)}|${cartIds}`;
+    if (sortedKeyRef.current === key) return;
+
+    let cancelled = false;
+    setSortingRoute(true);
+
+    visitAPI
+      .sortByPickup(cart.map(p => p.id), pickup_lat, pickup_lng)
+      .then(response => {
+        if (cancelled) return;
+        const sortedIds = response.data?.sorted_property_ids || [];
+        const distances = response.data?.distances_km || {};
+        const idToItem = Object.fromEntries(cart.map(p => [p.id, p]));
+        const reordered = sortedIds.map(id => idToItem[id]).filter(Boolean);
+        // Keep any items the backend didn't return at the end, preserving cart integrity
+        cart.forEach(item => {
+          if (!sortedIds.includes(item.id)) reordered.push(item);
+        });
+        const reorderedIds = reordered.map(p => p.id).join('|');
+        const currentIds = cart.map(p => p.id).join('|');
+        if (reorderedIds !== currentIds) {
+          setCart(reordered);
+        }
+        setDistanceMap(distances);
+        sortedKeyRef.current = key;
+      })
+      .catch(err => {
+        console.warn('Smart-distance sort failed:', err);
+      })
+      .finally(() => {
+        if (!cancelled) setSortingRoute(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [bookingData.pickup_lat, bookingData.pickup_lng, cart]);
+
+  // Live dynamic-price estimate. Re-runs whenever the inputs that affect price
+  // change (cart, pickup coords, schedule, visit purpose). Debounced so rapid
+  // typing / reorders don't hammer the backend.
+  useEffect(() => {
+    const { pickup_lat, pickup_lng, scheduled_date, scheduled_time, visit_purpose } = bookingData;
+    if (cart.length === 0 || !pickup_lat || !pickup_lng) {
+      setEstimate(null);
+      setEstimateError(null);
+      estimateKeyRef.current = null;
+      return;
     }
-  }, [cart.length]);
+
+    const propertyIds = cart.map(p => p.id);
+    const scheduledIso = scheduled_date && scheduled_time
+      ? buildScheduledIso(scheduled_date, scheduled_time)
+      : null;
+    const key = JSON.stringify({
+      propertyIds,
+      pickup_lat: Number(pickup_lat).toFixed(5),
+      pickup_lng: Number(pickup_lng).toFixed(5),
+      scheduledIso,
+      visit_purpose,
+    });
+    if (estimateKeyRef.current === key && estimate) return;
+
+    let cancelled = false;
+    setEstimating(true);
+    setEstimateError(null);
+
+    const handle = setTimeout(() => {
+      visitAPI
+        .estimatePrice({
+          property_ids: propertyIds,
+          pickup_lat,
+          pickup_lng,
+          visit_purpose: visit_purpose || 'navigate_only',
+          scheduled_at: scheduledIso || undefined,
+        })
+        .then(res => {
+          if (cancelled) return;
+          setEstimate(res.data);
+          estimateKeyRef.current = key;
+        })
+        .catch(err => {
+          if (cancelled) return;
+          console.warn('Price estimate failed:', err);
+          setEstimate(null);
+          setEstimateError(err.response?.data?.detail || 'Could not calculate price');
+        })
+        .finally(() => {
+          if (!cancelled) setEstimating(false);
+        });
+    }, 350);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(handle);
+    };
+  }, [
+    cart,
+    bookingData.pickup_lat,
+    bookingData.pickup_lng,
+    bookingData.scheduled_date,
+    bookingData.scheduled_time,
+    bookingData.visit_purpose,
+  ]);
 
   const removeFromCart = (propertyId) => {
     const newCart = cart.filter(item => item.id !== propertyId);
@@ -99,79 +228,9 @@ const VisitCart = () => {
     toast.success('Cart cleared');
   };
 
-  // Get current location for pickup
-  const getCurrentLocation = () => {
-    if (!navigator.geolocation) {
-      toast.error('Geolocation is not supported by your browser');
-      return;
-    }
-
-    setGettingLocation(true);
-    navigator.geolocation.getCurrentPosition(
-      async (position) => {
-        const { latitude, longitude } = position.coords;
-        
-        // Reverse geocode to get address
-        try {
-          const response = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
-          );
-          const data = await response.json();
-          const address = data.display_name || `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
-          
-          setBookingData(prev => ({
-            ...prev,
-            pickup_location: address,
-            pickup_lat: latitude,
-            pickup_lng: longitude
-          }));
-          toast.success('Location captured successfully!');
-        } catch (error) {
-          // If reverse geocoding fails, use coordinates
-          setBookingData(prev => ({
-            ...prev,
-            pickup_location: `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`,
-            pickup_lat: latitude,
-            pickup_lng: longitude
-          }));
-          toast.success('Location coordinates captured');
-        }
-        setGettingLocation(false);
-      },
-      (error) => {
-        setGettingLocation(false);
-        switch (error.code) {
-          case error.PERMISSION_DENIED:
-            toast.error('Please allow location access to use this feature');
-            break;
-          case error.POSITION_UNAVAILABLE:
-            toast.error('Location information unavailable');
-            break;
-          case error.TIMEOUT:
-            toast.error('Location request timed out');
-            break;
-          default:
-            toast.error('Unable to get your location');
-        }
-      },
-      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-    );
-  };
-
-  const packages = [
-    { id: 'single_visit', visits: 1, price: 200, validity: '3 days', popular: false },
-    { id: 'three_visits', visits: 3, price: 350, validity: '7 days', popular: true },
-    { id: 'five_visits', visits: 5, price: 500, validity: '10 days', popular: false }
-  ];
-
   const handlePayAndBook = async () => {
     if (cart.length === 0) {
       toast.error('Add properties to your cart first');
-      return;
-    }
-    
-    if (!selectedPackage) {
-      toast.error('Please select a visit package');
       return;
     }
 
@@ -180,34 +239,58 @@ const VisitCart = () => {
       return;
     }
 
+    if (!bookingData.pickup_lat || !bookingData.pickup_lng) {
+      toast.error('Please pick a pickup location with a valid address');
+      return;
+    }
+
+    const finalAmount = payableAmount;
+    if (!estimate || !finalAmount) {
+      toast.error('Please wait for the fare to be calculated');
+      return;
+    }
+
     if (!termsAccepted) {
       setShowTermsModal(true);
       return;
     }
 
-    // Store booking data and proceed to payment
+    const scheduledIso = buildScheduledIso(bookingData.scheduled_date, bookingData.scheduled_time);
+    const checkoutPayload = {
+      property_ids: cart.map(p => p.id),
+      pickup_lat: bookingData.pickup_lat,
+      pickup_lng: bookingData.pickup_lng,
+      visit_purpose: bookingData.visit_purpose || 'navigate_only',
+      scheduled_at: scheduledIso,
+      origin_url: window.location.origin,
+    };
 
     localStorage.setItem('pendingVisitBooking', JSON.stringify({
       property_ids: cart.map(p => p.id),
-      ...bookingData
+      visit_amount: finalAmount,
+      total_distance_km: estimate.total_distance_km,
+      checkout_payload: checkoutPayload,
+      ...bookingData,
     }));
+
+    if (useFakePaymentFlow) {
+      toast.info('Local test mode: skipping Cashfree and opening payment success directly');
+      navigate(`/payment-success?mock=1&order_id=mock_${Date.now()}&type=visit`);
+      return;
+    }
 
     setLoading(true);
     try {
-      const originUrl = window.location.origin;
-      const response = await paymentAPI.createCheckout(selectedPackage, originUrl, null);
-      
-      // Use Cashfree SDK for payment
+      const response = await paymentAPI.createVisitDynamicCheckout(checkoutPayload);
+
       const paymentSessionId = response.data.payment_session_id;
-      const returnUrl = `${originUrl}/payment-success?order_id=${response.data.order_id}`;
-      
+      const returnUrl = `${window.location.origin}/payment-success?order_id=${response.data.order_id}`;
+
       if (paymentSessionId) {
-        // Try Cashfree SDK first
         try {
           await initiateCashfreePayment(paymentSessionId, returnUrl);
         } catch (sdkError) {
           console.warn('Cashfree SDK error, falling back to redirect:', sdkError);
-          // Fallback to direct redirect if SDK fails
           if (response.data.checkout_url) {
             window.location.href = response.data.checkout_url;
           } else {
@@ -215,7 +298,6 @@ const VisitCart = () => {
           }
         }
       } else if (response.data.checkout_url) {
-        // Fallback to checkout URL
         window.location.href = response.data.checkout_url;
       } else {
         throw new Error('No payment session received');
@@ -231,7 +313,11 @@ const VisitCart = () => {
   const mins = estimatedMinutes % 60;
   const estimatedDuration = hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
 
-  const selectedPkg = packages.find(p => p.id === selectedPackage);
+  // Payable falls back to gross_amount for back-compat with older backend
+  // responses that didn't include the discount/payable fields.
+  const payableAmount = estimate
+    ? (estimate.payable_amount ?? estimate.gross_amount ?? 0)
+    : null;
 
   return (
     <div className="min-h-screen bg-[#FDFCFB] pb-32">
@@ -333,6 +419,12 @@ const VisitCart = () => {
                           {property.rent?.toLocaleString('en-IN')}
                           <span className="text-[#4A4D53] text-sm font-normal">/mo</span>
                         </p>
+                        {distanceMap[property.id] != null && (
+                          <p className="text-xs text-[#04473C] mt-1 flex items-center gap-1">
+                            <Navigation className="w-3 h-3" strokeWidth={1.5} />
+                            {distanceMap[property.id]} km from pickup
+                          </p>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -360,68 +452,150 @@ const VisitCart = () => {
                   <span className="text-[#4A4D53]">Est. Duration</span>
                   <span className="font-medium text-[#1A1C20]">{estimatedDuration}</span>
                 </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-[#4A4D53]">Smart Route</span>
+                  <span className="font-medium text-[#1A1C20] flex items-center gap-2">
+                    {sortingRoute ? (
+                      <>
+                        <span className="inline-block w-3 h-3 border-2 border-[#04473C] border-t-transparent rounded-full animate-spin" />
+                        Optimising…
+                      </>
+                    ) : bookingData.pickup_lat && bookingData.pickup_lng && cart.length > 1 ? (
+                      'Nearest first ✓'
+                    ) : (
+                      'Set pickup to sort'
+                    )}
+                  </span>
+                </div>
+              </div>
+              <div className="mt-4 pt-4 border-t border-[#04473C]/15 text-xs text-[#04473C] flex items-start gap-2">
+                <Navigation className="w-3.5 h-3.5 mt-0.5 flex-shrink-0" strokeWidth={1.5} />
+                <span>
+                  You'll be picked up from your pickup location, taken to each property in the optimised order, then dropped back at the same spot.
+                </span>
               </div>
             </div>
 
-            {/* Visit Packages */}
+            {/* Dynamic Price Breakdown */}
             <div className="bg-white border border-[#E5E1DB] p-6 mb-8">
               <h3 className="text-lg mb-2 flex items-center gap-2" style={{ fontFamily: 'Playfair Display, serif' }}>
                 <CreditCard className="w-5 h-5 text-[#04473C]" strokeWidth={1.5} />
-                Select Visit Package
+                Visit Fare
               </h3>
               <p className="text-sm text-[#4A4D53] mb-6">
-                Payment required before booking visits
+                Priced by round-trip distance, time of day, and number of properties. Bulk-visit discount applied automatically.
               </p>
-              
-              <div className="space-y-3">
-                {packages.map((pkg) => (
-                  <button
-                    key={pkg.id}
-                    onClick={() => setSelectedPackage(pkg.id)}
-                    disabled={pkg.visits < cart.length}
-                    className={`w-full p-5 border text-left transition-all relative ${
-                      selectedPackage === pkg.id
-                        ? 'border-[#04473C] bg-[#E6F0EE]'
-                        : pkg.visits < cart.length
-                          ? 'border-[#E5E1DB] bg-[#F5F3F0] opacity-50 cursor-not-allowed'
-                          : 'border-[#E5E1DB] hover:border-[#D0C9C0]'
-                    }`}
-                    data-testid={`package-${pkg.id}`}
-                  >
-                    {pkg.popular && (
-                      <span className="absolute -top-3 right-4 premium-badge">Popular</span>
-                    )}
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-4">
-                        <div className={`w-5 h-5 border flex items-center justify-center ${
-                          selectedPackage === pkg.id 
-                            ? 'border-[#04473C] bg-[#04473C]' 
-                            : 'border-[#D0C9C0]'
-                        }`}>
-                          {selectedPackage === pkg.id && <Check className="w-3 h-3 text-white" strokeWidth={2} />}
-                        </div>
-                        <div>
-                          <span className="font-medium text-[#1A1C20]">{pkg.visits} Visit{pkg.visits > 1 ? 's' : ''}</span>
-                          <span className="text-sm text-[#4A4D53] ml-2">· Valid for {pkg.validity}</span>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <span className="price-display text-xl">
-                          <span className="price-currency text-sm">₹</span>{pkg.price}
-                        </span>
-                        {pkg.visits > 1 && (
-                          <p className="text-xs text-[#4A4D53]">₹{Math.round(pkg.price / pkg.visits)}/visit</p>
-                        )}
-                      </div>
+
+              {!bookingData.pickup_lat || !bookingData.pickup_lng ? (
+                <div className="p-4 bg-[#F5F3F0] border border-[#E5E1DB] text-sm text-[#4A4D53]">
+                  Set a pickup location below to calculate your fare.
+                </div>
+              ) : estimating && !estimate ? (
+                <div className="p-4 bg-[#F5F3F0] border border-[#E5E1DB] text-sm text-[#4A4D53] flex items-center gap-2">
+                  <span className="inline-block w-3 h-3 border-2 border-[#04473C] border-t-transparent rounded-full animate-spin" />
+                  Calculating fare…
+                </div>
+              ) : estimateError ? (
+                <div className="p-4 bg-red-50 border border-red-200 text-sm text-[#8F2727]">
+                  {estimateError}
+                </div>
+              ) : estimate ? (
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-[#4A4D53]">Round-trip distance</span>
+                    <span className="font-medium text-[#1A1C20]">{estimate.total_distance_km} km</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-[#4A4D53]">Base fare</span>
+                    <span className="font-medium text-[#1A1C20]">₹{estimate.base_fare}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-[#4A4D53]">Distance charge</span>
+                    <span className="font-medium text-[#1A1C20]">₹{estimate.distance_fare}</span>
+                  </div>
+                  {estimate.distance_tier_fee > 0 && (
+                    <div className="flex justify-between">
+                      <span className="text-[#4A4D53]">
+                        Distance tier
+                        {estimate.breakdown?.distance_tier ? ` (${estimate.breakdown.distance_tier})` : ''}
+                      </span>
+                      <span className="font-medium text-[#1A1C20]">₹{estimate.distance_tier_fee}</span>
                     </div>
-                    {pkg.visits < cart.length && (
-                      <p className="text-xs text-[#8F2727] mt-2">
-                        Not enough visits for {cart.length} properties
-                      </p>
-                    )}
-                  </button>
-                ))}
-              </div>
+                  )}
+                  {estimate.time_of_week_fee > 0 && (
+                    <div className="flex justify-between">
+                      <span className="text-[#4A4D53]">Time-of-week</span>
+                      <span className="font-medium text-[#1A1C20]">₹{estimate.time_of_week_fee}</span>
+                    </div>
+                  )}
+                  {estimate.peak_multiplier && estimate.peak_multiplier !== 1 && (
+                    <div className="flex justify-between">
+                      <span className="text-[#4A4D53]">Peak ({estimate.peak_label})</span>
+                      <span className="font-medium text-[#1A1C20]">×{estimate.peak_multiplier}</span>
+                    </div>
+                  )}
+                  {estimate.waiting_allowance > 0 && (
+                    <div className="flex justify-between">
+                      <span className="text-[#4A4D53]">Waiting allowance</span>
+                      <span className="font-medium text-[#1A1C20]">₹{estimate.waiting_allowance}</span>
+                    </div>
+                  )}
+                  {estimate.traffic_surcharge > 0 && (
+                    <div className="flex justify-between">
+                      <span className="text-[#4A4D53]">Traffic surcharge</span>
+                      <span className="font-medium text-[#1A1C20]">₹{estimate.traffic_surcharge}</span>
+                    </div>
+                  )}
+                  {estimate.extra_property_fee > 0 && (
+                    <div className="flex justify-between">
+                      <span className="text-[#4A4D53]">Extra-property fee ({cart.length - 1})</span>
+                      <span className="font-medium text-[#1A1C20]">₹{estimate.extra_property_fee}</span>
+                    </div>
+                  )}
+
+                  <div className="flex justify-between pt-3 border-t border-[#E5E1DB]">
+                    <span className="text-[#4A4D53]">Subtotal</span>
+                    <span className="font-medium text-[#1A1C20]">₹{estimate.gross_amount}</span>
+                  </div>
+                  {estimate.discount_amount > 0 && (
+                    <div className="flex justify-between text-[#04473C]">
+                      <span>
+                        Bulk-visit discount
+                        {estimate.discount_percent ? ` (${estimate.discount_percent}% off)` : ''}
+                      </span>
+                      <span className="font-medium">-₹{estimate.discount_amount}</span>
+                    </div>
+                  )}
+
+                  <div className="flex justify-between pt-3 border-t border-[#04473C]/20 text-base">
+                    <span className="font-medium text-[#1A1C20]">Total Payment</span>
+                    <span className="price-display text-xl">
+                      <span className="price-currency text-sm">₹</span>{payableAmount}
+                    </span>
+                  </div>
+
+                  {estimate.platform_cut > 0 && (
+                    <p className="text-xs text-[#4A4D53] pt-1">
+                      Includes a{' '}
+                      {estimate.breakdown?.platform_cut_pct
+                        ? `${estimate.breakdown.platform_cut_pct}% `
+                        : ''}
+                      platform fee of ₹{estimate.platform_cut} that supports ride matching, support, and safety.
+                    </p>
+                  )}
+
+                  {estimating && (
+                    <div className="pt-2 text-xs text-[#4A4D53] flex items-center gap-2">
+                      <span className="inline-block w-2.5 h-2.5 border-2 border-[#04473C] border-t-transparent rounded-full animate-spin" />
+                      Updating…
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="p-4 bg-[#F5F3F0] border border-[#E5E1DB] text-sm text-[#4A4D53]">
+                  Enter your pickup location to see the fare.
+                </div>
+              )}
             </div>
 
             {/* Booking Details Form */}
@@ -468,44 +642,71 @@ const VisitCart = () => {
                 </div>
                 
                 <div>
+                  <label className="premium-label">Vehicle / Assistance Type</label>
+                  <p className="text-xs text-[#4A4D53] mb-3">
+                    Tell us whether you need only navigation, bike pickup, or car pickup.
+                  </p>
+                  <div className="grid gap-3 md:grid-cols-3">
+                    {[
+                      {
+                        id: 'navigate_only',
+                        label: 'Only Navigation',
+                        note: 'You already have your own vehicle and only want someone to guide you to the property',
+                        icon: MapPin
+                      },
+                      {
+                        id: 'bike_pickup',
+                        label: 'Bike Pickup',
+                        note: 'You want to be picked up on a bike and taken to the property',
+                        icon: Bike
+                      },
+                      {
+                        id: 'car_pickup',
+                        label: 'Car Pickup',
+                        note: 'You want to be picked up in a car and taken to the property',
+                        icon: Car
+                      }
+                    ].map((option) => {
+                      const Icon = option.icon;
+                      const selected = bookingData.visit_purpose === option.id;
+                      return (
+                        <button
+                          key={option.id}
+                          type="button"
+                          onClick={() => setBookingData(prev => ({ ...prev, visit_purpose: option.id }))}
+                          className={`border p-4 text-left transition-colors ${
+                            selected ? 'border-[#04473C] bg-[#E6F0EE]' : 'border-[#E5E1DB] bg-white'
+                          }`}
+                        >
+                          <div className="flex items-center gap-2 mb-2">
+                            <Icon className="w-4 h-4 text-[#04473C]" />
+                            <span className="font-medium text-[#1A1C20]">{option.label}</span>
+                          </div>
+                          <p className="text-xs text-[#4A4D53]">{option.note}</p>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <div>
                   <label className="premium-label flex items-center gap-2">
                     <MapPin className="w-4 h-4" strokeWidth={1.5} />
-                    Pickup Location
+                    Pickup / Starting Location
                   </label>
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      value={bookingData.pickup_location}
-                      onChange={(e) => setBookingData(prev => ({ ...prev, pickup_location: e.target.value, pickup_lat: null, pickup_lng: null }))}
-                      placeholder="Where should we pick you up?"
-                      className="premium-input flex-1"
-                      data-testid="pickup-location-input"
-                    />
-                    <button
-                      type="button"
-                      onClick={getCurrentLocation}
-                      disabled={gettingLocation}
-                      className="px-4 py-2 bg-[#04473C] text-white text-sm font-medium hover:bg-[#033530] transition-colors flex items-center gap-2 whitespace-nowrap disabled:opacity-50"
-                      data-testid="use-location-button"
-                    >
-                      {gettingLocation ? (
-                        <>
-                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                          Getting...
-                        </>
-                      ) : (
-                        <>
-                          <MapPin className="w-4 h-4" />
-                          Use Current
-                        </>
-                      )}
-                    </button>
-                  </div>
-                  {bookingData.pickup_lat && bookingData.pickup_lng && (
-                    <p className="text-xs text-green-600 mt-1 flex items-center gap-1">
-                      <Check className="w-3 h-3" /> GPS coordinates captured
-                    </p>
-                  )}
+                  <p className="text-xs text-[#4A4D53] mb-2">
+                    Start typing an address to see suggestions, pick a recent location, or tap "Use Current" to auto-fill.
+                  </p>
+                  <LocationAutocomplete
+                    value={bookingData.pickup_location}
+                    onChange={({ label, lat, lng }) => setBookingData(prev => ({
+                      ...prev,
+                      pickup_location: label,
+                      pickup_lat: lat,
+                      pickup_lng: lng
+                    }))}
+                    hasCoords={!!(bookingData.pickup_lat && bookingData.pickup_lng)}
+                  />
                 </div>
               </div>
             </div>
@@ -560,12 +761,23 @@ const VisitCart = () => {
                   <p className="text-xs text-[#4A4D53] uppercase tracking-wide">Total Payment</p>
                   <p className="price-display text-2xl">
                     <span className="price-currency text-base">₹</span>
-                    {selectedPkg?.price || 0}
+                    {payableAmount != null ? payableAmount : '—'}
                   </p>
+                  {estimate?.discount_amount > 0 && (
+                    <p className="text-xs text-[#04473C]">
+                      {estimate.discount_percent}% bulk-visit discount applied
+                    </p>
+                  )}
                 </div>
                 <button
                   onClick={handlePayAndBook}
-                  disabled={loading || !selectedPackage || cart.length === 0 || !termsAccepted}
+                  disabled={
+                    loading ||
+                    cart.length === 0 ||
+                    !termsAccepted ||
+                    !estimate ||
+                    estimating
+                  }
                   className="btn-primary flex items-center gap-2 disabled:opacity-50"
                   data-testid="pay-and-book-button"
                 >

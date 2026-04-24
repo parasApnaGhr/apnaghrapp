@@ -11,7 +11,7 @@ import os
 import logging
 from pathlib import Path
 from pydantic import BaseModel, Field, ConfigDict
-from typing import List, Optional, Dict
+from typing import List, Optional, Dict, Any
 import uuid
 from datetime import datetime, timezone, timedelta
 import bcrypt
@@ -23,6 +23,9 @@ from functools import lru_cache
 import asyncio
 from collections import defaultdict
 import time
+import hashlib
+import httpx
+from typing import Tuple
 
 # ============ PRODUCTION RESILIENCE UTILITIES ============
 
@@ -172,6 +175,75 @@ def calculate_distance_km(lat1: float, lon1: float, lat2: float, lon2: float) ->
 # Maximum radius for riders to see available visits (in km)
 RIDER_MAX_RADIUS_KM = 50
 
+
+# Geocoding ────────────────────────────────────────────────────────────────────
+# Many older properties in the DB were created before lat/lng were required, so
+# they have null coordinates. Fare calculation depends on real coords, so we
+# fall back to Nominatim (OpenStreetMap) on demand and cache the result back
+# onto the property doc. Nominatim asks clients to set a descriptive UA and
+# keep request rate low — our checkout traffic is tiny so this is fine.
+
+NOMINATIM_URL = "https://nominatim.openstreetmap.org/search"
+_GEOCODE_CACHE: Dict[str, Tuple[float, float]] = {}
+
+async def geocode_address(address: str) -> Optional[Tuple[float, float]]:
+    """Resolve a free-form address to (lat, lng). Returns None on failure."""
+    key = (address or "").strip().lower()
+    if not key:
+        return None
+    if key in _GEOCODE_CACHE:
+        return _GEOCODE_CACHE[key]
+    try:
+        async with httpx.AsyncClient(timeout=6.0) as client:
+            resp = await client.get(
+                NOMINATIM_URL,
+                params={
+                    "q": address,
+                    "format": "json",
+                    "limit": 1,
+                    "countrycodes": "in",
+                },
+                headers={"User-Agent": "ApnaGhr/1.0 (support@apnaghr.com)"},
+            )
+        if resp.status_code != 200:
+            return None
+        data = resp.json()
+        if not data:
+            return None
+        coords = (float(data[0]["lat"]), float(data[0]["lon"]))
+        _GEOCODE_CACHE[key] = coords
+        return coords
+    except Exception as e:
+        logging.warning(f"Geocode failed for '{address}': {e}")
+        return None
+
+
+async def resolve_property_coords(prop: dict) -> Optional[Tuple[float, float]]:
+    """Return (lat, lng) for a property, geocoding + caching if missing."""
+    lat = prop.get("latitude")
+    lng = prop.get("longitude")
+    if lat is not None and lng is not None:
+        try:
+            return float(lat), float(lng)
+        except (TypeError, ValueError):
+            pass
+    parts = [prop.get("exact_address"), prop.get("area_name"), prop.get("city")]
+    query = ", ".join(p for p in parts if p)
+    if not query:
+        return None
+    coords = await geocode_address(query)
+    if coords is None:
+        return None
+    new_lat, new_lng = coords
+    try:
+        await db.properties.update_one(
+            {"id": prop.get("id")},
+            {"$set": {"latitude": new_lat, "longitude": new_lng}},
+        )
+    except Exception as e:
+        logging.warning(f"Failed to cache geocoded coords for {prop.get('id')}: {e}")
+    return new_lat, new_lng
+
 # Import new modular routes
 from routes.packers import router as packers_router
 from routes.advertising import router as advertising_router
@@ -219,8 +291,8 @@ client = AsyncIOMotorClient(
     waitQueueTimeoutMS=5000,
     heartbeatFrequencyMS=10000
 )
-db = client[os.environ.get('DB_NAME', 'apnaghr_db')]
-db = client[os.environ.get('DB_NAME', 'apnaghr_db')]
+db = client[os.environ.get('DB_NAME', 'apnaghr_visit_db')]
+db = client[os.environ.get('DB_NAME', 'apnaghr_visit_db')]
 
 # Set database for modular routes
 set_tracking_db(db)
@@ -428,6 +500,13 @@ class VisitBooking(BaseModel):
     otp: Optional[str] = None
     total_properties: int = 1
     total_earnings: float = 0.0
+    gross_amount: float = 100.0
+    platform_fee: float = 0.0
+    vendor_earning: float = 0.0
+    vendor_share_percentage: float = 0.0
+    visit_purpose: str = "navigate_only"
+    visit_purpose_label: str = "Navigate Only"
+    vendor_id: Optional[str] = None
     estimated_duration: str = ""
     pickup_location: str = ""  # Customer pickup location
     pickup_lat: Optional[float] = None
@@ -453,6 +532,8 @@ class VisitBookingCreate(BaseModel):
     pickup_location: str
     pickup_lat: Optional[float] = None
     pickup_lng: Optional[float] = None
+    visit_amount: Optional[float] = None
+    visit_purpose: str = "navigate_only"
     referral_code: Optional[str] = None  # Optional seller referral code
 
 class RiderShiftUpdate(BaseModel):
@@ -620,7 +701,17 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
     try:
         token = credentials.credentials
         payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
-        
+
+        # Vendors are stored in db.vendors, not db.users
+        if payload.get('role') == 'vendor':
+            user = await asyncio.wait_for(
+                db.vendors.find_one({"id": payload['user_id']}, {"_id": 0, "password_hash": 0}),
+                timeout=5.0
+            )
+            if user:
+                user['role'] = 'vendor'
+                return user
+
         # Use timeout for user lookup to prevent slow queries from blocking
         user = await asyncio.wait_for(
             db.users.find_one({"id": payload['user_id']}, {"_id": 0}),
@@ -673,18 +764,38 @@ async def register(user_data: UserCreate):
 
 @api_router.post("/auth/login", response_model=LoginResponse)
 async def login(login_data: LoginRequest):
+    # First check users collection
     user = await db.users.find_one({"phone": login_data.phone}, {"_id": 0})
-    if not user or not verify_password(login_data.password, user['password']):
-        raise HTTPException(status_code=401, detail="Invalid credentials")
-    
-    token = create_jwt_token(user['id'], user['role'])
-    user.pop('password', None)
-    
-    # Include terms acceptance status in response
-    user['terms_accepted'] = user.get('terms_accepted', False)
-    user['terms_accepted_date'] = user.get('terms_accepted_date', None)
-    
-    return {"token": token, "user": user}
+    if user:
+        if not verify_password(login_data.password, user['password']):
+            raise HTTPException(status_code=401, detail="Invalid credentials")
+        token = create_jwt_token(user['id'], user['role'])
+        user.pop('password', None)
+        user['terms_accepted'] = user.get('terms_accepted', False)
+        user['terms_accepted_date'] = user.get('terms_accepted_date', None)
+        return {"token": token, "user": user}
+
+    # Fall back to vendors collection
+    vendor = await db.vendors.find_one({"phone": login_data.phone}, {"_id": 0})
+    if vendor:
+        if not bcrypt.checkpw(login_data.password.encode('utf-8'), vendor['password_hash'].encode('utf-8')):
+            raise HTTPException(status_code=401, detail="Invalid credentials")
+        if vendor.get('status') != 'active':
+            raise HTTPException(status_code=403, detail="Vendor account is suspended")
+        token = create_jwt_token(vendor['id'], 'vendor')
+        vendor_resp = {
+            "id": vendor['id'],
+            "name": vendor['name'],
+            "phone": vendor['phone'],
+            "email": vendor.get('email', ''),
+            "role": "vendor",
+            "city": vendor.get('city', ''),
+            "terms_accepted": True,
+            "terms_accepted_date": None,
+        }
+        return {"token": token, "user": vendor_resp}
+
+    raise HTTPException(status_code=401, detail="Invalid credentials")
 
 
 # ============ TERMS & CONDITIONS ACCEPTANCE ============
@@ -864,6 +975,98 @@ class RiderApplicationReview(BaseModel):
 # END RIDER ONBOARDING MODELS
 # ============================================
 
+# ============================================
+# VENDOR MODELS
+# ============================================
+
+def generate_vendor_daily_code(vendor_id: str) -> str:
+    """Deterministic 6-char alphanumeric daily code from vendor_id + today's date.
+    Changes automatically at midnight. No DB update needed."""
+    today = datetime.now().strftime('%Y-%m-%d')
+    seed = f"{vendor_id}:{today}:apnaghr-vendor-v1"
+    h = hashlib.sha256(seed.encode()).hexdigest()
+    # Use chars that are visually unambiguous (no 0/O, 1/I/l)
+    chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
+    return ''.join(chars[int(h[i * 2: i * 2 + 2], 16) % len(chars)] for i in range(6))
+
+VENDOR_PURPOSE_LABELS = {
+    "navigate_only": "Navigate Only",
+    "bike_pickup": "Bike Pickup + Navigate",
+    "car_pickup": "Car Pickup",
+}
+
+VENDOR_SHARE_PERCENTAGES = {
+    "navigate_only": 0.50,
+    "bike_pickup": 0.40,
+    "car_pickup": 0.30,
+}
+
+PLATFORM_CUT_PERCENTAGE = 0.20
+DEFAULT_VISIT_GROSS_AMOUNT = 100.0
+
+def normalize_visit_purpose(visit_purpose: Optional[str]) -> str:
+    if visit_purpose in VENDOR_SHARE_PERCENTAGES:
+        return visit_purpose
+    return "navigate_only"
+
+def calculate_visit_earnings(
+    gross_amount: float,
+    visit_purpose: Optional[str],
+    vendor_id: Optional[str] = None
+) -> Dict:
+    normalized_purpose = normalize_visit_purpose(visit_purpose)
+    gross = round(float(gross_amount or 0), 2)
+    platform_fee = round(gross * PLATFORM_CUT_PERCENTAGE, 2)
+    distributable_amount = round(gross - platform_fee, 2)
+    vendor_share_percentage = VENDOR_SHARE_PERCENTAGES[normalized_purpose] if vendor_id else 0.0
+    vendor_earning = round(distributable_amount * vendor_share_percentage, 2)
+    rider_earning = round(distributable_amount - vendor_earning, 2)
+
+    return {
+        "visit_purpose": normalized_purpose,
+        "visit_purpose_label": VENDOR_PURPOSE_LABELS[normalized_purpose],
+        "gross_amount": gross,
+        "platform_fee": platform_fee,
+        "distributable_amount": distributable_amount,
+        "vendor_share_percentage": round(vendor_share_percentage * 100, 2),
+        "vendor_earning": vendor_earning,
+        "rider_earning": rider_earning,
+        "vendor_id": vendor_id,
+    }
+
+class VendorCreate(BaseModel):
+    name: str
+    email: str
+    phone: str
+    password: str
+    city: str
+
+class VendorUpdate(BaseModel):
+    name: Optional[str] = None
+    email: Optional[str] = None
+    city: Optional[str] = None
+    status: Optional[str] = None  # active, suspended
+
+VENDOR_CONCERN_TYPES = [
+    "Rider Not Available",
+    "Rider Not Responding",
+    "Reached Late",
+    "Misbehaviour",
+    "Wrong Location Update",
+]
+
+class VendorConcernCreate(BaseModel):
+    rider_id: str
+    concern_type: str
+    notes: Optional[str] = None
+
+class VendorConcernResolve(BaseModel):
+    resolution_note: Optional[str] = None
+
+# ============================================
+# END VENDOR MODELS
+# ============================================
+
 @api_router.post("/auth/forgot-password")
 async def forgot_password(request: ForgotPasswordRequest):
     """Request password reset OTP via SMS or Email"""
@@ -989,10 +1192,16 @@ async def reset_password(request: ResetPasswordRequest):
         {"phone": request.phone},
         {"$set": {"password": hashed_pw}}
     )
-    
+
     if result.modified_count == 0:
         raise HTTPException(status_code=404, detail="User not found")
-    
+
+    # Keep rider-service collection in sync so rider app can authenticate
+    await db.riders.update_one(
+        {"phone": request.phone},
+        {"$set": {"password_hash": hashed_pw}}
+    )
+
     # Mark OTP as used
     await db.password_reset_otps.update_one(
         {"phone": request.phone, "otp": request.otp},
@@ -1028,7 +1237,13 @@ async def change_password(request: ChangePasswordRequest, current_user: dict = D
         {"id": current_user['id']},
         {"$set": {"password": new_hashed}}
     )
-    
+
+    # Keep rider-service collection in sync so rider app can authenticate
+    await db.riders.update_one(
+        {"$or": [{"id": current_user['id']}, {"phone": user.get("phone")}]},
+        {"$set": {"password_hash": new_hashed}}
+    )
+
     return {"success": True, "message": "Password changed successfully"}
 
 @api_router.get("/auth/me")
@@ -1687,7 +1902,26 @@ async def review_rider_application(
     
     if review.status == "rejected" and review.rejection_reason:
         update_data["rejection_reason"] = review.rejection_reason
-    
+
+    # Normalize payment/KYC fields so both legacy (flat) and new rider-service
+    # (nested bank_details/documents) application shapes resolve to a single set
+    # of flat keys we can safely copy into db.riders and db.users.
+    _bank = application.get("bank_details") or {}
+    _docs = application.get("documents") or {}
+    upi_id = application.get("upi_id")
+    bank_name = application.get("bank_name") or _bank.get("bank_name")
+    account_number = application.get("account_number") or _bank.get("account_number")
+    ifsc_code = application.get("ifsc_code") or _bank.get("ifsc_code")
+    account_holder_name = (
+        application.get("account_holder_name") or _bank.get("account_holder_name")
+    )
+    aadhaar_url = application.get("aadhaar_url") or _docs.get("aadhaar_url")
+    pan_url = application.get("pan_url") or _docs.get("pan_url")
+    selfie_url = application.get("selfie_url") or _docs.get("selfie_url")
+    driving_license_url = (
+        application.get("driving_license_url") or _docs.get("driving_license_url")
+    )
+
     # If approved, create a rider user account
     if review.status == "approved":
         # Check if user already exists
@@ -1699,30 +1933,114 @@ async def review_rider_application(
                 {"$set": {"role": "rider", "city": application.get("city")}}
             )
             update_data["user_id"] = existing_user.get("id")
+            # Sync into riders collection for rider-service app
+            await db.riders.update_one(
+                {"id": existing_user.get("id")},
+                {"$set": {
+                    "id": existing_user.get("id"),
+                    "name": existing_user.get("name"),
+                    "phone": existing_user.get("phone"),
+                    "city": application.get("city"),
+                    "password_hash": existing_user.get("password"),
+                    "status": "active",
+                    "is_online": False,
+                    "rating": 0.0,
+                    "completed_tasks": 0,
+                    "total_tasks": 0,
+                    "earnings": 0.0,
+                    "wallet_balance": 0,
+                    "whatsapp": application.get("whatsapp"),
+                    "address": application.get("address"),
+                    "areas": application.get("areas", []),
+                    "availability": application.get("availability"),
+                    "experience": application.get("experience"),
+                    "vendor_code": application.get("vendor_code"),
+                    "has_vehicle": application.get("has_vehicle"),
+                    "vehicle_type": application.get("vehicle_type"),
+                    "vehicle_number": application.get("vehicle_number"),
+                    "driving_license": application.get("driving_license"),
+                    "aadhar_number": application.get("aadhar_number"),
+                    "aadhar_front": application.get("aadhar_front"),
+                    "aadhar_back": application.get("aadhar_back"),
+                    "aadhaar_url": aadhaar_url,
+                    "pan_url": pan_url,
+                    "selfie_url": selfie_url,
+                    "driving_license_url": driving_license_url,
+                    "driving_license_photo": application.get("driving_license_photo"),
+                    "profile_photo": application.get("profile_photo"),
+                    "upi_id": upi_id,
+                    "bank_name": bank_name,
+                    "account_number": account_number,
+                    "ifsc_code": ifsc_code,
+                    "account_holder_name": account_holder_name,
+                    "bank_details": {
+                        "bank_name": bank_name,
+                        "account_number": account_number,
+                        "ifsc_code": ifsc_code,
+                        "account_holder_name": account_holder_name,
+                    },
+                    "documents": {
+                        "aadhaar_url": aadhaar_url,
+                        "pan_url": pan_url,
+                        "selfie_url": selfie_url,
+                        "driving_license_url": driving_license_url,
+                    },
+                    "legal_agreements": application.get("legal_agreements"),
+                    "updated_at": datetime.now(timezone.utc).isoformat()
+                }},
+                upsert=True
+            )
+            # Mirror onto db.users so /profile reads see the same payment/KYC info
+            await db.users.update_one(
+                {"id": existing_user.get("id")},
+                {"$set": {
+                    "upi_id": upi_id,
+                    "bank_details": {
+                        "bank_name": bank_name,
+                        "account_number": account_number,
+                        "ifsc_code": ifsc_code,
+                        "account_holder_name": account_holder_name,
+                    },
+                    "documents": {
+                        "aadhaar_url": aadhaar_url,
+                        "pan_url": pan_url,
+                        "selfie_url": selfie_url,
+                        "driving_license_url": driving_license_url,
+                    },
+                    "areas": application.get("areas", []),
+                    "availability": application.get("availability"),
+                    "has_vehicle": application.get("has_vehicle"),
+                    "legal_agreements": application.get("legal_agreements"),
+                }}
+            )
         else:
             # Create new rider user
             import secrets
             temp_password = secrets.token_urlsafe(8)
+            # Support both old form (full_name) and new rider-service form (name)
+            rider_name = application.get("full_name") or application.get("name") or ""
+            password_hash = bcrypt.hashpw(temp_password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+            rider_id = str(uuid.uuid4())
             new_user = {
-                "id": str(uuid.uuid4()),
-                "name": application.get("full_name"),
+                "id": rider_id,
+                "name": rider_name,
                 "phone": application.get("mobile"),
-                "password": bcrypt.hashpw(temp_password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8'),
+                "password": password_hash,
                 "role": "rider",
                 "city": application.get("city"),
                 "created_at": datetime.now(timezone.utc).isoformat(),
-                "upi_id": application.get("upi_id"),
+                "upi_id": upi_id,
                 "bank_details": {
-                    "bank_name": application.get("bank_name"),
-                    "account_number": application.get("account_number"),
-                    "ifsc_code": application.get("ifsc_code"),
-                    "account_holder_name": application.get("account_holder_name")
+                    "bank_name": bank_name,
+                    "account_number": account_number,
+                    "ifsc_code": ifsc_code,
+                    "account_holder_name": account_holder_name,
                 },
                 "documents": {
-                    "aadhaar_url": application.get("aadhaar_url"),
-                    "pan_url": application.get("pan_url"),
-                    "selfie_url": application.get("selfie_url"),
-                    "driving_license_url": application.get("driving_license_url")
+                    "aadhaar_url": aadhaar_url,
+                    "pan_url": pan_url,
+                    "selfie_url": selfie_url,
+                    "driving_license_url": driving_license_url,
                 },
                 "areas": application.get("areas", []),
                 "availability": application.get("availability"),
@@ -1730,14 +2048,81 @@ async def review_rider_application(
                 "legal_agreements": application.get("legal_agreements")
             }
             await db.users.insert_one(new_user)
-            update_data["user_id"] = new_user["id"]
+            update_data["user_id"] = rider_id
+
+            # Also create in the riders collection so the rider-service app can authenticate
+            rider_service_doc = {
+                "id": rider_id,
+                "name": rider_name,
+                "phone": application.get("mobile"),
+                "email": application.get("email"),
+                "city": application.get("city"),
+                "password_hash": password_hash,
+                "status": "active",
+                "is_online": False,
+                "current_lat": None,
+                "current_lng": None,
+                "rating": 0.0,
+                "completed_tasks": 0,
+                "total_tasks": 0,
+                "earnings": 0.0,
+                "wallet_balance": 0,
+                "whatsapp": application.get("whatsapp"),
+                "address": application.get("address"),
+                "areas": application.get("areas", []),
+                "availability": application.get("availability"),
+                "experience": application.get("experience"),
+                "vendor_code": application.get("vendor_code"),
+                "has_vehicle": application.get("has_vehicle"),
+                "vehicle_type": application.get("vehicle_type"),
+                "vehicle_number": application.get("vehicle_number"),
+                "driving_license": application.get("driving_license"),
+                "aadhar_number": application.get("aadhar_number"),
+                "aadhar_front": application.get("aadhar_front"),
+                "aadhar_back": application.get("aadhar_back"),
+                "aadhaar_url": aadhaar_url,
+                "pan_url": pan_url,
+                "selfie_url": selfie_url,
+                "driving_license_url": driving_license_url,
+                "driving_license_photo": application.get("driving_license_photo"),
+                "profile_photo": application.get("profile_photo"),
+                "upi_id": upi_id,
+                "bank_name": bank_name,
+                "account_number": account_number,
+                "ifsc_code": ifsc_code,
+                "account_holder_name": account_holder_name,
+                "bank_details": {
+                    "bank_name": bank_name,
+                    "account_number": account_number,
+                    "ifsc_code": ifsc_code,
+                    "account_holder_name": account_holder_name,
+                },
+                "documents": {
+                    "aadhaar_url": aadhaar_url,
+                    "pan_url": pan_url,
+                    "selfie_url": selfie_url,
+                    "driving_license_url": driving_license_url,
+                },
+                "legal_agreements": application.get("legal_agreements"),
+                "created_at": datetime.now(timezone.utc).isoformat(),
+                "updated_at": datetime.now(timezone.utc).isoformat()
+            }
+            await db.riders.insert_one(rider_service_doc)
             # Note: In production, send temp_password via SMS
-    
+
+        # Link rider to vendor if application had a valid vendor reference
+        vendor_id = application.get("vendor_id")
+        if vendor_id and update_data.get("user_id"):
+            await db.vendors.update_one(
+                {"id": vendor_id},
+                {"$addToSet": {"rider_ids": update_data["user_id"]}}
+            )
+
     await db.rider_applications.update_one(
         {"id": application_id},
         {"$set": update_data}
     )
-    
+
     return {"message": f"Application {review.status}", "status": review.status}
 
 @api_router.patch("/admin/rider-applications/{application_id}/ban")
@@ -1794,6 +2179,9 @@ class CashfreeCheckoutRequest(BaseModel):
     property_id: Optional[str] = None
     booking_id: Optional[str] = None
     ad_id: Optional[str] = None
+
+class MockVisitPackageRequest(BaseModel):
+    package_id: str
 
 @api_router.post("/payments/checkout")
 async def create_checkout(
@@ -1886,6 +2274,245 @@ async def create_checkout(
         logging.error(f"Cashfree checkout error: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Payment initialization failed: {str(e)}")
 
+DYNAMIC_VISIT_PACKAGE_TYPE = "visit_dynamic"
+DYNAMIC_VISIT_PACKAGE_VALIDITY_DAYS = 2
+
+
+class VisitDynamicCheckoutRequest(BaseModel):
+    property_ids: List[str]
+    pickup_lat: float
+    pickup_lng: float
+    visit_purpose: str = "navigate_only"
+    scheduled_at: Optional[str] = None
+    is_holiday: bool = False
+    traffic_factor: Optional[float] = None
+    origin_url: str
+
+
+async def _compute_visit_payable(req: VisitDynamicCheckoutRequest) -> "VisitPriceEstimateResponse":
+    """Server-side recomputation of the dynamic visit fare. Never trust the
+    client's number — the only inputs we accept are the property set, pickup
+    coords, visit purpose, and scheduled time."""
+    if not req.property_ids:
+        raise HTTPException(status_code=400, detail="At least one property is required")
+    estimate_req = VisitPriceEstimateRequest(
+        property_ids=req.property_ids,
+        pickup_lat=req.pickup_lat,
+        pickup_lng=req.pickup_lng,
+        visit_purpose=req.visit_purpose,
+        traffic_factor=req.traffic_factor,
+        scheduled_at=req.scheduled_at,
+        is_holiday=req.is_holiday,
+    )
+    return await estimate_visit_price(estimate_req)
+
+
+async def _create_dynamic_visit_package_from_transaction(transaction: dict) -> None:
+    """Create a short-lived visit_package record for a paid dynamic-visit
+    transaction so the existing /visits/book flow can consume it. Idempotent:
+    running twice for the same transaction will not create duplicates."""
+    meta = transaction.get('metadata') or {}
+    num_properties = int(meta.get('num_properties') or 0)
+    if num_properties <= 0:
+        logging.warning(
+            f"Dynamic visit transaction {transaction.get('session_id')} missing num_properties in metadata; skipping package creation"
+        )
+        return
+
+    existing_pkg = await db.visit_packages.find_one({
+        "customer_id": transaction['user_id'],
+        "package_type": DYNAMIC_VISIT_PACKAGE_TYPE,
+        "amount_paid": transaction['amount'],
+        "session_id": transaction.get('session_id'),
+    })
+    if existing_pkg:
+        return
+
+    now = datetime.now(timezone.utc)
+    visit_package = VisitPackage(
+        customer_id=transaction['user_id'],
+        package_type=DYNAMIC_VISIT_PACKAGE_TYPE,
+        total_visits=num_properties,
+        visits_used=0,
+        amount_paid=transaction['amount'],
+        valid_until=now + timedelta(days=DYNAMIC_VISIT_PACKAGE_VALIDITY_DAYS),
+    )
+    pkg_doc = visit_package.model_dump()
+    pkg_doc['created_at'] = pkg_doc['created_at'].isoformat()
+    pkg_doc['valid_until'] = pkg_doc['valid_until'].isoformat()
+    pkg_doc['session_id'] = transaction.get('session_id')
+    pkg_doc['property_ids'] = meta.get('property_ids') or []
+    pkg_doc['visit_purpose'] = meta.get('visit_purpose')
+    await db.visit_packages.insert_one(pkg_doc)
+    logging.info(
+        f"Created dynamic visit package for {transaction['user_id']} — {num_properties} visits, ₹{transaction['amount']}"
+    )
+
+
+@api_router.post("/payments/visit-dynamic-checkout")
+async def create_visit_dynamic_checkout(
+    request: VisitDynamicCheckoutRequest,
+    current_user: dict = Depends(get_current_user)
+):
+    """Create a Cashfree checkout whose amount is computed dynamically from the
+    pickup location, property set, visit purpose, and scheduled time — with the
+    multi-property bulk-visit discount applied."""
+    estimate = await _compute_visit_payable(request)
+    amount = float(estimate.payable_amount)
+    origin_url = request.origin_url.rstrip('/')
+    webhook_url = f"{origin_url}/api/webhook/cashfree"
+
+    metadata = {
+        "user_id": current_user['id'],
+        "package_id": DYNAMIC_VISIT_PACKAGE_TYPE,
+        "type": "visit",
+        "num_properties": estimate.num_properties,
+        "property_ids": request.property_ids,
+        "pickup_lat": request.pickup_lat,
+        "pickup_lng": request.pickup_lng,
+        "visit_purpose": estimate.visit_purpose,
+        "scheduled_at": request.scheduled_at,
+        "total_distance_km": estimate.total_distance_km,
+        "gross_amount": estimate.gross_amount,
+        "discount_percent": estimate.discount_percent,
+        "discount_amount": estimate.discount_amount,
+        "payable_amount": estimate.payable_amount,
+    }
+
+    try:
+        cashfree_service = get_cashfree_service()
+        order_id = cashfree_service.generate_order_id()
+
+        order_response = await cashfree_service.create_order_with_id(
+            order_id=order_id,
+            order_amount=amount,
+            customer_id=current_user['id'],
+            customer_phone=current_user.get('phone', '9999999999'),
+            customer_email=current_user.get('email'),
+            customer_name=current_user.get('name'),
+            return_url=f"{origin_url}/payment-success?order_id={order_id}",
+            notify_url=webhook_url,
+            order_note=f"ApnaGhr visit ({estimate.num_properties} properties, {estimate.total_distance_km} km)",
+            order_tags={
+                "user_id": current_user['id'],
+                "package_id": DYNAMIC_VISIT_PACKAGE_TYPE,
+                "num_properties": str(estimate.num_properties),
+            }
+        )
+
+        transaction = PaymentTransaction(
+            user_id=current_user['id'],
+            session_id=order_response['order_id'],
+            payment_id=order_response.get('cf_order_id'),
+            amount=amount,
+            currency="inr",
+            package_type=DYNAMIC_VISIT_PACKAGE_TYPE,
+            payment_status="pending",
+            metadata=metadata
+        )
+        trans_doc = transaction.model_dump()
+        trans_doc['created_at'] = trans_doc['created_at'].isoformat()
+        trans_doc['payment_session_id'] = order_response['payment_session_id']
+        await db.payment_transactions.insert_one(trans_doc)
+
+        cashfree_env = os.environ.get('CASHFREE_ENVIRONMENT', 'SANDBOX')
+        checkout_base = "https://payments.cashfree.com/order" if cashfree_env == "PRODUCTION" else "https://payments-test.cashfree.com/order"
+        checkout_url = f"{checkout_base}/#/{order_response['payment_session_id']}"
+
+        return {
+            "checkout_url": checkout_url,
+            "session_id": order_response['order_id'],
+            "payment_session_id": order_response['payment_session_id'],
+            "order_id": order_response['order_id'],
+            "cf_order_id": order_response.get('cf_order_id'),
+            "estimate": estimate.model_dump(),
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Dynamic visit checkout error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Payment initialization failed: {str(e)}")
+
+
+@api_router.post("/payments/mock-visit-dynamic")
+async def create_mock_visit_dynamic(
+    request: VisitDynamicCheckoutRequest,
+    current_user: dict = Depends(get_current_user)
+):
+    """Dynamic-fare visit package without calling Cashfree — local/test only."""
+    estimate = await _compute_visit_payable(request)
+    fake_session = f"mock_{uuid.uuid4().hex[:10]}"
+    metadata = {
+        "user_id": current_user['id'],
+        "package_id": DYNAMIC_VISIT_PACKAGE_TYPE,
+        "type": "visit",
+        "num_properties": estimate.num_properties,
+        "property_ids": request.property_ids,
+        "pickup_lat": request.pickup_lat,
+        "pickup_lng": request.pickup_lng,
+        "visit_purpose": estimate.visit_purpose,
+        "scheduled_at": request.scheduled_at,
+        "gross_amount": estimate.gross_amount,
+        "discount_percent": estimate.discount_percent,
+        "discount_amount": estimate.discount_amount,
+        "payable_amount": estimate.payable_amount,
+    }
+    transaction = PaymentTransaction(
+        user_id=current_user['id'],
+        session_id=fake_session,
+        payment_id=fake_session,
+        amount=float(estimate.payable_amount),
+        currency="inr",
+        package_type=DYNAMIC_VISIT_PACKAGE_TYPE,
+        payment_status="paid",
+        metadata=metadata,
+    )
+    trans_doc = transaction.model_dump()
+    trans_doc['created_at'] = trans_doc['created_at'].isoformat()
+    await db.payment_transactions.insert_one(trans_doc)
+    await _create_dynamic_visit_package_from_transaction(trans_doc)
+    return {
+        "order_id": fake_session,
+        "estimate": estimate.model_dump(),
+    }
+
+
+@api_router.post("/payments/mock-visit-package")
+async def create_mock_visit_package(
+    request: MockVisitPackageRequest,
+    current_user: dict = Depends(get_current_user)
+):
+    """Create a visit package without calling Cashfree - for local/testing only."""
+    if request.package_id not in PAYMENT_PACKAGES:
+        raise HTTPException(status_code=400, detail="Invalid package")
+
+    package = PAYMENT_PACKAGES[request.package_id]
+    if "visits" not in package:
+        raise HTTPException(status_code=400, detail="Mock visit package only supports visit packages")
+
+    now = datetime.now(timezone.utc)
+    existing_pkg = await db.visit_packages.find_one({
+        "customer_id": current_user["id"],
+        "package_type": request.package_id,
+        "valid_until": {"$gt": now.isoformat()}
+    }, {"_id": 0})
+    if existing_pkg:
+        return {"message": "Visit package already exists", "package": existing_pkg}
+
+    visit_package = VisitPackage(
+        customer_id=current_user["id"],
+        package_type=request.package_id,
+        total_visits=package["visits"],
+        visits_used=0,
+        amount_paid=package["amount"],
+        valid_until=now + timedelta(days=package["validity_days"])
+    )
+    pkg_doc = visit_package.model_dump()
+    pkg_doc["created_at"] = pkg_doc["created_at"].isoformat()
+    pkg_doc["valid_until"] = pkg_doc["valid_until"].isoformat()
+    await db.visit_packages.insert_one(pkg_doc)
+    return {"message": "Mock visit package created", "package": pkg_doc}
+
 @api_router.get("/wallet")
 async def get_customer_wallet(current_user: dict = Depends(get_current_user)):
     """Get customer wallet with available visits and packages."""
@@ -1961,9 +2588,15 @@ async def get_payment_status(order_id: str, current_user: dict = Depends(get_cur
             
             package = PAYMENT_PACKAGES.get(transaction['package_type'], {})
             package_type = package.get('type', 'visit')
-            
+
+            # Dynamic-fare visit: amount and visit count come from the
+            # transaction metadata, not from PAYMENT_PACKAGES.
+            if transaction['package_type'] == DYNAMIC_VISIT_PACKAGE_TYPE:
+                await _create_dynamic_visit_package_from_transaction(transaction)
+                package_type = "visit"
+
             # Handle visit packages
-            if 'visits' in package:
+            elif 'visits' in package:
                 # Check if package already exists (avoid duplicates)
                 existing_pkg = await db.visit_packages.find_one({
                     "customer_id": transaction['user_id'],
@@ -1971,7 +2604,7 @@ async def get_payment_status(order_id: str, current_user: dict = Depends(get_cur
                     "amount_paid": transaction['amount'],
                     "created_at": {"$gt": (datetime.now(timezone.utc) - timedelta(minutes=5)).isoformat()}
                 })
-                
+
                 if not existing_pkg:
                     visit_package = VisitPackage(
                         customer_id=transaction['user_id'],
@@ -2096,9 +2729,13 @@ async def cashfree_webhook(request: Request):
                 
                 package = PAYMENT_PACKAGES.get(transaction['package_type'], {})
                 package_type = package.get('type', 'visit')
-                
+
+                if transaction['package_type'] == DYNAMIC_VISIT_PACKAGE_TYPE:
+                    await _create_dynamic_visit_package_from_transaction(transaction)
+                    package_type = "visit"
+
                 # Handle visit packages
-                if 'visits' in package:
+                elif 'visits' in package:
                     visit_package = VisitPackage(
                         customer_id=transaction['user_id'],
                         package_type=transaction['package_type'],
@@ -2156,6 +2793,337 @@ async def cashfree_webhook(request: Request):
         logging.error(f"Cashfree webhook error: {str(e)}")
         return {"status": "error", "message": str(e)}
 
+# ──────────────────────────────────────────────────────────
+# VISIT PRICE ESTIMATION (Uber/Rapido-style dynamic pricing)
+# ──────────────────────────────────────────────────────────
+
+VISIT_PRICING = {
+    "navigate_only": {"base": 50.0, "per_km": 8.0,  "extra_property": 30.0},
+    "bike_pickup":   {"base": 80.0, "per_km": 12.0, "extra_property": 50.0},
+    "car_pickup":    {"base": 120.0, "per_km": 18.0, "extra_property": 80.0},
+}
+
+# ──────────────────────────────────────────────────────────
+# RIDER INCENTIVE → CUSTOMER FARE PARITY
+# Rules shared with the rider app (backend/earnings.py in rider-service).
+# Rider-only bonuses (streak, daily/weekly targets, launch, deal, referral,
+# loyalty, rating, level multiplier) are NOT reflected here — those are
+# platform-funded. The customer pays for: distance-tier, time-of-week
+# adders, peak hours, and a waiting-pay allowance.
+# ──────────────────────────────────────────────────────────
+
+def distance_tier_fee(distance_km: float) -> Dict[str, Any]:
+    d = float(distance_km or 0)
+    if d <= 5:
+        return {"tier": "short", "amount": 50.0, "label": "≤5 km"}
+    if d <= 10:
+        return {"tier": "medium", "amount": 100.0, "label": "5–10 km"}
+    if d <= 15:
+        return {"tier": "long", "amount": 150.0, "label": "10–15 km"}
+    return {"tier": "extra_long", "amount": 200.0, "label": ">15 km"}
+
+
+def time_of_week_fee(dt: datetime) -> Dict[str, Any]:
+    extras: List[str] = []
+    total = 0.0
+    if dt.weekday() >= 5:
+        extras.append("weekend +₹50")
+        total += 50.0
+    if 18 <= dt.hour < 21:
+        extras.append("evening +₹40")
+        total += 40.0
+    return {"amount": total, "extras": extras}
+
+
+def peak_multiplier(dt: datetime, is_holiday: bool = False) -> Dict[str, Any]:
+    if is_holiday:
+        return {"multiplier": 1.8, "label": "Holiday 1.8×"}
+    h, wd = dt.hour, dt.weekday()
+    if wd >= 5:
+        return {"multiplier": 1.3, "label": "Weekend 1.3×"}
+    if 17 <= h < 20:
+        return {"multiplier": 1.5, "label": "Evening rush 1.5×"}
+    if 9 <= h < 11:
+        return {"multiplier": 1.3, "label": "Morning peak 1.3×"}
+    if 12 <= h < 14:
+        return {"multiplier": 1.2, "label": "Lunch peak 1.2×"}
+    return {"multiplier": 1.0, "label": "Off-peak"}
+
+
+WAITING_BASE_FEE = 50.0            # flat on-site allowance for customer
+WAITING_PER_PROPERTY_MIN = 12      # baseline on-site minutes per property
+WAITING_EXTRA_PER_10_MIN = 10.0    # rider collects more if actual > baseline
+
+# Multi-property bulk-visit discounts. Tiers are evaluated high → low.
+# 5+ properties → 15% off. 3–4 properties → 10% off. 1–2 → no discount.
+MULTI_PROPERTY_DISCOUNTS = [
+    (5, 0.15, "15% off (5+ properties)"),
+    (3, 0.10, "10% off (3 properties)"),
+]
+
+
+def multi_property_discount(num_properties: int) -> Dict[str, Any]:
+    for threshold, pct, label in MULTI_PROPERTY_DISCOUNTS:
+        if num_properties >= threshold:
+            return {"percent": pct, "threshold": threshold, "label": label}
+    return {"percent": 0.0, "threshold": 0, "label": None}
+
+
+# Hard floor so dynamic pricing can never round to an absurdly small amount after
+# discount — Cashfree rejects orders below ₹1 and customers still owe at least a
+# minimum fare for the rider to show up.
+VISIT_MIN_PAYABLE_AMOUNT = 99.0
+
+
+class VisitPriceEstimateRequest(BaseModel):
+    property_ids: List[str]
+    pickup_lat: float
+    pickup_lng: float
+    visit_purpose: str = "navigate_only"
+    # Optional traffic factor (1.0 = no traffic, >1 = congestion)
+    # Frontend can pass ratio from Google Maps duration_in_traffic / duration
+    traffic_factor: Optional[float] = None
+    # Optional scheduled time (ISO8601). If omitted, peak/time-of-week rules
+    # use the current IST time.
+    scheduled_at: Optional[str] = None
+    is_holiday: bool = False
+
+class VisitPriceEstimateResponse(BaseModel):
+    visit_purpose: str
+    total_distance_km: float
+    num_properties: int
+    base_fare: float
+    distance_fare: float
+    distance_tier_fee: float
+    time_of_week_fee: float
+    peak_multiplier: float
+    peak_label: str
+    waiting_allowance: float
+    traffic_surcharge: float
+    extra_property_fee: float
+    gross_amount: float
+    discount_percent: float
+    discount_amount: float
+    payable_amount: float
+    platform_cut: float
+    rider_earning: float
+    vendor_earning: float
+    breakdown: Dict
+
+@api_router.post("/visits/estimate-price")
+async def estimate_visit_price(req: VisitPriceEstimateRequest):
+    """
+    Calculate dynamic visit price.
+    Route: Pickup → Property 1 → Property 2 → ... → Property N → Pickup (round trip).
+    """
+    purpose = req.visit_purpose if req.visit_purpose in VISIT_PRICING else "navigate_only"
+    pricing = VISIT_PRICING[purpose]
+
+    # Fetch property coordinates + address fallback fields (for on-demand
+    # geocoding when lat/lng is missing on legacy listings).
+    properties = await db.properties.find(
+        {'id': {'$in': req.property_ids}},
+        {
+            '_id': 0, 'id': 1, 'latitude': 1, 'longitude': 1, 'title': 1,
+            'exact_address': 1, 'area_name': 1, 'city': 1,
+        }
+    ).to_list(None)
+
+    prop_map = {p['id']: p for p in properties}
+    missing_props: List[str] = []
+    property_coords: List[Tuple[float, float]] = []
+
+    for pid in req.property_ids:
+        prop = prop_map.get(pid)
+        if not prop:
+            missing_props.append(pid)
+            continue
+        coords = await resolve_property_coords(prop)
+        if coords is None:
+            missing_props.append(prop.get('title') or pid)
+            continue
+        property_coords.append(coords)
+
+    if missing_props:
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                "Could not determine location for some properties: "
+                + ", ".join(missing_props)
+                + ". Please ask admin to set their coordinates."
+            ),
+        )
+
+    if not property_coords:
+        raise HTTPException(status_code=400, detail="No valid properties to price")
+
+    # Build ordered waypoints: pickup → each property in requested order → back to pickup
+    waypoints: List[Tuple[float, float]] = [(req.pickup_lat, req.pickup_lng)]
+    waypoints.extend(property_coords)
+    waypoints.append((req.pickup_lat, req.pickup_lng))  # return leg
+
+    # Sum all leg distances
+    total_distance = 0.0
+    for i in range(len(waypoints) - 1):
+        lat1, lon1 = waypoints[i]
+        lat2, lon2 = waypoints[i + 1]
+        total_distance += calculate_distance_km(lat1, lon1, lat2, lon2)
+
+    total_distance = round(total_distance, 2)
+    num_properties = len(req.property_ids)
+
+    base_fare = pricing["base"]
+    distance_fare = round(total_distance * pricing["per_km"], 2)
+    extra_property_fee = round(max(0, num_properties - 1) * pricing["extra_property"], 2)
+
+    # Traffic surcharge: factor >1.3 → 20% surcharge; >1.6 → 50% surcharge
+    traffic_factor = req.traffic_factor or 1.0
+    if traffic_factor >= 1.6:
+        surcharge_rate = 0.50
+    elif traffic_factor >= 1.3:
+        surcharge_rate = 0.20
+    else:
+        surcharge_rate = 0.0
+    traffic_surcharge = round((base_fare + distance_fare) * surcharge_rate, 2)
+
+    # ── Rider-incentive parity: distance tier + time-of-week + peak + waiting ──
+    ist = timezone(timedelta(hours=5, minutes=30))
+    if req.scheduled_at:
+        try:
+            sched_dt = datetime.fromisoformat(req.scheduled_at.replace('Z', '+00:00'))
+            if sched_dt.tzinfo is None:
+                sched_dt = sched_dt.replace(tzinfo=timezone.utc)
+            sched_local = sched_dt.astimezone(ist)
+        except Exception:
+            sched_local = datetime.now(ist)
+    else:
+        sched_local = datetime.now(ist)
+
+    tier = distance_tier_fee(total_distance)
+    time_fee = time_of_week_fee(sched_local)
+    peak = peak_multiplier(sched_local, req.is_holiday)
+    waiting_allowance = round(WAITING_BASE_FEE, 2)
+
+    # Apply peak multiplier to (base + distance tier + time-of-week) so peak
+    # scales the core trip value but not surcharges or per-property fees.
+    pre_peak = round(base_fare + distance_fare + tier["amount"] + time_fee["amount"], 2)
+    post_peak = round(pre_peak * peak["multiplier"], 2)
+
+    gross_amount = round(
+        post_peak
+        + traffic_surcharge
+        + extra_property_fee
+        + waiting_allowance,
+        2,
+    )
+
+    # Multi-property bulk-visit discount (3 = 10%, 5+ = 15%)
+    discount = multi_property_discount(num_properties)
+    discount_amount = round(gross_amount * discount["percent"], 2)
+    payable_amount = round(max(gross_amount - discount_amount, VISIT_MIN_PAYABLE_AMOUNT), 2)
+    # If the floor bumped us up, reduce the actual discount applied so the
+    # returned numbers are self-consistent.
+    discount_amount = round(gross_amount - payable_amount, 2)
+
+    # Platform/rider/vendor splits are based on the *payable* amount (what the
+    # customer actually pays), so bulk-visit discounts don't get back-charged
+    # to the rider.
+    platform_cut = round(payable_amount * PLATFORM_CUT_PERCENTAGE, 2)
+    distributable = round(payable_amount - platform_cut, 2)
+
+    # The dynamic-checkout flow doesn't attach a vendor, so the rider earns the
+    # full distributable amount (payable × 0.80). The vendor split is only
+    # relevant when a visit is tied to a specific vendor listing (see
+    # calculate_visit_earnings for that path).
+    vendor_earning = 0.0
+    rider_earning = distributable
+
+    return VisitPriceEstimateResponse(
+        visit_purpose=purpose,
+        total_distance_km=total_distance,
+        num_properties=num_properties,
+        base_fare=base_fare,
+        distance_fare=distance_fare,
+        distance_tier_fee=tier["amount"],
+        time_of_week_fee=time_fee["amount"],
+        peak_multiplier=peak["multiplier"],
+        peak_label=peak["label"],
+        waiting_allowance=waiting_allowance,
+        traffic_surcharge=traffic_surcharge,
+        extra_property_fee=extra_property_fee,
+        gross_amount=gross_amount,
+        discount_percent=round(discount["percent"] * 100, 1),
+        discount_amount=discount_amount,
+        payable_amount=payable_amount,
+        platform_cut=platform_cut,
+        rider_earning=rider_earning,
+        vendor_earning=vendor_earning,
+        breakdown={
+            "route_legs": len(waypoints) - 1,
+            "includes_return_to_pickup": True,
+            "traffic_factor": traffic_factor,
+            "surcharge_rate_pct": round(surcharge_rate * 100, 1),
+            "platform_cut_pct": round(PLATFORM_CUT_PERCENTAGE * 100, 1),
+            "distance_tier": tier["label"],
+            "time_extras": time_fee["extras"],
+            "peak": peak["label"],
+            "scheduled_local": sched_local.isoformat(),
+            "discount_label": discount["label"],
+            "min_payable_amount": VISIT_MIN_PAYABLE_AMOUNT,
+            "waiting_allowance_rule": (
+                f"₹{int(WAITING_BASE_FEE)} base (covers ~{WAITING_PER_PROPERTY_MIN} min/property); "
+                f"+₹{int(WAITING_EXTRA_PER_10_MIN)} per extra 10 min of on-site time."
+            ),
+            "excludes_rider_bonuses": [
+                "streak", "daily_target", "weekly_target", "launch_joining",
+                "deal_closure", "referral", "loyalty", "rating_bonus", "level_multiplier",
+            ],
+        }
+    )
+
+
+class VisitSortByPickupRequest(BaseModel):
+    property_ids: List[str]
+    pickup_lat: float
+    pickup_lng: float
+
+
+@api_router.post("/visits/sort-by-pickup")
+async def sort_visits_by_pickup(req: VisitSortByPickupRequest):
+    """
+    Return the given property IDs ordered by straight-line distance from the
+    pickup location (nearest first). Used by the visit cart so the route
+    starts with the closest property. Property lat/lng are not exposed to the
+    client; only the ordering and a coarse distance are returned.
+    """
+    properties = await db.properties.find(
+        {'id': {'$in': req.property_ids}},
+        {
+            '_id': 0, 'id': 1, 'latitude': 1, 'longitude': 1,
+            'exact_address': 1, 'area_name': 1, 'city': 1,
+        }
+    ).to_list(None)
+
+    prop_map = {p['id']: p for p in properties}
+    scored = []
+    for pid in req.property_ids:
+        prop = prop_map.get(pid)
+        coords = await resolve_property_coords(prop) if prop else None
+        if coords is not None:
+            lat, lng = coords
+            dist = calculate_distance_km(req.pickup_lat, req.pickup_lng, lat, lng)
+        else:
+            dist = None
+        scored.append((pid, dist))
+
+    scored.sort(key=lambda x: (x[1] is None, x[1] if x[1] is not None else 0))
+
+    return {
+        "sorted_property_ids": [pid for pid, _ in scored],
+        "distances_km": {pid: (round(d, 2) if d is not None else None) for pid, d in scored}
+    }
+
+
 # Visit booking endpoints
 @api_router.post("/visits/book")
 async def book_visit(booking_data: VisitBookingCreate, current_user: dict = Depends(get_current_user)):
@@ -2212,6 +3180,10 @@ async def book_visit(booking_data: VisitBookingCreate, current_user: dict = Depe
         if seller:
             referred_by = seller['id']
     
+    normalized_purpose = normalize_visit_purpose(booking_data.visit_purpose)
+    gross_amount = float(booking_data.visit_amount) if booking_data.visit_amount is not None else packages[0].get('amount_paid', num_properties * DEFAULT_VISIT_GROSS_AMOUNT)
+    earnings_split = calculate_visit_earnings(gross_amount, normalized_purpose)
+
     booking = VisitBooking(
         customer_id=current_user['id'],
         property_ids=booking_data.property_ids,
@@ -2227,13 +3199,24 @@ async def book_visit(booking_data: VisitBookingCreate, current_user: dict = Depe
         pickup_location=booking_data.pickup_location,
         pickup_lat=booking_data.pickup_lat,
         pickup_lng=booking_data.pickup_lng,
-        total_earnings=num_properties * 100,  # ₹100 per property for rider
+        total_earnings=earnings_split["rider_earning"],
+        gross_amount=earnings_split["gross_amount"],
+        platform_fee=earnings_split["platform_fee"],
+        vendor_earning=earnings_split["vendor_earning"],
+        vendor_share_percentage=earnings_split["vendor_share_percentage"],
+        visit_purpose=earnings_split["visit_purpose"],
+        visit_purpose_label=earnings_split["visit_purpose_label"],
         referred_by=referred_by  # Track seller who referred this client
     )
     
     doc = booking.model_dump()
     doc['created_at'] = doc['created_at'].isoformat()
-    await db.visit_bookings.insert_one(doc)
+    insert_result = await db.visit_bookings.insert_one(doc)
+    logging.info(f"Visit booking inserted with Mongo _id: {insert_result.inserted_id}, visit id: {doc['id']}")
+    saved_booking = await db.visit_bookings.find_one({"id": doc["id"]}, {"_id": 0})
+    if not saved_booking:
+        logging.error(f"Visit booking write verification failed for visit id: {doc['id']}")
+        raise HTTPException(status_code=500, detail="Visit booking was not saved to the database")
     
     # Update seller referral status if applicable
     if referred_by:
@@ -2640,6 +3623,16 @@ async def accept_visit(visit_id: str, current_user: dict = Depends(get_current_u
                         detail=f"This property is {distance:.1f} km away. You can only accept visits within {RIDER_MAX_RADIUS_KM} km radius."
                     )
     
+    vendor = await db.vendors.find_one(
+        {"rider_ids": current_user['id']},
+        {"_id": 0, "id": 1}
+    )
+    earnings_split = calculate_visit_earnings(
+        visit.get("gross_amount", (visit.get("total_properties", len(prop_ids) or 1) * DEFAULT_VISIT_GROSS_AMOUNT)),
+        visit.get("visit_purpose"),
+        vendor_id=vendor.get("id") if vendor else None
+    )
+
     result = await db.visit_bookings.update_one(
         {
             "id": visit_id, 
@@ -2650,7 +3643,15 @@ async def accept_visit(visit_id: str, current_user: dict = Depends(get_current_u
             "rider_id": current_user['id'], 
             "assigned_rider_id": current_user['id'],  # Set both for consistency
             "status": "rider_assigned",
-            "current_step": "go_to_customer"
+            "current_step": "go_to_customer",
+            "vendor_id": earnings_split["vendor_id"],
+            "visit_purpose": earnings_split["visit_purpose"],
+            "visit_purpose_label": earnings_split["visit_purpose_label"],
+            "gross_amount": earnings_split["gross_amount"],
+            "platform_fee": earnings_split["platform_fee"],
+            "vendor_earning": earnings_split["vendor_earning"],
+            "vendor_share_percentage": earnings_split["vendor_share_percentage"],
+            "total_earnings": earnings_split["rider_earning"],
         }}
     )
     
@@ -3547,6 +4548,7 @@ class ManualVisitCreate(BaseModel):
     pickup_location: Optional[str] = None
     pickup_lat: Optional[float] = None
     pickup_lng: Optional[float] = None
+    visit_purpose: str = "navigate_only"
 
 @api_router.get("/admin/search-customer")
 async def search_customer(phone: str, current_user: dict = Depends(get_current_user)):
@@ -3619,8 +4621,21 @@ async def create_manual_visit(data: ManualVisitCreate, current_user: dict = Depe
     
     # Create visit bookings for each property
     visit_ids = []
+    vendor = None
+    if data.assigned_rider_id:
+        vendor = await db.vendors.find_one(
+            {"rider_ids": data.assigned_rider_id},
+            {"_id": 0, "id": 1}
+        )
+
     for prop in properties:
         visit_id = str(uuid.uuid4())
+        per_visit_amount = float(data.payment_amount) / max(len(data.property_ids), 1)
+        earnings_split = calculate_visit_earnings(
+            per_visit_amount,
+            data.visit_purpose,
+            vendor_id=vendor.get("id") if vendor else None
+        )
         visit_booking = {
             "id": visit_id,
             "package_id": package_id,
@@ -3646,14 +4661,26 @@ async def create_manual_visit(data: ManualVisitCreate, current_user: dict = Depe
             "payment_status": "completed",
             "payment_method": data.payment_method,
             "amount_paid": data.payment_amount / len(data.property_ids),
-            "total_earnings": 100,  # ₹100 per property for rider
+            "total_earnings": earnings_split["rider_earning"],
+            "gross_amount": earnings_split["gross_amount"],
+            "platform_fee": earnings_split["platform_fee"],
+            "vendor_earning": earnings_split["vendor_earning"],
+            "vendor_share_percentage": earnings_split["vendor_share_percentage"],
+            "visit_purpose": earnings_split["visit_purpose"],
+            "visit_purpose_label": earnings_split["visit_purpose_label"],
+            "vendor_id": earnings_split["vendor_id"],
             "pickup_location": data.pickup_location if hasattr(data, 'pickup_location') and data.pickup_location else "",
             "pickup_lat": data.pickup_lat if hasattr(data, 'pickup_lat') else None,
             "pickup_lng": data.pickup_lng if hasattr(data, 'pickup_lng') else None,
             "created_by": "admin_manual",
             "created_at": datetime.now(timezone.utc)
         }
-        await db.visit_bookings.insert_one(visit_booking)
+        insert_result = await db.visit_bookings.insert_one(visit_booking)
+        logging.info(f"Manual visit inserted with Mongo _id: {insert_result.inserted_id}, visit id: {visit_id}")
+        saved_visit = await db.visit_bookings.find_one({"id": visit_id}, {"_id": 0})
+        if not saved_visit:
+            logging.error(f"Manual visit write verification failed for visit id: {visit_id}")
+            raise HTTPException(status_code=500, detail=f"Manual visit {visit_id} was not saved to the database")
         visit_ids.append(visit_id)
     
     # If rider is assigned, update their assignments
@@ -3698,6 +4725,52 @@ async def create_manual_visit(data: ManualVisitCreate, current_user: dict = Depe
         "visit_ids": visit_ids,
         "customer_id": customer_id,
         "customer_created": customer.get('created_by_admin', False)
+    }
+
+@api_router.delete("/admin/visits/clear-by-phone")
+async def clear_visits_by_phone(
+    phone: str,
+    status: Optional[str] = "pending",
+    current_user: dict = Depends(get_current_user)
+):
+    """Delete visits for a customer phone number.
+
+    Use this to clear stuck pending bookings that are showing
+    "Finding Rider" in the customer UI.
+    """
+    if current_user['role'] not in ['admin', 'support_admin', 'inventory_admin', 'rider_admin']:
+        raise HTTPException(status_code=403, detail="Admin access required")
+
+    customer = await db.users.find_one({"phone": phone}, {"_id": 0, "id": 1, "name": 1, "phone": 1})
+    if not customer:
+        raise HTTPException(status_code=404, detail=f"No customer found with phone {phone}")
+
+    query = {
+        "$or": [
+            {"customer_id": customer["id"]},
+            {"user_id": customer["id"]},
+            {"customer_phone": phone}
+        ]
+    }
+    if status:
+        query["status"] = status
+
+    visits = await db.visit_bookings.find(query, {"_id": 0, "id": 1, "status": 1, "rider_id": 1, "assigned_rider_id": 1}).to_list(None)
+    if not visits:
+        return {
+            "success": True,
+            "message": f"No visits found for {phone} with status={status}",
+            "customer": customer,
+            "deleted_visit_ids": []
+        }
+
+    result = await db.visit_bookings.delete_many(query)
+
+    return {
+        "success": True,
+        "message": f"Deleted {result.deleted_count} visit(s) for {phone}",
+        "customer": customer,
+        "deleted_visit_ids": [v["id"] for v in visits]
     }
 
 @api_router.get("/admin/manual-visits")
@@ -4197,6 +5270,20 @@ async def admin_assign_visit(visit_id: str, assignment: AssignRider, current_use
     """Admin assigns visit to specific rider"""
     if current_user['role'] not in ['admin', 'rider_admin']:
         raise HTTPException(status_code=403, detail="Admin access required")
+
+    visit = await db.visit_bookings.find_one({"id": visit_id, "status": "pending"}, {"_id": 0})
+    if not visit:
+        raise HTTPException(status_code=400, detail="Visit not available for assignment")
+
+    vendor = await db.vendors.find_one(
+        {"rider_ids": assignment.rider_id},
+        {"_id": 0, "id": 1}
+    )
+    earnings_split = calculate_visit_earnings(
+        visit.get("gross_amount", (visit.get("total_properties", len(visit.get("property_ids", [])) or 1) * DEFAULT_VISIT_GROSS_AMOUNT)),
+        visit.get("visit_purpose"),
+        vendor_id=vendor.get("id") if vendor else None
+    )
     
     result = await db.visit_bookings.update_one(
         {"id": visit_id, "status": "pending"},
@@ -4204,7 +5291,15 @@ async def admin_assign_visit(visit_id: str, assignment: AssignRider, current_use
             "rider_id": assignment.rider_id,
             "status": "rider_assigned",
             "current_step": "go_to_customer",
-            "assigned_by_admin": current_user['id']
+            "assigned_by_admin": current_user['id'],
+            "vendor_id": earnings_split["vendor_id"],
+            "visit_purpose": earnings_split["visit_purpose"],
+            "visit_purpose_label": earnings_split["visit_purpose_label"],
+            "gross_amount": earnings_split["gross_amount"],
+            "platform_fee": earnings_split["platform_fee"],
+            "vendor_earning": earnings_split["vendor_earning"],
+            "vendor_share_percentage": earnings_split["vendor_share_percentage"],
+            "total_earnings": earnings_split["rider_earning"],
         }}
     )
     
@@ -5219,6 +6314,327 @@ setup_chatbot_routes(api_router, db, get_current_user)
 # Setup Seller routes
 setup_seller_routes(api_router, db, get_current_user, bcrypt)
 
+# ============================================
+# VENDOR ENDPOINTS
+# ============================================
+
+@api_router.post("/admin/vendors")
+async def create_vendor(vendor: VendorCreate, current_user: dict = Depends(get_current_user)):
+    """Admin creates a vendor account"""
+    if current_user.get("role") not in ["admin"]:
+        raise HTTPException(status_code=403, detail="Admin access required")
+
+    if await db.vendors.find_one({"phone": vendor.phone}):
+        raise HTTPException(status_code=400, detail="Phone already registered")
+    if await db.vendors.find_one({"email": vendor.email}):
+        raise HTTPException(status_code=400, detail="Email already registered")
+
+    vendor_id = str(uuid.uuid4())
+    password_hash = bcrypt.hashpw(vendor.password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+    doc = {
+        "id": vendor_id,
+        "name": vendor.name,
+        "email": vendor.email,
+        "phone": vendor.phone,
+        "password_hash": password_hash,
+        "city": vendor.city,
+        "status": "active",
+        "rider_ids": [],
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "updated_at": datetime.now(timezone.utc).isoformat(),
+    }
+    await db.vendors.insert_one(doc)
+    doc.pop("_id", None)
+    doc.pop("password_hash", None)
+    doc["daily_code"] = generate_vendor_daily_code(vendor_id)
+    return {"message": "Vendor created", "vendor": doc}
+
+
+@api_router.get("/admin/vendors")
+async def list_vendors(current_user: dict = Depends(get_current_user)):
+    """List all vendors with their daily codes and rider counts"""
+    if current_user.get("role") not in ["admin"]:
+        raise HTTPException(status_code=403, detail="Admin access required")
+
+    vendors = await db.vendors.find({}, {"_id": 0, "password_hash": 0}).to_list(500)
+    for v in vendors:
+        v["daily_code"] = generate_vendor_daily_code(v["id"])
+        v["rider_count"] = len(v.get("rider_ids", []))
+    return {"vendors": vendors}
+
+
+@api_router.get("/admin/vendors/{vendor_id}")
+async def get_vendor_detail(vendor_id: str, current_user: dict = Depends(get_current_user)):
+    """Get vendor detail with their linked riders"""
+    if current_user.get("role") not in ["admin"]:
+        raise HTTPException(status_code=403, detail="Admin access required")
+
+    vendor = await db.vendors.find_one({"id": vendor_id}, {"_id": 0, "password_hash": 0})
+    if not vendor:
+        raise HTTPException(status_code=404, detail="Vendor not found")
+
+    vendor["daily_code"] = generate_vendor_daily_code(vendor_id)
+
+    rider_ids = vendor.get("rider_ids", [])
+    riders = []
+    if rider_ids:
+        riders = await db.riders.find(
+            {"id": {"$in": rider_ids}},
+            {"_id": 0, "password_hash": 0, "password": 0}
+        ).to_list(500)
+        if not riders:
+            riders = await db.users.find(
+                {"id": {"$in": rider_ids}, "role": "rider"},
+                {"_id": 0, "password": 0}
+            ).to_list(500)
+
+    concerns = await db.vendor_concerns.find(
+        {"vendor_id": vendor_id},
+        {"_id": 0}
+    ).sort("created_at", -1).to_list(200)
+    rider_name_map = {r.get("id"): r.get("name", "Rider") for r in riders}
+    for concern in concerns:
+        concern["rider_name"] = concern.get("rider_name") or rider_name_map.get(concern.get("rider_id"), "Rider")
+
+    vendor["riders"] = riders
+    vendor["concerns"] = concerns
+    vendor["concern_types"] = VENDOR_CONCERN_TYPES
+    return vendor
+
+
+@api_router.post("/admin/vendors/{vendor_id}/concerns")
+async def create_vendor_concern(vendor_id: str, payload: VendorConcernCreate, current_user: dict = Depends(get_current_user)):
+    """Admin raises a rider concern for a vendor"""
+    if current_user.get("role") not in ["admin", "support_admin", "rider_admin"]:
+        raise HTTPException(status_code=403, detail="Admin access required")
+
+    vendor = await db.vendors.find_one({"id": vendor_id}, {"_id": 0, "id": 1, "name": 1, "rider_ids": 1})
+    if not vendor:
+        raise HTTPException(status_code=404, detail="Vendor not found")
+
+    if payload.concern_type not in VENDOR_CONCERN_TYPES:
+        raise HTTPException(status_code=400, detail="Invalid concern type")
+    if payload.rider_id not in vendor.get("rider_ids", []):
+        raise HTTPException(status_code=400, detail="Rider is not linked to this vendor")
+
+    rider = await db.users.find_one({"id": payload.rider_id, "role": "rider"}, {"_id": 0, "id": 1, "name": 1, "phone": 1})
+    if not rider:
+        rider = await db.riders.find_one({"id": payload.rider_id}, {"_id": 0, "id": 1, "name": 1, "phone": 1})
+    if not rider:
+        raise HTTPException(status_code=404, detail="Rider not found")
+
+    concern = {
+        "id": str(uuid.uuid4()),
+        "vendor_id": vendor_id,
+        "vendor_name": vendor.get("name"),
+        "rider_id": rider["id"],
+        "rider_name": rider.get("name", "Rider"),
+        "rider_phone": rider.get("phone", ""),
+        "concern_type": payload.concern_type,
+        "notes": (payload.notes or "").strip(),
+        "status": "open",
+        "raised_by": current_user.get("id"),
+        "raised_by_role": current_user.get("role"),
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "resolved_at": None,
+        "resolution_note": None,
+    }
+    await db.vendor_concerns.insert_one(concern)
+    concern.pop("_id", None)
+    return {"message": "Concern raised successfully", "concern": concern}
+
+
+@api_router.patch("/admin/vendors/{vendor_id}")
+async def update_vendor(vendor_id: str, update: VendorUpdate, current_user: dict = Depends(get_current_user)):
+    """Update vendor details"""
+    if current_user.get("role") not in ["admin"]:
+        raise HTTPException(status_code=403, detail="Admin access required")
+
+    updates = {k: v for k, v in update.model_dump().items() if v is not None}
+    if not updates:
+        raise HTTPException(status_code=400, detail="No fields to update")
+    updates["updated_at"] = datetime.now(timezone.utc).isoformat()
+    await db.vendors.update_one({"id": vendor_id}, {"$set": updates})
+    return {"message": "Vendor updated"}
+
+
+@api_router.delete("/admin/vendors/{vendor_id}")
+async def delete_vendor(vendor_id: str, current_user: dict = Depends(get_current_user)):
+    """Permanently remove a vendor account — Admin only"""
+    if current_user.get("role") not in ["admin"]:
+        raise HTTPException(status_code=403, detail="Admin access required")
+
+    vendor = await db.vendors.find_one({"id": vendor_id}, {"_id": 0, "name": 1})
+    if not vendor:
+        raise HTTPException(status_code=404, detail="Vendor not found")
+
+    await db.vendors.delete_one({"id": vendor_id})
+    return {"message": f"Vendor removed successfully"}
+
+
+@api_router.post("/vendor/login")
+async def vendor_login(credentials: LoginRequest):
+    """Vendor login — returns JWT with role=vendor"""
+    vendor = await db.vendors.find_one({"phone": credentials.phone}, {"_id": 0})
+    if not vendor:
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+    if not bcrypt.checkpw(credentials.password.encode('utf-8'), vendor["password_hash"].encode('utf-8')):
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+    if vendor.get("status") != "active":
+        raise HTTPException(status_code=403, detail="Vendor account is suspended")
+
+    payload = {
+        "user_id": vendor["id"],
+        "role": "vendor",
+        "exp": datetime.now(timezone.utc) + timedelta(hours=720)
+    }
+    token = jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
+    return {"token": token, "role": "vendor", "name": vendor["name"]}
+
+
+@api_router.get("/vendor/me")
+async def get_vendor_profile(current_user: dict = Depends(get_current_user)):
+    """Get vendor's own profile with today's daily code"""
+    if current_user.get("role") != "vendor":
+        raise HTTPException(status_code=403, detail="Vendor access required")
+
+    vendor = await db.vendors.find_one({"id": current_user["id"]}, {"_id": 0, "password_hash": 0})
+    if not vendor:
+        raise HTTPException(status_code=404, detail="Vendor not found")
+
+    vendor["daily_code"] = generate_vendor_daily_code(vendor["id"])
+
+    rider_ids = vendor.get("rider_ids", [])
+    riders = []
+    if rider_ids:
+        riders = await db.riders.find(
+            {"id": {"$in": rider_ids}},
+            {"_id": 0, "password_hash": 0, "password": 0}
+        ).to_list(500)
+        if not riders:
+            riders = await db.users.find(
+                {"id": {"$in": rider_ids}, "role": "rider"},
+                {"_id": 0, "password": 0}
+            ).to_list(500)
+
+    completed_visits = []
+    active_visit_count = 0
+    if rider_ids:
+        completed_visits = await db.visit_bookings.find(
+            {
+                "rider_id": {"$in": rider_ids},
+                "status": "completed"
+            },
+            {"_id": 0}
+        ).sort("visit_end_time", -1).to_list(200)
+
+        active_visit_count = await db.visit_bookings.count_documents({
+            "rider_id": {"$in": rider_ids},
+            "status": {"$in": ["assigned", "rider_assigned", "pickup_started", "at_customer", "navigating", "at_property", "in_progress"]}
+        })
+
+    normalized_completed_visits = []
+    for visit in completed_visits:
+        if visit.get("vendor_earning") is not None and visit.get("gross_amount") is not None and visit.get("platform_fee") is not None:
+            normalized_completed_visits.append(visit)
+            continue
+
+        fallback_split = calculate_visit_earnings(
+            visit.get("gross_amount", (visit.get("total_properties") or len(visit.get("property_ids", [])) or 1) * DEFAULT_VISIT_GROSS_AMOUNT),
+            visit.get("visit_purpose"),
+            vendor_id=vendor["id"]
+        )
+        normalized_visit = dict(visit)
+        normalized_visit["gross_amount"] = fallback_split["gross_amount"]
+        normalized_visit["platform_fee"] = fallback_split["platform_fee"]
+        normalized_visit["vendor_earning"] = fallback_split["vendor_earning"]
+        normalized_visit["visit_purpose"] = fallback_split["visit_purpose"]
+        normalized_visit["visit_purpose_label"] = fallback_split["visit_purpose_label"]
+        normalized_visit["total_earnings"] = visit.get("total_earnings", fallback_split["rider_earning"])
+        normalized_completed_visits.append(normalized_visit)
+
+    total_vendor_earnings = round(sum(float(v.get("vendor_earning", 0) or 0) for v in normalized_completed_visits), 2)
+    total_rider_earnings = round(sum(float(v.get("total_earnings", 0) or 0) for v in normalized_completed_visits), 2)
+    total_platform_fee = round(sum(float(v.get("platform_fee", 0) or 0) for v in normalized_completed_visits), 2)
+    total_gross_amount = round(sum(float(v.get("gross_amount", 0) or 0) for v in normalized_completed_visits), 2)
+
+    recent_completed_visits = []
+    for visit in normalized_completed_visits[:12]:
+        recent_completed_visits.append({
+            "id": visit.get("id"),
+            "scheduled_date": visit.get("scheduled_date"),
+            "scheduled_time": visit.get("scheduled_time"),
+            "visit_end_time": visit.get("visit_end_time"),
+            "rider_id": visit.get("rider_id"),
+            "rider_name": next((r.get("name") for r in riders if r.get("id") == visit.get("rider_id")), "Rider"),
+            "property_count": visit.get("total_properties") or len(visit.get("property_ids", [])) or 1,
+            "gross_amount": round(float(visit.get("gross_amount", 0) or 0), 2),
+            "platform_fee": round(float(visit.get("platform_fee", 0) or 0), 2),
+            "vendor_earning": round(float(visit.get("vendor_earning", 0) or 0), 2),
+            "rider_earning": round(float(visit.get("total_earnings", 0) or 0), 2),
+            "visit_purpose": normalize_visit_purpose(visit.get("visit_purpose")),
+            "visit_purpose_label": visit.get("visit_purpose_label") or VENDOR_PURPOSE_LABELS[normalize_visit_purpose(visit.get("visit_purpose"))],
+        })
+
+    vendor["earnings_summary"] = {
+        "total_vendor_earnings": total_vendor_earnings,
+        "total_rider_earnings": total_rider_earnings,
+        "total_platform_fee": total_platform_fee,
+        "total_gross_amount": total_gross_amount,
+        "completed_visit_count": len(normalized_completed_visits),
+        "active_visit_count": active_visit_count,
+    }
+    concerns = await db.vendor_concerns.find(
+        {"vendor_id": vendor["id"]},
+        {"_id": 0}
+    ).sort("created_at", -1).to_list(200)
+    vendor["concern_summary"] = {
+        "open_count": sum(1 for concern in concerns if concern.get("status") == "open"),
+        "resolved_count": sum(1 for concern in concerns if concern.get("status") == "resolved"),
+    }
+    vendor["riders"] = riders
+    vendor["recent_completed_visits"] = recent_completed_visits
+    vendor["concerns"] = concerns
+    return vendor
+
+
+@api_router.get("/vendor/concerns")
+async def get_vendor_concerns(current_user: dict = Depends(get_current_user)):
+    if current_user.get("role") != "vendor":
+        raise HTTPException(status_code=403, detail="Vendor access required")
+
+    concerns = await db.vendor_concerns.find(
+        {"vendor_id": current_user["id"]},
+        {"_id": 0}
+    ).sort("created_at", -1).to_list(200)
+    return {"concerns": concerns, "concern_types": VENDOR_CONCERN_TYPES}
+
+
+@api_router.patch("/vendor/concerns/{concern_id}/resolve")
+async def resolve_vendor_concern(concern_id: str, payload: VendorConcernResolve, current_user: dict = Depends(get_current_user)):
+    if current_user.get("role") != "vendor":
+        raise HTTPException(status_code=403, detail="Vendor access required")
+
+    result = await db.vendor_concerns.update_one(
+        {"id": concern_id, "vendor_id": current_user["id"]},
+        {
+            "$set": {
+                "status": "resolved",
+                "resolved_at": datetime.now(timezone.utc).isoformat(),
+                "resolution_note": (payload.resolution_note or "").strip(),
+            }
+        }
+    )
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Concern not found")
+
+    concern = await db.vendor_concerns.find_one({"id": concern_id}, {"_id": 0})
+    return {"message": "Concern resolved", "concern": concern}
+
+# ============================================
+# END VENDOR ENDPOINTS
+# ============================================
+
 app.include_router(api_router)
 
 # Include new modular routes
@@ -5418,6 +6834,7 @@ async def seed_default_accounts():
             logger.info(f"Account already exists: {account['phone']}")
 
 # Health check endpoint for production keep-alive (outside /api prefix)
+
 @app.get("/health")
 async def health_check():
     """Health check endpoint for Kubernetes/load balancer"""

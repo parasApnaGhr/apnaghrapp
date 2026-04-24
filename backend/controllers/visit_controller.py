@@ -53,8 +53,11 @@ class VisitController:
             "created_at": datetime.now(timezone.utc).isoformat()
         }
         
-        await self.db.visit_bookings.insert_one(booking.copy())
-        
+        insert_result = await self.db.visit_bookings.insert_one(booking.copy())
+        saved_booking = await self.db.visit_bookings.find_one({"id": booking["id"]}, {"_id": 0})
+        if not saved_booking:
+            raise HTTPException(status_code=500, detail="Visit booking was not saved to the database")
+
         return sanitize_mongo_doc(booking)
     
     async def get_customer_bookings(self, customer_id: str, phone: Optional[str] = None) -> List[dict]:

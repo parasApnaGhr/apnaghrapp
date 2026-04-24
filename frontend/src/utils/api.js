@@ -129,14 +129,18 @@ export const propertyAPI = {
 
 export const paymentAPI = {
   // Cashfree checkout - supports visits, packers, and ads
-  createCheckout: (packageId, originUrl, propertyId = null, bookingId = null, adId = null) => 
-    api.post('/payments/checkout', { 
-      package_id: packageId, 
-      origin_url: originUrl, 
+  createCheckout: (packageId, originUrl, propertyId = null, bookingId = null, adId = null) =>
+    api.post('/payments/checkout', {
+      package_id: packageId,
+      origin_url: originUrl,
       property_id: propertyId,
       booking_id: bookingId,
       ad_id: adId
     }),
+  createMockVisitPackage: (packageId) => api.post('/payments/mock-visit-package', { package_id: packageId }),
+  // Dynamic-fare visit checkout: server computes amount from pickup + properties.
+  createVisitDynamicCheckout: (payload) => api.post('/payments/visit-dynamic-checkout', payload),
+  createMockVisitDynamic: (payload) => api.post('/payments/mock-visit-dynamic', payload),
   getPaymentStatus: (orderId) => api.get(`/payments/status/${orderId}`),
 };
 
@@ -177,6 +181,16 @@ export const visitAPI = {
   }),
   // Live tracking - Uber-like customer tracking
   trackVisit: (visitId) => api.get(`/visits/${visitId}/track`),
+  // Smart routing - reorder cart properties by distance from pickup
+  sortByPickup: (propertyIds, pickupLat, pickupLng) =>
+    api.post('/visits/sort-by-pickup', {
+      property_ids: propertyIds,
+      pickup_lat: pickupLat,
+      pickup_lng: pickupLng
+    }),
+  // Dynamic pricing estimate – server computes base + distance + tier + peak
+  // + waiting + traffic + extra-property fee with bulk-visit discount applied.
+  estimatePrice: (payload) => api.post('/visits/estimate-price', payload),
 };
 
 export const riderAPI = {

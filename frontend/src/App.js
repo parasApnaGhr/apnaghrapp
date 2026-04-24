@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import { HelmetProvider } from 'react-helmet-async';
@@ -23,6 +23,7 @@ import CustomerSupport from './pages/CustomerSupport';
 import CustomerPrivacy from './pages/CustomerPrivacy';
 import RiderProfile from './pages/RiderProfile';
 import LegalPolicies from './pages/LegalPolicies';
+import VendorDashboard from './pages/VendorDashboard';
 import AddPropertyLocation from './pages/AddPropertyLocation';
 // New Rider Onboarding Module
 import RiderOnboarding from './pages/onboarding/RiderOnboarding';
@@ -38,6 +39,25 @@ import EarnMoneyPage from './seo-pages/pages/EarnMoneyPage';
 import CityRiderPage from './seo-pages/pages/CityRiderPage';
 import Earn2000Page from './seo-pages/pages/Earn2000Page';
 import '@/App.css';
+
+const RIDER_APP_URL = process.env.REACT_APP_RIDER_URL || 'http://localhost:3001';
+
+// Redirects to the rider-service app, passing the JWT token via URL so the
+// rider-service can store it as rider_token without requiring a second login.
+const RiderRedirect = ({ path = '/dashboard' }) => {
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    const url = new URL(`${RIDER_APP_URL}${path}`);
+    if (token) url.searchParams.set('token', token);
+    window.location.replace(url.toString());
+  }, [path]);
+
+  return (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="w-16 h-16 border-4 border-[#E07A5F] border-t-transparent rounded-full animate-spin"></div>
+    </div>
+  );
+};
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const { user, loading } = useAuth();
@@ -75,7 +95,9 @@ const AppRoutes = () => {
     } else if (role === 'builder') {
       return '/builder';
     } else if (role === 'rider') {
-      return '/rider';
+      return '/rider'; // /rider route handles external redirect to rider-service
+    } else if (role === 'vendor') {
+      return '/vendor';
     } else if (role === 'seller') {
       return '/seller';
     } else if (['admin', 'support_admin', 'inventory_admin', 'rider_admin'].includes(role)) {
@@ -236,20 +258,16 @@ const AppRoutes = () => {
         }
       />
 
-      <Route
-        path="/rider"
-        element={
-          <ProtectedRoute allowedRoles={['rider']}>
-            <RiderDashboard />
-          </ProtectedRoute>
-        }
-      />
+      {/* Rider routes → redirect to rider-service app (localhost:3001) via splash */}
+      <Route path="/rider" element={<RiderRedirect path="/splash" />} />
+      <Route path="/rider/profile" element={<RiderRedirect path="/splash" />} />
+      <Route path="/rider/*" element={<RiderRedirect path="/splash" />} />
 
       <Route
-        path="/rider/profile"
+        path="/vendor"
         element={
-          <ProtectedRoute allowedRoles={['rider']}>
-            <RiderProfile />
+          <ProtectedRoute allowedRoles={['vendor']}>
+            <VendorDashboard />
           </ProtectedRoute>
         }
       />
@@ -299,7 +317,7 @@ const AppRoutes = () => {
           RIDER ONBOARDING MODULE - New rider applications
           PUBLIC route - no authentication required
           ============================================ */}
-      <Route path="/join-as-rider" element={<RiderOnboarding />} />
+      <Route path="/join-as-rider" element={<RiderRedirect path="/apply" />} />
 
       {/* ============================================
           PRIVACY POLICY PAGES - Role-specific policies

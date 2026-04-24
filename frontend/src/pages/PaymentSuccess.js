@@ -15,14 +15,21 @@ const PaymentSuccess = () => {
   
   const orderId = searchParams.get('order_id') || searchParams.get('session_id');
   const paymentType = searchParams.get('type');
+  const isMockPayment = searchParams.get('mock') === '1';
 
   useEffect(() => {
+    if (isMockPayment) {
+      setStatus('success');
+      autoBookVisit();
+      return;
+    }
+
     if (orderId) {
       pollPaymentStatus();
     } else {
       setStatus('error');
     }
-  }, [orderId]);
+  }, [orderId, isMockPayment]);
 
   // Auto-book visit after payment success
   const autoBookVisit = async () => {
@@ -35,10 +42,30 @@ const PaymentSuccess = () => {
     try {
       const pendingBooking = JSON.parse(pendingBookingStr);
       console.log('Attempting to auto-book visit:', pendingBooking);
-      
+
+      if (isMockPayment) {
+        // Dynamic-pricing flow: the backend needs the same checkout payload
+        // used at pay time so it can recompute the fare and mint a
+        // short-lived visit package.
+        if (pendingBooking.checkout_payload) {
+          try {
+            await paymentAPI.createMockVisitDynamic(pendingBooking.checkout_payload);
+          } catch (dynamicError) {
+            console.warn('Mock dynamic visit creation error:', dynamicError);
+          }
+        } else if (pendingBooking.package_id) {
+          // Legacy fixed-package fallback for any in-flight pre-migration carts.
+          try {
+            await paymentAPI.createMockVisitPackage(pendingBooking.package_id);
+          } catch (packageError) {
+            console.warn('Mock package creation error:', packageError);
+          }
+        }
+      }
+
       // Small delay to ensure package is created
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
+
       // Create the visit booking
       const response = await visitAPI.bookVisit({
         property_ids: pendingBooking.property_ids,
@@ -46,7 +73,9 @@ const PaymentSuccess = () => {
         scheduled_time: pendingBooking.scheduled_time,
         pickup_location: pendingBooking.pickup_location,
         pickup_lat: pendingBooking.pickup_lat,
-        pickup_lng: pendingBooking.pickup_lng
+        pickup_lng: pendingBooking.pickup_lng,
+        visit_amount: pendingBooking.visit_amount,
+        visit_purpose: pendingBooking.visit_purpose || 'navigate_only'
       });
 
       console.log('Visit booked successfully:', response.data);
@@ -128,6 +157,25 @@ const PaymentSuccess = () => {
       };
     }
     
+    if (packageType === 'visit_dynamic' || type === 'visit') {
+      if (visitBooked && bookingDetails) {
+        return {
+          title: 'Visit Scheduled!',
+          message: `Your property visit is confirmed for ${bookingDetails.scheduled_date} at ${bookingDetails.scheduled_time}. A rider will pick you up from your location and drop you back.`,
+          icon: Calendar,
+          buttonText: 'View My Bookings',
+          redirectTo: '/customer/bookings'
+        };
+      }
+      return {
+        title: 'Payment Successful!',
+        message: 'Your visit is booked. We will confirm the rider shortly.',
+        icon: Calendar,
+        buttonText: 'View My Bookings',
+        redirectTo: '/customer/bookings'
+      };
+    }
+
     if (packageType === 'single_visit') {
       if (visitBooked && bookingDetails) {
         return {

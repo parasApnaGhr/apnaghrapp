@@ -93,12 +93,47 @@ const RiderApplicationsPanel = () => {
     }
   };
 
+  // Helper — new app uses "name", old app used "full_name"
+  const appName = (app) => app.name || app.full_name || '—';
+
+  // Helper — render a document that may be a base64 string or a URL
+  const DocItem = ({ src, label, icon: Icon, color }) => {
+    if (!src) return null;
+    const isBase64 = src.startsWith('data:');
+    return isBase64 ? (
+      <div className="space-y-2">
+        <div className="flex items-center gap-2 text-sm font-medium text-gray-700">
+          <Icon className={`w-4 h-4 ${color}`} />
+          {label}
+        </div>
+        <img
+          src={src}
+          alt={label}
+          className="w-full rounded-lg border border-gray-200 object-cover cursor-pointer hover:opacity-90 transition"
+          style={{ maxHeight: 180 }}
+          onClick={() => window.open(src, '_blank')}
+        />
+      </div>
+    ) : (
+      <a
+        href={src}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="flex items-center gap-2 p-3 bg-white border border-gray-200 rounded-lg hover:bg-gray-100"
+      >
+        <Icon className={`w-5 h-5 ${color}`} />
+        <span className="text-sm">{label}</span>
+        <Download className="w-4 h-4 ml-auto" />
+      </a>
+    );
+  };
+
   // Filter applications by search
   const filteredApps = applications.filter(app => {
     if (!searchQuery) return true;
     const query = searchQuery.toLowerCase();
     return (
-      app.full_name?.toLowerCase().includes(query) ||
+      appName(app).toLowerCase().includes(query) ||
       app.mobile?.includes(query) ||
       app.city?.toLowerCase().includes(query)
     );
@@ -222,10 +257,10 @@ const RiderApplicationsPanel = () => {
                   <tr key={app.id} className="hover:bg-gray-50">
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
-                        {app.selfie_url ? (
+                        {(app.profile_photo || app.selfie_url) ? (
                           <img
-                            src={app.selfie_url}
-                            alt={app.full_name}
+                            src={app.profile_photo || app.selfie_url}
+                            alt={appName(app)}
                             className="w-10 h-10 rounded-full object-cover"
                           />
                         ) : (
@@ -234,13 +269,16 @@ const RiderApplicationsPanel = () => {
                           </div>
                         )}
                         <div>
-                          <div className="font-medium text-gray-900">{app.full_name}</div>
-                          <div className="text-sm text-gray-500">{app.availability?.replace('_', ' ')}</div>
+                          <div className="font-medium text-gray-900">{appName(app)}</div>
+                          <div className="text-sm text-gray-500">{app.availability?.replace(/_/g, ' ')}</div>
                         </div>
                       </div>
                     </td>
                     <td className="px-4 py-3">
                       <div className="text-sm text-gray-900">+91 {app.mobile}</div>
+                      {app.whatsapp && app.whatsapp !== app.mobile && (
+                        <div className="text-xs text-gray-400">WA: {app.whatsapp}</div>
+                      )}
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-1 text-sm text-gray-700">
@@ -249,9 +287,16 @@ const RiderApplicationsPanel = () => {
                       </div>
                     </td>
                     <td className="px-4 py-3">
-                      <span className={`text-sm ${app.has_vehicle ? 'text-green-600' : 'text-gray-500'}`}>
-                        {app.has_vehicle ? 'Yes' : 'No'}
-                      </span>
+                      {app.vehicle_type ? (
+                        <div>
+                          <span className="text-sm text-green-600 capitalize">{app.vehicle_type}</span>
+                          {app.vehicle_number && <div className="text-xs text-gray-400">{app.vehicle_number}</div>}
+                        </div>
+                      ) : (
+                        <span className={`text-sm ${app.has_vehicle ? 'text-green-600' : 'text-gray-500'}`}>
+                          {app.has_vehicle ? 'Yes' : 'No'}
+                        </span>
+                      )}
                     </td>
                     <td className="px-4 py-3">
                       <StatusBadge status={app.status} />
@@ -329,10 +374,10 @@ const RiderApplicationsPanel = () => {
             <div className="p-6 space-y-6">
               {/* Header */}
               <div className="flex items-center gap-4">
-                {selectedApp.selfie_url ? (
+                {(selectedApp.profile_photo || selectedApp.selfie_url) ? (
                   <img
-                    src={selectedApp.selfie_url}
-                    alt={selectedApp.full_name}
+                    src={selectedApp.profile_photo || selectedApp.selfie_url}
+                    alt={appName(selectedApp)}
                     className="w-20 h-20 rounded-xl object-cover"
                   />
                 ) : (
@@ -341,7 +386,7 @@ const RiderApplicationsPanel = () => {
                   </div>
                 )}
                 <div>
-                  <h3 className="text-xl font-bold text-gray-900">{selectedApp.full_name}</h3>
+                  <h3 className="text-xl font-bold text-gray-900">{appName(selectedApp)}</h3>
                   <p className="text-gray-600">{selectedApp.city}</p>
                   <StatusBadge status={selectedApp.status} />
                 </div>
@@ -350,147 +395,135 @@ const RiderApplicationsPanel = () => {
               {/* Contact */}
               <div className="bg-gray-50 rounded-xl p-4">
                 <h4 className="font-semibold text-gray-900 mb-3">Contact Information</h4>
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <span className="text-gray-500">Mobile:</span>
-                    <span className="ml-2 text-gray-900">+91 {selectedApp.mobile}</span>
-                  </div>
-                  <div>
-                    <span className="text-gray-500">WhatsApp:</span>
-                    <span className="ml-2 text-gray-900">{selectedApp.whatsapp || 'Same as mobile'}</span>
-                  </div>
-                  <div>
-                    <span className="text-gray-500">City:</span>
-                    <span className="ml-2 text-gray-900">{selectedApp.city}</span>
-                  </div>
-                  <div>
-                    <span className="text-gray-500">Areas:</span>
-                    <span className="ml-2 text-gray-900">{selectedApp.areas?.join(', ') || 'All areas'}</span>
-                  </div>
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  <div><span className="text-gray-500">Mobile:</span><span className="ml-2 text-gray-900">+91 {selectedApp.mobile}</span></div>
+                  <div><span className="text-gray-500">WhatsApp:</span><span className="ml-2 text-gray-900">{selectedApp.whatsapp || 'Same as mobile'}</span></div>
+                  {selectedApp.email && <div><span className="text-gray-500">Email:</span><span className="ml-2 text-gray-900">{selectedApp.email}</span></div>}
+                  <div><span className="text-gray-500">City:</span><span className="ml-2 text-gray-900">{selectedApp.city}</span></div>
+                  {selectedApp.address && (
+                    <div className="col-span-2"><span className="text-gray-500">Address:</span><span className="ml-2 text-gray-900">{selectedApp.address}</span></div>
+                  )}
+                  {selectedApp.areas?.length > 0 && (
+                    <div className="col-span-2">
+                      <span className="text-gray-500">Work Areas:</span>
+                      <div className="flex flex-wrap gap-1 mt-1">
+                        {selectedApp.areas.map(a => (
+                          <span key={a} className="px-2 py-0.5 bg-gray-200 text-gray-700 rounded text-xs">{a}</span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
 
               {/* Documents */}
               <div className="bg-gray-50 rounded-xl p-4">
-                <h4 className="font-semibold text-gray-900 mb-3">Documents</h4>
+                <h4 className="font-semibold text-gray-900 mb-3">KYC Documents</h4>
+                {selectedApp.aadhar_number && (
+                  <p className="text-sm text-gray-600 mb-3">
+                    <span className="text-gray-500">Aadhaar Number:</span>
+                    <span className="ml-2 font-mono font-medium text-gray-900">{selectedApp.aadhar_number}</span>
+                  </p>
+                )}
                 <div className="grid grid-cols-2 gap-4">
-                  {selectedApp.aadhaar_url && (
-                    <a
-                      href={selectedApp.aadhaar_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-2 p-3 bg-white border border-gray-200 rounded-lg hover:bg-gray-100"
-                    >
-                      <FileText className="w-5 h-5 text-blue-600" />
-                      <span>Aadhaar Card</span>
-                      <Download className="w-4 h-4 ml-auto" />
-                    </a>
-                  )}
-                  {selectedApp.pan_url && (
-                    <a
-                      href={selectedApp.pan_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-2 p-3 bg-white border border-gray-200 rounded-lg hover:bg-gray-100"
-                    >
-                      <FileText className="w-5 h-5 text-green-600" />
-                      <span>PAN Card</span>
-                      <Download className="w-4 h-4 ml-auto" />
-                    </a>
-                  )}
-                  {selectedApp.driving_license_url && (
-                    <a
-                      href={selectedApp.driving_license_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-2 p-3 bg-white border border-gray-200 rounded-lg hover:bg-gray-100"
-                    >
-                      <Car className="w-5 h-5 text-purple-600" />
-                      <span>Driving License</span>
-                      <Download className="w-4 h-4 ml-auto" />
-                    </a>
-                  )}
-                  {selectedApp.selfie_url && (
-                    <a
-                      href={selectedApp.selfie_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-2 p-3 bg-white border border-gray-200 rounded-lg hover:bg-gray-100"
-                    >
-                      <Camera className="w-5 h-5 text-orange-600" />
-                      <span>Selfie Photo</span>
-                      <Download className="w-4 h-4 ml-auto" />
-                    </a>
-                  )}
+                  <DocItem src={selectedApp.aadhar_front}          label="Aadhaar Front"     icon={FileText} color="text-blue-600" />
+                  <DocItem src={selectedApp.aadhar_back}           label="Aadhaar Back"      icon={FileText} color="text-blue-600" />
+                  <DocItem src={selectedApp.driving_license_photo} label="Driving License"   icon={Car}      color="text-purple-600" />
+                  <DocItem src={selectedApp.profile_photo}         label="Profile Photo"     icon={Camera}   color="text-orange-600" />
+                  {/* backward compat with old URL-based docs */}
+                  <DocItem src={selectedApp.aadhaar_url}           label="Aadhaar Card"      icon={FileText} color="text-blue-600" />
+                  <DocItem src={selectedApp.pan_url}               label="PAN Card"          icon={FileText} color="text-green-600" />
+                  <DocItem src={selectedApp.driving_license_url}   label="Driving License"   icon={Car}      color="text-purple-600" />
+                  <DocItem src={selectedApp.selfie_url}            label="Selfie"            icon={Camera}   color="text-orange-600" />
                 </div>
               </div>
 
               {/* Work Details */}
               <div className="bg-gray-50 rounded-xl p-4">
                 <h4 className="font-semibold text-gray-900 mb-3">Work Details</h4>
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <span className="text-gray-500">Vehicle:</span>
-                    <span className={`ml-2 ${selectedApp.has_vehicle ? 'text-green-600' : 'text-gray-900'}`}>
-                      {selectedApp.has_vehicle ? 'Yes' : 'No'}
-                    </span>
-                  </div>
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  {selectedApp.vehicle_type ? (
+                    <>
+                      <div><span className="text-gray-500">Vehicle Type:</span><span className="ml-2 text-green-600 capitalize">{selectedApp.vehicle_type}</span></div>
+                      <div><span className="text-gray-500">Vehicle No:</span><span className="ml-2 text-gray-900 font-mono">{selectedApp.vehicle_number}</span></div>
+                      <div><span className="text-gray-500">License No:</span><span className="ml-2 text-gray-900 font-mono">{selectedApp.driving_license}</span></div>
+                    </>
+                  ) : (
+                    <div><span className="text-gray-500">Vehicle:</span><span className={`ml-2 ${selectedApp.has_vehicle ? 'text-green-600' : 'text-gray-900'}`}>{selectedApp.has_vehicle ? 'Yes' : 'No'}</span></div>
+                  )}
                   <div>
                     <span className="text-gray-500">Availability:</span>
-                    <span className="ml-2 text-gray-900">
-                      {selectedApp.availability?.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                    </span>
+                    <span className="ml-2 text-gray-900">{selectedApp.availability?.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) || '—'}</span>
                   </div>
                   {selectedApp.experience && (
-                    <div className="col-span-2">
-                      <span className="text-gray-500">Experience:</span>
-                      <p className="mt-1 text-gray-900">{selectedApp.experience}</p>
-                    </div>
+                    <div className="col-span-2"><span className="text-gray-500">Experience:</span><p className="mt-1 text-gray-900">{selectedApp.experience}</p></div>
                   )}
                 </div>
               </div>
 
-              {/* Payment Details */}
-              <div className="bg-gray-50 rounded-xl p-4">
-                <h4 className="font-semibold text-gray-900 mb-3">Payment Details</h4>
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <span className="text-gray-500">UPI ID:</span>
-                    <span className="ml-2 text-gray-900">{selectedApp.upi_id}</span>
+              {/* Vendor Code — shown when present */}
+              {selectedApp.vendor_code && (
+                <div className="bg-gray-50 rounded-xl p-4">
+                  <h4 className="font-semibold text-gray-900 mb-3 text-sm">Vendor Code</h4>
+                  <div className="flex items-center gap-3 text-sm">
+                    <span className="font-mono bg-white border border-gray-200 px-3 py-1.5 rounded-lg text-[#04473C] font-bold tracking-[0.2em]">
+                      {selectedApp.vendor_code}
+                    </span>
+                    {selectedApp.vendor_id ? (
+                      <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">✓ Valid — vendor linked</span>
+                    ) : (
+                      <span className="text-xs bg-amber-100 text-amber-700 px-2 py-1 rounded-full font-medium">Code entered but no matching vendor found</span>
+                    )}
                   </div>
-                  {selectedApp.bank_name && (
-                    <div>
-                      <span className="text-gray-500">Bank:</span>
-                      <span className="ml-2 text-gray-900">{selectedApp.bank_name}</span>
-                    </div>
-                  )}
                 </div>
+              )}
+
+              {/* Payment Details — always shown */}
+              <div className="bg-gray-50 rounded-xl p-4">
+                <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                  <Wallet className="w-4 h-4 text-gray-500" /> Payment Details
+                </h4>
+                {(selectedApp.upi_id || selectedApp.bank_name) ? (
+                  <div className="grid grid-cols-2 gap-3 text-sm">
+                    {selectedApp.upi_id && (
+                      <div className="col-span-2">
+                        <span className="text-gray-500">UPI ID:</span>
+                        <span className="ml-2 text-gray-900 font-mono">{selectedApp.upi_id}</span>
+                      </div>
+                    )}
+                    {selectedApp.bank_name && <div><span className="text-gray-500">Bank:</span><span className="ml-2 text-gray-900">{selectedApp.bank_name}</span></div>}
+                    {selectedApp.account_number && <div><span className="text-gray-500">Account:</span><span className="ml-2 text-gray-900 font-mono">{selectedApp.account_number}</span></div>}
+                    {selectedApp.ifsc_code && <div><span className="text-gray-500">IFSC:</span><span className="ml-2 text-gray-900 font-mono">{selectedApp.ifsc_code}</span></div>}
+                    {selectedApp.account_holder_name && <div><span className="text-gray-500">Holder:</span><span className="ml-2 text-gray-900">{selectedApp.account_holder_name}</span></div>}
+                  </div>
+                ) : (
+                  <p className="text-sm text-gray-400 italic">Not provided — application submitted via old form</p>
+                )}
               </div>
 
-              {/* Legal Agreements */}
+              {/* Legal Agreements — always shown */}
               <div className="bg-gray-50 rounded-xl p-4">
                 <h4 className="font-semibold text-gray-900 mb-3">Legal Agreements</h4>
-                <div className="flex flex-wrap gap-2">
-                  {selectedApp.legal_agreements?.non_circumvention && (
-                    <span className="px-2 py-1 bg-green-100 text-green-700 rounded text-xs">Non-Circumvention ✓</span>
-                  )}
-                  {selectedApp.legal_agreements?.commission_protection && (
-                    <span className="px-2 py-1 bg-green-100 text-green-700 rounded text-xs">Commission Protection ✓</span>
-                  )}
-                  {selectedApp.legal_agreements?.penalty_clause && (
-                    <span className="px-2 py-1 bg-green-100 text-green-700 rounded text-xs">Penalty Clause ✓</span>
-                  )}
-                  {selectedApp.legal_agreements?.work_compliance && (
-                    <span className="px-2 py-1 bg-green-100 text-green-700 rounded text-xs">Work Compliance ✓</span>
-                  )}
-                  {selectedApp.legal_agreements?.payment_terms && (
-                    <span className="px-2 py-1 bg-green-100 text-green-700 rounded text-xs">Payment Terms ✓</span>
-                  )}
-                </div>
-                {selectedApp.legal_agreements?.agreed_at && (
-                  <p className="text-xs text-gray-500 mt-2">
-                    Agreed on: {new Date(selectedApp.legal_agreements.agreed_at).toLocaleString()}
-                  </p>
+                {selectedApp.legal_agreements ? (
+                  <div className="flex flex-wrap gap-2">
+                    {[
+                      ['non_circumvention',    'Non-Circumvention'],
+                      ['commission_protection','Commission Protection'],
+                      ['penalty_clause',       'Penalty Clause'],
+                      ['work_compliance',      'Work Compliance'],
+                      ['payment_terms',        'Payment Terms'],
+                    ].map(([key, label]) => (
+                      <span key={key} className={`px-2 py-1 rounded text-xs font-medium ${
+                        selectedApp.legal_agreements[key]
+                          ? 'bg-green-100 text-green-700'
+                          : 'bg-red-100 text-red-600'
+                      }`}>
+                        {label} {selectedApp.legal_agreements[key] ? '✓' : '✗'}
+                      </span>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm text-gray-400 italic">Not provided — application submitted via old form</p>
                 )}
               </div>
 

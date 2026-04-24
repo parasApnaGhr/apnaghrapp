@@ -5,7 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { propertyAPI, paymentAPI, getMediaUrl } from '../utils/api';
 import { initiateCashfreePayment } from '../utils/cashfree';
 import api from '../utils/api';
-import { ArrowLeft, MapPin, Bed, Sofa, Home, Lock, Video, ShoppingCart, Plus, Check, Play, X, ChevronLeft, ChevronRight, ZoomIn } from 'lucide-react';
+import { ArrowLeft, MapPin, Bed, Sofa, Home, Lock, Video, ShoppingCart, Play, X, ChevronLeft, ChevronRight, ZoomIn, CalendarCheck, Users, CreditCard } from 'lucide-react';
 import { toast } from 'sonner';
 
 const PropertyDetail = () => {
@@ -18,7 +18,8 @@ const PropertyDetail = () => {
   const [selectedImage, setSelectedImage] = useState(0);
   const [explainerVideo, setExplainerVideo] = useState(null);
   const [showLightbox, setShowLightbox] = useState(false);
-  
+  const [showVisitModal, setShowVisitModal] = useState(false);
+
   const [cart, setCart] = useState(() => {
     const saved = localStorage.getItem('visitCart');
     return saved ? JSON.parse(saved) : [];
@@ -57,55 +58,33 @@ const PropertyDetail = () => {
     }
   };
 
-  const addToCart = () => {
-    if (!isInCart && property) {
-      const newCart = [...cart, {
-        id: property.id,
-        title: property.title,
-        rent: property.rent,
-        area_name: property.area_name,
-        bhk: property.bhk,
-        furnishing: property.furnishing,
-        images: property.images
-      }];
-      setCart(newCart);
-      toast.success('Property added to visit cart!');
-    }
-  };
-
-  const removeFromCart = () => {
-    const newCart = cart.filter(item => item.id !== id);
+  const addCurrentPropertyToCart = () => {
+    if (!property) return cart;
+    if (cart.some(item => item.id === property.id)) return cart;
+    const newCart = [...cart, {
+      id: property.id,
+      title: property.title,
+      rent: property.rent,
+      area_name: property.area_name,
+      bhk: property.bhk,
+      furnishing: property.furnishing,
+      images: property.images
+    }];
     setCart(newCart);
-    toast.success('Property removed from cart');
+    return newCart;
   };
 
-  const handleBookVisit = async (packageId) => {
-    setProcessingPayment(true);
-    try {
-      const originUrl = window.location.origin;
-      const response = await paymentAPI.createCheckout(packageId, originUrl, id);
-      
-      const paymentSessionId = response.data.payment_session_id;
-      const returnUrl = `${originUrl}/payment-success?order_id=${response.data.order_id}`;
-      
-      if (paymentSessionId) {
-        try {
-          await initiateCashfreePayment(paymentSessionId, returnUrl);
-        } catch (sdkError) {
-          console.warn('Cashfree SDK error, falling back to redirect:', sdkError);
-          if (response.data.checkout_url) {
-            window.location.href = response.data.checkout_url;
-          } else {
-            throw new Error('Payment initialization failed');
-          }
-        }
-      } else if (response.data.checkout_url) {
-        window.location.href = response.data.checkout_url;
-      }
-    } catch (error) {
-      toast.error(error.response?.data?.detail || 'Failed to create payment');
-      setProcessingPayment(false);
-    }
+  const handleChooseMore = () => {
+    const newCart = addCurrentPropertyToCart();
+    setShowVisitModal(false);
+    toast.success(`Added to cart (${newCart.length} ${newCart.length === 1 ? 'property' : 'properties'}). Pick more to visit together.`);
+    navigate('/customer');
+  };
+
+  const handleProceedToPay = () => {
+    addCurrentPropertyToCart();
+    setShowVisitModal(false);
+    navigate('/customer/cart');
   };
 
   const handleLockProperty = async () => {
@@ -439,132 +418,134 @@ const PropertyDetail = () => {
         )}
 
         {/* Booking Options */}
-        <motion.div 
+        <motion.div
           className="bg-white border border-[#E5E1DB] p-8"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
         >
-          <h3 className="text-xl mb-6" style={{ fontFamily: 'Playfair Display, serif' }}>
+          <h3 className="text-xl mb-2" style={{ fontFamily: 'Playfair Display, serif' }}>
             Book Your Visit
           </h3>
+          <p className="text-sm text-[#4A4D53] mb-6">
+            Schedule a guided visit. Pay only after you finalise the properties and pickup location in your cart.
+          </p>
 
-          {/* Add to Cart Button */}
-          <div className="mb-8">
-            {isInCart ? (
-              <div className="flex gap-4">
-                <button
-                  onClick={removeFromCart}
-                  className="flex-1 btn-outline flex items-center justify-center gap-2"
-                  data-testid="remove-from-cart-button"
-                >
-                  <Check className="w-5 h-5" strokeWidth={1.5} />
-                  In Cart
-                </button>
-                <button
-                  onClick={() => navigate('/customer/cart')}
-                  className="flex-1 btn-primary flex items-center justify-center gap-2"
-                  data-testid="view-cart-button"
-                >
-                  <ShoppingCart className="w-5 h-5" strokeWidth={1.5} />
-                  View Cart ({cart.length})
-                </button>
-              </div>
-            ) : (
-              <button
-                onClick={addToCart}
-                className="w-full btn-gold flex items-center justify-center gap-2"
-                data-testid="add-to-cart-button"
-              >
-                <Plus className="w-5 h-5" strokeWidth={1.5} />
-                Add to Visit Cart
-              </button>
-            )}
+          <button
+            onClick={() => setShowVisitModal(true)}
+            className="w-full btn-primary flex items-center justify-center gap-2"
+            data-testid="book-visit-button"
+          >
+            <CalendarCheck className="w-5 h-5" strokeWidth={1.5} />
+            {isInCart ? 'Continue Booking' : 'Book Visit'}
+          </button>
+          <p className="text-xs text-center text-[#4A4D53] mt-3">
+            You'll be picked up from your location and dropped back at the same spot after the visit.
+          </p>
+
+          <div className="border-t border-[#E5E1DB] pt-6 mt-8">
+            <button
+              onClick={() => !processingPayment && handleLockProperty()}
+              disabled={processingPayment}
+              data-testid="lock-property-button"
+              className="btn-secondary w-full flex items-center justify-center gap-2"
+            >
+              <Lock className="w-5 h-5" strokeWidth={1.5} />
+              Lock Property - ₹999
+            </button>
             <p className="text-xs text-center text-[#4A4D53] mt-3">
-              Add multiple properties and book one visit for all
+              Lock this property exclusively. Amount adjusted in final brokerage.
             </p>
           </div>
-
-          <div className="border-t border-[#E5E1DB] pt-8">
-            <p className="text-sm text-[#4A4D53] mb-6 text-center">Or purchase visit credits</p>
-            
-            <div className="space-y-4 mb-8">
-              {/* Single Visit */}
-              <div
-                className={`border p-5 cursor-pointer transition-all ${processingPayment ? 'opacity-50' : 'hover:border-[#04473C] hover:shadow-lg'}`}
-                onClick={() => !processingPayment && handleBookVisit('single_visit')}
-                data-testid="single-visit-button"
-              >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium text-[#1A1C20]">1 Visit</p>
-                    <p className="text-sm text-[#4A4D53]">Valid for 3 days</p>
-                  </div>
-                  <p className="price-display text-2xl">
-                    <span className="price-currency text-base">₹</span>200
-                  </p>
-                </div>
-              </div>
-
-              {/* 3 Visits Package */}
-              <div
-                className={`border border-[#C6A87C] p-5 cursor-pointer transition-all relative ${processingPayment ? 'opacity-50' : 'hover:shadow-lg'}`}
-                onClick={() => !processingPayment && handleBookVisit('three_visits')}
-                data-testid="three-visits-button"
-              >
-                <span className="absolute -top-3 right-4 premium-badge">Popular</span>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium text-[#1A1C20]">3 Visits</p>
-                    <p className="text-sm text-[#4A4D53]">Valid for 7 days</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="price-display text-2xl">
-                      <span className="price-currency text-base">₹</span>350
-                    </p>
-                    <p className="text-xs text-[#4A4D53]">₹117 per visit</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* 5 Visits Package */}
-              <div
-                className={`border border-[#04473C] bg-[#E6F0EE] p-5 cursor-pointer transition-all relative ${processingPayment ? 'opacity-50' : 'hover:shadow-lg'}`}
-                onClick={() => !processingPayment && handleBookVisit('five_visits')}
-                data-testid="five-visits-button"
-              >
-                <span className="absolute -top-3 right-4 verified-badge">Best Value</span>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium text-[#1A1C20]">5 Visits</p>
-                    <p className="text-sm text-[#4A4D53]">Valid for 10 days</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="price-display text-2xl">
-                      <span className="price-currency text-base">₹</span>500
-                    </p>
-                    <p className="text-xs text-[#4A4D53]">₹100 per visit</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="border-t border-[#E5E1DB] pt-6">
-              <button
-                onClick={() => !processingPayment && handleLockProperty()}
-                disabled={processingPayment}
-                data-testid="lock-property-button"
-                className="btn-secondary w-full flex items-center justify-center gap-2"
-              >
-                <Lock className="w-5 h-5" strokeWidth={1.5} />
-                Lock Property - ₹999
-              </button>
-              <p className="text-xs text-center text-[#4A4D53] mt-3">
-                Lock this property exclusively. Amount adjusted in final brokerage.
-              </p>
-            </div>
-          </div>
         </motion.div>
+
+        {/* Book Visit Modal */}
+        {showVisitModal && (
+          <div
+            className="fixed inset-0 z-[90] bg-black/60 flex items-end md:items-center justify-center p-0 md:p-4"
+            onClick={() => setShowVisitModal(false)}
+            data-testid="book-visit-modal"
+          >
+            <motion.div
+              initial={{ y: 40, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              className="bg-white w-full md:max-w-md rounded-t-2xl md:rounded-lg p-6 md:p-8 relative"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                onClick={() => setShowVisitModal(false)}
+                className="absolute top-4 right-4 p-2 hover:bg-[#F5F3F0]"
+                aria-label="Close"
+              >
+                <X className="w-5 h-5 text-[#1A1C20]" strokeWidth={1.5} />
+              </button>
+
+              {cart.length === 0 ? (
+                <>
+                  <h3 className="text-xl mb-2" style={{ fontFamily: 'Playfair Display, serif' }}>
+                    Plan your visit
+                  </h3>
+                  <p className="text-sm text-[#4A4D53] mb-6">
+                    Would you like to visit this property only, or shortlist a few more and visit them all in a single trip?
+                  </p>
+                </>
+              ) : (
+                <>
+                  <h3 className="text-xl mb-2" style={{ fontFamily: 'Playfair Display, serif' }}>
+                    Add more or proceed?
+                  </h3>
+                  <p className="text-sm text-[#4A4D53] mb-6">
+                    You already have {cart.length} {cart.length === 1 ? 'property' : 'properties'} in your visit cart{isInCart ? ' (this one included)' : ''}. Want to add more or continue to payment?
+                  </p>
+                </>
+              )}
+
+              <div className="space-y-3">
+                <button
+                  onClick={handleChooseMore}
+                  className="w-full p-4 border border-[#E5E1DB] text-left hover:border-[#04473C] hover:bg-[#E6F0EE]/40 transition-colors"
+                  data-testid="choose-multiple-button"
+                >
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 bg-[#E6F0EE] flex items-center justify-center flex-shrink-0">
+                      <Users className="w-5 h-5 text-[#04473C]" strokeWidth={1.5} />
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-medium text-[#1A1C20]">
+                        {cart.length === 0 ? 'Select multiple properties' : 'Add more properties'}
+                      </p>
+                      <p className="text-xs text-[#4A4D53] mt-1">
+                        Browse more listings and add them to the same visit trip.
+                      </p>
+                    </div>
+                  </div>
+                </button>
+
+                <button
+                  onClick={handleProceedToPay}
+                  className="w-full p-4 border border-[#04473C] bg-[#04473C] text-white text-left hover:bg-[#033530] transition-colors"
+                  data-testid="proceed-to-pay-button"
+                >
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 bg-white/15 flex items-center justify-center flex-shrink-0">
+                      <CreditCard className="w-5 h-5 text-white" strokeWidth={1.5} />
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-medium">
+                        {cart.length === 0 ? 'Visit this property only' : 'Proceed to pay for visit'}
+                      </p>
+                      <p className="text-xs text-white/70 mt-1">
+                        {cart.length === 0
+                          ? 'Go to the cart, enter pickup details and complete payment.'
+                          : `Review ${Math.max(cart.length, isInCart ? cart.length : cart.length + 1)} properties, add pickup location and pay.`}
+                      </p>
+                    </div>
+                  </div>
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
 
         {/* How It Works Section */}
         <motion.div 

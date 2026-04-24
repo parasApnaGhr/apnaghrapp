@@ -3,9 +3,10 @@ import api from '../utils/api';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Plus, Search, User, Phone, MapPin, Home, Calendar, Clock,
-  IndianRupee, Check, X, Bike, AlertCircle, QrCode, CreditCard
+  IndianRupee, Check, X, Bike, AlertCircle, QrCode, CreditCard, Car
 } from 'lucide-react';
 import { toast } from 'sonner';
+import LocationAutocomplete from './LocationAutocomplete';
 
 const ManualVisitPanel = () => {
   const [properties, setProperties] = useState([]);
@@ -31,7 +32,8 @@ const ManualVisitPanel = () => {
     notes: '',
     pickup_location: '',
     pickup_lat: null,
-    pickup_lng: null
+    pickup_lng: null,
+    visit_purpose: 'navigate_only'
   });
 
   useEffect(() => {
@@ -144,7 +146,11 @@ const ManualVisitPanel = () => {
         payment_amount: '',
         payment_reference: '',
         assigned_rider_id: '',
-        notes: ''
+        notes: '',
+        pickup_location: '',
+        pickup_lat: null,
+        pickup_lng: null,
+        visit_purpose: 'navigate_only'
       });
       loadRecentManualVisits();
     } catch (error) {
@@ -293,45 +299,73 @@ const ManualVisitPanel = () => {
                 </div>
 
                 {/* Pickup Location */}
-                <div className="bg-[#E6F0EE] p-4 space-y-4 border border-[#04473C]/20">
+                <div className="bg-[#E6F0EE] p-4 space-y-3 border border-[#04473C]/20">
                   <h4 className="font-medium flex items-center gap-2">
                     <MapPin className="w-4 h-4 text-[#04473C]" />
                     Pickup Location (for GPS Navigation)
                   </h4>
-                  <div>
-                    <input
-                      type="text"
-                      value={formData.pickup_location}
-                      onChange={(e) => setFormData({ ...formData, pickup_location: e.target.value })}
-                      className="premium-input"
-                      placeholder="Enter customer pickup address (e.g., Sector 17, Chandigarh)"
-                    />
-                    <p className="text-xs text-[#4A4D53] mt-1">
-                      If left empty, rider will navigate to the first property address
-                    </p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (navigator.geolocation) {
-                        navigator.geolocation.getCurrentPosition(
-                          (position) => {
-                            setFormData({
-                              ...formData,
-                              pickup_lat: position.coords.latitude,
-                              pickup_lng: position.coords.longitude,
-                              pickup_location: formData.pickup_location || 'Current Location (GPS)'
-                            });
-                            toast.success('GPS location captured!');
-                          },
-                          (error) => toast.error('Could not get location: ' + error.message)
-                        );
+                  <LocationAutocomplete
+                    value={formData.pickup_location}
+                    onChange={({ label, lat, lng }) => setFormData(prev => ({
+                      ...prev,
+                      pickup_location: label,
+                      pickup_lat: lat,
+                      pickup_lng: lng
+                    }))}
+                    placeholder="Enter customer pickup address (e.g., Sector 17, Chandigarh)"
+                    hasCoords={!!(formData.pickup_lat && formData.pickup_lng)}
+                  />
+                  <p className="text-xs text-[#4A4D53]">
+                    If left empty, rider will navigate to the first property address.
+                  </p>
+                </div>
+
+                <div className="bg-white border border-[#E5E1DB] p-4 space-y-4">
+                  <h4 className="font-medium flex items-center gap-2">
+                    <Bike className="w-4 h-4 text-[#04473C]" />
+                    Visit Type
+                  </h4>
+                  <div className="grid gap-3 md:grid-cols-3">
+                    {[
+                      {
+                        id: 'navigate_only',
+                        label: 'Navigate Only',
+                        note: 'Vendor share: 50% after 10% platform cut',
+                        icon: MapPin
+                      },
+                      {
+                        id: 'bike_pickup',
+                        label: 'Bike Pickup',
+                        note: 'Vendor share: 40% after platform cut',
+                        icon: Bike
+                      },
+                      {
+                        id: 'car_pickup',
+                        label: 'Car Pickup',
+                        note: 'Vendor share: 30% after platform cut',
+                        icon: Car
                       }
-                    }}
-                    className="text-sm text-[#04473C] hover:underline flex items-center gap-1"
-                  >
-                    <MapPin className="w-3 h-3" /> Use Current Location
-                  </button>
+                    ].map((option) => {
+                      const Icon = option.icon;
+                      const selected = formData.visit_purpose === option.id;
+                      return (
+                        <button
+                          key={option.id}
+                          type="button"
+                          onClick={() => setFormData({ ...formData, visit_purpose: option.id })}
+                          className={`border p-3 text-left transition-colors ${
+                            selected ? 'border-[#04473C] bg-[#E6F0EE]' : 'border-[#E5E1DB]'
+                          }`}
+                        >
+                          <div className="flex items-center gap-2 mb-1">
+                            <Icon className="w-4 h-4 text-[#04473C]" />
+                            <span className="font-medium text-sm">{option.label}</span>
+                          </div>
+                          <p className="text-xs text-[#4A4D53]">{option.note}</p>
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
 
                 {/* Property Selection */}

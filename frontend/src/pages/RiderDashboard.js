@@ -940,7 +940,7 @@ const RiderDashboard = () => {
                             </div>
                             <div className="text-right">
                               <p className="text-xs text-white/70">
-                                ₹100 × {visit.property_ids?.length || 1} {(visit.property_ids?.length || 1) === 1 ? 'property' : 'properties'}
+                                {visit.visit_purpose_label || 'Visit payout'} · Gross ₹{visit.gross_amount || (visit.property_ids?.length || 1) * 100}
                               </p>
                               {(visit.property_ids?.length || 1) > 1 && (
                                 <p className="text-sm text-[#4ECDC4] font-medium mt-1">

@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
-import { 
-  Users, Package, Bike, LogOut, Home, DollarSign, 
-  Settings, MapPin, CheckSquare, CreditCard, BarChart3, Image, Upload, UserPlus, Gift, QrCode, ClipboardList, Target, Trophy, Shield, RefreshCw
+import {
+  Users, Package, Bike, LogOut, Home, DollarSign,
+  Settings, MapPin, CheckSquare, CreditCard, BarChart3, Image, Upload, UserPlus, Gift, QrCode, ClipboardList, Target, Trophy, Shield, RefreshCw, Store
 } from 'lucide-react';
 import CustomerSupportPanel from '../components/CustomerSupportPanel';
 import InventoryPanel from '../components/InventoryPanel';
@@ -21,6 +21,7 @@ import NotificationsDropdown from '../components/NotificationsDropdown';
 import ImageMigrationTool from '../components/ImageMigrationTool';
 import BulkImageUploader from '../components/BulkImageUploader';
 import RiderApplicationsPanel from '../components/RiderApplicationsPanel';
+import VendorManagementPanel from '../components/VendorManagementPanel';
 import LeadsPanel from '../components/LeadsPanel';
 import AdminPerformancePanel from '../components/AdminPerformancePanel';
 import AccessTypeModal from '../components/AccessTypeModal';
@@ -114,6 +115,7 @@ const AdminDashboard = () => {
     { id: 'promotions', label: 'Promotions', icon: Gift },
     { id: 'analytics', label: 'Property Analytics', icon: BarChart3 },
     { id: 'rider-applications', label: 'Rider Applications', icon: ClipboardList },
+    { id: 'vendors', label: 'Vendors', icon: Store },
     { id: 'riders', label: 'Riders', icon: Bike },
     { id: 'sellers', label: 'Sellers', icon: UserPlus },
     { id: 'support', label: 'Support', icon: Users },
@@ -420,6 +422,7 @@ const AdminDashboard = () => {
               {activePanel === 'payouts' && <PayoutsPanel />}
               {activePanel === 'promotions' && <PromotionsPanel />}
               {activePanel === 'rider-applications' && <RiderApplicationsPanel />}
+              {activePanel === 'vendors' && <VendorManagementPanel />}
               {activePanel === 'riders' && <RiderManagementPanel />}
               {activePanel === 'sellers' && <SellerManagementPanel />}
               {activePanel === 'support' && <CustomerSupportPanel />}
